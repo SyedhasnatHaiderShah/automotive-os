@@ -2334,3 +2334,120 @@ export async function fetchFleetAndConsignmentData(): Promise<FleetAndConsignmen
   return VERIFIED_FLEET_CONSIGNMENT_FIXTURE;
 }
 
+/**
+ * ==============================================================================
+ * S24: Zero-Rated GCC Export & Customs Bond Discrepancy (Screen f2549d0dc269410ebc65bcfa2240280c)
+ * ==============================================================================
+ */
+
+export interface ExportDiscrepancyKpis {
+  clearedRevenueAed: number;
+  clearedSalesCount: number;
+  escrowLienHoldbackAed: number;
+  gccZeroRatedVolumeAed: number;
+  customsClockDay: number;
+  customsClockMaxDays: number;
+  daysRemaining: number;
+  deadlineDate: string;
+}
+
+export interface ExportDiscrepancyInvoice {
+  invoiceNumber: string;
+  issueDate: string;
+  sellerNameEn: string;
+  sellerNameAr: string;
+  sellerTrn: string;
+  buyerName: string;
+  buyerTrn: string;
+  bayanRef: string;
+  portOfExit: string;
+  portOfEntry: string;
+  vehicleTitle: string;
+  vin: string;
+  specs: string;
+  grossSalePriceAed: number;
+  vatAmountAed: number;
+  contingencyVatLienAed: number;
+  netReleasedPrincipalAed: number;
+  tlvHash: string;
+}
+
+export interface ExportDualLedger {
+  lcDepositAed: number;
+  statutoryTaxHoldAed: number;
+  authorizedNetReleaseAed: number;
+  varianceAed: number;
+  reconciled: boolean;
+}
+
+export interface CorporateTaxBondStatus {
+  bondedReExportAed: number;
+  applicableCtRate: string;
+  contingentTaxExposureAed: number;
+  customsComplianceScore: string;
+  reconciledBayanRatio: string;
+  mainlandSplitPct: number;
+  bondedSplitPct: number;
+}
+
+export interface ExportDiscrepancyData {
+  kpis: ExportDiscrepancyKpis;
+  activeInvoice: ExportDiscrepancyInvoice;
+  dualLedger: ExportDualLedger;
+  taxStatus: CorporateTaxBondStatus;
+}
+
+export const VERIFIED_EXPORT_DISCREPANCY_FIXTURE: ExportDiscrepancyData = {
+  kpis: {
+    clearedRevenueAed: 30690000,
+    clearedSalesCount: 13,
+    escrowLienHoldbackAed: 210000,
+    gccZeroRatedVolumeAed: 4200000,
+    customsClockDay: 78,
+    customsClockMaxDays: 90,
+    daysRemaining: 12,
+    deadlineDate: '26 Apr 2025',
+  },
+  activeInvoice: {
+    invoiceNumber: 'INV-2025-0140',
+    issueDate: '10 Apr 2025',
+    sellerNameEn: 'SilberArrows Luxury Motor Cars FZCO',
+    sellerNameAr: 'سيلبر آروز لتجارة السيارات الفاخرة ش.م.ح',
+    sellerTrn: '100293847500003',
+    buyerName: 'Al-Rajhi Prestige Fleet (Riyadh, KSA)',
+    buyerTrn: '300184918200003',
+    bayanRef: 'BAY-99812-25',
+    portOfExit: 'JAFZA Exit',
+    portOfEntry: 'Batha Border (Pending)',
+    vehicleTitle: '2024 Ferrari SF90 XX Stradale Asset Unit',
+    vin: 'SA-981240-DXB',
+    specs: 'GCC KSA Homologated • 120 km',
+    grossSalePriceAed: 4200000,
+    vatAmountAed: 0,
+    contingencyVatLienAed: 210000,
+    netReleasedPrincipalAed: 3990000,
+    tlvHash: '4e81bc92a884d9f1c713b918ecaa028198f390bc8923a101e92cbb41',
+  },
+  dualLedger: {
+    lcDepositAed: 4200000,
+    statutoryTaxHoldAed: 210000,
+    authorizedNetReleaseAed: 3990000,
+    varianceAed: 210000,
+    reconciled: false,
+  },
+  taxStatus: {
+    bondedReExportAed: 4200000,
+    applicableCtRate: '0% (Qualifying FZP)',
+    contingentTaxExposureAed: 210000,
+    customsComplianceScore: 'Pending Audit Proof',
+    reconciledBayanRatio: '13 / 14 Reconciled',
+    mainlandSplitPct: 62,
+    bondedSplitPct: 38,
+  },
+};
+
+export async function fetchExportDiscrepancyData(): Promise<ExportDiscrepancyData> {
+  return VERIFIED_EXPORT_DISCREPANCY_FIXTURE;
+}
+
+
