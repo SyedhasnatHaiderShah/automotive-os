@@ -782,3 +782,345 @@ export const VERIFIED_SALES_ORDER_FIXTURE: SalesOrderStudioData = {
 export async function fetchSalesOrderStudio(): Promise<SalesOrderStudioData> {
   return VERIFIED_SALES_ORDER_FIXTURE;
 }
+
+export interface WorkshopBayTrackBlock {
+  id: string;
+  roNumber: string;
+  vehicleModel: string;
+  scope: string;
+  technician?: string;
+  timeRange: string;
+  leftPct: number;
+  widthPct: number;
+  status: 'COMPLETED' | 'IN_PROGRESS' | 'ACTIVE_SELECTED' | 'QUEUED' | 'READY_VACANT';
+}
+
+export interface WorkshopBay {
+  bayNumber: number;
+  bayCode: string;
+  title: string;
+  typeLabel: string;
+  specBadge: string;
+  specBadgeColor: 'tertiary' | 'primary' | 'secondary' | 'surface-bright';
+  statusDot: string;
+  isSelected?: boolean;
+  tracks: WorkshopBayTrackBlock[];
+}
+
+export interface WorkshopJobCardData {
+  roNumber: string;
+  bayName: string;
+  vehicle: {
+    model: string;
+    subModel: string;
+    plate: string;
+    vin: string;
+    odometerKm: number;
+  };
+  client: {
+    name: string;
+    serviceAdvisor: string;
+    masterTechnician: string;
+    techClockedTime: string;
+  };
+  mpiTelemetry: {
+    carbonDiscsLife: number;
+    tireTreadMm: string;
+    tireTreadPct: number;
+    oilQualityPct: number;
+    aeroWingStatus: string;
+  };
+  customerScope: {
+    id: string;
+    number: number;
+    title: string;
+    description: string;
+    status: 'COMPLETED' | 'ACTIVE' | 'VERIFIED';
+  }[];
+  whatsappAuth: {
+    phoneMasked: string;
+    signedTimeGst: string;
+    isValid: boolean;
+  };
+  financialSummary: {
+    laborHours: number;
+    laborRateAed: number;
+    laborTotalAed: number;
+    partsAndFluidsAed: number;
+    calibrationFeeAed: number;
+    subtotalNetAed: number;
+    vatAed: number;
+    totalAed: number;
+  };
+  telemetryEnvironmental: {
+    hvacTempRh: string;
+    exhaustCfm: string;
+    centralAirBar: string;
+  };
+  bays: WorkshopBay[];
+}
+
+export const VERIFIED_WORKSHOP_FIXTURE: WorkshopJobCardData = {
+  roNumber: 'RO #2025-4094',
+  bayName: 'Active in Bay 02',
+  vehicle: {
+    model: 'Porsche 911 GT3 RS (992)',
+    subModel: 'Arctic Grey / Weissach Package • 4.0L Naturally Aspirated Flat-6 (525 PS)',
+    plate: 'DXB D-9821',
+    vin: 'WP0ZZZ99ZPS298104',
+    odometerKm: 4120,
+  },
+  client: {
+    name: 'Al Maktoum Family Office',
+    serviceAdvisor: 'Karim El-Sayed',
+    masterTechnician: 'Alex Mercer (Silver Level)',
+    techClockedTime: '01h 15m',
+  },
+  mpiTelemetry: {
+    carbonDiscsLife: 92,
+    tireTreadMm: 'F:4.8 / R:3.9mm',
+    tireTreadPct: 48,
+    oilQualityPct: 85,
+    aeroWingStatus: 'DRS Calibrated (0 Delamination)',
+  },
+  customerScope: [
+    {
+      id: 'scope-1',
+      number: 1,
+      title: '1. Dubai Autodrome GP Circuit Track Alignment',
+      description: 'Hunter 3D setup: Camber -2.5° front, -2.0° rear. Neutral toe, ride height corner balance for 78kg driver ballast.',
+      status: 'COMPLETED',
+    },
+    {
+      id: 'scope-2',
+      number: 2,
+      title: '2. Brake Hydraulic Flush — Castrol SRF Racing Fluid',
+      description: 'High wet boiling point (270°C) flush for thermal track endurance. Pressure-bled at 2.2 bar.',
+      status: 'COMPLETED',
+    },
+    {
+      id: 'scope-3',
+      number: 3,
+      title: '3. RTA Comprehensive Mulkiya Pre-Passing Check',
+      description: 'Electronic safety audit before Tasjeel bay transfer; tinted film opacity compliant (30% VLT).',
+      status: 'VERIFIED',
+    },
+  ],
+  whatsappAuth: {
+    phoneMasked: '+971 50 ••• 8821',
+    signedTimeGst: '13:42 GST',
+    isValid: true,
+  },
+  financialSummary: {
+    laborHours: 3.5,
+    laborRateAed: 450,
+    laborTotalAed: 1575,
+    partsAndFluidsAed: 2420,
+    calibrationFeeAed: 850,
+    subtotalNetAed: 4845,
+    vatAed: 242.25,
+    totalAed: 5087.25,
+  },
+  telemetryEnvironmental: {
+    hvacTempRh: '22.4°C • 48% RH',
+    exhaustCfm: '4,800 CFM Nominal',
+    centralAirBar: '11.2 Bar (Regulated)',
+  },
+  bays: [
+    {
+      bayNumber: 1,
+      bayCode: 'Bay 01',
+      title: 'Hydraulic Heavy Mechanical',
+      typeLabel: 'Heavy Mechanical & Suspension',
+      specBadge: '5T HOIST',
+      specBadgeColor: 'surface-bright',
+      statusDot: 'bg-tertiary',
+      tracks: [
+        {
+          id: 'b1-t1',
+          roNumber: 'RO-4071',
+          vehicleModel: 'McLaren 765LT',
+          scope: 'Downpipes & Cat Delete (Passed)',
+          timeRange: '08:30 - 12:00',
+          leftPct: 10,
+          widthPct: 35,
+          status: 'COMPLETED',
+        },
+        {
+          id: 'b1-t2',
+          roNumber: 'RO-4091',
+          vehicleModel: 'Ferrari 296 GTB',
+          scope: 'KW V4 Coilovers • Tech: Tariq M.',
+          technician: 'Tariq M.',
+          timeRange: '13:00 - 15:30',
+          leftPct: 50,
+          widthPct: 25,
+          status: 'IN_PROGRESS',
+        },
+      ],
+    },
+    {
+      bayNumber: 2,
+      bayCode: 'Bay 02',
+      title: 'Hunter 3D Laser Alignment',
+      typeLabel: 'Supercar High-Downforce Alignment',
+      specBadge: 'SELECTED',
+      specBadgeColor: 'primary',
+      statusDot: 'bg-primary animate-pulse',
+      isSelected: true,
+      tracks: [
+        {
+          id: 'b2-t1',
+          roNumber: 'RO-4080',
+          vehicleModel: 'SF90 Stradale',
+          scope: 'Toe/Camber Calibration (Passed)',
+          timeRange: '08:00 - 12:00',
+          leftPct: 0,
+          widthPct: 40,
+          status: 'COMPLETED',
+        },
+        {
+          id: 'b2-t2',
+          roNumber: 'RO-4094',
+          vehicleModel: 'Porsche 911 GT3 RS',
+          scope: 'Track Geometry • Tech: Alex M.',
+          technician: 'Alex M.',
+          timeRange: '13:30 - 15:30',
+          leftPct: 60,
+          widthPct: 20,
+          status: 'ACTIVE_SELECTED',
+        },
+        {
+          id: 'b2-t3',
+          roNumber: 'RO-4102',
+          vehicleModel: 'Corvette Z06',
+          scope: '16:15 Track Setup',
+          timeRange: '16:00 - 17:45',
+          leftPct: 80,
+          widthPct: 18,
+          status: 'QUEUED',
+        },
+      ],
+    },
+    {
+      bayNumber: 3,
+      bayCode: 'Bay 03',
+      title: 'Mulkiya 150-Point Pass Line',
+      typeLabel: 'Tasjeel Shamil RTA Inspection',
+      specBadge: 'RTA / TASJEEL',
+      specBadgeColor: 'secondary',
+      statusDot: 'bg-secondary',
+      tracks: [
+        {
+          id: 'b3-t1',
+          roNumber: 'RO-4088',
+          vehicleModel: 'AMG G 63',
+          scope: '14:00-14:45 Chassis Pass',
+          timeRange: '14:00 - 14:45',
+          leftPct: 60,
+          widthPct: 8,
+          status: 'IN_PROGRESS',
+        },
+        {
+          id: 'b3-t2',
+          roNumber: 'RO-4099',
+          vehicleModel: 'Valkyrie (RO-4099)',
+          scope: '15:00 Tub Resonance',
+          timeRange: '15:00 - 16:30',
+          leftPct: 70,
+          widthPct: 15,
+          status: 'QUEUED',
+        },
+      ],
+    },
+    {
+      bayNumber: 4,
+      bayCode: 'Bay 04',
+      title: 'A/C Dyno & Hybrid Telemetry',
+      typeLabel: 'Climate & ECU Dyno Cell',
+      specBadge: '22°C DYNO CELL',
+      specBadgeColor: 'tertiary',
+      statusDot: 'bg-tertiary',
+      tracks: [
+        {
+          id: 'b4-t1',
+          roNumber: 'RO-4082',
+          vehicleModel: 'Lamborghini Revuelto (RO-4082)',
+          scope: 'Hybrid Inverter Thermal Cycle • Tech: Marcus Vance',
+          technician: 'Marcus Vance',
+          timeRange: '11:30 - 15:00',
+          leftPct: 35,
+          widthPct: 35,
+          status: 'IN_PROGRESS',
+        },
+      ],
+    },
+    {
+      bayNumber: 5,
+      bayCode: 'Bay 05',
+      title: 'PPF & Ceramic Clean Room',
+      typeLabel: 'Detailing, PPF & Handover Room',
+      specBadge: 'DUST-FREE',
+      specBadgeColor: 'surface-bright',
+      statusDot: 'bg-secondary',
+      tracks: [
+        {
+          id: 'b5-t1',
+          roNumber: 'RO-4079',
+          vehicleModel: 'Rolls-Royce Cullinan Series II (RO-4079)',
+          scope: 'Ceramic Pro 9H 4-Layer Curing • Sunil K.',
+          technician: 'Sunil K.',
+          timeRange: '09:00 - 17:00 FULL DAY',
+          leftPct: 10,
+          widthPct: 80,
+          status: 'IN_PROGRESS',
+        },
+      ],
+    },
+    {
+      bayNumber: 6,
+      bayCode: 'Bay 06',
+      title: 'Quick Lube & Fluid Check',
+      typeLabel: 'Quick Lube & Rapid Turn (Fast Lane)',
+      specBadge: 'FAST LANE',
+      specBadgeColor: 'tertiary',
+      statusDot: 'bg-surface-bright',
+      tracks: [
+        {
+          id: 'b6-t1',
+          roNumber: 'RO-4075',
+          vehicleModel: 'Bentley Continental GT',
+          scope: '60k Major Service Done (12:30 Handed Over)',
+          timeRange: '09:00 - 12:30',
+          leftPct: 10,
+          widthPct: 45,
+          status: 'COMPLETED',
+        },
+        {
+          id: 'b6-t2',
+          roNumber: 'VACANT',
+          vehicleModel: 'READY / VACANT',
+          scope: 'Open for 45m rapid turn',
+          timeRange: '13:30 - 14:45',
+          leftPct: 56,
+          widthPct: 14,
+          status: 'READY_VACANT',
+        },
+        {
+          id: 'b6-t3',
+          roNumber: 'RO-4105',
+          vehicleModel: 'BMW M8 Competition',
+          scope: '15:15 Fast Lube',
+          timeRange: '15:15 - 17:00',
+          leftPct: 72,
+          widthPct: 18,
+          status: 'QUEUED',
+        },
+      ],
+    },
+  ],
+};
+
+export async function fetchWorkshopOperations(): Promise<WorkshopJobCardData> {
+  return VERIFIED_WORKSHOP_FIXTURE;
+}

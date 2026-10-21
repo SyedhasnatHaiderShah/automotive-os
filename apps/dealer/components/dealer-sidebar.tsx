@@ -163,6 +163,20 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
               {isArabic ? 'طلبات المبيعات وعروض الأسعار' : 'Sales Orders & Quotes'}
             </span>
           </Link>
+
+          <Link
+            href="/workshop"
+            className={`flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-xs sm:text-sm ${
+              pathname?.startsWith('/workshop')
+                ? 'bg-primary-container text-on-primary-container font-semibold shadow-md'
+                : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">build_circle</span>
+            <span className="font-body-md">
+              {isArabic ? 'ورشة العمل وتوزيع المنصات' : 'Workshop & Bays'}
+            </span>
+          </Link>
         </nav>
       </div>
 
