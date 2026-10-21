@@ -89,7 +89,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
         {/* Section Label */}
         <div className="px-4 py-2">
           <div className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
-            Operational Core
+            {isArabic ? 'العمليات الأساسية' : 'Operational Core'}
           </div>
         </div>
 
@@ -137,6 +137,32 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
               </Link>
             );
           })}
+        </nav>
+
+        {/* P1 Roadmap Section */}
+        <div className="px-4 pt-3 pb-1 flex items-center justify-between">
+          <span className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
+            {isArabic ? '[خطة P1 / نظام الوكالة]' : '[P1 ROADMAP / DMS]'}
+          </span>
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-secondary/15 text-secondary tracking-widest">
+            Future
+          </span>
+        </div>
+
+        <nav className="flex flex-col gap-1 px-2.5 pb-2">
+          <Link
+            href="/sales"
+            className={`flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-xs sm:text-sm ${
+              pathname?.startsWith('/sales')
+                ? 'bg-primary-container text-on-primary-container font-semibold shadow-md'
+                : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">receipt_long</span>
+            <span className="font-body-md">
+              {isArabic ? 'طلبات المبيعات وعروض الأسعار' : 'Sales Orders & Quotes'}
+            </span>
+          </Link>
         </nav>
       </div>
 

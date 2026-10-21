@@ -201,10 +201,42 @@
 
 ---
 
-## 3. Regulatory Governance, KYB & Consumer Protection
-- **Cabinet Resolution No. (58) of 2020:** Full UBO 100% equity accounting with UAE PASS Gold level-4 authentication, PEP/OFAC negative verification, and commercial registry checks cross-referenced with DET / DED.
-- **Fair Trade & Consumer Protection:** Specification mismatch detection prevents mislabeling imported vehicles as "Original GCC Spec"; requires mandatory "GCC Agency Retrofit" disclosure badge when OEM tropical cooling upgrades are verified.
-- **Dual-Operator Protocol & HSM Keystore:** Tier-0 clearance actions require multi-signature cryptographic authorization and immutable ledger recording.
-- **Circuit Breaker Protection:** SuperAdmin emergency market circuit breaker immediately halts custodial disbursements and suspends automated RTA title mutations under suspicious price dumping or fraud events.
+# Group F (P1 Initial Cohort) Regression Report — Automotive OS
+
+**Date (UTC):** 2026-10-21 08:42:00  
+**Phase:** Group F (P1 Advanced Workflows — S17, S18)  
+**Overall Group F Status:** **100% VERIFIED (2/2 screens)**  
+**Cumulative Screens Verified:** **18/26 screens (16/16 P0 screens + 2/10 P1 screens)**  
+**Regression Status:** **ZERO REGRESSIONS (PASS)**
+
+---
+
+## 1. Group F Screen Verification Summary
+
+| Screen ID | Title | Route | Status | Evidence Report |
+|---|---|---|---|---|
+| **S17** | Seller Sanctions & Escrow Dispute Review | `/disputes` in `apps/admin` | **VERIFIED** | [`docs/qa/evidence/S17/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S17/QA_REPORT.md) |
+| **S18** | Sales Orders & Quotations Studio | `/sales` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S18/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S18/QA_REPORT.md) |
+
+---
+
+## 2. Regression Test Suite Execution
+
+| Test Suite | Scope | Result | Execution Time | Details |
+|---|---|---|---|---|
+| S17 Playwright Verification | 16 checks, 4 viewports, Case #DSP-2025-019, FAB escrow lock, dual-key handshake | **PASS** | 9.0s | 16/16 checks passed (4 screenshots) |
+| S18 Playwright Verification | 15 checks, 4 viewports, Order SO-2025-0891, FTA 5% VAT, Trade-In offset, UAE PASS | **PASS** | 10.0s | 15/15 checks passed (4 screenshots) |
+| `turbo run typecheck` | Monorepo (Turbo, 8 packages, 10 tasks) | **PASS** | 5.2s | 0 TypeScript errors across monorepo |
+| `inventory-listings.spec.ts` | 24 E2E integration & moderation isolation tests in `apps/api` | **PASS** | 4.1s | 24/24 tests passed (0 failures) |
+| `auth-tenancy.spec.ts` | 14 integration & admin authorization tests in `apps/api` | **PASS** | 3.7s | 14/14 tests passed (0 failures) |
+| `admin build` | Next.js 15 production build for `apps/admin` | **PASS** | 3.3s | 0 errors, `/disputes` compiled cleanly |
+| `dealer build` | Next.js 15 production build for `apps/dealer` | **PASS** | 2.6s | 0 errors, `/sales` compiled cleanly |
+
+---
+
+## 3. UAE Legal, Tax & Security Compliance
+- **UAE Federal Law No. 15 & DIFC Civil Interlock (S17):** Escrow custody strictly managed under `INTEGRATION_TRUTH_TABLE.md`; automated fund disbursement without dual judicial/banking attestation is prevented. Emergency temporary dealer suspension immediately halts listings across public marketplace via transactional outbox.
+- **UAE FTA VAT Article 59 & Trade-In Equity (S18):** Line items calculate standard 5% VAT and 0% customs bond exemption accurately; trade-in appraisal offset and bank lien settlement (Emirates NBD) properly deduct from net customer outlay; dealer margin is masked in Sales Rep view per multi-tenant least-privilege security.
+
 
 

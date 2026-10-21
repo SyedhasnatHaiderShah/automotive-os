@@ -13,6 +13,7 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
 
   const isListingActive = pathname?.includes('/moderation') ?? false;
   const isKybActive = pathname?.includes('/verifications') ?? false;
+  const isDisputesActive = pathname?.includes('/disputes') ?? false;
   const isCommandActive = pathname === '/' || pathname === '/operations-command';
 
   return (
@@ -101,10 +102,13 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                 </span>
               </Link>
 
-              <a
-                href="#disputes"
-                onClick={(e) => e.preventDefault()}
-                className="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
+              <Link
+                href="/disputes"
+                className={`flex items-center justify-between px-space-sm py-2 rounded-lg transition-colors ${
+                  isDisputesActive
+                    ? 'bg-surface-container-high text-primary font-medium'
+                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+                }`}
               >
                 <div className="flex items-center gap-space-sm">
                   <span className="material-symbols-outlined text-[18px]">gavel</span>
@@ -115,7 +119,7 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                 <span className="bg-error-container text-on-error-container font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">
                   2
                 </span>
-              </a>
+              </Link>
             </nav>
           </div>
 

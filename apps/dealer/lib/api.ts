@@ -507,3 +507,278 @@ export async function createDealerVehicle(
     isFixture: true,
   };
 }
+
+export interface QuoteLineItem {
+  id: string;
+  itemCode: string;
+  description: string;
+  subDescription?: string;
+  taxStatus: 'Standard 5%' | 'Exempt (0%)';
+  qty: number;
+  unitPriceAed: number;
+  netLineTotalAed: number;
+}
+
+export interface SignOffGate {
+  stepNumber: number;
+  title: string;
+  subtitle: string;
+  status: 'DONE' | 'ACTIVE' | 'PRE_APPROVED' | 'PENDING';
+  badge: string;
+  badgeType: 'tertiary' | 'primary' | 'secondary' | 'outline';
+  detail: string;
+  hashOrTimestamp?: string;
+  actions?: { label: string; primary?: boolean }[];
+}
+
+export interface SalesOrderPipelineItem {
+  orderId: string;
+  timestamp: string;
+  clientEntity: string;
+  clientRep: string;
+  vehicleTitle: string;
+  vehicleVin: string;
+  netTotalAed: string;
+  settlementMechanism: string;
+  lifecycleStage: string;
+  stageColor: 'primary' | 'secondary' | 'tertiary' | 'outline';
+  actionLabel: string;
+}
+
+export interface SalesOrderStudioData {
+  orderNumber: string;
+  orderType: string;
+  specRegion: string;
+  currencyMode: string;
+  client: {
+    name: string;
+    badge: string;
+    principalRep: string;
+    email: string;
+    phone: string;
+  };
+  vehicle: {
+    title: string;
+    subTitle: string;
+    vin: string;
+    odometerKm: number;
+    warranty: string;
+    stockId: string;
+    imageUrl: string;
+    tasjeelScore: string;
+  };
+  lineItems: QuoteLineItem[];
+  tradeIn?: {
+    vehicleTitle: string;
+    spec: string;
+    vin: string;
+    agreedValuationAed: number;
+    lienSettlementAed: number;
+    netEquityAed: number;
+    imageUrl: string;
+  };
+  commercials: {
+    subtotalTaxableAed: number;
+    uaeVatAed: number;
+    grossTotalAed: number;
+    netPayableAed: number;
+    escrowDepositAed: number;
+    frontEndMarginPct: number;
+    frontEndMarginAed: number;
+    fiCommissionAed: number;
+  };
+  signOffGates: SignOffGate[];
+  pipeline: SalesOrderPipelineItem[];
+}
+
+export const VERIFIED_SALES_ORDER_FIXTURE: SalesOrderStudioData = {
+  orderNumber: 'SO-2025-0891',
+  orderType: 'Pro-Forma Order',
+  specRegion: 'GCC Spec • Dubai, UAE',
+  currencyMode: 'AED (Dirhams)',
+  client: {
+    name: 'Al Maktoum Family Office',
+    badge: 'UAE PASS Gold Biometric Verified',
+    principalRep: 'Tariq Al-Hashimi',
+    email: 'tariq@familyoffice.ae',
+    phone: '+971 50 882 1904',
+  },
+  vehicle: {
+    title: '2024 Porsche 911 GT3 RS Weissach',
+    subTitle: 'Al Nabooda Motors Dubai Delivery • Clubsport Spec • Carbon Ceramic PCCB • Front Axle Lift',
+    vin: 'WP0AF2A97RS289012',
+    odometerKm: 1850,
+    warranty: 'Valid Thru 2027',
+    stockId: '#DXB-911-RS',
+    imageUrl: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=80',
+    tasjeelScore: 'Tasjeel 160-Point Comprehensive Pass',
+  },
+  lineItems: [
+    {
+      id: 'li-1',
+      itemCode: 'BASE-UNIT',
+      description: 'Base Showroom Asking Price',
+      subDescription: '2024 Porsche 911 GT3 RS Weissach Package (DXB Grounded Unit)',
+      taxStatus: 'Standard 5%',
+      qty: 1,
+      unitPriceAed: 1420000,
+      netLineTotalAed: 1420000,
+    },
+    {
+      id: 'li-2',
+      itemCode: 'ACC-PPF',
+      description: 'Bespoke Commission & Staging Package',
+      subDescription: 'Stek DynoShield Full Body PPF Self-Healing + Akrapovic Titanium Exhaust Stage-1 Calibration',
+      taxStatus: 'Standard 5%',
+      qty: 1,
+      unitPriceAed: 48500,
+      netLineTotalAed: 48500,
+    },
+    {
+      id: 'li-3',
+      itemCode: 'RTA-PDI',
+      description: 'Pre-Delivery Inspection & Tasjeel Passing Fee',
+      subDescription: 'RTA Vehicle Registration Service, VIP Expedited Lane, RFID Fitment',
+      taxStatus: 'Standard 5%',
+      qty: 1,
+      unitPriceAed: 2200,
+      netLineTotalAed: 2200,
+    },
+    {
+      id: 'li-4',
+      itemCode: 'GCC-BOND',
+      description: 'GCC Transit / KSA Customs Bond Surcharge',
+      subDescription: 'Cross-Border Customs Manifest & Clearance Guarantee',
+      taxStatus: 'Exempt (0%)',
+      qty: 1,
+      unitPriceAed: 0,
+      netLineTotalAed: 0,
+    },
+  ],
+  tradeIn: {
+    vehicleTitle: '2022 Mercedes-AMG G 63 V8 BiTurbo',
+    spec: 'GCC Spec • G Manufaktur Interior • 18,400 KM • Single HNWI Owner',
+    vin: 'W1N4632761892014',
+    agreedValuationAed: 610000,
+    lienSettlementAed: 120000,
+    netEquityAed: 490000,
+    imageUrl: 'https://images.unsplash.com/photo-1520031441872-265e4ff70366?auto=format&fit=crop&w=800&q=80',
+  },
+  commercials: {
+    subtotalTaxableAed: 1470700,
+    uaeVatAed: 73535,
+    grossTotalAed: 1544235,
+    netPayableAed: 1054235,
+    escrowDepositAed: 210847,
+    frontEndMarginPct: 14.8,
+    frontEndMarginAed: 210500,
+    fiCommissionAed: 28400,
+  },
+  signOffGates: [
+    {
+      stepNumber: 1,
+      title: 'Step 1: Consultant Quotation Issue',
+      subtitle: 'Signed by Marc Ackermann (GM / Principal)',
+      status: 'DONE',
+      badge: '14:10 GST',
+      badgeType: 'tertiary',
+      detail: 'Quotation created from tenant stock with itemized schedule and cryptographic seal.',
+      hashOrTimestamp: 'Hash: #SHA256-8A91C0...',
+    },
+    {
+      stepNumber: 2,
+      title: 'Step 2: Customer UAE PASS Signature',
+      subtitle: 'Awaiting Tariq Al-Hashimi OTP biometric handshake via UAE PASS app.',
+      status: 'ACTIVE',
+      badge: 'Active Step',
+      badgeType: 'primary',
+      detail: 'Biometric authorization request dispatched to buyer UAE PASS mobile token.',
+      actions: [{ label: 'Resend Prompt', primary: true }, { label: 'Manual Override' }],
+    },
+    {
+      stepNumber: 3,
+      title: 'Step 3: Commercial Margin Sign-Off',
+      subtitle: '>12% Margin Threshold cleared (Projected: 14.8%). Pre-authorized by Marc Ackermann.',
+      status: 'PRE_APPROVED',
+      badge: 'Pre-Approved',
+      badgeType: 'tertiary',
+      detail: 'Internal dealership margin policy satisfied without requiring executive waiver.',
+    },
+    {
+      stepNumber: 4,
+      title: 'Step 4: FAB Escrow Account Lock',
+      subtitle: 'First Abu Dhabi Bank (FAB) Vault Escrow. Deposit AED 210,847.00 allocated IBAN.',
+      status: 'PENDING',
+      badge: 'Pending #2',
+      badgeType: 'outline',
+      detail: 'Sovereign vault custody lock awaits customer biometric sign-off.',
+    },
+    {
+      stepNumber: 5,
+      title: 'Step 5: RTA Electronic Ownership',
+      subtitle: 'Mulkiya issuance & plate assignment at Al Quoz Tasjeel hub.',
+      status: 'PENDING',
+      badge: 'Queue',
+      badgeType: 'outline',
+      detail: 'Direct digital title transfer through RTA e-registration gateway.',
+    },
+  ],
+  pipeline: [
+    {
+      orderId: 'SO-2025-0891',
+      timestamp: 'TODAY • 14:10 GST',
+      clientEntity: 'Al Maktoum Family Office',
+      clientRep: 'Tariq Al-Hashimi (Gold PASS)',
+      vehicleTitle: '2024 Porsche 911 GT3 RS',
+      vehicleVin: 'WP0AF2A97RS289012',
+      netTotalAed: '1,054,235.00',
+      settlementMechanism: 'Sovereign Escrow (FAB)',
+      lifecycleStage: 'Customer Signature',
+      stageColor: 'primary',
+      actionLabel: 'Sign Handshake',
+    },
+    {
+      orderId: 'SO-2025-0888',
+      timestamp: 'YESTERDAY • 18:45 GST',
+      clientEntity: 'Khamis Bin Dahi Holdings',
+      clientRep: 'Corporate Vault Account',
+      vehicleTitle: '2023 Ferrari 296 GTB Assetto',
+      vehicleVin: 'ZFF92NHA7P029311',
+      netTotalAed: '1,380,000.00',
+      settlementMechanism: 'Trade-in Heavy + Wire',
+      lifecycleStage: 'Escrow Locked',
+      stageColor: 'secondary',
+      actionLabel: 'View Dossier',
+    },
+    {
+      orderId: 'SO-2025-0882',
+      timestamp: '24 OCT • 11:20 GST',
+      clientEntity: 'Alexander Vance',
+      clientRep: 'Private Collector (UK Expat)',
+      vehicleTitle: '2022 Aston Martin DBS Superleggera',
+      vehicleVin: 'SCFRMFAW3NG819200',
+      netTotalAed: '945,000.00',
+      settlementMechanism: 'Direct Wire TT (CBD)',
+      lifecycleStage: 'Ready for Handover',
+      stageColor: 'tertiary',
+      actionLabel: 'Print Mulkiya',
+    },
+    {
+      orderId: 'SO-2025-0879',
+      timestamp: '22 OCT • 16:05 GST',
+      clientEntity: 'Al Qasimi Investment Trust',
+      clientRep: 'Sharjah Royal Office',
+      vehicleTitle: '2024 Rolls-Royce Spectre',
+      vehicleVin: 'SCA664S05PU192837',
+      netTotalAed: '2,150,000.00',
+      settlementMechanism: 'Bank Guarantee / Letter of Credit',
+      lifecycleStage: 'Quotation Draft',
+      stageColor: 'outline',
+      actionLabel: 'Edit Draft',
+    },
+  ],
+};
+
+export async function fetchSalesOrderStudio(): Promise<SalesOrderStudioData> {
+  return VERIFIED_SALES_ORDER_FIXTURE;
+}
