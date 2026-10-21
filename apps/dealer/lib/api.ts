@@ -2065,3 +2065,272 @@ export const VERIFIED_ACCOUNTING_DESK_FIXTURE: AccountingDeskData = {
 export async function fetchAccountingDeskData(): Promise<AccountingDeskData> {
   return VERIFIED_ACCOUNTING_DESK_FIXTURE;
 }
+
+/**
+ * ==============================================================================
+ * S23: Corporate Fleet Accounts & VIP Consignment Portfolio (Screen 09331cdd3c704e419e8aba6f6b87ccae)
+ * ==============================================================================
+ */
+
+export interface ConsignmentKpis {
+  portfolioValueAed: number;
+  consignedUnitsCount: number;
+  insuranceCoveragePct: number;
+  fleetUnitsUnderManagement: number;
+  vipKeyAccountsCount: number;
+  fleetUptimePct: number;
+  mtdProjectedYieldAed: number;
+  avgMarginPct: number;
+  closedSalesCount: number;
+  mulkiyaCompliancePct: number;
+  expiringUnitsCount: number;
+}
+
+export interface FeaturedConsignmentAgreement {
+  vehicleTitle: string;
+  chassisVin: string;
+  mandateType: string;
+  consignorName: string;
+  consignorTier: string;
+  physicalLocation: string;
+  mandateDaysRemaining: number;
+  mandateDaysTotal: number;
+  agreedReserveAed: number;
+  askingPriceAed: number;
+  grossSpreadAed: number;
+  grossMarginTargetPct: number;
+  reconditioningDeductionsAed: number;
+  netDealershipProfitAed: number;
+  netMarginPct: number;
+  tasjeelGrade: string;
+  tasjeelNotes: string;
+  prepDetailingAed: number;
+  prepDetailingDescription: string;
+  bailmentContractRef: string;
+}
+
+export interface FleetVehicleUnit {
+  unitId: string;
+  model: string;
+  plate: string;
+  mulkiyaValidUntil: string;
+  isUrgent?: boolean;
+  odometerKm: number;
+  nextIntervalKm: number;
+  status: string;
+  statusBadgeClass: string;
+  rtaBooking?: string;
+}
+
+export interface CorporateFleetAccount {
+  accountName: string;
+  trn: string;
+  dedLicense: string;
+  tier: string;
+  paymentTerms: string;
+  activeUnitsCount: number;
+  composition: Array<{
+    model: string;
+    units: number;
+    statusLabel: string;
+    badgeClass: string;
+  }>;
+  slaDescription: string;
+  priorityUnits: FleetVehicleUnit[];
+}
+
+export interface ConsignmentPipelineRow {
+  id: string;
+  accountName: string;
+  accountType: string;
+  accountTypeBadgeClass: string;
+  vehicleTitle: string;
+  vehicleSpecs: string;
+  vin: string;
+  plate: string;
+  agreementType: string;
+  agreementBadgeClass: string;
+  agreedValueAed: number;
+  commissionSplitLabel: string;
+  mulkiyaStatus: string;
+  mulkiyaValid: boolean;
+  pipelineStatus: string;
+  pipelineBadgeClass: string;
+}
+
+export interface FleetAndConsignmentData {
+  kpis: ConsignmentKpis;
+  featuredConsignment: FeaturedConsignmentAgreement;
+  spotlightFleet: CorporateFleetAccount;
+  pipeline: ConsignmentPipelineRow[];
+}
+
+export const VERIFIED_FLEET_CONSIGNMENT_FIXTURE: FleetAndConsignmentData = {
+  kpis: {
+    portfolioValueAed: 64200000,
+    consignedUnitsCount: 32,
+    insuranceCoveragePct: 100,
+    fleetUnitsUnderManagement: 128,
+    vipKeyAccountsCount: 6,
+    fleetUptimePct: 98.4,
+    mtdProjectedYieldAed: 1280000,
+    avgMarginPct: 5.5,
+    closedSalesCount: 12,
+    mulkiyaCompliancePct: 96.8,
+    expiringUnitsCount: 8,
+  },
+  featuredConsignment: {
+    vehicleTitle: '2023 Ferrari 296 GTB Assetto Fiorano',
+    chassisVin: 'ZFF98LHA0P0293108',
+    mandateType: 'Exclusive Mandate',
+    consignorName: 'Sheikh Khalid Al-Nahyan (Private Collection Holding FZCO)',
+    consignorTier: 'VIP TIER-1',
+    physicalLocation: 'Showroom Vault Bay 04, Al Quoz 1 Hub',
+    mandateDaysRemaining: 45,
+    mandateDaysTotal: 60,
+    agreedReserveAed: 1480000,
+    askingPriceAed: 1650000,
+    grossSpreadAed: 170000,
+    grossMarginTargetPct: 10.3,
+    reconditioningDeductionsAed: 7200,
+    netDealershipProfitAed: 162800,
+    netMarginPct: 9.87,
+    tasjeelGrade: 'GRADE A (98/100)',
+    tasjeelNotes: 'Structural integrity certified • Zero paint meter anomalies • GCC Spec',
+    prepDetailingAed: 4500,
+    prepDetailingDescription: '9H Ceramic + Trickle charger conditioning (settled at transaction)',
+    bailmentContractRef: '#CSG-2025-089A-DXB',
+  },
+  spotlightFleet: {
+    accountName: 'Falcon Luxury Chauffeur & VIP Hospitality FZ-LLC',
+    trn: '100482938100003',
+    dedLicense: '#894211',
+    tier: 'VIP Hospitality Fleet Tier-1',
+    paymentTerms: 'Net-30 Invoicing',
+    activeUnitsCount: 36,
+    composition: [
+      {
+        model: 'Mercedes-Maybach S 680',
+        units: 18,
+        statusLabel: '100% Operational',
+        badgeClass: 'bg-tertiary/15 text-tertiary',
+      },
+      {
+        model: 'Range Rover SV Autobiography',
+        units: 12,
+        statusLabel: '1 In Service Bay',
+        badgeClass: 'bg-secondary/15 text-secondary',
+      },
+      {
+        model: 'Rolls-Royce Ghost',
+        units: 6,
+        statusLabel: 'VIP Dedicated',
+        badgeClass: 'bg-primary/15 text-primary',
+      },
+    ],
+    slaDescription: 'Guaranteed SLA: 2-Hour emergency turnaround in Workshop Bay 6',
+    priorityUnits: [
+      {
+        unitId: 'FLC-MAY-01',
+        model: 'Maybach S 680 4MATIC',
+        plate: 'DXB-K-4921',
+        mulkiyaValidUntil: 'Valid until 18 Nov 2025',
+        odometerKm: 24180,
+        nextIntervalKm: 1240,
+        status: 'Compliant',
+        statusBadgeClass: 'bg-tertiary/15 text-tertiary',
+      },
+      {
+        unitId: 'FLC-RR-04',
+        model: 'Rolls-Royce Ghost Extended',
+        plate: 'DXB-AA-1102',
+        mulkiyaValidUntil: 'Due in 6 Days',
+        isUrgent: true,
+        odometerKm: 19420,
+        nextIntervalKm: 850,
+        status: 'Inspection Due',
+        statusBadgeClass: 'bg-error/15 text-error',
+        rtaBooking: 'Fast-Track Booked',
+      },
+    ],
+  },
+  pipeline: [
+    {
+      id: 'pipe-01',
+      accountName: 'Sheikh Hamdan Al Maktoum Col.',
+      accountType: 'Royal Consignment',
+      accountTypeBadgeClass: 'text-primary',
+      vehicleTitle: 'Porsche 911 GT3 RS (992)',
+      vehicleSpecs: 'Weissach Package • 1,200 KM',
+      vin: 'WP0AF2A97PS298114',
+      plate: 'Plate: DXB-R-911',
+      agreementType: '90-Day Exclusive',
+      agreementBadgeClass: 'bg-primary/10 text-primary',
+      agreedValueAed: 1850000,
+      commissionSplitLabel: '8.0% (AED 148,000)',
+      mulkiyaStatus: 'Valid (Oct 2025)',
+      mulkiyaValid: true,
+      pipelineStatus: 'Vault Active',
+      pipelineBadgeClass: 'bg-tertiary/15 text-tertiary',
+    },
+    {
+      id: 'pipe-02',
+      accountName: 'Dubai Royal Chauffeur Services',
+      accountType: 'Corporate Fleet Tier-1',
+      accountTypeBadgeClass: 'text-secondary',
+      vehicleTitle: 'Bentley Flying Spur W12 Mulliner',
+      vehicleSpecs: 'Executive 4-Seat • 31,400 KM',
+      vin: 'SCBDG4ZG4NC082103',
+      plate: 'Plate: DXB-F-2201',
+      agreementType: 'Full Fleet SLA',
+      agreementBadgeClass: 'bg-secondary/10 text-secondary',
+      agreedValueAed: 1150000,
+      commissionSplitLabel: 'Monthly Retainer',
+      mulkiyaStatus: 'Expiring in 5 Days',
+      mulkiyaValid: false,
+      pipelineStatus: 'Inspection Due',
+      pipelineBadgeClass: 'bg-error/15 text-error',
+    },
+    {
+      id: 'pipe-03',
+      accountName: 'Apex Racing FZCO',
+      accountType: 'Private Track Mandate',
+      accountTypeBadgeClass: 'text-primary',
+      vehicleTitle: 'McLaren 765LT Spider',
+      vehicleSpecs: 'MSO Carbon Defined • 3,800 KM',
+      vin: 'SBM13MAA2MW004921',
+      plate: 'Plate: DXB-W-765',
+      agreementType: 'Consignment Sale',
+      agreementBadgeClass: 'bg-primary/10 text-primary',
+      agreedValueAed: 2300000,
+      commissionSplitLabel: '6.5% (AED 149,500)',
+      mulkiyaStatus: 'Valid (Jan 2026)',
+      mulkiyaValid: true,
+      pipelineStatus: 'Pending Offer',
+      pipelineBadgeClass: 'bg-secondary/15 text-secondary',
+    },
+    {
+      id: 'pipe-04',
+      accountName: 'Al-Futtaim Executive Mobility',
+      accountType: 'Corporate Fleet Tier-1',
+      accountTypeBadgeClass: 'text-secondary',
+      vehicleTitle: 'Mercedes-AMG G63 Mansory Edition',
+      vehicleSpecs: 'Obsidian Black • 8,400 KM',
+      vin: 'WDB4632761X991042',
+      plate: 'Plate: DXB-E-6300',
+      agreementType: 'Corporate Lease Pool',
+      agreementBadgeClass: 'bg-secondary/10 text-secondary',
+      agreedValueAed: 1280000,
+      commissionSplitLabel: 'Fixed Fleet Margin',
+      mulkiyaStatus: 'Valid (Dec 2025)',
+      mulkiyaValid: true,
+      pipelineStatus: 'On-Road Fleet',
+      pipelineBadgeClass: 'bg-tertiary/15 text-tertiary',
+    },
+  ],
+};
+
+export async function fetchFleetAndConsignmentData(): Promise<FleetAndConsignmentData> {
+  return VERIFIED_FLEET_CONSIGNMENT_FIXTURE;
+}
+

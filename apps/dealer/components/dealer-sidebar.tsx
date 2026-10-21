@@ -219,6 +219,20 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
               {isArabic ? 'الفواتير والمحاسبة الضريبية' : 'Invoices & Accounting'}
             </span>
           </Link>
+
+          <Link
+            href="/fleet"
+            className={`flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-xs sm:text-sm ${
+              pathname?.startsWith('/fleet')
+                ? 'bg-primary-container text-on-primary-container font-semibold shadow-md'
+                : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">directions_car</span>
+            <span className="font-body-md">
+              {isArabic ? 'الأساطيل والبيع بالأمانة' : 'Fleet & Consignment'}
+            </span>
+          </Link>
         </nav>
       </div>
 
