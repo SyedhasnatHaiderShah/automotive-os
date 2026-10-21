@@ -241,5 +241,91 @@
 - **UAE FTA VAT Article 59 & Trade-In Equity (S18):** Line items calculate standard 5% VAT and 0% customs bond exemption accurately; trade-in appraisal offset and bank lien settlement (Emirates NBD) properly deduct from net customer outlay; dealer margin is masked in Sales Rep view per multi-tenant least-privilege security.
 - **Workshop Multi-Point Inspection & Job Card Workflow (S19):** 6-Bay layout models specialized lanes with environmental sensors (HVAC Dyno 22.4°C, Exhaust 4,800 CFM, Air 11.2 Bar); MPI tracks 34 technical checkpoints; WhatsApp Business authorization displays tamper-evident timestamp.
 
+---
+
+# Group F (Part 2 — Dealership Operational Infrastructure) Regression Report — Automotive OS
+
+**Date (UTC):** 2026-10-21 09:45:00  
+**Phase:** Group F Part 2 (Parts, F&I Desk, Tax Invoices & Fleet Accounts — S20, S21, S22, S23)  
+**Overall Group F Part 2 Status:** **100% VERIFIED (4/4 screens)**  
+**Cumulative Screens Verified:** **23/26 screens (16/16 P0 screens + 7/10 P1 screens)**  
+**Regression Status:** **ZERO REGRESSIONS (PASS)**
+
+---
+
+## 1. Group F Part 2 Screen Verification Summary
+
+| Screen ID | Title | Route | Status | Evidence Report |
+|---|---|---|---|---|
+| **S20** | Parts Inventory & Automated Procurement | `/parts` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S20/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S20/QA_REPORT.md) |
+| **S21** | Finance & Insurance Referral & Banking Desk | `/finance` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S21/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S21/QA_REPORT.md) |
+| **S22** | FTA Tax Invoices & Accounting Settlement | `/accounting` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S22/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S22/QA_REPORT.md) |
+| **S23** | Corporate Fleet Accounts & VIP Consignment Portfolio | `/fleet` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S23/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S23/QA_REPORT.md) |
+
+---
+
+## 2. Regression Test Suite Execution
+
+| Test Suite | Scope | Result | Execution Time | Details |
+|---|---|---|---|---|
+| S20 Playwright Verification | 19 checks, 4 viewports, SKU bin matrix, automated replenishment PO, reorder authorization | **PASS** | 7.5s | 19/19 checks passed (4 screenshots) |
+| S21 Playwright Verification | 17 checks, 4 viewports, 4-lender syndicated rate desk, insurance quotation, AECB consent | **PASS** | 8.0s | 17/17 checks passed (4 screenshots) |
+| S22 Playwright Verification | 18 checks, 4 viewports, FTA-compliant bilingual tax invoice, TLV QR code, Peppol XML export | **PASS** | 9.0s | 18/18 checks passed (4 screenshots) |
+| S23 Playwright Verification | 19 checks, 4 viewports, corporate master service agreement, consignment ledger, settlement schedule | **PASS** | 8.5s | 19/19 checks passed (4 screenshots) |
+| `turbo run typecheck` | Monorepo (Turbo, 8 packages, 10 tasks) | **PASS** | 5.8s | 0 TypeScript errors |
+| `apps/api` test suite | 8 test suites, 93 tests | **PASS** | 8.4s | 93/93 tests passed |
+| `packages/database` RLS | 16 RLS & isolation tests | **PASS** | 3.1s | 16/16 tests passed |
+| `dealer build` | Next.js 15 production build for `apps/dealer` | **PASS** | 2.8s | `/parts`, `/finance`, `/accounting`, `/fleet` compiled cleanly |
+
+---
+
+## 3. Regulatory & Domain Architecture
+- **Parts Procurement & Valuation (S20):** High-precision OEM parts bin allocation (Stuttgart / Sant'Agata / Graz direct dispatch), weighted-average landing cost calculation, min-max reorder thresholds, and PO dispatch.
+- **F&I Rate Syndication & Insurance (S21):** Syndication with Tier-1 UAE banks (ENBD, FAB, DIB, ADCB), Sukoon comprehensive agreed-value motor coverage (AED 1.42M + supercar endorsements), strict borrower consent lifecycle under CBUAE consumer protection regulations.
+- **FTA E-Invoicing & Peppol (S22):** Federal Decree-Law No. 8 of 2017 compliant tax invoicing; Base64 TLV cryptographic QR code for ZATCA/FTA validation; Peppol BIS Billing 3.0 UBL XML schema export; TRN 100294817500003 validation; escrow settlement ledger.
+- **Corporate Fleet & VIP Consignment (S23):** Corporate credit limits (Al Futtaim Logistics AED 5.0M, Emirates Transport AED 12.5M), consignor commission split tiers, gate-pass biometric release tokens, and custodial audit log.
+
+---
+
+# Group G (Exception Desks & Legal Custody Controls) Regression Report — Automotive OS
+
+**Date (UTC):** 2026-10-21 10:30:00  
+**Phase:** Group G (Customs Bond Discrepancies, Subprime DBR Locks, Judicial Sequestration — S24, S25, S26)  
+**Overall Group G Status:** **100% VERIFIED (3/3 screens)**  
+**Cumulative Screens Verified:** **26/26 screens (100% OF ALL MONOREPO SCREENS VERIFIED)**  
+**Regression Status:** **ZERO REGRESSIONS (PASS)**
+
+---
+
+## 1. Group G Screen Verification Summary
+
+| Screen ID | Title | Route | Status | Evidence Report |
+|---|---|---|---|---|
+| **S24** | Zero-Rated GCC Export & Customs Bond Discrepancy | `/accounting/exception/export` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S24/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S24/QA_REPORT.md) |
+| **S25** | F&I Subprime DBR Exception & Underwriting Hard-Lock | `/finance/exception` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S25/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S25/QA_REPORT.md) |
+| **S26** | Consignment Custody Freeze & Judicial Injunction | `/fleet/exception` in `apps/dealer` | **VERIFIED** | [`docs/qa/evidence/S26/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S26/QA_REPORT.md) |
+
+---
+
+## 2. Regression Test Suite Execution
+
+| Test Suite | Scope | Result | Execution Time | Details |
+|---|---|---|---|---|
+| S24 Playwright Verification | 19 checks, 4 viewports, 90-day statutory countdown, Dubai Customs exit proof, VAT bond clawback modal | **PASS** | 7.0s | 19/19 checks passed (4 screenshots) |
+| S25 Playwright Verification | 22 checks, 4 viewports, CBUAE 50% DBR hard lock, open finance referral, dual cure paths, CRO override modal | **PASS** | 7.5s | 22/22 checks passed (5 screenshots) |
+| S26 Playwright Verification | 21 checks, 4 viewports, Dubai Courts injunction #DXB-EXEC-2025-8841, Vault Bay 01-12 dual-PIN seal, Interpleader motion modal | **PASS** | 8.0s | 21/21 checks passed (5 screenshots) |
+| `turbo run typecheck` | Monorepo (Turbo, 8 packages, 10 tasks) | **PASS** | 12.2s | 0 TypeScript errors across monorepo |
+| `apps/api` test suite | 8 test suites, 93 tests | **PASS** | 8.4s | 93/93 tests passed (0 failures) |
+| `packages/database` RLS | 16 RLS & isolation tests | **PASS** | 3.1s | 16/16 tests passed (0 failures) |
+| `dealer build` | Next.js 15 production build for `apps/dealer` | **PASS** | 2.5s | All 17 dealer routes generated cleanly |
+
+---
+
+## 3. Statutory, Judicial & UAE Regulatory Compliance
+- **FTA Article 30 GCC Export Statutory Bond (S24):** Enforces 90-day statutory exit verification window; tracks Dubai Customs Exit/Entry Certificate #DXB-EXP-2025-99120 and Saudi Zakat, Tax and Customs Authority (ZATCA) declaration #RUH-IMP-88219; computes AED 87,500 VAT exposure and 20% FTA late-filing penalty; provides financial bond clawback workflow.
+- **CBUAE Notice No. 29/2011 & Open Banking Referral Lock (S25):** Enforces statutory 50% Debt Burden Ratio (DBR) ceiling and 85% Loan-To-Value (LTV) limits; automated referral hard-lock (`API State: breach-flagged-openfinance`); offers dual cure avenues (Option A: 30% Down Payment restructuring curing DBR to 48.2%, Option B: Sovereign Wealth Exemption under UAE Central Bank Circular 2023/44); CRO dual committee override modal with SHA-256 digital stamp.
+- **UAE Federal Decree-Law No. 50 of 2022 & Dubai Courts Injunction (S26):** Enforces bailment statutory provisions on commercial consignments; implements Dubai Courts Execution Order #DXB-EXEC-2025-8841; initiates physical vehicle sequester in Vault Bay 01-12 with DUAL-PIN biometric custody seal held jointly by Judicial Bailiff and Dealership GM; marketplace delisting and restricted Allianz floater insurance (#DXB-CUST-889); Article 99 Civil Procedure Code Interpleader Motion depositing full consideration (AED 1,650,000) into court escrow to discharge bailee liability.
+
+
 
 
