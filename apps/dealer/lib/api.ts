@@ -1415,3 +1415,332 @@ export const VERIFIED_PARTS_FIXTURE: PartsProcurementData = {
 export async function fetchPartsProcurementData(): Promise<PartsProcurementData> {
   return VERIFIED_PARTS_FIXTURE;
 }
+
+/**
+ * ==============================================================================
+ * S21: Finance & Insurance (F&I) Referral & Banking Desk (Screen 2de2a58f7a914c94a7cf093d8a1984df)
+ * ==============================================================================
+ */
+
+export interface LenderOfferItem {
+  id: string;
+  bankCode: 'ENBD' | 'FAB' | 'DIB' | 'ADCB';
+  bankName: string;
+  deskName: string;
+  statusLabel: string;
+  statusType: 'APPROVED' | 'COMMITTEE' | 'SHARIA' | 'STANDBY';
+  decisionSla: string;
+  flatRatePct: number;
+  reducingRatePct: number;
+  dealerReserveAed: number;
+  dealerMarginSharePct: number;
+  specialCondition: string;
+  selected: boolean;
+}
+
+export interface InsurancePolicyData {
+  carrierName: string;
+  policyType: string;
+  agreedValuationAed: number;
+  rateFactorPct: number;
+  annualPremiumAed: number;
+  brokerageSharePct: number;
+  brokeragePayoutAed: number;
+  endorsements: Array<{
+    id: string;
+    title: string;
+    subtitle: string;
+    icon: string;
+    active: boolean;
+  }>;
+}
+
+export interface FinanceCaseDossier {
+  caseNumber: string;
+  openedTimeAgo: string;
+  vehicle: {
+    stockNumber: string;
+    title: string;
+    vin: string;
+    specs: string;
+    imageUrl: string;
+    invoicePriceAed: number;
+  };
+  applicant: {
+    name: string;
+    uaePassVerified: boolean;
+    affiliation: string;
+    roleTitle: string;
+    aecbScore: number;
+    riskTier: string;
+    monthlyIncomeAed: number;
+  };
+  commercials: {
+    downPaymentAed: number;
+    downPaymentPct: number;
+    netPrincipalAed: number;
+    tenorMonths: number;
+  };
+  guardrails: {
+    dbrPct: number;
+    statutoryMaxDbrPct: number;
+    ltvPct: number;
+    statutoryMaxLtvPct: number;
+    tenorBufferMonths: number;
+    attestationNotice: string;
+  };
+  lenders: LenderOfferItem[];
+  insurance: InsurancePolicyData;
+}
+
+export interface FinancePipelineFile {
+  id: string;
+  fileRef: string;
+  vehicleTitle: string;
+  vehicleSpecs: string;
+  customerName: string;
+  customerTier: string;
+  invoiceValueAed: number;
+  financedAmtAed: number;
+  lenderName: string;
+  productTerms: string;
+  underwritingStatus: string;
+  statusBadgeClass: string;
+  dealerReserveAed: number;
+}
+
+export interface FinanceDeskData {
+  summary: {
+    financedPipelineQtdAed: number;
+    inFlightFilesCount: number;
+    momGrowthPct: number;
+    avgApprovalHours: number;
+    avgBenchmarkHours: number;
+    slaAdvantagePct: number;
+    projectedDealerYieldAed: number;
+    overallYieldPct: number;
+    cbuaeLtvCompliancePct: number;
+    minEquityMetPct: number;
+    breachesCount: number;
+  };
+  activeDossier: FinanceCaseDossier;
+  pipelineFiles: FinancePipelineFile[];
+}
+
+export const VERIFIED_FINANCE_DESK_FIXTURE: FinanceDeskData = {
+  summary: {
+    financedPipelineQtdAed: 28450000,
+    inFlightFilesCount: 18,
+    momGrowthPct: 12.4,
+    avgApprovalHours: 4.8,
+    avgBenchmarkHours: 24.0,
+    slaAdvantagePct: 79,
+    projectedDealerYieldAed: 842600,
+    overallYieldPct: 2.96,
+    cbuaeLtvCompliancePct: 100.0,
+    minEquityMetPct: 20.0,
+    breachesCount: 0,
+  },
+  activeDossier: {
+    caseNumber: '#FNI-2025-0418',
+    openedTimeAgo: '2h 14m ago',
+    vehicle: {
+      stockNumber: '#DXB-911-RS',
+      title: '2024 Porsche 911 GT3 RS Weissach',
+      vin: 'WP0AF2A97RS194022',
+      specs: 'GCC Spec • 4.0L Naturally Aspirated Boxer-6 • 518 BHP • PDK 7-Speed • 1,240 km',
+      imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDXxoytAedWl5H6HrmG4QhUVDNmym26K4t5YTM_3Sa6zp-BRUJq2FI5Krko9ZIyEeZJWQs4FG_u27-NYxR-Gzpyg18ryk9BeJa74RVyjbYVXjXZNvCULQA9YWdcuiLvWHOQlRx0Q2-XGOT2q7S09rT7_2zo0CsM5JPsR5FDyVujBmJMz85Xx7j1vtIWP-wBM7T8jVCY3MisGNj4dAzwqeTfdA1qpuGQPmloTMQY7RYU4GF8ee5SeZU5',
+      invoicePriceAed: 1420000,
+    },
+    applicant: {
+      name: 'Dr. Tariq Al-Hashimi',
+      uaePassVerified: true,
+      affiliation: 'Al Maktoum Family Office',
+      roleTitle: 'Principal Executive',
+      aecbScore: 842,
+      riskTier: 'Very Low Risk',
+      monthlyIncomeAed: 145000,
+    },
+    commercials: {
+      downPaymentAed: 284000,
+      downPaymentPct: 20.0,
+      netPrincipalAed: 1136000,
+      tenorMonths: 48,
+    },
+    guardrails: {
+      dbrPct: 18.4,
+      statutoryMaxDbrPct: 50.0,
+      ltvPct: 80.0,
+      statutoryMaxLtvPct: 80.0,
+      tenorBufferMonths: 12,
+      attestationNotice: 'Direct salary feed & dividend distribution attested via CBUAE gateway 38m ago. No physical payslips required.',
+    },
+    lenders: [
+      {
+        id: 'lnd-01',
+        bankCode: 'ENBD',
+        bankName: 'Emirates NBD',
+        deskName: 'Private Banking Auto Desk',
+        statusLabel: 'Conditionally Approved (Offer Ready)',
+        statusType: 'APPROVED',
+        decisionSla: 'Sanctioned in 1.4h',
+        flatRatePct: 2.49,
+        reducingRatePct: 4.65,
+        dealerReserveAed: 13064,
+        dealerMarginSharePct: 1.15,
+        specialCondition: 'Processing fee waived (VIP)',
+        selected: true,
+      },
+      {
+        id: 'lnd-02',
+        bankCode: 'FAB',
+        bankName: 'First Abu Dhabi Bank',
+        deskName: 'FAB Elite Auto Lending',
+        statusLabel: 'Credit Committee (L3 Gate)',
+        statusType: 'COMMITTEE',
+        decisionSla: 'Est. Decision: 45 min',
+        flatRatePct: 2.39,
+        reducingRatePct: 4.48,
+        dealerReserveAed: 14200,
+        dealerMarginSharePct: 1.25,
+        specialCondition: 'Requires salary certificate attestation',
+        selected: false,
+      },
+      {
+        id: 'lnd-03',
+        bankCode: 'DIB',
+        bankName: 'Dubai Islamic Bank',
+        deskName: 'Al Islami Auto Murabaha',
+        statusLabel: 'Sharia Shurah Board Pre-cleared',
+        statusType: 'SHARIA',
+        decisionSla: 'Asset Sale Agreement Ready',
+        flatRatePct: 2.55,
+        reducingRatePct: 4.78,
+        dealerReserveAed: 11360,
+        dealerMarginSharePct: 1.00,
+        specialCondition: 'Takaful Bundling mandatory',
+        selected: false,
+      },
+      {
+        id: 'lnd-04',
+        bankCode: 'ADCB',
+        bankName: 'ADCB Private',
+        deskName: 'Millionaire Auto Program',
+        statusLabel: 'Backup Offer Registered',
+        statusType: 'STANDBY',
+        decisionSla: 'Standby syndicate node',
+        flatRatePct: 2.60,
+        reducingRatePct: 4.89,
+        dealerReserveAed: 10224,
+        dealerMarginSharePct: 0.90,
+        specialCondition: 'Standard auto underwriting',
+        selected: false,
+      },
+    ],
+    insurance: {
+      carrierName: 'Oman Insurance (Sukoon)',
+      policyType: 'Agreed Value Supercar Policy',
+      agreedValuationAed: 1420000,
+      rateFactorPct: 3.00,
+      annualPremiumAed: 42600,
+      brokerageSharePct: 15.0,
+      brokeragePayoutAed: 6390,
+      endorsements: [
+        {
+          id: 'end-01',
+          title: 'GCC Agency Repair Guarantee',
+          subtitle: 'Authorized Al Nabooda Porsche Center exclusively',
+          icon: 'verified',
+          active: true,
+        },
+        {
+          id: 'end-02',
+          title: 'Dubai Autodrome Track Day Cover',
+          subtitle: 'FIA Non-competitive sanctioned track events',
+          icon: 'sports_score',
+          active: true,
+        },
+        {
+          id: 'end-03',
+          title: 'Zero Depreciation on Carbon Aero & PCCB',
+          subtitle: 'Full replacement value guaranteed for 24 months',
+          icon: 'shield',
+          active: true,
+        },
+        {
+          id: 'end-04',
+          title: '24/7 Enclosed Flatbed Recovery',
+          subtitle: 'Covering all UAE Emirates & GCC cross-border transit',
+          icon: 'local_shipping',
+          active: true,
+        },
+      ],
+    },
+  },
+  pipelineFiles: [
+    {
+      id: 'pipe-01',
+      fileRef: '#FNI-2025-0414',
+      vehicleTitle: 'Ferrari 296 GTB Assetto Fiorano',
+      vehicleSpecs: '2023 • Rosso Corsa • 3,100 km',
+      customerName: 'H.E. Sheikh Majid Al Qasimi',
+      customerTier: 'AECB 860 (Tier-1)',
+      invoiceValueAed: 1650000,
+      financedAmtAed: 1320000,
+      lenderName: 'FAB Elite Auto',
+      productTerms: '2.35% Flat • 36 Months',
+      underwritingStatus: 'FAB Sanctioned',
+      statusBadgeClass: 'bg-tertiary/15 text-tertiary',
+      dealerReserveAed: 16500,
+    },
+    {
+      id: 'pipe-02',
+      fileRef: '#FNI-2025-0409',
+      vehicleTitle: 'Mercedes-AMG G63 4x4²',
+      vehicleSpecs: '2024 • Obsidian Black • 850 km',
+      customerName: 'Khalfan Saeed Real Estate LLC',
+      customerTier: 'Corporate Facility',
+      invoiceValueAed: 1890000,
+      financedAmtAed: 1400000,
+      lenderName: 'Emirates NBD Commercial',
+      productTerms: '2.45% Flat • 48 Months',
+      underwritingStatus: 'Funds Disbursed',
+      statusBadgeClass: 'bg-secondary/15 text-secondary',
+      dealerReserveAed: 17500,
+    },
+    {
+      id: 'pipe-03',
+      fileRef: '#FNI-2025-0402',
+      vehicleTitle: 'Aston Martin Valkyrie Spider',
+      vehicleSpecs: '2024 • British Racing Green • 120 km',
+      customerName: 'Private Collector (Jumeirah Islands)',
+      customerTier: 'Sovereign Direct Client',
+      invoiceValueAed: 14200000,
+      financedAmtAed: 0,
+      lenderName: 'Self-Financed Wire',
+      productTerms: 'Insurance Brokerage Only',
+      underwritingStatus: 'Cash Settle / Insurance Bound',
+      statusBadgeClass: 'bg-primary/15 text-primary',
+      dealerReserveAed: 63900,
+    },
+    {
+      id: 'pipe-04',
+      fileRef: '#FNI-2025-0398',
+      vehicleTitle: 'Rolls-Royce Cullinan Series II',
+      vehicleSpecs: '2025 • Arctic White • Delivery Mileage',
+      customerName: 'Bader Sultan Al Nuaimi',
+      customerTier: 'AECB 795 (Tier-1)',
+      invoiceValueAed: 2750000,
+      financedAmtAed: 2200000,
+      lenderName: 'Dubai Islamic Bank (DIB)',
+      productTerms: '2.50% Murabaha • 60 Months',
+      underwritingStatus: 'Pending Murabaha Asset Sale',
+      statusBadgeClass: 'bg-secondary/15 text-secondary',
+      dealerReserveAed: 22000,
+    },
+  ],
+};
+
+export async function fetchFinanceDeskData(): Promise<FinanceDeskData> {
+  return VERIFIED_FINANCE_DESK_FIXTURE;
+}
