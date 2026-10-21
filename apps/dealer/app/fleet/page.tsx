@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
 import {
@@ -1226,6 +1227,14 @@ export default function FleetAndConsignmentPage() {
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
                   <span>{isRtl ? 'حظر قضائي تحفظي' : 'Consignor Legal Dispute Hold'}</span>
                 </button>
+
+                <Link
+                  href="/fleet/exception"
+                  className="px-3 py-1.5 rounded-lg font-body-sm text-body-sm transition-all flex items-center gap-1.5 bg-error/15 text-error hover:bg-error/25 font-bold border border-error/30"
+                >
+                  <span className="material-symbols-outlined text-[16px]">gavel</span>
+                  <span>{isRtl ? 'فتح تفاصيل الحظر القضائي (S26)' : 'Open S26 Custody Freeze Drill-down'}</span>
+                </Link>
               </div>
             </div>
           </div>

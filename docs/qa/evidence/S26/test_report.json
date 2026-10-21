@@ -1,0 +1,117 @@
+{
+  "screen": "S26",
+  "title": "Consignment Custody Freeze & Judicial Injunction",
+  "route": "/fleet/exception",
+  "timestamp": "2026-10-21T10:24:19.443Z",
+  "total": 21,
+  "passed": 21,
+  "failed": 0,
+  "status": "VERIFIED",
+  "checks": [
+    {
+      "name": "Route HTTP Status 200",
+      "pass": true,
+      "details": "Status: 200"
+    },
+    {
+      "name": "Bailment & Allianz Floater Strip",
+      "pass": true,
+      "details": "Federal Law No. 50 & AED 100M Allianz"
+    },
+    {
+      "name": "Custody Dispute Freeze Banner",
+      "pass": true,
+      "details": "Execution Order #DXB-EXEC-2025-8841, Vault Bay 01-12"
+    },
+    {
+      "name": "Freeze Banner Actions",
+      "pass": true,
+      "details": "Enforce Quarantine and View Court Injunction present"
+    },
+    {
+      "name": "Desk Title & Top Actions",
+      "pass": true,
+      "details": "Consignment & Fleet desk with Onboard, Create Fleet, Bulk Renewal"
+    },
+    {
+      "name": "KPI Summary Cards (4 Metrics)",
+      "pass": true,
+      "details": "Portfolio AED 64.2M, Fleet 128 units, Yield AED 1.28M, Mulkiya 96.8%"
+    },
+    {
+      "name": "Custody Vault Frozen Spotlight",
+      "pass": true,
+      "details": "Ferrari 296 GTB, Sheikh Khalid Al-Nahyan, Reserve AED 1.48M Frozen, Delisted, Tasjeel Grade A"
+    },
+    {
+      "name": "Corporate Fleet Account Matrix",
+      "pass": true,
+      "details": "Falcon Luxury Chauffeur, 36 Units, Priority units FLC-MAY-01 & FLC-RR-04"
+    },
+    {
+      "name": "Custody & Bailment Ledger",
+      "pass": true,
+      "details": "Legal dispute lien, Restricted floater, Commission engine AED 1.65M locked, Hearing 12 May 2025"
+    },
+    {
+      "name": "Consolidated Master Pipeline Table",
+      "pass": true,
+      "details": "Porsche 911 GT3 RS, Bentley Flying Spur, McLaren 765LT Spider"
+    },
+    {
+      "name": "Desktop 1440 Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S26\\desktop_1440.png"
+    },
+    {
+      "name": "Interpleader Motion Admitted Modal",
+      "pass": true,
+      "details": "AED 1.65M bond deposited in court escrow"
+    },
+    {
+      "name": "Quarantine Cleared via Interpleader Deposit",
+      "pass": true,
+      "details": "Status: INTERPLEADER ESCROW BOUND / CLEARED"
+    },
+    {
+      "name": "Interpleader Cured Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S26\\modal_interpleader_cured.png"
+    },
+    {
+      "name": "Court Execution Order Modal",
+      "pass": true,
+      "details": "Official judicial decree details displayed"
+    },
+    {
+      "name": "Court Order Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S26\\modal_court_order.png"
+    },
+    {
+      "name": "Quarantine Security Log Modal",
+      "pass": true,
+      "details": "Biometric DUAL-PIN vault seal active"
+    },
+    {
+      "name": "RBAC Least-Privilege Masking",
+      "pass": true,
+      "details": "Commission splits and yields masked as ••••••"
+    },
+    {
+      "name": "Arabic RTL Mode",
+      "pass": true,
+      "details": "dir=\"rtl\" with Arabic legal terminology"
+    },
+    {
+      "name": "Arabic RTL Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S26\\arabic_rtl.png"
+    },
+    {
+      "name": "Mobile 390 Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S26\\mobile_390.png"
+    }
+  ]
+}

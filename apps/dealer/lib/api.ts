@@ -2800,5 +2800,228 @@ export async function fetchSubprimeDbrExceptionData(): Promise<SubprimeDbrExcept
   return VERIFIED_SUBPRIME_DBR_EXCEPTION_FIXTURE;
 }
 
+/**
+ * ==============================================================================
+ * S26: Consignment Custody Freeze & Judicial Injunction (Screen c0870d6ef04d45d6879d621f438ba4cb)
+ * ==============================================================================
+ */
+
+export interface JudicialFreezeDossier {
+  courtOrderNumber: string;
+  courtName: string;
+  courtNameAr: string;
+  hearingDate: string;
+  injunctionRef: string;
+  vehicle: {
+    title: string;
+    titleAr: string;
+    chassisVin: string;
+    imageUrl: string;
+    vaultLocation: string;
+    specs: string;
+    tasjeelGrade: string;
+    inspectionImpounded: boolean;
+  };
+  consignor: {
+    name: string;
+    nameAr: string;
+    entity: string;
+    status: string;
+    legalCounsel: string;
+    phone: string;
+  };
+  mandate: {
+    status: 'FROZEN' | 'RELEASED_FROM_ATTACHMENT';
+    listingStatus: 'DELISTED' | 'ACTIVE_ON_FLOOR';
+    judicialSealApplied: boolean;
+    dualPinLocked: boolean;
+    custodianOfficer: string;
+  };
+  financials: {
+    askingPriceAed: number;
+    consignorReserveAed: number;
+    dealershipCommissionAed: number;
+    escrowDepositLockedAed: number;
+    isCommissionHeld: boolean;
+  };
+  compliance: {
+    bailmentLawStatute: string;
+    allianzInsuranceStatus: string;
+    allianzPolicyNumber: string;
+    chattelLienRegistered: boolean;
+    rtaGatewayTransferLocked: boolean;
+    dubaiPoliceBlacklisted: boolean;
+  };
+}
+
+export interface CustodyFreezePageData {
+  kpis: ConsignmentKpis;
+  freezeDossier: JudicialFreezeDossier;
+  fleetAccount: CorporateFleetAccount;
+  pipelineItems: ConsignmentPipelineRow[];
+}
+
+export const VERIFIED_CUSTODY_FREEZE_FIXTURE: CustodyFreezePageData = {
+  kpis: {
+    portfolioValueAed: 64200000,
+    consignedUnitsCount: 32,
+    insuranceCoveragePct: 100,
+    fleetUnitsUnderManagement: 128,
+    vipKeyAccountsCount: 6,
+    fleetUptimePct: 98.4,
+    mtdProjectedYieldAed: 1280000,
+    avgMarginPct: 5.5,
+    closedSalesCount: 12,
+    mulkiyaCompliancePct: 96.8,
+    expiringUnitsCount: 8,
+  },
+  freezeDossier: {
+    courtOrderNumber: 'DXB-EXEC-2025-8841',
+    courtName: 'Dubai Commercial Court 4',
+    courtNameAr: 'محكمة دبي التجارية - الدائرة الرابعة',
+    hearingDate: '12 May 2025',
+    injunctionRef: '#CSG-2025-089A-DISPUTE',
+    vehicle: {
+      title: '2023 Ferrari 296 GTB Assetto Fiorano',
+      titleAr: '2023 فيراري 296 GTB أسيتو فيورانو',
+      chassisVin: 'ZFF98LHA0P6293108',
+      imageUrl: 'https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=1200&q=80',
+      vaultLocation: 'Vault Bay 01-12 [SECURED QUARANTINE]',
+      specs: '3.0L Twin-Turbo V6 Hybrid • 819 BHP • Assetto Fiorano Track Pack • Carbon Wheels • 2,400 KM',
+      tasjeelGrade: 'GRADE A (98/100)',
+      inspectionImpounded: true,
+    },
+    consignor: {
+      name: 'Sheikh Khalid Al-Nahyan',
+      nameAr: 'الشيخ خالد آل نهيان',
+      entity: 'Private Collection Holding FZCO',
+      status: 'DISPUTED CONSIGNOR',
+      legalCounsel: 'Al Tamimi & Co (Advocates & Legal Consultants)',
+      phone: '+971 4 364 1641',
+    },
+    mandate: {
+      status: 'FROZEN',
+      listingStatus: 'DELISTED',
+      judicialSealApplied: true,
+      dualPinLocked: true,
+      custodianOfficer: 'Justice Bailiff Tariq Mansour (DIFC / Dubai Courts)',
+    },
+    financials: {
+      askingPriceAed: 1650000,
+      consignorReserveAed: 1480000,
+      dealershipCommissionAed: 170000,
+      escrowDepositLockedAed: 1650000,
+      isCommissionHeld: true,
+    },
+    compliance: {
+      bailmentLawStatute: 'UAE Federal Decree-Law No. 50 of 2022 (Commercial Transactions Law - Bailment Provisions)',
+      allianzInsuranceStatus: 'SUSPENDED FOR ROAD USE — VAULT STORAGE ONLY under Allianz policy #DXB-CUST-889 special rider',
+      allianzPolicyNumber: 'DXB-CUST-889',
+      chattelLienRegistered: true,
+      rtaGatewayTransferLocked: true,
+      dubaiPoliceBlacklisted: true,
+    },
+  },
+  fleetAccount: {
+    accountName: 'Falcon Luxury Chauffeur & VIP Hospitality FZ-LLC',
+    trn: '100482938100003',
+    dedLicense: '#894211',
+    tier: 'Tier-1 • Net-30 Invoicing',
+    paymentTerms: 'Corporate Retainer + SLA',
+    activeUnitsCount: 36,
+    composition: [
+      { model: 'Mercedes-Maybach S 680', units: 18, statusLabel: '100% Operational', badgeClass: 'bg-tertiary/15 text-tertiary' },
+      { model: 'Range Rover SV Autobiography', units: 12, statusLabel: '1 In Service Bay', badgeClass: 'bg-secondary/15 text-secondary' },
+      { model: 'Rolls-Royce Ghost', units: 6, statusLabel: 'VIP Dedicated', badgeClass: 'bg-primary/15 text-primary' },
+    ],
+    slaDescription: 'Guaranteed SLA: 2-Hour emergency turnaround in Workshop Bay 6',
+    priorityUnits: [
+      {
+        unitId: 'FLC-MAY-01',
+        model: 'Maybach S 680 4MATIC',
+        plate: 'DXB-K-4921',
+        mulkiyaValidUntil: '18 Nov 2025',
+        odometerKm: 24180,
+        nextIntervalKm: 1240,
+        status: 'Compliant',
+        statusBadgeClass: 'bg-tertiary/15 text-tertiary',
+      },
+      {
+        unitId: 'FLC-RR-04',
+        model: 'Rolls-Royce Ghost Extended',
+        plate: 'DXB-AA-1102',
+        mulkiyaValidUntil: 'Due in 6 Days',
+        isUrgent: true,
+        odometerKm: 19420,
+        nextIntervalKm: 80,
+        status: 'Inspection Due',
+        statusBadgeClass: 'bg-error/15 text-error',
+        rtaBooking: 'Fast-Track Booked',
+      },
+    ],
+  },
+  pipelineItems: [
+    {
+      id: 'pipe-csg-01',
+      accountName: 'Sheikh Hamdan Al Maktoum Col.',
+      accountType: 'Royal Consignment',
+      accountTypeBadgeClass: 'bg-primary/15 text-primary',
+      vehicleTitle: 'Porsche 911 GT3 RS (992)',
+      vehicleSpecs: 'Weissach Package • 1,200 KM',
+      vin: 'WP0AF2A97PS298114',
+      plate: 'Plate: DXB-R-911',
+      agreementType: '90-Day Exclusive',
+      agreementBadgeClass: 'bg-surface-container text-on-surface',
+      agreedValueAed: 1850000,
+      commissionSplitLabel: '8.0% (AED 148,000)',
+      mulkiyaStatus: 'Valid (Oct 2025)',
+      mulkiyaValid: true,
+      pipelineStatus: 'Vault Active',
+      pipelineBadgeClass: 'bg-tertiary/15 text-tertiary',
+    },
+    {
+      id: 'pipe-csg-02',
+      accountName: 'Dubai Royal Chauffeur Services',
+      accountType: 'Corporate Fleet Tier-1',
+      accountTypeBadgeClass: 'bg-secondary/15 text-secondary',
+      vehicleTitle: 'Bentley Flying Spur W12',
+      vehicleSpecs: 'Mulliner Executive 4-Seat • 31,400 KM',
+      vin: 'SCBDG4ZG4NC082103',
+      plate: 'Plate: DXB-F-2201',
+      agreementType: 'Full Fleet SLA',
+      agreementBadgeClass: 'bg-surface-container text-on-surface',
+      agreedValueAed: 1150000,
+      commissionSplitLabel: 'Monthly Retainer',
+      mulkiyaStatus: 'Expiring in 5 Days',
+      mulkiyaValid: false,
+      pipelineStatus: 'Inspection Due',
+      pipelineBadgeClass: 'bg-error/15 text-error',
+    },
+    {
+      id: 'pipe-csg-03',
+      accountName: 'Apex Racing FZCO',
+      accountType: 'Private Track Mandate',
+      accountTypeBadgeClass: 'bg-primary/15 text-primary',
+      vehicleTitle: 'McLaren 765LT Spider',
+      vehicleSpecs: 'MSO Carbon Defined • 3,800 KM',
+      vin: 'SBM13MAA2MW004921',
+      plate: 'Plate: DXB-W-765',
+      agreementType: 'Consignment Sale',
+      agreementBadgeClass: 'bg-surface-container text-on-surface',
+      agreedValueAed: 2300000,
+      commissionSplitLabel: '6.5% (AED 149,500)',
+      mulkiyaStatus: 'Valid (Jan 2026)',
+      mulkiyaValid: true,
+      pipelineStatus: 'Pending Offer',
+      pipelineBadgeClass: 'bg-secondary/15 text-secondary',
+    },
+  ],
+};
+
+export async function fetchCustodyFreezeData(): Promise<CustodyFreezePageData> {
+  return VERIFIED_CUSTODY_FREEZE_FIXTURE;
+}
+
+
 
 
