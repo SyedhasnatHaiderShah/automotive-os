@@ -1,0 +1,122 @@
+{
+  "screen": "S25",
+  "title": "F&I Subprime DBR Exception & Underwriting Hard-Lock",
+  "route": "/finance/exception",
+  "timestamp": "2026-10-21T10:11:14.482Z",
+  "total": 22,
+  "passed": 22,
+  "failed": 0,
+  "status": "VERIFIED",
+  "checks": [
+    {
+      "name": "Route HTTP Status 200",
+      "pass": true,
+      "details": "Status: 200"
+    },
+    {
+      "name": "Regulatory Breach Warning Banner",
+      "pass": true,
+      "details": "Notice No. 29/2011 displayed"
+    },
+    {
+      "name": "Open Banking API State Flagged",
+      "pass": true,
+      "details": "API State: breach-flagged-openfinance"
+    },
+    {
+      "name": "Desk Title Present",
+      "pass": true,
+      "details": "F&I Referral & Lending Status Desk"
+    },
+    {
+      "name": "Top 4 Action Buttons",
+      "pass": true,
+      "details": "Simulate, Rate Sheet, Export Log, Submit Dossier all present"
+    },
+    {
+      "name": "KPI Summary Cards (4 Metrics)",
+      "pass": true,
+      "details": "Pipeline AED 28.45M, SLA 4.8h, Yield AED 842.6k, LTV Breach 85%"
+    },
+    {
+      "name": "Active Dossier Spotlight",
+      "pass": true,
+      "details": "Case #FNI-2025-0422, G63 4x4², Sultan Al-Mansoori, AECB 645 High DBR Risk"
+    },
+    {
+      "name": "Bank Syndication Matrix (4 Lenders)",
+      "pass": true,
+      "details": "ENBD Declined, FAB Rejected, DIB Conditional Sharia, ADCB Special Review"
+    },
+    {
+      "name": "Insurance Underwriting & 4 Riders",
+      "pass": true,
+      "details": "Sukoon Agreed Value AED 1.42M + 4 Active Supercar Endorsements"
+    },
+    {
+      "name": "CBUAE Guardrails Card",
+      "pass": true,
+      "details": "DBR 58.4% (+8.4% breach), Regulation 29/2011 notice"
+    },
+    {
+      "name": "Restructure & Exception Desk",
+      "pass": true,
+      "details": "30% Down option, Sovereign Wealth option, CRO Escalation button"
+    },
+    {
+      "name": "Pipeline Files Table",
+      "pass": true,
+      "details": "Ferrari 296 GTB, Valkyrie Spider, Cullinan present"
+    },
+    {
+      "name": "Desktop 1440 Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S25\\desktop_1440.png"
+    },
+    {
+      "name": "Option A 30% Down Restructure Cured DBR",
+      "pass": true,
+      "details": "DBR reduced to 48.2%, CBUAE Compliant, Syndication Unlocked"
+    },
+    {
+      "name": "Restructure Cured Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S25\\modal_restructure_cured.png"
+    },
+    {
+      "name": "CRO Exception Granted Modal",
+      "pass": true,
+      "details": "Dual committee authorization logged"
+    },
+    {
+      "name": "CRO Escalation Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S25\\modal_cro_escalation.png"
+    },
+    {
+      "name": "Rate Sheet Matrix Modal",
+      "pass": true,
+      "details": "Bank spreads across Tier-1 to Subprime displayed"
+    },
+    {
+      "name": "RBAC Least-Privilege Masking",
+      "pass": true,
+      "details": "Dealer reserves and sensitive yields masked for Sales Rep"
+    },
+    {
+      "name": "Arabic RTL Mode",
+      "pass": true,
+      "details": "dir=\"rtl\" with Arabic localization"
+    },
+    {
+      "name": "Arabic RTL Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S25\\arabic_rtl.png"
+    },
+    {
+      "name": "Mobile 390 Screenshot",
+      "pass": true,
+      "details": "H:\\Personal\\Automotiv OS\\docs\\qa\\evidence\\S25\\mobile_390.png"
+    }
+  ]
+}

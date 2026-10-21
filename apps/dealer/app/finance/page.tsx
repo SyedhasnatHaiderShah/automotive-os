@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
 import {
@@ -857,6 +858,18 @@ export default function FinanceAndInsurancePage() {
                         <span>{isRtl ? 'الالتزام الحالي' : 'Current Commitment'}</span>
                         <span>{isRtl ? 'الحد الأقصى القانوني: 50.0%' : 'CBUAE Statutory Max: 50.0%'}</span>
                       </div>
+
+                      {demonstratorState === 'HIGH_DBR' && (
+                        <div className="pt-2">
+                          <Link
+                            href="/finance/exception"
+                            className="inline-flex items-center justify-center w-full gap-1.5 px-3 py-2 rounded-lg bg-error text-on-error font-body-sm text-[12px] font-bold hover:bg-error/90 transition-all"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                            <span>{isRtl ? 'فتح تفاصيل الاستثناء وتجميد الاكتتاب (S25)' : 'Open S25 DBR Exception & Underwriting Hard-Lock'}</span>
+                          </Link>
+                        </div>
+                      )}
                     </div>
 
                     {/* LTV & Tenor Checks */}

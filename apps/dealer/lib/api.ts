@@ -2450,4 +2450,355 @@ export async function fetchExportDiscrepancyData(): Promise<ExportDiscrepancyDat
   return VERIFIED_EXPORT_DISCREPANCY_FIXTURE;
 }
 
+/**
+ * ==============================================================================
+ * S25: F&I Subprime DBR Exception & Underwriting Hard-Lock (Screen 569de90e9e7143f6b47dc5994dd3a098)
+ * ==============================================================================
+ */
+
+export interface SubprimeLenderOffer {
+  id: string;
+  bankCode: 'ENBD' | 'FAB' | 'DIB' | 'ADCB';
+  bankName: string;
+  deskName: string;
+  statusLabel: string;
+  statusType: 'DECLINED' | 'REJECTED' | 'CONDITIONAL_SHARIA' | 'SPECIAL_REVIEW';
+  statusDescription: string;
+  decisionSla: string;
+  profitRateDisplay: string;
+  dealerReserveAed: number;
+  dealerReserveDisplay: string;
+  specialCondition: string;
+  actionLabel: string;
+  actionType: 'decline_letter' | 'view_bounds' | 'structure_30' | 'submit_pledge';
+  isLocked: boolean;
+}
+
+export interface SubprimeApplicantProfile {
+  name: string;
+  nameAr: string;
+  uaePassVerified: boolean;
+  affiliation: string;
+  roleTitle: string;
+  aecbScore: number;
+  riskTier: string;
+  vehicleInvoicePriceAed: number;
+  downPaymentAed: number;
+  downPaymentPct: number;
+  minDownPaymentPct: number;
+  netFinancedPrincipalAed: number;
+  monthlyIncomeAed: number;
+  monthlyLiabilitiesAed: number;
+}
+
+export interface SubprimeCbuaeGuardrails {
+  dbrPct: number;
+  statutoryMaxDbrPct: number;
+  dbrBreachPct: number;
+  ltvPct: number;
+  statutoryMaxLtvPct: number;
+  tenorMonths: number;
+  maxTenorMonths: number;
+  isCompliant: boolean;
+  regulationNoticeEn: string;
+  regulationNoticeAr: string;
+}
+
+export interface SubprimeRestructureOptions {
+  recommendedCurePath: string;
+  optionATitle: string;
+  optionADesc: string;
+  optionBTitle: string;
+  optionBDesc: string;
+  projectedPaymentAed: number;
+  disposableExcessAed: number;
+  potentialReserveYieldAed: number;
+  curedDbrPct: number;
+  curedDownPaymentAed: number;
+  curedDownPaymentPct: number;
+  curedFinancedPrincipalAed: number;
+}
+
+export interface SubprimeDbrExceptionData {
+  caseNumber: string;
+  stockNumber: string;
+  flaggedTimeAgo: string;
+  apiState: string;
+  vehicle: {
+    stockNumber: string;
+    title: string;
+    titleAr: string;
+    vin: string;
+    specs: string;
+    imageUrl: string;
+    invoicePriceAed: number;
+  };
+  applicant: SubprimeApplicantProfile;
+  guardrails: SubprimeCbuaeGuardrails;
+  restructure: SubprimeRestructureOptions;
+  lenders: SubprimeLenderOffer[];
+  insurance: InsurancePolicyData;
+  summary: {
+    financedPipelineQtdAed: number;
+    inFlightFilesCount: number;
+    momGrowthPct: number;
+    avgApprovalHours: number;
+    avgBenchmarkHours: number;
+    slaAdvantagePct: number;
+    projectedDealerYieldAed: number;
+    overallYieldPct: number;
+    cbuaeLtvCompliancePct: number;
+    minEquityMetPct: number;
+    breachesCount: number;
+  };
+  pipelineFiles: FinancePipelineFile[];
+}
+
+export const VERIFIED_SUBPRIME_DBR_EXCEPTION_FIXTURE: SubprimeDbrExceptionData = {
+  caseNumber: '#FNI-2025-0422',
+  stockNumber: '#DXB-G63-4X4',
+  flaggedTimeAgo: '28m ago',
+  apiState: 'breach-flagged-openfinance',
+  vehicle: {
+    stockNumber: '#DXB-G63-4X4',
+    title: '2024 Mercedes-AMG G 63 4x4²',
+    titleAr: '2024 مرسيدس AMG G 63 4x4²',
+    vin: 'W1N4632761X891044',
+    specs: 'GCC Spec • 4.0L Bi-Turbo V8 • 577 BHP • 9G-TRONIC • Portal Axles • 850 km',
+    imageUrl: 'https://images.unsplash.com/photo-1520031441872-265e4ff70366?auto=format&fit=crop&w=1200&q=80',
+    invoicePriceAed: 1890000,
+  },
+  applicant: {
+    name: 'Sultan Al-Mansoori',
+    nameAr: 'سلطان المنصوري',
+    uaePassVerified: true,
+    affiliation: 'Al-Mansoori Private Holding',
+    roleTitle: 'Managing Partner',
+    aecbScore: 645,
+    riskTier: 'High DBR Risk',
+    vehicleInvoicePriceAed: 1890000,
+    downPaymentAed: 283500,
+    downPaymentPct: 15.0,
+    minDownPaymentPct: 20.0,
+    netFinancedPrincipalAed: 1606500,
+    monthlyIncomeAed: 157500,
+    monthlyLiabilitiesAed: 92000,
+  },
+  guardrails: {
+    dbrPct: 58.4,
+    statutoryMaxDbrPct: 50.0,
+    dbrBreachPct: 8.4,
+    ltvPct: 85.0,
+    statutoryMaxLtvPct: 80.0,
+    tenorMonths: 60,
+    maxTenorMonths: 60,
+    isCompliant: false,
+    regulationNoticeEn: 'NON-COMPLIANT UNDER REGULATION 29/2011: Total verified monthly debt of AED 92,000 exceeds 50.0% of verified salary AED 157,500. Automatic sanction is blocked by UAE Central Bank rules.',
+    regulationNoticeAr: 'غير متوافق وفق نظام المصرف المركزي رقم 29/2011: إجمالي الالتزامات الشهرية البالغة 92,000 درهم تتجاوز 50% من الراتب المعتمد 157,500 درهم. تم تجميد التحويل المصرفي الآلي.',
+  },
+  restructure: {
+    recommendedCurePath: 'Inject 30% Down',
+    optionATitle: 'Option A: Structure 30% Down',
+    optionADesc: 'Increasing equity to AED 567,000 brings financed amount to AED 1,323,000 and drops monthly DBR to 48.2% (under statutory 50% cap). Cures DBR breach instantly.',
+    optionBTitle: 'Option B: Sovereign Wealth Guarantor',
+    optionBDesc: 'Pledge portfolio under custodian escrow or attach UAE Pass sovereign co-signer. Exempts applicant from retail DBR ceiling.',
+    projectedPaymentAed: 30240,
+    disposableExcessAed: 13240,
+    potentialReserveYieldAed: 18500,
+    curedDbrPct: 48.2,
+    curedDownPaymentAed: 567000,
+    curedDownPaymentPct: 30.0,
+    curedFinancedPrincipalAed: 1323000,
+  },
+  lenders: [
+    {
+      id: 'sub-lnd-01',
+      bankCode: 'ENBD',
+      bankName: 'Emirates NBD',
+      deskName: 'Private Banking Auto Desk',
+      statusLabel: 'DECLINED (DBR Ceiling Exceeded)',
+      statusType: 'DECLINED',
+      statusDescription: 'Calculated DBR 58.4% > 50% max',
+      decisionSla: 'Automated Breach Lockout',
+      profitRateDisplay: '2.49% Flat Locked',
+      dealerReserveAed: 0,
+      dealerReserveDisplay: 'AED 0 Forfeited',
+      specialCondition: 'Requires DBR debt consolidation or co-borrower',
+      actionLabel: 'Decline Letter',
+      actionType: 'decline_letter',
+      isLocked: true,
+    },
+    {
+      id: 'sub-lnd-02',
+      bankCode: 'FAB',
+      bankName: 'First Abu Dhabi Bank',
+      deskName: 'FAB Elite Auto Lending',
+      statusLabel: 'REJECTED - Tenor & LTV Out of Bounds',
+      statusType: 'REJECTED',
+      statusDescription: 'Statutory LTV 85.0% > 80.0% cap',
+      decisionSla: 'Statutory LTV Breach',
+      profitRateDisplay: '2.39% Flat Locked',
+      dealerReserveAed: 0,
+      dealerReserveDisplay: 'AED 0 Forfeited',
+      specialCondition: 'Customer must inject min AED 94,500 cash equity',
+      actionLabel: 'View Bounds',
+      actionType: 'view_bounds',
+      isLocked: true,
+    },
+    {
+      id: 'sub-lnd-03',
+      bankCode: 'DIB',
+      bankName: 'Dubai Islamic Bank',
+      deskName: 'Al Islami Auto Murabaha',
+      statusLabel: 'CONDITIONAL SHARIA WAIVER',
+      statusType: 'CONDITIONAL_SHARIA',
+      statusDescription: 'Requires 30% Down Payment or Cross-Guarantee',
+      decisionSla: 'Murabaha Asset Sale Ready',
+      profitRateDisplay: '2.85% Flat / 5.25% Profit Rate',
+      dealerReserveAed: 18500,
+      dealerReserveDisplay: 'AED 18,500 Conditional Margin',
+      specialCondition: 'Inject AED 567,000 equity to lower DBR to 48.2%',
+      actionLabel: 'Structure 30%',
+      actionType: 'structure_30',
+      isLocked: false,
+    },
+    {
+      id: 'sub-lnd-04',
+      bankCode: 'ADCB',
+      bankName: 'ADCB Private',
+      deskName: 'Private Wealth Syndicate Desk',
+      statusLabel: 'SPECIAL WEALTH DESK REVIEW',
+      statusType: 'SPECIAL_REVIEW',
+      statusDescription: 'Requires AED 2M Liquid Asset Pledge',
+      decisionSla: 'Custodian Escrow Pledge',
+      profitRateDisplay: '2.75% Flat / 5.10% Reducing',
+      dealerReserveAed: 16800,
+      dealerReserveDisplay: 'AED 16,800 Special Node Yield',
+      specialCondition: 'Pledge portfolio under custody to bypass DBR',
+      actionLabel: 'Submit Pledge',
+      actionType: 'submit_pledge',
+      isLocked: false,
+    },
+  ],
+  insurance: {
+    carrierName: 'Oman Insurance (Sukoon) • Agreed Value',
+    policyType: 'Agreed Value Supercar Policy',
+    agreedValuationAed: 1420000,
+    rateFactorPct: 3.00,
+    annualPremiumAed: 42600,
+    brokerageSharePct: 15.0,
+    brokeragePayoutAed: 6390,
+    endorsements: [
+      {
+        id: 'sub-end-01',
+        title: 'GCC Agency Repair Guarantee',
+        subtitle: 'Authorized Al Nabooda Porsche Center exclusively',
+        icon: 'verified',
+        active: true,
+      },
+      {
+        id: 'sub-end-02',
+        title: 'Dubai Autodrome Track Day Cover',
+        subtitle: 'FIA Non-competitive sanctioned track events',
+        icon: 'sports_score',
+        active: true,
+      },
+      {
+        id: 'sub-end-03',
+        title: 'Zero Depreciation on Carbon Aero & PCCB',
+        subtitle: 'Full replacement value guaranteed for 24 months',
+        icon: 'shield',
+        active: true,
+      },
+      {
+        id: 'sub-end-04',
+        title: '24/7 Enclosed Flatbed Recovery',
+        subtitle: 'Covering all UAE Emirates & GCC cross-border transit',
+        icon: 'local_shipping',
+        active: true,
+      },
+    ],
+  },
+  summary: {
+    financedPipelineQtdAed: 28450000,
+    inFlightFilesCount: 18,
+    momGrowthPct: 12.4,
+    avgApprovalHours: 4.8,
+    avgBenchmarkHours: 24.0,
+    slaAdvantagePct: 79,
+    projectedDealerYieldAed: 842600,
+    overallYieldPct: 2.96,
+    cbuaeLtvCompliancePct: 85.0,
+    minEquityMetPct: 15.0,
+    breachesCount: 1,
+  },
+  pipelineFiles: [
+    {
+      id: 'pipe-01',
+      fileRef: '#FNI-2025-0414',
+      vehicleTitle: 'Ferrari 296 GTB Assetto Fiorano',
+      vehicleSpecs: '2023 • Rosso Corsa • 3,100 km',
+      customerName: 'H.E. Sheikh Majid Al Qasimi',
+      customerTier: 'AECB 860 (Tier-1)',
+      invoiceValueAed: 1650000,
+      financedAmtAed: 1320000,
+      lenderName: 'FAB Elite Auto',
+      productTerms: '2.35% Flat • 36 Months',
+      underwritingStatus: 'FAB Sanctioned',
+      statusBadgeClass: 'bg-tertiary/15 text-tertiary',
+      dealerReserveAed: 16500,
+    },
+    {
+      id: 'pipe-02',
+      fileRef: '#FNI-2025-0409',
+      vehicleTitle: 'Mercedes-AMG G63 4x4²',
+      vehicleSpecs: '2024 • Obsidian Black • 850 km',
+      customerName: 'Khalfan Saeed Real Estate LLC',
+      customerTier: 'Corporate Facility',
+      invoiceValueAed: 1890000,
+      financedAmtAed: 1400000,
+      lenderName: 'Emirates NBD Commercial',
+      productTerms: '2.45% Flat • 48 Months',
+      underwritingStatus: 'Funds Disbursed',
+      statusBadgeClass: 'bg-secondary/15 text-secondary',
+      dealerReserveAed: 17500,
+    },
+    {
+      id: 'pipe-03',
+      fileRef: '#FNI-2025-0402',
+      vehicleTitle: 'Aston Martin Valkyrie Spider',
+      vehicleSpecs: '2024 • British Racing Green • 120 km',
+      customerName: 'Private Collector (Jumeirah Islands)',
+      customerTier: 'Sovereign Direct Client',
+      invoiceValueAed: 14200000,
+      financedAmtAed: 0,
+      lenderName: 'Self-Financed Wire',
+      productTerms: 'Insurance Brokerage Only',
+      underwritingStatus: 'Cash Settle / Insurance Bound',
+      statusBadgeClass: 'bg-primary/15 text-primary',
+      dealerReserveAed: 63900,
+    },
+    {
+      id: 'pipe-04',
+      fileRef: '#FNI-2025-0398',
+      vehicleTitle: 'Rolls-Royce Cullinan Series II',
+      vehicleSpecs: '2025 • Arctic White • Delivery Mileage',
+      customerName: 'Bader Sultan Al Nuaimi',
+      customerTier: 'AECB 795 (Tier-1)',
+      invoiceValueAed: 2750000,
+      financedAmtAed: 2200000,
+      lenderName: 'Dubai Islamic Bank (DIB)',
+      productTerms: '2.50% Murabaha • 60 Months',
+      underwritingStatus: 'Pending Murabaha Asset Sale',
+      statusBadgeClass: 'bg-secondary/15 text-secondary',
+      dealerReserveAed: 22000,
+    },
+  ],
+};
+
+export async function fetchSubprimeDbrExceptionData(): Promise<SubprimeDbrExceptionData> {
+  return VERIFIED_SUBPRIME_DBR_EXCEPTION_FIXTURE;
+}
+
+
 
