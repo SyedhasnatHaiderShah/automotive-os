@@ -156,6 +156,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 <div className="bg-surface-container-high/90 backdrop-blur-md p-1 rounded-xl flex items-center gap-1 text-on-surface border border-white/[0.06]">
                   <button
                     type="button"
+                    id="view-principal-btn"
                     onClick={() => setCurrentRole('PRINCIPAL')}
                     className={`px-3 py-1.5 rounded-lg font-body-sm text-xs font-semibold transition-all flex items-center gap-1.5 ${
                       currentRole === 'PRINCIPAL'
@@ -168,6 +169,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                   </button>
                   <button
                     type="button"
+                    id="view-rep-btn"
                     onClick={() => setCurrentRole('SALES_REP')}
                     className={`px-3 py-1.5 rounded-lg font-body-sm text-xs transition-all flex items-center gap-1.5 ${
                       currentRole === 'SALES_REP'
@@ -239,7 +241,10 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 <div className="mt-2 flex flex-col">
                   <div className="flex items-baseline gap-1.5">
                     <span className="font-label-caps text-xs text-primary font-bold">AED</span>
-                    <span className="font-headline-md text-base sm:text-lg font-bold text-on-surface font-data-mono-num">
+                    <span
+                      id="stat-floor-val"
+                      className="font-headline-md text-base sm:text-lg font-bold text-on-surface font-data-mono-num"
+                    >
                       {stats.floorValuationAed.toLocaleString('en-US')}
                     </span>
                   </div>
@@ -310,7 +315,10 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
 
           {/* Role Permission Alert Strip (Shows when in Sales Rep mode) */}
           {currentRole === 'SALES_REP' && (
-            <div className="mb-4 p-4 rounded-2xl bg-surface-container-high border-l-4 border-primary flex items-center justify-between shadow-lg animate-fade-in border border-white/[0.06]">
+            <div
+              id="role-alert-banner"
+              className="mb-4 p-4 rounded-2xl bg-surface-container-high border-l-4 border-primary flex items-center justify-between shadow-lg animate-fade-in border border-white/[0.06]"
+            >
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
                   <span className="material-symbols-outlined text-[20px]">visibility_off</span>
@@ -341,6 +349,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 </span>
                 <input
                   type="text"
+                  id="vin-search-input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter by Marque, VIN (WP0...), Model, Stock ID (#DXB-911) or Chassis..."
@@ -349,6 +358,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 {searchQuery && (
                   <button
                     type="button"
+                    id="clear-search-btn"
                     onClick={() => setSearchQuery('')}
                     className="absolute right-3 top-2.5 text-on-surface-variant hover:text-on-surface"
                   >
@@ -487,12 +497,15 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
 
           {/* Bulk Action Bar (Surfaces when rows are checked) */}
           {selectedIds.size > 0 && (
-            <div className="mb-4 p-3.5 rounded-2xl bg-surface-container-high shadow-2xl flex flex-wrap items-center justify-between gap-3 border border-white/[0.07] animate-fade-in">
+            <div
+              id="bulk-action-bar"
+              className="mb-4 p-3.5 rounded-2xl bg-surface-container-high shadow-2xl flex flex-wrap items-center justify-between gap-3 border border-white/[0.07] animate-fade-in"
+            >
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5 bg-primary/20 text-primary px-3 py-1 rounded-lg border border-primary/30">
                   <span className="material-symbols-outlined text-[17px]">check_box</span>
                   <span className="font-body-sm text-xs font-bold">
-                    {selectedIds.size} Vehicles Selected
+                    <span id="selected-count">{selectedIds.size}</span> Vehicles Selected
                   </span>
                 </div>
                 <div className="font-body-sm text-xs text-on-surface-variant">
@@ -559,6 +572,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                     <th className="w-12 px-4 text-center">
                       <input
                         type="checkbox"
+                        id="select-all-check"
                         checked={selectedIds.size === filteredVehicles.length && filteredVehicles.length > 0}
                         onChange={toggleSelectAll}
                         className="rounded bg-surface-container-high border-0 accent-primary text-primary focus:ring-0 cursor-pointer w-4 h-4"
@@ -575,7 +589,10 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 </thead>
 
                 {/* Table Body */}
-                <tbody className="font-body-md text-xs sm:text-sm text-on-surface divide-y divide-white/[0.04]">
+                <tbody
+                  id="inventory-table-body"
+                  className="font-body-md text-xs sm:text-sm text-on-surface divide-y divide-white/[0.04]"
+                >
                   {filteredVehicles.map((vehicle) => {
                     const isSelected = selectedIds.has(vehicle.id);
                     const isVinRevealed = revealedVins.has(vehicle.id);
@@ -708,6 +725,11 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                           {vehicle.stockStatus === 'SOLD' && (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container-highest text-on-surface-variant">
                               Sold / Archived
+                            </span>
+                          )}
+                          {vehicle.listingStatus === 'UNPUBLISHED' && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface-variant border border-white/[0.05]">
+                              Unpublished
                             </span>
                           )}
                           {(!vehicle.listingStatus || vehicle.listingStatus === 'DRAFT') && (

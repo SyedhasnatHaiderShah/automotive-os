@@ -331,7 +331,7 @@ export async function fetchDealerInventory(): Promise<{
   items: DealerVehicleItem[];
   stats: InventoryStats;
 }> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   try {
     const response = await fetch(`${apiUrl}/api/v1/inventory/vehicles`, {
@@ -391,7 +391,7 @@ export async function fetchDealerInventory(): Promise<{
  * Fetch tenant CRM leads with backend API and verified Stitch fallback
  */
 export async function fetchDealerLeads(): Promise<DealerLeadItem[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   try {
     const response = await fetch(`${apiUrl}/api/v1/leads`, {
@@ -439,7 +439,7 @@ export interface IntakeVehiclePayload {
 export async function createDealerVehicle(
   payload: IntakeVehiclePayload
 ): Promise<DealerVehicleItem> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   try {
     const response = await fetch(`${apiUrl}/api/v1/inventory/vehicles`, {

@@ -22,6 +22,11 @@ export class PublicListingQueryDto {
   @IsOptional()
   make?: string;
 
+  @ApiProperty({ description: 'Filter by Dealership slug (e.g. silberarrows, al-futtaim-prestige)', required: false })
+  @IsString()
+  @IsOptional()
+  dealerSlug?: string;
+
   @ApiProperty({ description: 'Filter by Model name or slug (e.g. Land Cruiser, 911)', required: false })
   @IsString()
   @IsOptional()

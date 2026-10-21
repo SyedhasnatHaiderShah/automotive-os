@@ -1,27 +1,27 @@
 screen_id,Stitch_design_name,Stitch_project_id,Stitch_screen_id,source_design_url_or_export,reference_screenshot_path,approved_at,notes
-S01,Marketplace Home & Car Search,,,,,,
-S02,Search Results & Dealer Filters,,,,,,
-S03,Mobile Filters Overlay Sheet,,,,,,
-S04,Vehicle Comparison Matrix,,,,,,
-S05,Vehicle Listing Detail Dossier,,,,,,
-S06,Verified Dealership Storefront,,,,,,
-S07,VIP Enquiry & Consent Flow,,,,,,
-S08,Buyer Enquiry Status Timeline,,,,,,
-S09,"Appointments, Test Drives & Virtual Garage",,,,,,
-S10,Saved Searches & Favorites,,,,,,
-S11,Buyer Profile & Privacy Permissions,,,,,,
-S12,Dealer Executive Overview Dashboard,,,,,,
-S13,Vehicle Inventory Management Grid,,,,,,
-S14,Platform Operations & Governance Command,,,,,,
-S15,KYB Dealer Verification & Audit Dossier,,,,,,
-S16,Vehicle Listing Moderation & VIN Risk Review,,,,,,
-S17,Seller Sanctions & Escrow Dispute Review,,,,,,
-S18,Sales Orders & Quotations Studio,,,,,,
-S19,Workshop Job Card & Bay Operations Calendar,,,,,,
-S20,Parts Inventory & Automated Procurement,,,,,,
-S21,Finance & Insurance Referral & Banking Desk,,,,,,
-S22,FTA Tax Invoices & Accounting Settlement,,,,,,
-S23,Corporate Fleet Accounts & VIP Consignment Portfolio,,,,,,
-S24,Zero-Rated GCC Export & Customs Bond Discrepancy,,,,,,
-S25,F&I Subprime DBR Exception & Underwriting Hard-Lock,,,,,,
-S26,Consignment Custody Freeze & Judicial Injunction,,,,,,
+S01,Marketplace Home & Car Search,4467699827252507387,5f05e07d66314d02ba903a3e9635e5e0,projects/4467699827252507387/screens/5f05e07d66314d02ba903a3e9635e5e0,packages/ui/stitch-reference/stitch-home-screenshot.png,2026-10-20T11:23:14Z,Obsidian & Studio Glass dark mode
+S02,Search Results & Dealer Filters,4467699827252507387,25f8c91796994dafa16e145333eb0cc0,projects/4467699827252507387/screens/25f8c91796994dafa16e145333eb0cc0,packages/ui/stitch-reference/stitch-search-screenshot.png,2026-10-20T11:23:14Z,Obsidian dark mode with faceted filters
+S03,Mobile Filters Overlay Sheet,4467699827252507387,28fac34d59ea40ed8e273e74e7dbe2a0,projects/4467699827252507387/screens/28fac34d59ea40ed8e273e74e7dbe2a0,packages/ui/stitch-reference/stitch-mobile-filters-screenshot.png,2026-10-20T11:23:14Z,390px mobile drawer
+S04,Vehicle Comparison Matrix,4467699827252507387,b51417ac4c204fedb45c2149513931f0,projects/4467699827252507387/screens/b51417ac4c204fedb45c2149513931f0,STITCH_MCP:projects/4467699827252507387/screens/b51417ac4c204fedb45c2149513931f0,2026-10-20T11:23:14Z,4-way comparison matrix
+S05,Vehicle Listing Detail Dossier,4467699827252507387,f8eeabe57ad843a1b14e3323102c8151,projects/4467699827252507387/screens/f8eeabe57ad843a1b14e3323102c8151,packages/ui/stitch-reference/stitch-detail-screenshot.png,2026-10-20T11:23:14Z,Full vehicle dossier
+S06,Verified Dealership Storefront,4467699827252507387,a6d81d9621e44e26a1c232ee6b5af777,projects/4467699827252507387/screens/a6d81d9621e44e26a1c232ee6b5af777,STITCH_MCP:projects/4467699827252507387/screens/a6d81d9621e44e26a1c232ee6b5af777,2026-10-20T11:23:14Z,Dealership inventory and trade license
+S07,VIP Enquiry & Consent Flow,4467699827252507387,1ff78cd6f95845538cc81b3849e62c88,projects/4467699827252507387/screens/1ff78cd6f95845538cc81b3849e62c88,packages/ui/stitch-reference/stitch-enquiry-screenshot.png,2026-10-20T11:23:14Z,Explicit data grant checkboxes
+S08,Buyer Enquiry Status Timeline,4467699827252507387,a22fe42f09924bcf85ec90f61abcf9b7,projects/4467699827252507387/screens/a22fe42f09924bcf85ec90f61abcf9b7,STITCH_MCP:projects/4467699827252507387/screens/a22fe42f09924bcf85ec90f61abcf9b7,2026-10-20T11:23:14Z,Lead progress timeline
+S09,"Appointments, Test Drives & Virtual Garage",4467699827252507387,ad4e47810bc64f479b9f6a871187c52c,projects/4467699827252507387/screens/ad4e47810bc64f479b9f6a871187c52c,STITCH_MCP:projects/4467699827252507387/screens/ad4e47810bc64f479b9f6a871187c52c,2026-10-20T11:23:14Z,Bookings & garage
+S10,Saved Searches & Favorites,4467699827252507387,f01f7d612a404834a9d371d8c38945e2,projects/4467699827252507387/screens/f01f7d612a404834a9d371d8c38945e2,STITCH_MCP:projects/4467699827252507387/screens/f01f7d612a404834a9d371d8c38945e2,2026-10-20T11:23:14Z,Saved vehicles & alerts
+S11,Buyer Profile & Privacy Permissions,4467699827252507387,569db08de4024230815eb363576d3554,projects/4467699827252507387/screens/569db08de4024230815eb363576d3554,STITCH_MCP:projects/4467699827252507387/screens/569db08de4024230815eb363576d3554,2026-10-20T11:23:14Z,Profile & consent revoke
+S12,Dealer Executive Overview Dashboard,4467699827252507387,d36891533e434d269961e108cff842e2,projects/4467699827252507387/screens/d36891533e434d269961e108cff842e2,packages/ui/stitch-reference/stitch-dealer-dashboard.png,2026-10-20T11:23:14Z,Light Studio Glass DMS cockpit
+S13,Vehicle Inventory Management Grid,4467699827252507387,68e3e92ee73344beaddb67201f3db443,projects/4467699827252507387/screens/68e3e92ee73344beaddb67201f3db443,packages/ui/stitch-reference/stitch-dealer-inventory.png,2026-10-20T11:23:14Z,Light Studio Glass inventory matrix
+S14,Platform Operations & Governance Command,4467699827252507387,4404fdad57e3414992311b05009d6c7c,projects/4467699827252507387/screens/4404fdad57e3414992311b05009d6c7c,STITCH_MCP:projects/4467699827252507387/screens/4404fdad57e3414992311b05009d6c7c,2026-10-20T11:23:14Z,Platform Admin command cockpit
+S15,KYB Dealer Verification & Audit Dossier,4467699827252507387,c66fabd239274215933c237649699f1d,projects/4467699827252507387/screens/c66fabd239274215933c237649699f1d,packages/ui/stitch-reference/stitch-admin-kyb.png,2026-10-20T11:23:14Z,Admin KYB review & decision
+S16,Vehicle Listing Moderation & VIN Risk Review,4467699827252507387,8ac37f225c8e44ff8d99e824c784ccd7,projects/4467699827252507387/screens/8ac37f225c8e44ff8d99e824c784ccd7,packages/ui/stitch-reference/stitch-admin-moderation.png,2026-10-20T11:23:14Z,Admin listing review & VIN audit
+S17,Seller Sanctions & Escrow Dispute Review,4467699827252507387,10ebda02e492484d9444279dcbfdaa23,projects/4467699827252507387/screens/10ebda02e492484d9444279dcbfdaa23,STITCH_MCP:projects/4467699827252507387/screens/10ebda02e492484d9444279dcbfdaa23,2026-10-20T11:23:14Z,Disputes & sanctions (P1-GATED)
+S18,Sales Orders & Quotations Studio,4467699827252507387,e5eba1a68cca4c94b95a19b4c01c5312,projects/4467699827252507387/screens/e5eba1a68cca4c94b95a19b4c01c5312,STITCH_MCP:projects/4467699827252507387/screens/e5eba1a68cca4c94b95a19b4c01c5312,2026-10-20T11:23:14Z,Sales quotes (P1)
+S19,Workshop Job Card & Bay Operations Calendar,4467699827252507387,fb12b426f33b4543875b91044d10dd82,projects/4467699827252507387/screens/fb12b426f33b4543875b91044d10dd82,STITCH_MCP:projects/4467699827252507387/screens/fb12b426f33b4543875b91044d10dd82,2026-10-20T11:23:14Z,Workshop & bays (P1)
+S20,Parts Inventory & Automated Procurement,4467699827252507387,962b5df669c94fe29940311699ce33b4,projects/4467699827252507387/screens/962b5df669c94fe29940311699ce33b4,STITCH_MCP:projects/4467699827252507387/screens/962b5df669c94fe29940311699ce33b4,2026-10-20T11:23:14Z,Parts inventory (P1)
+S21,Finance & Insurance Referral & Banking Desk,4467699827252507387,2de2a58f7a914c94a7cf093d8a1984df,projects/4467699827252507387/screens/2de2a58f7a914c94a7cf093d8a1984df,STITCH_MCP:projects/4467699827252507387/screens/2de2a58f7a914c94a7cf093d8a1984df,2026-10-20T11:23:14Z,F&I banking desk (P1-GATED)
+S22,FTA Tax Invoices & Accounting Settlement,4467699827252507387,481e7a7007f64c8c8c76e7e7ad5ec63d,projects/4467699827252507387/screens/481e7a7007f64c8c8c76e7e7ad5ec63d,STITCH_MCP:projects/4467699827252507387/screens/481e7a7007f64c8c8c76e7e7ad5ec63d,2026-10-20T11:23:14Z,FTA tax invoices (P1-GATED)
+S23,Corporate Fleet Accounts & VIP Consignment Portfolio,4467699827252507387,09331cdd3c704e419e8aba6f6b87ccae,projects/4467699827252507387/screens/09331cdd3c704e419e8aba6f6b87ccae,STITCH_MCP:projects/4467699827252507387/screens/09331cdd3c704e419e8aba6f6b87ccae,2026-10-20T11:23:14Z,Fleet & consignment (P1)
+S24,Zero-Rated GCC Export & Customs Bond Discrepancy,4467699827252507387,f2549d0dc269410ebc65bcfa2240280c,projects/4467699827252507387/screens/f2549d0dc269410ebc65bcfa2240280c,STITCH_MCP:projects/4467699827252507387/screens/f2549d0dc269410ebc65bcfa2240280c,2026-10-20T11:23:14Z,Customs/VAT export (P1-GATED)
+S25,F&I Subprime DBR Exception & Underwriting Hard-Lock,4467699827252507387,569de90e9e7143f6b47dc5994dd3a098,projects/4467699827252507387/screens/569de90e9e7143f6b47dc5994dd3a098,STITCH_MCP:projects/4467699827252507387/screens/569de90e9e7143f6b47dc5994dd3a098,2026-10-20T11:23:14Z,DBR exception lock (P1-GATED)
+S26,Consignment Custody Freeze & Judicial Injunction,4467699827252507387,c0870d6ef04d45d6879d621f438ba4cb,projects/4467699827252507387/screens/c0870d6ef04d45d6879d621f438ba4cb,STITCH_MCP:projects/4467699827252507387/screens/c0870d6ef04d45d6879d621f438ba4cb,2026-10-20T11:23:14Z,Court legal hold (P1-GATED)

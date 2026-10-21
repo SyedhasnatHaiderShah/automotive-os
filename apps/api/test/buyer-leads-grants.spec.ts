@@ -474,6 +474,48 @@ describe('Buyer Profile, Favorites, CRM Leads & Data Grants (E2E Integration Tes
       const appt = enquiry.appointments.find((a: any) => a.id === createdAppointmentId);
       expect(appt?.status).toBe(AppointmentStatus.CONFIRMED);
     });
+
+    it('Buyer A lists appointments directly at /api/v1/me/appointments', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/me/appointments')
+        .set('Authorization', `Bearer ${buyerAToken}`)
+        .expect(200);
+
+      expect(Array.isArray(res.body)).toBe(true);
+      const appt = res.body.find((a: any) => a.id === createdAppointmentId);
+      expect(appt).toBeDefined();
+      expect(appt.status).toBe(AppointmentStatus.CONFIRMED);
+      expect(appt.listing).toBeDefined();
+    });
+
+    it('Cross-buyer denial: Buyer B cannot cancel Buyer A appointment', async () => {
+      await request(app.getHttpServer())
+        .post(`/api/v1/me/appointments/${createdAppointmentId}/cancel`)
+        .set('Authorization', `Bearer ${buyerBToken}`)
+        .send({ reason: 'Malicious cancellation attempt' })
+        .expect(404);
+    });
+
+    it('Buyer A cancels the appointment with release reason', async () => {
+      const res = await request(app.getHttpServer())
+        .post(`/api/v1/me/appointments/${createdAppointmentId}/cancel`)
+        .set('Authorization', `Bearer ${buyerAToken}`)
+        .send({ reason: 'Personal schedule conflict' })
+        .expect(200);
+
+      expect(res.body.id).toBe(createdAppointmentId);
+      expect(res.body.status).toBe(AppointmentStatus.CANCELLED);
+
+      // Verify outbox event for cancellation
+      const outbox = await prisma.outboxEvent.findFirst({
+        where: {
+          aggregateType: 'appointment',
+          aggregateId: createdAppointmentId,
+          eventType: 'appointment.cancelled',
+        },
+      });
+      expect(outbox).toBeDefined();
+    });
   });
 
   describe('7. Buyer Data Grant Revocation & Real-Time Dealership Redaction', () => {

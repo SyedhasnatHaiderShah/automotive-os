@@ -423,6 +423,215 @@ export class MeService {
   }
 
   // ==========================================
+  // Buyer Appointments Listing, Cancel & Reschedule
+  // ==========================================
+
+  async getBuyerAppointments(userId: string): Promise<any[]> {
+    const appointments = await this.prisma.appointment.findMany({
+      where: { buyerUserId: userId },
+      include: {
+        lead: {
+          include: {
+            listing: {
+              include: {
+                tenant: true,
+                vehicle: {
+                  include: {
+                    model: {
+                      include: {
+                        make: true,
+                      },
+                    },
+                    media: {
+                      orderBy: { sortOrder: 'asc' },
+                      take: 1,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { startsAt: 'asc' },
+    });
+
+    return appointments.map((a) => ({
+      id: a.id,
+      tenantId: a.tenantId,
+      leadId: a.leadId,
+      startsAt: a.startsAt.toISOString(),
+      endsAt: a.endsAt.toISOString(),
+      status: a.status,
+      note: a.note,
+      createdAt: a.createdAt.toISOString(),
+      updatedAt: a.updatedAt.toISOString(),
+      listing: a.lead?.listing
+        ? {
+            id: a.lead.listing.id,
+            slug: a.lead.listing.slug,
+            title: a.lead.listing.title,
+            vinMasked: a.lead.listing.vehicle?.vin
+              ? `${a.lead.listing.vehicle.vin.slice(0, 3)}•••••${a.lead.listing.vehicle.vin.slice(-4)}`
+              : null,
+            imageUrl: a.lead.listing.vehicle?.media?.[0]?.objectKey
+              ? (a.lead.listing.vehicle.media[0].objectKey.startsWith('http')
+                  ? a.lead.listing.vehicle.media[0].objectKey
+                  : `https://cdn.automotive-os.ae/${a.lead.listing.vehicle.media[0].objectKey}`)
+              : null,
+            dealershipName: a.lead.listing.tenant?.displayName || 'Verified Dealership',
+          }
+        : null,
+    }));
+  }
+
+  async cancelAppointment(
+    userId: string,
+    appointmentId: string,
+    reason?: string
+  ): Promise<AppointmentResponseDto> {
+    const existing = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!existing || existing.buyerUserId !== userId) {
+      throw new NotFoundException('Appointment not found for this buyer');
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const appt = await tx.appointment.update({
+        where: { id: appointmentId },
+        data: { status: AppointmentStatus.CANCELLED },
+      });
+
+      await tx.outboxEvent.create({
+        data: {
+          tenantId: appt.tenantId,
+          aggregateType: 'appointment',
+          aggregateId: appt.id,
+          eventType: 'appointment.cancelled',
+          payload: {
+            appointmentId: appt.id,
+            leadId: appt.leadId,
+            tenantId: appt.tenantId,
+            buyerUserId: userId,
+            reason: reason || 'BUYER_CANCELLED',
+          },
+        },
+      });
+
+      await tx.auditEvent.create({
+        data: {
+          tenantId: appt.tenantId,
+          actorUserId: userId,
+          action: 'APPOINTMENT_CANCELLED',
+          targetType: 'appointment',
+          targetId: appt.id,
+          metadata: {
+            reason: reason || 'BUYER_CANCELLED',
+          },
+        },
+      });
+
+      return appt;
+    });
+
+    return {
+      id: updated.id,
+      tenantId: updated.tenantId,
+      leadId: updated.leadId,
+      startsAt: updated.startsAt.toISOString(),
+      endsAt: updated.endsAt.toISOString(),
+      status: updated.status,
+      note: updated.note,
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+    };
+  }
+
+  async rescheduleAppointment(
+    userId: string,
+    appointmentId: string,
+    startsAtStr: string,
+    endsAtStr: string
+  ): Promise<AppointmentResponseDto> {
+    const existing = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!existing || existing.buyerUserId !== userId) {
+      throw new NotFoundException('Appointment not found for this buyer');
+    }
+
+    const startsAt = new Date(startsAtStr);
+    const endsAt = new Date(endsAtStr);
+
+    if (isNaN(startsAt.getTime()) || isNaN(endsAt.getTime())) {
+      throw new BadRequestException('Invalid timestamp format');
+    }
+
+    if (endsAt <= startsAt) {
+      throw new BadRequestException('Appointment end time must be after start time');
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const appt = await tx.appointment.update({
+        where: { id: appointmentId },
+        data: {
+          startsAt,
+          endsAt,
+          status: AppointmentStatus.REQUESTED,
+        },
+      });
+
+      await tx.outboxEvent.create({
+        data: {
+          tenantId: appt.tenantId,
+          aggregateType: 'appointment',
+          aggregateId: appt.id,
+          eventType: 'appointment.rescheduled',
+          payload: {
+            appointmentId: appt.id,
+            leadId: appt.leadId,
+            tenantId: appt.tenantId,
+            buyerUserId: userId,
+            startsAt: appt.startsAt.toISOString(),
+            endsAt: appt.endsAt.toISOString(),
+          },
+        },
+      });
+
+      await tx.auditEvent.create({
+        data: {
+          tenantId: appt.tenantId,
+          actorUserId: userId,
+          action: 'APPOINTMENT_RESCHEDULED',
+          targetType: 'appointment',
+          targetId: appt.id,
+          metadata: {
+            startsAt: appt.startsAt.toISOString(),
+            endsAt: appt.endsAt.toISOString(),
+          },
+        },
+      });
+
+      return appt;
+    });
+
+    return {
+      id: updated.id,
+      tenantId: updated.tenantId,
+      leadId: updated.leadId,
+      startsAt: updated.startsAt.toISOString(),
+      endsAt: updated.endsAt.toISOString(),
+      status: updated.status,
+      note: updated.note,
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+    };
+  }
+
+  // ==========================================
   // Data Grant Revocation (Buyer-Controlled Privacy)
   // ==========================================
 

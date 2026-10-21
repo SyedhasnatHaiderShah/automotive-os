@@ -57,3 +57,32 @@ export class AppointmentResponseDto {
   @ApiProperty({ description: 'Updated timestamp' })
   updatedAt!: string;
 }
+
+export class CancelAppointmentDto {
+  @ApiProperty({
+    description: 'Reason for cancellation',
+    example: 'Found alternative vehicle',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  reason?: string;
+}
+
+export class RescheduleAppointmentDto {
+  @ApiProperty({
+    description: 'New appointment start timestamp in UTC (ISO 8601)',
+    example: '2026-10-25T14:00:00Z',
+  })
+  @IsDateString()
+  @IsNotEmpty()
+  startsAt!: string;
+
+  @ApiProperty({
+    description: 'New appointment end timestamp in UTC (ISO 8601)',
+    example: '2026-10-25T15:00:00Z',
+  })
+  @IsDateString()
+  @IsNotEmpty()
+  endsAt!: string;
+}

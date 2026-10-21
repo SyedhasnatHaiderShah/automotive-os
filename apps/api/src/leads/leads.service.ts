@@ -45,8 +45,11 @@ export class LeadsService {
     this.rateLimiter.checkLimit(buyerUserId);
 
     // 2. Validate listing and active stock
-    const listing = await this.prisma.listing.findUnique({
-      where: { id: listingId },
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(listingId);
+    const listing = await this.prisma.listing.findFirst({
+      where: isUuid
+        ? { OR: [{ id: listingId }, { slug: listingId }] }
+        : { slug: listingId },
       include: {
         vehicle: true,
         tenant: true,

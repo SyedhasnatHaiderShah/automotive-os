@@ -214,6 +214,7 @@ export default function KybVerificationDetailPage() {
                   </button>
 
                   <button
+                    id="btn-reject-dossier"
                     onClick={() => setRejectModalOpen(true)}
                     className="h-10 px-4 rounded-lg bg-error-container/60 hover:bg-error-container text-on-error-container font-body-sm font-medium transition-all shadow-sm flex items-center gap-1.5"
                     type="button"
@@ -223,6 +224,7 @@ export default function KybVerificationDetailPage() {
                   </button>
 
                   <button
+                    id="btn-approve-dossier"
                     onClick={() => setBiometricModalOpen(true)}
                     className="h-10 px-5 rounded-lg bg-primary-container text-on-primary-container hover:bg-primary font-body-sm font-semibold tracking-wide transition-all shadow-lg flex items-center gap-2 group"
                     type="button"
@@ -743,6 +745,7 @@ export default function KybVerificationDetailPage() {
                             Tier-1 Sovereign
                           </span>
                           <input
+                            id="tier-1-radio"
                             type="radio"
                             name="dealer_tier"
                             value="tier-1"
@@ -769,6 +772,7 @@ export default function KybVerificationDetailPage() {
                             Tier-2 Probationary
                           </span>
                           <input
+                            id="tier-2-radio"
                             type="radio"
                             name="dealer_tier"
                             value="tier-2"
@@ -791,6 +795,7 @@ export default function KybVerificationDetailPage() {
                     </label>
                     <div className="relative">
                       <select
+                        id="reason-code-select"
                         value={reasonCode}
                         onChange={(e) => setReasonCode(e.target.value)}
                         className="w-full h-11 px-3 pr-8 rounded-lg bg-surface-container text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:ring-1 focus:ring-primary-container"
@@ -822,6 +827,7 @@ export default function KybVerificationDetailPage() {
                       </span>
                     </div>
                     <textarea
+                      id="operator-audit-note"
                       value={auditNote}
                       onChange={(e) => setAuditNote(e.target.value)}
                       className="w-full p-space-sm rounded-lg bg-surface-container text-on-surface font-data-mono-num text-body-sm focus:outline-none focus:ring-1 focus:ring-primary-container resize-none"
@@ -883,6 +889,7 @@ export default function KybVerificationDetailPage() {
 
                   {/* Terminal Confirmation Trigger */}
                   <button
+                    id="btn-mint-credentials"
                     onClick={() => setBiometricModalOpen(true)}
                     className="w-full h-11 rounded-lg bg-primary text-on-primary hover:bg-primary-fixed-dim font-body-sm font-semibold tracking-wider uppercase transition-colors shadow-lg flex items-center justify-center gap-2 mt-1"
                     type="button"
@@ -972,7 +979,7 @@ export default function KybVerificationDetailPage() {
 
       {/* Biometric Two-Factor Authorization Modal */}
       {biometricModalOpen && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-md z-50 flex items-center justify-center p-space-md">
+        <div id="biometric-modal" className="fixed inset-0 bg-background/80 backdrop-blur-md z-50 flex items-center justify-center p-space-md">
           <div className="w-full max-w-lg p-space-lg rounded-xl bg-surface-container-low shadow-2xl flex flex-col gap-space-md relative overflow-hidden border border-surface-container-high/40">
             <div className="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
 
@@ -991,6 +998,7 @@ export default function KybVerificationDetailPage() {
                 </div>
               </div>
               <button
+                id="btn-close-modal"
                 type="button"
                 onClick={() => setBiometricModalOpen(false)}
                 className="p-1 rounded text-outline hover:text-on-surface transition-colors"
@@ -1023,6 +1031,7 @@ export default function KybVerificationDetailPage() {
 
             {/* Biometric scanner simulation box */}
             <div
+              id="biometric-scanner-box"
               onClick={handleExecuteBiometricSign}
               className="h-28 rounded-lg bg-surface-container-lowest flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-surface-container transition-all group border border-surface-container-high/40"
             >
@@ -1048,6 +1057,7 @@ export default function KybVerificationDetailPage() {
 
             <div className="flex items-center justify-end gap-space-sm pt-space-xs">
               <button
+                id="btn-cancel-modal"
                 type="button"
                 onClick={() => setBiometricModalOpen(false)}
                 className="px-4 py-2 rounded-lg bg-surface-container text-on-surface font-body-sm font-medium hover:bg-surface-container-high transition-colors"
@@ -1055,6 +1065,7 @@ export default function KybVerificationDetailPage() {
                 Cancel
               </button>
               <button
+                id="btn-confirm-sign"
                 type="button"
                 onClick={handleExecuteBiometricSign}
                 disabled={isBroadcasting}

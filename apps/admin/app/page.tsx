@@ -7,6 +7,92 @@ import { AdminHeader } from '../components/AdminHeader';
 
 export default function AdminOverviewPage() {
   const [isRtl, setIsRtl] = useState(false);
+  const [cockpitMode, setCockpitMode] = useState<'normal' | 'circuit' | 'auditor'>('normal');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [triageItems, setTriageItems] = useState([
+    {
+      id: 'triage-1',
+      title: 'Apex GT Motors FZCO',
+      meta: 'DED Lic #948211 • DIFC Prescribed',
+      tag: '14 Days Left',
+      tagColor: 'text-primary bg-primary/10',
+      dotColor: 'bg-primary',
+      description: 'Commercial Trade License due for statutory renewal. Automated DED verification webhook alerted imminent expiry.',
+      impact: 'Impact: Tier-1 Escrow Lock',
+      impactColor: 'text-outline',
+      actionText: 'Request DED Renewal',
+      actionType: 'primary',
+      status: 'pending'
+    },
+    {
+      id: 'triage-2',
+      title: 'Bugatti Chiron Pur Sport',
+      meta: 'Chassis #042 • Listed by Al-Ghanim Royal',
+      tag: 'Spec Conflict',
+      tagColor: 'text-on-error-container bg-error-container',
+      dotColor: 'bg-error',
+      description: 'Non-GCC tropicalized cooling detected in Molsheim manufacturer database vs GCC claimed in dealer listing.',
+      impact: 'RTA Title Check Failed',
+      impactColor: 'text-error',
+      actionText: 'Escalate to Moderation',
+      actionType: 'flag',
+      status: 'pending'
+    },
+    {
+      id: 'triage-3',
+      title: 'SilberArrows Luxury FZCO',
+      meta: 'Bulk Batch #1094 • 6x Porsche GT Series',
+      tag: 'Auto-Cleared',
+      tagColor: 'text-tertiary bg-tertiary/10',
+      dotColor: 'bg-tertiary',
+      description: 'Bulk asset onboarding passed biometric notary & automated Tasjeel Shamil RTA chassis inspection webhook.',
+      impact: 'Signed by Merkle #8912401',
+      impactColor: 'text-tertiary',
+      actionText: 'View Certificate',
+      actionType: 'neutral',
+      status: 'cleared'
+    },
+    {
+      id: 'triage-4',
+      title: 'Gulf Prestige Motors',
+      meta: 'Ferrari SF90 Stradale • VIN: ...88219',
+      tag: 'Price Dump Risk',
+      tagColor: 'text-on-error-container bg-error-container',
+      dotColor: 'bg-error animate-pulse',
+      description: 'Suspicious rapid price markdown (-AED 450,000 in 10 mins). Escrow settlement automatically put on protective lock.',
+      impact: 'Anti-Market Fraud Alert',
+      impactColor: 'text-error',
+      actionText: 'Freeze Escrow',
+      actionType: 'danger',
+      status: 'pending'
+    }
+  ]);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleCircuitBreakerClick = () => {
+    if (cockpitMode === 'circuit') {
+      setCockpitMode('normal');
+      showToast(isRtl ? 'تم إلغاء قاطع الدائرة واستئناف نشاط المنصة' : 'Circuit breaker disengaged. Platform resumed normal ops.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      'CONFIRM SOVEREIGN MARKET CIRCUIT BREAKER?\n\nThis will instantly halt all Escrow disbursements across DIFC/CBUAE nodes and suspend automated RTA title mutations.'
+    );
+    if (confirmed) {
+      setCockpitMode('circuit');
+      showToast(isRtl ? 'تم تنشيط قاطع الدائرة الطارئ للمنصة' : 'EMERGENCY MARKET CIRCUIT BREAKER ACTIVATED');
+    }
+  };
+
+  const handleTriageAction = (id: string, actionName: string) => {
+    showToast(`${actionName}: Executed successfully. Audit entry logged to DIFC ledger.`);
+    setTriageItems(prev => prev.map(item => item.id === id ? { ...item, status: 'resolved' } : item));
+  };
 
   return (
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
@@ -15,273 +101,632 @@ export default function AdminOverviewPage() {
         <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
-          <div className="flex flex-col gap-space-lg">
+          <div className="flex flex-col w-full gap-space-lg">
             {/* Top Operations Command Banner */}
-            <div className="p-space-lg rounded-xl bg-surface-container-low shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-space-lg relative overflow-hidden border border-surface-container-high/40">
-              <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none blur-3xl" />
+            <div className="relative overflow-hidden rounded-xl bg-surface-container-low p-space-lg shadow-xl border border-surface-container-high/40">
+              <div className="absolute -right-24 -top-24 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+              
+              <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-space-md relative z-10">
+                <div className="flex flex-col gap-space-xs">
+                  <div className="flex items-center gap-space-sm flex-wrap">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-caps text-label-caps uppercase tracking-wider font-semibold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                      {isRtl ? 'عمليات المقاصة السيادية' : 'Sovereign Clearinghouse Operations'}
+                    </span>
+                    <span className="text-outline font-data-mono-num text-body-sm">•</span>
+                    <span className="text-on-surface-variant font-data-mono-num text-body-sm flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[15px] text-tertiary">verified</span>
+                      {isRtl ? 'بوابة مركز دبي المالي العالمي واقتصادية دبي (مستوى 0)' : 'DIFC & Dubai DED Gateway Tier-0'}
+                    </span>
+                  </div>
 
-              <div className="flex flex-col gap-space-xs z-10 max-w-2xl">
-                <div className="flex flex-wrap items-center gap-space-sm">
-                  <span className="px-2.5 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-body-sm font-semibold flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
-                    All Sovereign Gateways Operational
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-surface-container-highest text-secondary font-data-mono-num text-body-sm">
-                    DED Live • RTA Shamil 9ms
-                  </span>
+                  <h1 className="font-headline-xl text-headline-xl text-on-surface tracking-tight font-semibold">
+                    {isRtl ? 'مركز قيادة العمليات والمخاطر السيادية' : 'Platform Operations & Risk Command'}
+                  </h1>
+
+                  <div className="flex items-center gap-space-sm flex-wrap text-body-sm text-on-surface-variant pt-1">
+                    <span className="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded">
+                      <span className="text-outline">{isRtl ? 'الوكلاء المعتمدون:' : 'Accredited Dealers:'}</span>
+                      <span className="font-data-mono-num text-on-surface font-semibold">48</span>
+                    </span>
+                    <span className="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded">
+                      <span className="text-outline">{isRtl ? 'الضمان قيد التنفيذ:' : 'In-Flight Escrow:'}</span>
+                      <span className="font-data-mono-num text-primary font-semibold">
+                        {cockpitMode === 'auditor' ? 'AED [REDACTED]' : 'AED 142.8M'}
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded">
+                      <span className="text-outline">{isRtl ? 'استعلامات هيئة الطرق يومياً:' : 'Daily RTA Title Queries:'}</span>
+                      <span className="font-data-mono-num text-on-surface font-semibold">1,842</span>
+                    </span>
+                    <span className="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded text-tertiary">
+                      <span className="w-2 h-2 rounded-full bg-tertiary" />
+                      <span className="text-outline">{isRtl ? 'مؤشر المخاطر:' : 'Risk Score:'}</span>
+                      <span className="font-data-mono-num font-semibold text-tertiary">98.4% (Nominal)</span>
+                    </span>
+                  </div>
                 </div>
 
-                <h1 className="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight mt-1">
-                  {isRtl ? 'مركز قيادة العمليات والرقابة السيادية' : 'Operations Command & Sovereign Trust Hub'}
-                </h1>
-                <p className="font-body-md text-body-md text-on-surface-variant">
-                  Platform oversight terminal for UAE verified-dealer marketplace integrity, VIN discrepancy triage, and institutional dealer accreditation.
-                </p>
-              </div>
+                {/* Action Row */}
+                <div className="flex items-center gap-space-sm flex-wrap">
+                  <button
+                    id="btn-export-difc"
+                    onClick={() => showToast(isRtl ? 'تم تنزيل تقرير مركز دبي المالي المعتمد' : 'Exporting DIFC Regulatory Report (PDF + Cryptographic Attestation)...')}
+                    className="h-10 px-4 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm flex items-center gap-2 transition-colors shadow-sm"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px] text-primary">download</span>
+                    <span>{isRtl ? 'تصدير تقرير مركز دبي المالي' : 'Export DIFC Regulatory Report'}</span>
+                  </button>
 
-              {/* Direct Quick Actions */}
-              <div className="flex flex-wrap items-center gap-space-sm z-10">
-                <Link
-                  href="/moderation/listings/mod-9921"
-                  className="h-10 px-4 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm font-medium transition-all flex items-center gap-2 shadow-sm"
-                >
-                  <span className="material-symbols-outlined text-[18px] text-primary">policy</span>
-                  <span>Inspect Flares (#MOD-9921)</span>
-                </Link>
-                <Link
-                  href="/verifications/kyb-2025-0842"
-                  className="h-10 px-4 rounded-lg bg-primary text-on-primary hover:bg-primary-fixed-dim font-body-sm font-semibold transition-all flex items-center gap-2 shadow-md"
-                >
-                  <span className="material-symbols-outlined text-[18px]">verified_user</span>
-                  <span>Sign KYB (#KYB-0842)</span>
-                </Link>
+                  <button
+                    id="btn-force-sync"
+                    onClick={() => showToast(isRtl ? 'تم مزامنة كافة البوابات السيادية بنجاح' : 'Sovereign Gateways synchronized: RTA (12ms), TAMM (16ms), UAE PASS (Active)')}
+                    className="h-10 px-4 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm flex items-center gap-2 transition-colors shadow-sm"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px] text-secondary">sync</span>
+                    <span>{isRtl ? 'مزامنة البوابات السيادية' : 'Force Sync Sovereign Gateways'}</span>
+                  </button>
+
+                  <button
+                    id="circuit-breaker-btn"
+                    onClick={handleCircuitBreakerClick}
+                    className={`h-10 px-4 rounded font-body-sm font-medium flex items-center gap-2 transition-all shadow-sm ${
+                      cockpitMode === 'circuit'
+                        ? 'bg-error text-on-error font-semibold animate-pulse shadow-lg'
+                        : cockpitMode === 'auditor'
+                        ? 'bg-surface-container-highest text-outline cursor-not-allowed'
+                        : 'bg-error-container/80 hover:bg-error hover:text-on-error text-error'
+                    }`}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {cockpitMode === 'circuit' ? 'lock' : cockpitMode === 'auditor' ? 'visibility' : 'emergency_home'}
+                    </span>
+                    <span>
+                      {cockpitMode === 'circuit'
+                        ? (isRtl ? 'السوق معطل (قاطع الدائرة مقفل)' : 'MARKET HALTED (CIRCUIT LOCKED)')
+                        : cockpitMode === 'auditor'
+                        ? (isRtl ? 'وضع المدقق (العمليات معطلة)' : 'Auditor Mode (Actions Disabled)')
+                        : (isRtl ? 'قاطع الدائرة الطارئ للسوق' : 'Emergency Market Circuit Breaker')}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Quick Metrics Matrix */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
-              <Link
-                href="/moderation"
-                className="p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex flex-col justify-between gap-space-xs border border-surface-container-high/40 group shadow-md"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
-                    Listing Moderation
-                  </span>
-                  <span className="material-symbols-outlined text-primary text-[20px] group-hover:translate-x-0.5 transition-transform">
-                    arrow_forward
-                  </span>
+            {/* TOP TIER HIGH-DENSITY METRIC GRID (BENTO 4-COL) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md">
+              {/* CARD 1: ESCROW UNDER CUSTODY */}
+              <div className="rounded-xl bg-surface-container p-space-lg flex flex-col justify-between relative overflow-hidden shadow-md group border border-surface-container-high/40">
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+                      {isRtl ? 'الأموال في الحفظ الأمين' : 'Capital in Safe-Custody'}
+                    </span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                      {isRtl ? 'إجمالي أموال الضمان' : 'Total Escrow Under Custody'}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary flex-shrink-0">
+                    <span className="material-symbols-outlined text-[22px]">account_balance</span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="font-headline-xl text-headline-xl text-primary font-bold">14</span>
-                  <span className="font-body-sm text-outline">vehicles pending</span>
+                <div className="mt-4 flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-label-caps text-label-caps text-primary uppercase font-bold">AED</span>
+                    <span className="font-data-currency-lg text-data-currency-lg text-on-surface font-semibold tracking-tight">
+                      {cockpitMode === 'auditor' ? '••••••••' : '142,850,000'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant font-data-mono-num text-body-sm">
+                    <span className="text-tertiary font-semibold">64</span> {isRtl ? 'عقد بيع نشط' : 'active transacting deeds'}
+                  </div>
                 </div>
-                <span className="font-body-sm text-error font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-error animate-pulse" /> 4 Discrepancy Flares
-                </span>
-              </Link>
+                <div className="mt-4 pt-3 flex items-center justify-between text-body-sm bg-surface-container-lowest/60 -mx-space-lg -mb-space-lg px-space-lg py-2.5">
+                  <span className="flex items-center gap-1.5 text-tertiary">
+                    <span className="material-symbols-outlined text-[15px]">verified_user</span>
+                    <span className="font-label-caps text-label-caps uppercase tracking-wider font-semibold">CBUAE Shielded</span>
+                  </span>
+                  <span className="font-data-mono-num text-body-sm text-on-surface-variant">100% Capital Adequacy</span>
+                </div>
+              </div>
 
+              {/* CARD 2: KYB QUEUE */}
               <Link
                 href="/verifications"
-                className="p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex flex-col justify-between gap-space-xs border border-surface-container-high/40 group shadow-md"
+                className="rounded-xl bg-surface-container hover:bg-surface-container-high/80 transition-all p-space-lg flex flex-col justify-between relative overflow-hidden shadow-md group border border-surface-container-high/40"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
-                    KYB Verifications
-                  </span>
-                  <span className="material-symbols-outlined text-secondary text-[20px] group-hover:translate-x-0.5 transition-transform">
-                    arrow_forward
-                  </span>
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+                      {isRtl ? 'العناية الواجبة التجارية' : 'Commercial Due Diligence'}
+                    </span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                      {isRtl ? 'طابور اعتماد الوكلاء' : 'KYB Verification Queue'}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary flex-shrink-0 group-hover:scale-105 transition-transform">
+                    <span className="material-symbols-outlined text-[22px]">badge</span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="font-headline-xl text-headline-xl text-secondary font-bold">6</span>
-                  <span className="font-body-sm text-outline">dealers pending</span>
+                <div className="mt-4 flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-data-currency-lg text-data-currency-lg text-secondary font-semibold">6</span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface">
+                      {isRtl ? 'وكلاء قيد الاعتماد' : 'Dealerships Pending'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 text-body-sm">
+                    <span className="px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-caps text-label-caps font-semibold">
+                      2 Urgent Re-certs
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps">
+                      4 Inbound
+                    </span>
+                  </div>
                 </div>
-                <span className="font-body-sm text-tertiary font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> 1 Ready for Dual-Sign
-                </span>
+                <div className="mt-4 pt-3 flex items-center justify-between text-body-sm bg-surface-container-lowest/60 -mx-space-lg -mb-space-lg px-space-lg py-2.5">
+                  <span className="text-outline font-label-caps text-label-caps uppercase">{isRtl ? 'سرعة الإنجاز' : 'SLA Velocity'}</span>
+                  <span className="font-data-mono-num text-body-sm text-tertiary">4.2h <span className="text-outline">/ 24h statutory</span></span>
+                </div>
               </Link>
 
-              <div className="p-space-md rounded-xl bg-surface-container-low flex flex-col justify-between gap-space-xs border border-surface-container-high/40 shadow-md">
-                <div className="flex items-center justify-between">
-                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
-                    DIFC HSM Node
-                  </span>
-                  <span className="material-symbols-outlined text-tertiary text-[20px]">
-                    lock_open
-                  </span>
+              {/* CARD 3: LISTING MODERATION */}
+              <Link
+                href="/moderation"
+                className="rounded-xl bg-surface-container hover:bg-surface-container-high/80 transition-all p-space-lg flex flex-col justify-between relative overflow-hidden shadow-md group border border-surface-container-high/40"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+                      {isRtl ? 'تدقيق سلامة الأصول' : 'Asset Integrity Scrutiny'}
+                    </span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                      {isRtl ? 'طابور مراجعة الإعلانات' : 'Listing Moderation Backlog'}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary flex-shrink-0 group-hover:scale-105 transition-transform">
+                    <span className="material-symbols-outlined text-[22px]">fact_check</span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="font-headline-xl text-headline-xl text-tertiary font-bold">99.98%</span>
-                  <span className="font-body-sm text-outline">uptime</span>
+                <div className="mt-4 flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-data-currency-lg text-data-currency-lg text-on-surface font-semibold">14</span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface-variant">
+                      {isRtl ? 'مركبة قيد التدقيق' : 'Vehicles in Review'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-1 font-data-mono-num text-body-sm text-on-surface-variant">
+                    <span>8 Initial</span>
+                    <span className="text-outline">•</span>
+                    <span className="text-primary font-medium">4 Spec Alert</span>
+                    <span className="text-outline">•</span>
+                    <span className="text-error font-medium">2 VIN Collision</span>
+                  </div>
                 </div>
-                <span className="font-body-sm text-outline font-data-mono-num">
-                  Auto-lock in 12m • 0 Anomalies
-                </span>
-              </div>
+                <div className="mt-4 pt-3 flex items-center justify-between text-body-sm bg-surface-container-lowest/60 -mx-space-lg -mb-space-lg px-space-lg py-2.5">
+                  <span className="text-outline font-label-caps text-label-caps uppercase">{isRtl ? 'التيليمتري الآلي' : 'Automated Telemetry'}</span>
+                  <span className="font-data-mono-num text-body-sm text-on-surface">Tasjeel Shamil sync ON</span>
+                </div>
+              </Link>
 
-              <div className="p-space-md rounded-xl bg-surface-container-low flex flex-col justify-between gap-space-xs border border-surface-container-high/40 shadow-md">
-                <div className="flex items-center justify-between">
-                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
-                    Regulatory Compliance
-                  </span>
-                  <span className="material-symbols-outlined text-primary text-[20px]">
-                    shield
-                  </span>
+              {/* CARD 4: ACTIVE ENFORCEMENT ACTIONS */}
+              <div className="rounded-xl bg-surface-container p-space-lg flex flex-col justify-between relative overflow-hidden shadow-md group border border-surface-container-high/40">
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-label-caps text-label-caps text-error uppercase tracking-wider font-semibold">
+                      {isRtl ? 'الامتثال السيادي' : 'Sovereign Compliance'}
+                    </span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                      {isRtl ? 'إجراءات الإنفاذ النشطة' : 'Enforcement Actions'}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-error-container flex items-center justify-center text-error flex-shrink-0">
+                    <span className="material-symbols-outlined text-[22px]">gavel</span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="font-headline-xl text-headline-xl text-on-surface font-bold">100%</span>
-                  <span className="font-body-sm text-outline">Res. 58/2020</span>
+                <div className="mt-4 flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-data-currency-lg text-data-currency-lg text-error font-semibold">2</span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface">
+                      {isRtl ? 'تجميدات مشروطة' : 'Conditional Freezes'}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1 mt-1 text-body-sm">
+                    <span className="text-on-surface-variant flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-error" />
+                      1 Escrow Disbursement Hold
+                    </span>
+                    <span className="text-on-surface-variant flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      1 Showroom Audit Required
+                    </span>
+                  </div>
                 </div>
-                <span className="font-body-sm text-tertiary font-medium">
-                  Central Bank goAML Linked
-                </span>
+                <div className="mt-4 pt-3 flex items-center justify-between text-body-sm bg-surface-container-lowest/60 -mx-space-lg -mb-space-lg px-space-lg py-2.5">
+                  <span className="text-outline font-label-caps text-label-caps uppercase">{isRtl ? 'حالة الجزاء' : 'Sanction State'}</span>
+                  <span className="font-data-mono-num text-body-sm text-error font-medium">Tier-2 Operational Seal</span>
+                </div>
               </div>
             </div>
 
-            {/* Quick Priority Review Deck */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
-              {/* Box 1: Urgent Vehicle Moderation Cases */}
-              <div className="rounded-xl bg-surface-container-low p-space-lg shadow-md flex flex-col gap-space-md border border-surface-container-high/40">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-space-sm">
-                    <span className="material-symbols-outlined text-primary text-[22px]">policy</span>
-                    <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
-                      Urgent Listing Moderation Cases
-                    </h2>
+            {/* SECONDARY HIGH-SIGNAL TELEMETRY SPLIT VIEW (2-COLUMN GRID) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
+              {/* LEFT COLUMN: GATEWAY & THROUGHPUT TELEMETRY (7 COLS) */}
+              <div className="lg:col-span-7 flex flex-col gap-space-md">
+                {/* Real-time gateway nodes */}
+                <div className="rounded-xl bg-surface-container p-space-lg shadow-md flex flex-col gap-space-md border border-surface-container-high/40">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-label-caps text-label-caps text-primary uppercase tracking-wider font-semibold">
+                        {isRtl ? 'نسيج البيانات السيادي' : 'Sovereign Data Fabric'}
+                      </span>
+                      <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">
+                        {isRtl ? 'تغذية البوابات السيادية في الوقت الحقيقي' : 'Real-Time Sovereign Gateway Feeds'}
+                      </h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-tertiary animate-ping" />
+                      <span className="font-data-mono-num text-body-sm text-tertiary font-semibold">Real-time (WSS)</span>
+                    </div>
                   </div>
-                  <Link href="/moderation" className="text-body-sm text-primary hover:underline">
-                    View All 14 →
-                  </Link>
+
+                  {/* Node Feed Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
+                    {/* Dubai RTA */}
+                    <div className="rounded-lg bg-surface-container-high p-space-md flex flex-col justify-between gap-space-sm border border-surface-container-highest/60">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="material-symbols-outlined text-primary text-[20px]">directions_car</span>
+                          <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">Dubai RTA Node</span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> LIVE
+                        </span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">Latency:</span>
+                        <span className="font-data-mono-num text-on-surface font-semibold">12ms (Direct Fibre)</span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">Throughput:</span>
+                        <span className="font-data-mono-num text-tertiary">1,420 checks/hr • 0 err</span>
+                      </div>
+                      <div className="w-full bg-surface-container-lowest h-1.5 rounded overflow-hidden">
+                        <div className="bg-tertiary h-full rounded transition-all duration-500" style={{ width: '98%' }} />
+                      </div>
+                    </div>
+
+                    {/* TAMM Abu Dhabi */}
+                    <div className="rounded-lg bg-surface-container-high p-space-md flex flex-col justify-between gap-space-sm border border-surface-container-highest/60">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="material-symbols-outlined text-secondary text-[20px]">assured_workload</span>
+                          <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">TAMM Abu Dhabi</span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> CONNECTED
+                        </span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">Latency:</span>
+                        <span className="font-data-mono-num text-on-surface font-semibold">16ms (Hub-ADX)</span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">Throughput:</span>
+                        <span className="font-data-mono-num text-secondary">422 checks/hr</span>
+                      </div>
+                      <div className="w-full bg-surface-container-lowest h-1.5 rounded overflow-hidden">
+                        <div className="bg-secondary h-full rounded transition-all duration-500" style={{ width: '94%' }} />
+                      </div>
+                    </div>
+
+                    {/* UAE PASS Gold */}
+                    <div className="rounded-lg bg-surface-container-high p-space-md flex flex-col justify-between gap-space-sm border border-surface-container-highest/60">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="material-symbols-outlined text-primary text-[20px]">fingerprint</span>
+                          <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">UAE PASS Gold</span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> AUTHENTICATED
+                        </span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">Biometric Pass:</span>
+                        <span className="font-data-mono-num text-on-surface font-semibold">Level 4 Certified</span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">SLA Uptime:</span>
+                        <span className="font-data-mono-num text-tertiary">99.98% 30-Day Avg</span>
+                      </div>
+                      <div className="w-full bg-surface-container-lowest h-1.5 rounded overflow-hidden">
+                        <div className="bg-primary h-full rounded transition-all duration-500" style={{ width: '99.9%' }} />
+                      </div>
+                    </div>
+
+                    {/* CBUAE Escrow Node */}
+                    <div className="rounded-lg bg-surface-container-high p-space-md flex flex-col justify-between gap-space-sm border border-surface-container-highest/60">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="material-symbols-outlined text-tertiary text-[20px]">lock</span>
+                          <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">CBUAE Clearing Node</span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps font-semibold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> ACTIVE
+                        </span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">Settlement Rate:</span>
+                        <span className="font-data-mono-num text-on-surface font-semibold">Zero Failures</span>
+                      </div>
+                      <div className="flex items-baseline justify-between text-body-sm">
+                        <span className="text-outline">Batch Reconciliation:</span>
+                        <span className="font-data-mono-num text-on-surface-variant">T+0 Real-Time Gross</span>
+                      </div>
+                      <div className="w-full bg-surface-container-lowest h-1.5 rounded overflow-hidden">
+                        <div className="bg-tertiary h-full rounded transition-all duration-500" style={{ width: '100%' }} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-space-xs">
-                  <Link
-                    href="/moderation/listings/mod-9921"
-                    className="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between cursor-pointer border-l-2 border-primary"
-                  >
+                {/* VISUAL TIMELINE CHART & REGIONAL BREAKDOWN */}
+                <div className="rounded-xl bg-surface-container p-space-lg shadow-md flex flex-col gap-space-md border border-surface-container-high/40">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span className="font-body-sm font-semibold text-on-surface block">
-                        2024 Porsche 911 GT3 RS Weissach
+                      <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+                        {isRtl ? 'تيليمتري تسوية عقود البيع' : 'Deed Settlement Telemetry'}
                       </span>
-                      <span className="text-[11px] text-primary flex items-center gap-1 font-data-mono-num">
-                        #MOD-9921 • Cooling Code Mismatch (C00 Retrofit)
-                      </span>
+                      <h3 className="font-headline-md text-headline-md text-on-surface font-semibold">
+                        {isRtl ? 'حجم التداول بالساعة على المنصة (مليون درهم)' : 'Hourly Platform Trade Volume (AED M)'}
+                      </h3>
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-error-container/30 text-error font-data-mono-num text-[11px] font-semibold">
-                      P1-Regulatory
-                    </span>
-                  </Link>
+                    <div className="flex items-center gap-space-sm font-label-caps text-label-caps">
+                      <span className="flex items-center gap-1 text-primary"><span className="w-2 h-2 rounded-full bg-primary" /> Dubai 68%</span>
+                      <span className="flex items-center gap-1 text-secondary"><span className="w-2 h-2 rounded-full bg-secondary" /> Abu Dhabi 24%</span>
+                      <span className="flex items-center gap-1 text-tertiary"><span className="w-2 h-2 rounded-full bg-tertiary" /> Sharjah 8%</span>
+                    </div>
+                  </div>
 
-                  <Link
-                    href="/moderation/listings/mod-9922"
-                    className="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between cursor-pointer border-l-2 border-secondary"
-                  >
-                    <div>
-                      <span className="font-body-sm font-semibold text-on-surface block">
-                        2024 Ferrari 296 GTB Assetto Fiorano
-                      </span>
-                      <span className="text-[11px] text-outline flex items-center gap-1 font-data-mono-num">
-                        #MOD-9922 • High Price Variance (±18.4%)
-                      </span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-data-mono-num text-[11px] font-semibold">
-                      P2-Market
-                    </span>
-                  </Link>
+                  {/* Inline SVG Volume Telemetry Graph */}
+                  <div className="w-full h-44 relative bg-surface-container-lowest rounded-lg p-2 flex flex-col justify-end overflow-hidden border border-surface-container-highest/40">
+                    <svg className="w-full h-36" fill="none" preserveAspectRatio="none" viewBox="0 0 680 140">
+                      <line className="text-surface-container-highest" stroke="currentColor" strokeDasharray="3 3" strokeWidth="0.5" x1="0" x2="680" y1="35" y2="35" />
+                      <line className="text-surface-container-highest" stroke="currentColor" strokeDasharray="3 3" strokeWidth="0.5" x1="0" x2="680" y1="70" y2="70" />
+                      <line className="text-surface-container-highest" stroke="currentColor" strokeDasharray="3 3" strokeWidth="0.5" x1="0" x2="680" y1="105" y2="105" />
+                      <defs>
+                        <linearGradient id="dubaiGrad" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="0%" stopColor="#f2ca50" stopOpacity="0.35" />
+                          <stop offset="100%" stopColor="#f2ca50" stopOpacity="0.0" />
+                        </linearGradient>
+                        <linearGradient id="adGrad" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="0%" stopColor="#7bd0ff" stopOpacity="0.25" />
+                          <stop offset="100%" stopColor="#7bd0ff" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M0,120 Q60,95 110,80 T220,50 T330,65 T440,25 T550,40 T680,15 L680,140 L0,140 Z" fill="url(#dubaiGrad)" />
+                      <path d="M0,120 Q60,95 110,80 T220,50 T330,65 T440,25 T550,40 T680,15" fill="none" stroke="#f2ca50" strokeWidth="2" />
+                      <path d="M0,130 Q70,120 140,110 T280,85 T420,70 T560,55 T680,45 L680,140 L0,140 Z" fill="url(#adGrad)" />
+                      <path d="M0,130 Q70,120 140,110 T280,85 T420,70 T560,55 T680,45" fill="none" stroke="#7bd0ff" strokeWidth="1.5" />
+                      <circle className="fill-primary stroke-background" cx="440" cy="25" r="4" strokeWidth="2" />
+                      <circle className="fill-primary stroke-background" cx="680" cy="15" r="4" strokeWidth="2" />
+                    </svg>
 
-                  <Link
-                    href="/moderation/listings/mod-9923"
-                    className="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between cursor-pointer border-l-2 border-error"
-                  >
-                    <div>
-                      <span className="font-body-sm font-semibold text-on-surface block">
-                        2023 Mercedes-AMG G63 4x4²
-                      </span>
-                      <span className="text-[11px] text-error flex items-center gap-1 font-data-mono-num">
-                        #MOD-9923 • Missing Tasjeel 150-Point PDF
-                      </span>
+                    <div className="flex items-center justify-between px-2 pt-1 font-data-mono-num text-[11px] text-outline">
+                      <span>08:00 GST</span>
+                      <span>10:00</span>
+                      <span>12:00 (Peak DED)</span>
+                      <span>14:00</span>
+                      <span>16:00 (RTA Clearing)</span>
+                      <span>Now (17:42)</span>
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-error/15 text-error font-data-mono-num text-[11px] font-semibold">
-                      Action Required
-                    </span>
-                  </Link>
+                  </div>
+
+                  {/* Regional Ratio Metrics Bar */}
+                  <div className="grid grid-cols-3 gap-space-sm pt-1">
+                    <div className="bg-surface-container-high rounded p-2.5 flex flex-col border border-surface-container-highest/40">
+                      <span className="font-label-caps text-label-caps text-outline uppercase font-semibold">Dubai Volume</span>
+                      <span className="font-data-mono-num text-body-lg text-primary font-semibold">AED 97.14M</span>
+                      <span className="font-body-sm text-outline">44 Deeds Settled</span>
+                    </div>
+                    <div className="bg-surface-container-high rounded p-2.5 flex flex-col border border-surface-container-highest/40">
+                      <span className="font-label-caps text-label-caps text-outline uppercase font-semibold">Abu Dhabi</span>
+                      <span className="font-data-mono-num text-body-lg text-secondary font-semibold">AED 34.28M</span>
+                      <span className="font-body-sm text-outline">15 Deeds Settled</span>
+                    </div>
+                    <div className="bg-surface-container-high rounded p-2.5 flex flex-col border border-surface-container-highest/40">
+                      <span className="font-label-caps text-label-caps text-outline uppercase font-semibold">Sharjah & North</span>
+                      <span className="font-data-mono-num text-body-lg text-tertiary font-semibold">AED 11.43M</span>
+                      <span className="font-body-sm text-outline">5 Deeds Settled</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Box 2: Institutional KYB Dealership Applications */}
-              <div className="rounded-xl bg-surface-container-low p-space-lg shadow-md flex flex-col gap-space-md border border-surface-container-high/40">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-space-sm">
-                    <span className="material-symbols-outlined text-secondary text-[22px]">
-                      verified_user
+              {/* RIGHT COLUMN: URGENT COMPLIANCE & T&S ALERT MATRIX (5 COLS) */}
+              <div className="lg:col-span-5 flex flex-col gap-space-md">
+                <div className="rounded-xl bg-surface-container p-space-lg shadow-md flex flex-col gap-space-md border border-surface-container-high/40">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-label-caps text-label-caps text-error uppercase tracking-wider font-semibold">
+                        {isRtl ? 'تصعيدات ذات أولوية' : 'Priority Escalations'}
+                      </span>
+                      <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">
+                        {isRtl ? 'مصفوفة فرز المشغلين العاجلة' : 'Urgent Operator Triage Matrix'}
+                      </h2>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-data-mono-num text-body-sm font-semibold">
+                      4 Action Required
                     </span>
-                    <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
-                      Dealer KYB Accreditation Queue
-                    </h2>
                   </div>
-                  <Link href="/verifications" className="text-body-sm text-primary hover:underline">
-                    View All 6 →
-                  </Link>
+
+                  <div className="flex flex-col gap-space-sm" id="triage-container">
+                    {triageItems.map((item) => (
+                      <div
+                        key={item.id}
+                        id={item.id}
+                        className={`p-space-md rounded-lg bg-surface-container-high hover:bg-surface-container-highest transition-colors flex flex-col gap-space-sm shadow-sm border border-surface-container-highest/50 ${
+                          item.status === 'resolved' ? 'opacity-60 bg-surface-container/50' : ''
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-1.5">
+                              <span className={`w-2 h-2 rounded-full ${item.dotColor}`} />
+                              <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                                {item.title}
+                              </span>
+                            </div>
+                            <span className="font-data-mono-num text-body-sm text-outline">
+                              {item.meta}
+                            </span>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded font-label-caps text-label-caps font-semibold uppercase ${item.tagColor}`}>
+                            {item.tag}
+                          </span>
+                        </div>
+
+                        <p className="font-body-sm text-on-surface-variant">
+                          {item.description}
+                        </p>
+
+                        <div className="flex items-center justify-between pt-1">
+                          <span className={`font-label-caps text-label-caps ${item.impactColor} font-semibold`}>
+                            {item.impact}
+                          </span>
+                          {item.status === 'resolved' ? (
+                            <span className="text-tertiary font-data-mono-num text-body-sm flex items-center gap-1 font-semibold">
+                              <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                              Resolved
+                            </span>
+                          ) : (
+                            <button
+                              disabled={cockpitMode === 'auditor'}
+                              onClick={() => handleTriageAction(item.id, item.actionText)}
+                              className={`px-3 py-1.5 rounded font-body-sm font-medium transition-colors flex items-center gap-1 ${
+                                item.actionType === 'primary'
+                                  ? 'bg-primary text-on-primary hover:bg-primary-fixed'
+                                  : item.actionType === 'danger'
+                                  ? 'bg-error text-on-error font-semibold hover:bg-error-container'
+                                  : item.actionType === 'flag'
+                                  ? 'bg-surface-bright text-on-surface hover:bg-surface-container-lowest'
+                                  : 'bg-surface-container text-on-surface-variant hover:text-on-surface'
+                              } ${cockpitMode === 'auditor' ? 'opacity-40 cursor-not-allowed' : ''}`}
+                              type="button"
+                            >
+                              {item.actionType === 'primary' && <span className="material-symbols-outlined text-[15px]">send</span>}
+                              {item.actionType === 'flag' && <span className="material-symbols-outlined text-[15px] text-error">flag</span>}
+                              <span>{item.actionText}</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              </div>
+            </div>
 
-                <div className="flex flex-col gap-space-xs">
-                  <Link
-                    href="/verifications/kyb-2025-0842"
-                    className="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between cursor-pointer border-l-2 border-primary"
-                  >
-                    <div>
-                      <span className="font-body-sm font-semibold text-on-surface block">
-                        Royal Apex Luxury Motor Vehicles FZCO
-                      </span>
-                      <span className="text-[11px] text-tertiary flex items-center gap-1 font-data-mono-num">
-                        DET #984120 • 100% UBO Pass • Score: 12/100
-                      </span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded bg-primary/20 text-primary font-data-mono-num text-[11px] font-semibold">
-                      Awaiting Sign
-                    </span>
-                  </Link>
-
-                  <Link
-                    href="/verifications/kyb-2025-0843"
-                    className="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between cursor-pointer border-l-2 border-tertiary"
-                  >
-                    <div>
-                      <span className="font-body-sm font-semibold text-on-surface block">
-                        Emirates Prestige Auto Trading LLC
-                      </span>
-                      <span className="text-[11px] text-outline flex items-center gap-1 font-data-mono-num">
-                        DED #771209 • Capital AED 15M • Score: 18/100
-                      </span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary font-data-mono-num text-[11px] font-semibold">
-                      Under Review
-                    </span>
-                  </Link>
-
-                  <Link
-                    href="/verifications/kyb-2025-0844"
-                    className="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between cursor-pointer border-l-2 border-error"
-                  >
-                    <div>
-                      <span className="font-body-sm font-semibold text-on-surface block">
-                        Gulf Hypercar Concierge FZCO
-                      </span>
-                      <span className="text-[11px] text-error flex items-center gap-1 font-data-mono-num">
-                        DET #881204 • Watchlist Match • Score: 68/100
-                      </span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded bg-error/15 text-error font-data-mono-num text-[11px] font-semibold">
-                      PEP Flagged
-                    </span>
-                  </Link>
+            {/* PLATFORM HEALTH & NODE INFRASTRUCTURE STATUS BAR */}
+            <div className="rounded-xl bg-surface-container-lowest p-space-md flex flex-col md:flex-row items-center justify-between gap-space-md shadow-lg border border-surface-container-high/40">
+              <div className="flex items-center gap-space-md flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-tertiary" />
+                  <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                    {isRtl ? 'بنية العقد التحتية' : 'Node Infrastructure'}
+                  </span>
                 </div>
+                <div className="flex items-center gap-space-sm text-body-sm text-on-surface-variant flex-wrap">
+                  <span className="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded border border-surface-container-highest/50">
+                    <span className="font-label-caps text-label-caps text-outline">DIFC Core:</span>
+                    <span className="text-tertiary font-data-mono-num font-semibold">99.99% Nominal</span>
+                  </span>
+                  <span className="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded border border-surface-container-highest/50">
+                    <span className="font-label-caps text-label-caps text-outline">DXB-South Gateway:</span>
+                    <span className="text-tertiary font-data-mono-num font-semibold">8ms Ultra-Low</span>
+                  </span>
+                  <span className="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded border border-surface-container-highest/50">
+                    <span className="font-label-caps text-label-caps text-outline">Vault HSM:</span>
+                    <span className="text-primary font-data-mono-num font-semibold">FIPS 140-3 Active</span>
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-space-sm font-data-mono-num text-body-sm text-outline">
+                <span className="material-symbols-outlined text-[16px] text-tertiary">shield</span>
+                <span>Merkle Root Pub: <span className="text-on-surface font-semibold">Block #8,912,404</span> (32s ago)</span>
+              </div>
+            </div>
+
+            {/* SIMULATION / STATE TOGGLE DEMO BAR */}
+            <div className="rounded-lg bg-surface-container p-space-sm flex flex-col sm:flex-row items-center justify-between gap-space-sm shadow-md border border-surface-container-high/50">
+              <div className="flex items-center gap-2 px-space-sm">
+                <span className="material-symbols-outlined text-outline text-[18px]">tune</span>
+                <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+                  {isRtl ? 'محاكي وضع القيادة:' : 'Cockpit Mode Simulator:'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 w-full sm:w-auto">
+                <button
+                  id="btn-state-normal"
+                  onClick={() => {
+                    setCockpitMode('normal');
+                    showToast(isRtl ? 'تم تفعيل الوضع التشغيلي المأهول' : 'Switched to Populated Operational State');
+                  }}
+                  className={`flex-1 sm:flex-initial px-3 py-1.5 rounded font-body-sm font-medium transition-colors ${
+                    cockpitMode === 'normal'
+                      ? 'bg-primary text-on-primary'
+                      : 'bg-surface-container-high text-on-surface-variant hover:text-on-surface'
+                  }`}
+                  type="button"
+                >
+                  {isRtl ? 'الوضع التشغيلي المأهول' : 'Populated Operational State'}
+                </button>
+                <button
+                  id="btn-state-circuit"
+                  onClick={() => {
+                    setCockpitMode('circuit');
+                    showToast(isRtl ? 'تم تفعيل وضع قاطع الدائرة' : 'Circuit Breaker Triggered (Read-Only)');
+                  }}
+                  className={`flex-1 sm:flex-initial px-3 py-1.5 rounded font-body-sm font-medium transition-colors ${
+                    cockpitMode === 'circuit'
+                      ? 'bg-error text-on-error font-semibold'
+                      : 'bg-surface-container-high text-on-surface-variant hover:text-on-surface'
+                  }`}
+                  type="button"
+                >
+                  {isRtl ? 'قاطع الدائرة (للقراءة فقط)' : 'Circuit Breaker Triggered (Read-Only)'}
+                </button>
+                <button
+                  id="btn-state-auditor"
+                  onClick={() => {
+                    setCockpitMode('auditor');
+                    showToast(isRtl ? 'تم تفعيل وضع تصريح المدقق' : 'Auditor Clearance View (Financials Masked)');
+                  }}
+                  className={`flex-1 sm:flex-initial px-3 py-1.5 rounded font-body-sm font-medium transition-colors ${
+                    cockpitMode === 'auditor'
+                      ? 'bg-primary text-on-primary'
+                      : 'bg-surface-container-high text-on-surface-variant hover:text-on-surface'
+                  }`}
+                  type="button"
+                >
+                  {isRtl ? 'وضع تصريح المدقق' : 'Auditor Clearance View'}
+                </button>
               </div>
             </div>
           </div>
         </main>
       </div>
+
+      {/* Floating Action Feedback Toast */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-lg bg-surface-container-highest border border-primary/40 text-on-surface shadow-2xl flex items-center gap-2 animate-bounce">
+          <span className="material-symbols-outlined text-primary text-[18px]">info</span>
+          <span className="font-body-sm text-body-sm">{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }

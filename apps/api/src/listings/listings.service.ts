@@ -418,6 +418,13 @@ export class ListingsService {
       },
     };
 
+    if (query.dealerSlug) {
+      where.tenant.slug = {
+        equals: query.dealerSlug,
+        mode: 'insensitive',
+      };
+    }
+
     if (query.emirate) {
       where.vehicle.branch = {
         emirate: {

@@ -208,6 +208,7 @@ export default function ListingModerationPage() {
                   </button>
 
                   <button
+                    id="btn-reject-delist"
                     onClick={() => setRejectModalOpen(true)}
                     className="h-10 px-4 rounded-lg bg-error-container hover:bg-error text-on-error-container hover:text-on-error font-body-sm font-medium transition-all flex items-center gap-2 shadow-sm"
                     type="button"
@@ -217,6 +218,7 @@ export default function ListingModerationPage() {
                   </button>
 
                   <button
+                    id="btn-approve-publish"
                     onClick={() => {
                       setSelectedOption('A');
                       handleCommitAdjudication();
@@ -618,6 +620,7 @@ export default function ListingModerationPage() {
                       }`}
                     >
                       <input
+                        id="option-a-radio"
                         type="radio"
                         name="adjudication_choice"
                         checked={selectedOption === 'A'}
@@ -649,6 +652,7 @@ export default function ListingModerationPage() {
                       }`}
                     >
                       <input
+                        id="option-b-radio"
                         type="radio"
                         name="adjudication_choice"
                         checked={selectedOption === 'B'}
@@ -675,6 +679,7 @@ export default function ListingModerationPage() {
                       }`}
                     >
                       <input
+                        id="option-c-radio"
                         type="radio"
                         name="adjudication_choice"
                         checked={selectedOption === 'C'}
@@ -701,6 +706,7 @@ export default function ListingModerationPage() {
                       }`}
                     >
                       <input
+                        id="option-d-radio"
                         type="radio"
                         name="adjudication_choice"
                         checked={selectedOption === 'D'}
@@ -724,6 +730,7 @@ export default function ListingModerationPage() {
                       Generated Regulatory Citation Notice to Dealer
                     </label>
                     <textarea
+                      id="citation-textarea"
                       value={citationText}
                       onChange={(e) => setCitationText(e.target.value)}
                       className="w-full rounded-lg bg-surface-container-highest/60 p-space-sm font-data-mono-num text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
@@ -739,6 +746,7 @@ export default function ListingModerationPage() {
                     <div className="space-y-1 text-body-sm text-on-surface-variant">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
+                          id="attest-beacon"
                           type="checkbox"
                           checked={attestation1}
                           onChange={(e) => setAttestation1(e.target.checked)}
@@ -748,6 +756,7 @@ export default function ListingModerationPage() {
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
+                          id="attest-lien"
                           type="checkbox"
                           checked={attestation2}
                           onChange={(e) => setAttestation2(e.target.checked)}
@@ -757,6 +766,7 @@ export default function ListingModerationPage() {
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
+                          id="attest-stolen"
                           type="checkbox"
                           checked={attestation3}
                           onChange={(e) => setAttestation3(e.target.checked)}
@@ -769,6 +779,7 @@ export default function ListingModerationPage() {
 
                   {/* Final Execution Button */}
                   <button
+                    id="btn-commit-adjudication"
                     onClick={handleCommitAdjudication}
                     disabled={isSubmitting || !attestation1 || !attestation2 || !attestation3}
                     className="w-full h-11 rounded-lg bg-primary hover:bg-primary-fixed-dim text-on-primary font-body-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"

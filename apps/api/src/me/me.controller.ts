@@ -32,7 +32,9 @@ import {
 import { BuyerEnquiryResponseDto } from './dto/buyer-enquiry-response.dto';
 import {
   AppointmentResponseDto,
+  CancelAppointmentDto,
   CreateAppointmentDto,
+  RescheduleAppointmentDto,
 } from './dto/create-appointment.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
@@ -180,5 +182,47 @@ export class MeController {
     @Param('leadId') leadId: string
   ): Promise<{ success: boolean; revokedAt: string }> {
     return this.meService.revokeLeadGrant(userId, leadId);
+  }
+
+  // ==========================================
+  // Buyer Appointments Management
+  // ==========================================
+
+  @Get('appointments')
+  @ApiOperation({ summary: 'List all test-drive and showroom appointments booked by buyer' })
+  @ApiResponse({ status: 200, type: [AppointmentResponseDto] })
+  async getBuyerAppointments(
+    @CurrentUser('id') userId: string
+  ): Promise<any[]> {
+    return this.meService.getBuyerAppointments(userId);
+  }
+
+  @Post('appointments/:appointmentId/cancel')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Cancel booked test-drive appointment and release holding slot/escrow' })
+  @ApiResponse({ status: 200, type: AppointmentResponseDto })
+  async cancelAppointment(
+    @CurrentUser('id') userId: string,
+    @Param('appointmentId') appointmentId: string,
+    @Body() dto: CancelAppointmentDto
+  ): Promise<AppointmentResponseDto> {
+    return this.meService.cancelAppointment(userId, appointmentId, dto?.reason);
+  }
+
+  @Post('appointments/:appointmentId/reschedule')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reschedule test-drive appointment slot' })
+  @ApiResponse({ status: 200, type: AppointmentResponseDto })
+  async rescheduleAppointment(
+    @CurrentUser('id') userId: string,
+    @Param('appointmentId') appointmentId: string,
+    @Body() dto: RescheduleAppointmentDto
+  ): Promise<AppointmentResponseDto> {
+    return this.meService.rescheduleAppointment(
+      userId,
+      appointmentId,
+      dto.startsAt,
+      dto.endsAt
+    );
   }
 }
