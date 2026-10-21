@@ -1124,3 +1124,294 @@ export const VERIFIED_WORKSHOP_FIXTURE: WorkshopJobCardData = {
 export async function fetchWorkshopOperations(): Promise<WorkshopJobCardData> {
   return VERIFIED_WORKSHOP_FIXTURE;
 }
+
+/**
+ * ==============================================================================
+ * S20: Parts Inventory & Automated Procurement (Screen 962b5df669c94fe29940311699ce33b4)
+ * ==============================================================================
+ */
+
+export interface PartItem {
+  id: string;
+  sku: string;
+  oemCode: string;
+  marque: 'Porsche' | 'Ferrari' | 'Mercedes-AMG' | 'Aston Martin' | 'Universal';
+  category: 'Brakes' | 'Powertrain' | 'Aero & Carbon' | 'Fluids & Consumables' | 'Electrical';
+  name: string;
+  subDescription: string;
+  binLocation: string;
+  zoneName: string;
+  stockOnHand: number;
+  stockUnitLabel: string;
+  availableQty: number;
+  reservedQty: number;
+  reservedRef?: string;
+  safetyMin: number;
+  costAed: number;
+  retailAed: number;
+  marginPct: number;
+  status: 'OPTIMAL' | 'LOW_STOCK' | 'ON_ORDER';
+  inboundPoRef?: string;
+  leadTimeDays?: number;
+}
+
+export interface InboundPoConsignment {
+  poNumber: string;
+  supplierName: string;
+  hubLocation: string;
+  totalValueAed: number;
+  bayanRef: string;
+  etaDescription: string;
+  logisticsCarrier: string;
+  lineItemCount: number;
+  manifestHighlights: Array<{
+    title: string;
+    units: number;
+    unitLabel: string;
+    oemCode: string;
+    verified: boolean;
+  }>;
+}
+
+export interface AgencyVendor {
+  id: string;
+  name: string;
+  marque: string;
+  marqueBadgeClass: string;
+  routeSla: string;
+  onTimeScore: string;
+  avgSlaDays: string;
+}
+
+export interface PartsProcurementData {
+  valuation: {
+    inventoryCostAed: number;
+    activeSkusCount: number;
+    momGrowthPct: number;
+    costCapacityPct: number;
+    belowSafetyMinCount: number;
+    criticalNotes: string;
+    inboundShipmentsAed: number;
+    openPoConsignmentsCount: number;
+    firstPickFillRatePct: number;
+    avgDrawMinutes: number;
+  };
+  parts: PartItem[];
+  inboundShipment: InboundPoConsignment;
+  agencyVendors: AgencyVendor[];
+  activeRoDemands: {
+    bays: string;
+    jobTitle: string;
+    technicianName: string;
+    partsAllocatedCount: number;
+    pendingPartName: string;
+    fillPct: number;
+  };
+}
+
+export const VERIFIED_PARTS_FIXTURE: PartsProcurementData = {
+  valuation: {
+    inventoryCostAed: 3840500,
+    activeSkusCount: 1420,
+    momGrowthPct: 4.2,
+    costCapacityPct: 76,
+    belowSafetyMinCount: 8,
+    criticalNotes: '6 Porsche / 2 Ferrari',
+    inboundShipmentsAed: 412000,
+    openPoConsignmentsCount: 4,
+    firstPickFillRatePct: 96.4,
+    avgDrawMinutes: 6.2,
+  },
+  parts: [
+    {
+      id: 'prt-001-por-brk',
+      sku: '#SKU-POR-992-BRK',
+      oemCode: 'OEM #992-351-409-G',
+      marque: 'Porsche',
+      category: 'Brakes',
+      name: 'PCCB Front Carbon Ceramic Rotor (Left, 410mm)',
+      subDescription: 'Porsche 992 GT3 / GT3 RS • Al Nabooda Sourced',
+      binLocation: 'Rack B-04-3',
+      zoneName: 'Climate Supercar Vault',
+      stockOnHand: 4,
+      stockUnitLabel: 'on hand',
+      availableQty: 2,
+      reservedQty: 2,
+      reservedRef: 'RO-4094',
+      safetyMin: 2,
+      costAed: 24500,
+      retailAed: 32800,
+      marginPct: 33.8,
+      status: 'OPTIMAL',
+    },
+    {
+      id: 'prt-002-mich-c2r',
+      sku: '#SKU-MICH-C2R-325',
+      oemCode: 'MICH-3253021-N0',
+      marque: 'Porsche',
+      category: 'Brakes',
+      name: 'Michelin Pilot Sport Cup 2 R (325/30 R21 - Rear)',
+      subDescription: 'Porsche N0 Spec • Central Tyre Bay Storage',
+      binLocation: 'Bin C-01-Floor',
+      zoneName: 'Tyre Stack Bay 2',
+      stockOnHand: 8,
+      stockUnitLabel: 'on hand',
+      availableQty: 8,
+      reservedQty: 0,
+      safetyMin: 4,
+      costAed: 2850,
+      retailAed: 3650,
+      marginPct: 28.0,
+      status: 'OPTIMAL',
+    },
+    {
+      id: 'prt-003-brm-caliper',
+      sku: '#SKU-BRM-MONO-6P',
+      oemCode: 'BRM-XB6-221',
+      marque: 'Ferrari',
+      category: 'Brakes',
+      name: 'Brembo Racing Carbon Monobloc Brake Caliper Set',
+      subDescription: 'Ferrari 488 Pista / F8 • Al Tayer Motors',
+      binLocation: 'Rack B-02-1',
+      zoneName: 'Supercar Security Cage',
+      stockOnHand: 1,
+      stockUnitLabel: 'Unit (Min: 2)',
+      availableQty: 1,
+      reservedQty: 0,
+      safetyMin: 2,
+      costAed: 18200,
+      retailAed: 24500,
+      marginPct: 34.6,
+      status: 'LOW_STOCK',
+    },
+    {
+      id: 'prt-004-mob-drum',
+      sku: '#SKU-MOB-0W40-208L',
+      oemCode: 'MOB-SUP-208',
+      marque: 'Universal',
+      category: 'Fluids & Consumables',
+      name: 'Mobil 1 Supercar 0W-40 Synthetic Oil (208L Drum)',
+      subDescription: 'Porsche A40 / AMG 229.5 Bulk Consumable',
+      binLocation: 'Drum Bay D-01',
+      zoneName: 'Bunding Containment Area',
+      stockOnHand: 2,
+      stockUnitLabel: 'drums (416L)',
+      availableQty: 2,
+      reservedQty: 0,
+      safetyMin: 1,
+      costAed: 6400,
+      retailAed: 9200,
+      marginPct: 43.7,
+      status: 'OPTIMAL',
+    },
+    {
+      id: 'prt-005-fer-f8-exh',
+      sku: '#SKU-FER-F8-EXH',
+      oemCode: 'FER-OEM-349811',
+      marque: 'Ferrari',
+      category: 'Powertrain',
+      name: 'Ferrari F8 Tributo Titanium Exhaust Header (OEM)',
+      subDescription: 'Inbound PO #2025-PO-0428 • Direct Factory Maranello',
+      binLocation: 'Rack A-12-Transit',
+      zoneName: 'Pre-assigned Bin',
+      stockOnHand: 0,
+      stockUnitLabel: 'on hand',
+      availableQty: 0,
+      reservedQty: 0,
+      safetyMin: 1,
+      costAed: 38900,
+      retailAed: 51500,
+      marginPct: 32.3,
+      status: 'ON_ORDER',
+      inboundPoRef: '#2025-PO-0428',
+      leadTimeDays: 3,
+    },
+    {
+      id: 'prt-006-mb-oil-cooler',
+      sku: '#SKU-MB-M177-OC',
+      oemCode: 'A177-180-02-00',
+      marque: 'Mercedes-AMG',
+      category: 'Powertrain',
+      name: 'Mercedes-AMG M177 Biturbo Oil Cooler Assembly',
+      subDescription: 'AMG GT R / C63 S • Gargash Enterprises',
+      binLocation: 'Rack A-08-2',
+      zoneName: 'Engine Subassembly Aisle',
+      stockOnHand: 3,
+      stockUnitLabel: 'on hand',
+      availableQty: 3,
+      reservedQty: 0,
+      safetyMin: 1,
+      costAed: 4900,
+      retailAed: 6850,
+      marginPct: 39.7,
+      status: 'OPTIMAL',
+    },
+  ],
+  inboundShipment: {
+    poNumber: 'PO #2025-PO-0428',
+    supplierName: 'Porsche AG Logistics Centre',
+    hubLocation: 'DWC Free Zone Bonded Terminal, Dubai',
+    totalValueAed: 142600,
+    bayanRef: '#BAY-98124',
+    etaDescription: 'Tomorrow, 11:00 GST',
+    logisticsCarrier: 'Transguard Armored & Bonded Logistics • 8 High-Priority Line Items',
+    lineItemCount: 8,
+    manifestHighlights: [
+      {
+        title: 'GT3 RS Weissach Carbon Wing Uprights',
+        units: 2,
+        unitLabel: 'Units',
+        oemCode: 'OEM #992-827-901',
+        verified: true,
+      },
+      {
+        title: 'Titanium Roll Cage Bolt Kit (M8 x 45)',
+        units: 12,
+        unitLabel: 'Kits',
+        oemCode: 'OEM #992-008-622',
+        verified: true,
+      },
+    ],
+  },
+  agencyVendors: [
+    {
+      id: 'vnd-01',
+      name: 'Al Nabooda Automobiles',
+      marque: 'PORSCHE',
+      marqueBadgeClass: 'bg-primary/10 text-primary',
+      routeSla: 'Direct Jebel Ali Hub dispatch • 24h cycle',
+      onTimeScore: '98% On-Time',
+      avgSlaDays: 'Avg 24h SLA',
+    },
+    {
+      id: 'vnd-02',
+      name: 'Al Tayer Motors',
+      marque: 'FERRARI',
+      marqueBadgeClass: 'bg-error/10 text-error',
+      routeSla: 'Direct Maranello / Al Manara dispatch',
+      onTimeScore: '94% On-Time',
+      avgSlaDays: 'Avg 48h SLA',
+    },
+    {
+      id: 'vnd-03',
+      name: 'Gargash Enterprises',
+      marque: 'AMG',
+      marqueBadgeClass: 'bg-secondary/10 text-secondary',
+      routeSla: 'JAFZA Distribution Centre courier',
+      onTimeScore: '99% On-Time',
+      avgSlaDays: 'Same-Day',
+    },
+  ],
+  activeRoDemands: {
+    bays: 'Bays 1 & 4',
+    jobTitle: 'GT3 RS 10,000 KM Major Service',
+    technicianName: 'Master Technician Tariq M.',
+    partsAllocatedCount: 4,
+    pendingPartName: 'awaiting carbon brake sensor clip',
+    fillPct: 85,
+  },
+};
+
+export async function fetchPartsProcurementData(): Promise<PartsProcurementData> {
+  return VERIFIED_PARTS_FIXTURE;
+}

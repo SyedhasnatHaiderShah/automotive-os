@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"outline":"#99907c","inverse-on-surface":"#2d3136","on-secondary":"#00354a","outline-variant":"#4d4635","tertiary-fixed":"#6ffbbe","surface":"#101419","on-surface":"#e0e2ea","surface-container-highest":"#31353b","on-tertiary-fixed-variant":"#005236","primary-fixed":"#ffe088","surface-dim":"#101419","on-background":"#e0e2ea","tertiary-container":"#33ca90","primary-fixed-dim":"#e9c349","on-primary-fixed-variant":"#574500","on-primary-fixed":"#241a00","on-primary":"#3c2f00","inverse-surface":"#e0e2ea","on-error":"#690005","background":"#101419","inverse-primary":"#735c00","surface-container-high":"#262a30","surface-container":"#1c2025","surface-variant":"#31353b","surface-bright":"#36393f","surface-container-lowest":"#0a0e13","on-tertiary-container":"#005035","secondary-fixed-dim":"#7bd0ff","on-tertiary":"#003824","on-tertiary-fixed":"#002113","on-primary-container":"#554300","on-secondary-container":"#00374d","tertiary":"#58e7aa","on-error-container":"#ffdad6","primary":"#f2ca50","secondary-fixed":"#c4e7ff","error":"#ffb4ab","error-container":"#93000a","secondary":"#7bd0ff","tertiary-fixed-dim":"#4edea3","surface-container-low":"#181c21","on-surface-variant":"#d0c5af","secondary-container":"#00a6e0","on-secondary-fixed":"#001e2c","surface-tint":"#e9c349","on-secondary-fixed-variant":"#004c69","primary-container":"#d4af37"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-lg":"1.5rem","margin":"2rem","gutter":"1.5rem","gutter-mobile":"0.75rem","gutter-desktop-wide":"2rem","space-sm":"0.5rem","space-3xl":"4rem","space-xl":"2rem","margin-mobile":"1rem","space-2xl":"3rem","space-xs":"0.25rem","margin-desktop-wide":"3rem","space-md":"1rem"},fontFamily:{"headline-xl":["Outfit"],"headline-xl-mobile":["Outfit"],"headline-md":["Outfit"],"label-caps":["Inter"],"body-lg":["Inter"],"body-sm":["Inter"],"headline-lg":["Outfit"],"headline-sm":["Outfit"],"display-hero":["Outfit"],"data-mono-num":["JetBrains Mono"],"data-currency-lg":["Outfit"],"body-md":["Inter"],"display-hero-mobile":["Outfit"]},fontSize:{"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"500"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"500"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"data-mono-num":["13px",{"lineHeight":"18px","letterSpacing":"-0.01em","fontWeight":"500"}],"data-currency-lg":["32px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)]"><div class="flex flex-col flex-1 min-h-0"><div class="h-16 px-space-md flex items-center justify-between bg-surface-container/60 shrink-0"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center"><span class="material-symbols-outlined text-on-primary-container text-[20px]">directions_car</span></div><div><div class="font-headline-sm text-headline-sm font-semibold text-on-surface tracking-tight leading-none">Automotive OS</div><div class="font-label-caps text-label-caps uppercase text-primary mt-0.5 tracking-wider">Dealership Suite</div></div></div><span class="material-symbols-outlined text-on-surface-variant text-[18px] cursor-pointer hover:text-on-surface">unfold_more</span></div><div class="overflow-y-auto flex-1 py-space-xs"><div class="px-space-md py-space-xs"><div class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">Operational Core</div></div><nav class="flex flex-col gap-1 px-space-sm mb-space-sm" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dealer-executive-overview-dashboard" href="#">Dashboard</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="vehicle-inventory-management-grid" href="#">Inventory</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="add-vehicle" href="#">Add Vehicle</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="crm-pipeline" href="#">CRM Pipeline</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="test-drives" href="#">Test Drives</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="rta-compliance" href="#">RTA &amp; Compliance</a></nav><div class="px-space-md pt-space-xs pb-space-xs flex items-center justify-between"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">[P1 ROADMAP / DMS]</span><span class="px-1.5 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-secondary/15 text-secondary tracking-widest">Future</span></div><nav class="flex flex-col gap-1 px-space-sm pb-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="sales-orders-and-quotes" href="#">Sales Orders &amp; Quotes</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="workshop-and-bays" href="#">Workshop &amp; Bays</a><a aria-current="page" class="px-space-md py-2 transition-all block bg-primary-container text-on-primary-container font-semibold rounded-lg" data-path="parts-and-procurement" href="#">Parts &amp; Procurement</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="finance-and-insurance" href="#">Finance &amp; Insurance</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="invoices-and-accounting" href="#">Invoices &amp; Accounting</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="fleet-accounts" href="#">Fleet Accounts</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dms-analytics" href="#">DMS Analytics</a></nav></div></div><div class="p-space-sm bg-surface-container-lowest/80 flex flex-col gap-space-xs shrink-0"><div class="bg-surface-container-high/90 p-space-sm rounded-lg flex flex-col gap-1.5"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-on-surface font-semibold">Vault Allocations</span><span class="font-data-mono-num text-data-mono-num text-primary font-semibold">42 / 50</span></div><div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 84%"></div></div><div class="flex items-center justify-between pt-1"><span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary inline-block"></span>All changes saved</span><span class="font-label-caps text-label-caps text-on-surface-variant">Tier-1</span></div></div><div class="p-space-xs bg-surface-container/60 rounded-lg flex flex-col gap-0.5"><div class="font-body-sm text-body-sm font-semibold text-on-surface truncate">SilberArrows Luxury FZCO</div><div class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-tertiary">verified</span>DED #612048 • GCC Spec</div></div></div></aside><div class="pl-64 min-h-screen flex flex-col"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 px-space-sm py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest cursor-pointer text-on-surface transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-body-sm text-body-sm font-semibold">SilberArrows • Al Quoz 1 Hub</span><span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span></div><div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-body-sm text-body-sm font-medium">RTA API Connected</span><span class="font-data-mono-num text-data-mono-num text-on-surface-variant">14ms</span></div><div class="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container border border-outline-variant/40"><span class="material-symbols-outlined text-[15px] text-secondary">architecture</span><span class="font-label-caps text-label-caps uppercase text-secondary font-semibold tracking-wider">[FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]</span></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors"><span class="font-semibold text-primary">EN</span><span class="text-on-surface-variant">/</span><span class="text-on-surface-variant hover:text-on-surface">عربي</span></button><button class="relative p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary"></span></button><div class="flex items-center gap-3 pl-space-xs"><div class="text-right"><div class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Marc Ackermann</div><div class="font-label-caps text-label-caps text-on-surface-variant">General Manager</div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface px-space-lg pb-space-xl flex-1"><div class="flex flex-col w-full">
+<!-- P1 Specification Roadmap Header Notice -->
+<div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-surface-container via-surface-container-high to-surface-container p-space-md mb-space-lg shadow-xl">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md relative z-10">
+<div class="flex items-start gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-primary text-[24px]">precision_manufacturing</span>
+</div>
+<div class="min-w-0">
+<div class="flex flex-wrap items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-label-caps text-label-caps tracking-widest uppercase font-semibold">
+              [FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]
+            </span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-data-mono-num text-body-sm">
+              REV-0.94 / PHASE 1 SPEC
+            </span>
+<span class="text-on-surface-variant font-body-sm">DED #612048 • SilberArrows Al Quoz Hub</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-snug">
+            CONCEPT TEMPLATE ONLY: Phase 1 Dealership Management System Roadmap. Interactive specification mockups for EPC integration, inventory valuation, physical bin matrix &amp; automated PO purchasing.
+          </p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<div class="hidden sm:flex flex-col text-right pr-space-sm">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">GCC Spec Integration</span>
+<span class="font-data-mono-num text-body-sm text-tertiary flex items-center justify-end gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> RTA &amp; UAE Customs Bayan
+          </span>
+</div>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-highest text-on-surface hover:bg-surface-bright transition-colors font-body-sm text-body-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">terminal</span>
+<span>DMS API Schema</span>
+</button>
+</div>
+</div>
+<div class="absolute -right-8 -bottom-10 w-48 h-48 bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
+</div>
+<!-- Breadcrumbs & Quick Execution Strip -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md mb-space-lg">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="hover:text-on-surface cursor-pointer transition-colors">Dealership Suite</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="hover:text-on-surface cursor-pointer transition-colors">Future DMS (P1)</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Parts &amp; Procurement</span>
+<span class="font-label-caps text-label-caps uppercase px-1.5 py-0.5 rounded bg-surface-container-high text-primary/90 ml-1">قطع الغيار والتوريد</span>
+</div>
+<!-- Top Action CTA Toolbar -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<button class="px-space-md py-2.5 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-body-md font-semibold hover:opacity-90 transition-all flex items-center gap-2 shadow-md">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+<span>Create Purchase Order (PO)</span>
+</button>
+<button class="px-space-md py-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors font-body-md text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-tertiary">qr_code_scanner</span>
+<span>Receive Stock / Bin Intake</span>
+</button>
+<button class="px-space-md py-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors font-body-md text-body-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">document_scanner</span>
+<span>Scan OEM Barcode / EPC</span>
+</button>
+<button class="px-3 py-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors font-body-md text-body-md" title="Run Stocktake Audit">
+<span class="material-symbols-outlined text-[18px]">inventory</span>
+</button>
+</div>
+</div>
+<!-- Inventory Valuation & Operational KPIs -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-lg">
+<!-- Card 1: Valuation -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md relative overflow-hidden group hover:bg-surface-container transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Inventory Valuation (Cost)</span>
+<span class="material-symbols-outlined text-[20px] text-primary">account_balance_wallet</span>
+</div>
+<div class="flex items-baseline gap-1.5 mb-1">
+<span class="font-label-caps text-label-caps text-primary uppercase">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface">3,840,500</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pt-2">
+<span>1,420 Active SKUs</span>
+<span class="text-tertiary font-data-mono-num flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +4.2% MoM
+        </span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-primary" style="width: 76%"></div>
+</div>
+</div>
+<!-- Card 2: Low Stock -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md relative overflow-hidden group hover:bg-surface-container transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Critical Reorder Threshold</span>
+<span class="material-symbols-outlined text-[20px] text-error">warning</span>
+</div>
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-data-currency-lg text-data-currency-lg text-error">8</span>
+<span class="font-body-md text-body-md text-on-surface-variant">SKUs Below Safety Min</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pt-2">
+<span>6 Porsche / 2 Ferrari</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-caps text-label-caps uppercase font-semibold">Immediate Action</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-error" style="width: 28%"></div>
+</div>
+</div>
+<!-- Card 3: Open POs -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md relative overflow-hidden group hover:bg-surface-container transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">Inbound Shipments (Air / Bonded)</span>
+<span class="material-symbols-outlined text-[20px] text-secondary">flight_land</span>
+</div>
+<div class="flex items-baseline gap-1.5 mb-1">
+<span class="font-label-caps text-label-caps text-secondary uppercase">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface">412,000</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pt-2">
+<span>4 Open PO Consignments</span>
+<span class="font-data-mono-num text-secondary">ETA 24-72h</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-secondary" style="width: 60%"></div>
+</div>
+</div>
+<!-- Card 4: First Pick Fill Rate -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md relative overflow-hidden group hover:bg-surface-container transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider">First-Pick Fill Rate (ROs)</span>
+<span class="material-symbols-outlined text-[20px] text-tertiary">task_alt</span>
+</div>
+<div class="flex items-baseline gap-2 mb-1">
+<span class="font-data-currency-lg text-data-currency-lg text-tertiary font-data-mono-num">96.4%</span>
+<span class="font-body-sm text-body-sm text-tertiary font-medium">Benchmark ≥95%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pt-2">
+<span>Workshop Bays 1–8</span>
+<span class="font-data-mono-num text-on-surface">Avg 6.2 min draw</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-tertiary" style="width: 96.4%"></div>
+</div>
+</div>
+</div>
+<!-- Main Workstation Layout: 8 cols Data Matrix + 4 cols Procurement Drawer -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start mb-space-lg">
+<!-- LEFT PANEL: Main Stock Matrix & Filtering (8 cols) -->
+<div class="xl:col-span-8 flex flex-col gap-space-md">
+<!-- Search, Marque Switcher & Dense Filter Bar -->
+<div class="p-space-md rounded-xl bg-surface-container-low shadow-md flex flex-col gap-space-sm">
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-space-sm">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full h-11 pl-10 pr-10 rounded-lg bg-surface-container text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="parts-search-input" placeholder="Search by SKU, OEM Part #, Description, VIN fitment..." type="text" value="PCCB Front Rotor"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+<!-- Quick Marque Badges -->
+<div class="flex items-center gap-1.5 overflow-x-auto py-1">
+<button class="px-3 py-2 rounded-lg bg-primary text-on-primary font-headline-sm text-body-sm font-semibold whitespace-nowrap shadow-sm">All Marques</button>
+<button class="px-3 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Porsche (840)</button>
+<button class="px-3 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Ferrari (285)</button>
+<button class="px-3 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Mercedes-AMG (210)</button>
+<button class="px-3 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-body-sm text-body-sm whitespace-nowrap">Aston Martin (85)</button>
+</div>
+</div>
+<!-- Secondary Filter Pills Row -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-2 text-on-surface-variant text-body-sm">
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant mr-1">Categories:</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface font-body-sm text-body-sm cursor-pointer hover:bg-surface-container-high">Brakes (32)</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-body-sm text-body-sm cursor-pointer hover:bg-surface-container-high">Powertrain (114)</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-body-sm text-body-sm cursor-pointer hover:bg-surface-container-high">Aero &amp; Carbon (68)</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-body-sm text-body-sm cursor-pointer hover:bg-surface-container-high">Fluids &amp; Consumables (42)</span>
+<span class="px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant font-body-sm text-body-sm cursor-pointer hover:bg-surface-container-high">Electrical (84)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Hub Location:</span>
+<select class="bg-surface-container text-on-surface rounded-md px-2.5 py-1 font-body-sm text-body-sm focus:outline-none">
+<option>All Locations (Al Quoz Hub 1)</option>
+<option>Aisle A (Engine &amp; Gearbox)</option>
+<option>Aisle B (Ceramic &amp; Chassis)</option>
+<option>Aisle C (Tyres &amp; Wheels)</option>
+<option>Vault Locker (Exotic Carbon)</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Parts Inventory High-Density SKU Data Table -->
+<div class="rounded-xl bg-surface-container-low shadow-xl overflow-hidden flex flex-col">
+<div class="p-space-md flex items-center justify-between bg-surface-container/40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">format_list_bulleted</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Parts &amp; Components Repository</h3>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-data-mono-num text-body-sm">Showing 6 of 1,420 items</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" title="Export CSV for UAE Tax / FTA Audit">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" title="Batch Pricing Margin Calculator">
+<span class="material-symbols-outlined text-[18px]">calculate</span>
+</button>
+</div>
+</div>
+<!-- Table Viewport -->
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-md text-body-md" id="parts-table">
+<thead>
+<tr class="bg-surface-container-lowest text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-3 px-space-md">SKU / OEM Code / Marque</th>
+<th class="py-3 px-3">Bin Location</th>
+<th class="py-3 px-3 text-center">Stock Levels</th>
+<th class="py-3 px-3 text-right">Cost (AED)</th>
+<th class="py-3 px-3 text-right">RO Retail (AED)</th>
+<th class="py-3 px-3 text-center">Status</th>
+<th class="py-3 px-space-md text-right">Direct Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-highest/30">
+<!-- ROW 1: Porsche PCCB Rotor (High Value, Allocated) -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">#SKU-POR-992-BRK</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">OEM #992-351-409-G</span>
+</div>
+<span class="font-body-md text-on-surface font-medium truncate max-w-xs">PCCB Front Carbon Ceramic Rotor (Left, 410mm)</span>
+<span class="font-body-sm text-on-surface-variant">Porsche 992 GT3 / GT3 RS • Al Nabooda Sourced</span>
+</div>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-data-mono-num text-body-sm text-secondary font-medium">Rack B-04-3</span>
+<span class="font-body-sm text-on-surface-variant">Climate Supercar Vault</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<div class="inline-flex flex-col items-center">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-num text-body-md text-on-surface font-semibold">4</span>
+<span class="text-body-sm text-on-surface-variant">on hand</span>
+</div>
+<span class="font-body-sm text-secondary font-data-mono-num">2 avail • 2 res (RO-4094)</span>
+</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-body-sm text-on-surface whitespace-nowrap">
+                  24,500.00
+                </td>
+<td class="py-3 px-3 text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">32,800.00</span>
+<span class="font-label-caps text-label-caps text-tertiary">+33.8% Margin</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-body-sm text-body-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Optimal
+                  </span>
+</td>
+<td class="py-3 px-space-md text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-medium transition-colors" title="Allocate to Repair Order">
+                      Allocate RO
+                    </button>
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors" title="Add to Reorder Cart">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 2: Michelin Cup 2 R Tyres -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">#SKU-MICH-C2R-325</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">MICH-3253021-N0</span>
+</div>
+<span class="font-body-md text-on-surface font-medium truncate max-w-xs">Michelin Pilot Sport Cup 2 R (325/30 R21 - Rear)</span>
+<span class="font-body-sm text-on-surface-variant">Porsche N0 Spec • Central Tyre Bay Storage</span>
+</div>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-data-mono-num text-body-sm text-on-surface">Bin C-01-Floor</span>
+<span class="font-body-sm text-on-surface-variant">Tyre Stack Bay 2</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<div class="inline-flex flex-col items-center">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-num text-body-md text-on-surface font-semibold">8</span>
+<span class="text-body-sm text-on-surface-variant">on hand</span>
+</div>
+<span class="font-body-sm text-tertiary font-data-mono-num">8 avail (0 res)</span>
+</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-body-sm text-on-surface whitespace-nowrap">
+                  2,850.00
+                </td>
+<td class="py-3 px-3 text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">3,650.00</span>
+<span class="font-label-caps text-label-caps text-tertiary">+28.0% Margin</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-body-sm text-body-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Optimal
+                  </span>
+</td>
+<td class="py-3 px-space-md text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-medium transition-colors">
+                      Allocate RO
+                    </button>
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 3: Brembo Monobloc Caliper (Low Stock) -->
+<tr class="hover:bg-surface-container/60 transition-colors bg-error/5">
+<td class="py-3 px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-data-mono-num text-body-sm text-error font-semibold">#SKU-BRM-MONO-6P</span>
+<span class="px-1.5 py-0.5 rounded bg-error-container/20 text-error font-label-caps text-label-caps">BRM-XB6-221</span>
+</div>
+<span class="font-body-md text-on-surface font-medium truncate max-w-xs">Brembo Racing Carbon Monobloc Brake Caliper Set</span>
+<span class="font-body-sm text-on-surface-variant">Ferrari 488 Pista / F8 • Al Tayer Motors</span>
+</div>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-data-mono-num text-body-sm text-secondary font-medium">Rack B-02-1</span>
+<span class="font-body-sm text-on-surface-variant">Supercar Security Cage</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<div class="inline-flex flex-col items-center">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-num text-body-md text-error font-semibold">1</span>
+<span class="text-body-sm text-error font-semibold">Unit (Min: 2)</span>
+</div>
+<span class="font-body-sm text-on-surface-variant font-data-mono-num">1 avail • Safety Breach</span>
+</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-body-sm text-on-surface whitespace-nowrap">
+                  18,200.00
+                </td>
+<td class="py-3 px-3 text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">24,500.00</span>
+<span class="font-label-caps text-label-caps text-tertiary">+34.6% Margin</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-body-sm text-body-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> Low Stock
+                  </span>
+</td>
+<td class="py-3 px-space-md text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="px-2.5 py-1.5 rounded bg-primary text-on-primary font-headline-sm text-body-sm font-semibold hover:opacity-90 transition-colors shadow-sm">
+                      1-Tap Reorder
+                    </button>
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 4: Mobil 1 Drum (Fluids) -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">#SKU-MOB-0W40-208L</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">MOB-SUP-208</span>
+</div>
+<span class="font-body-md text-on-surface font-medium truncate max-w-xs">Mobil 1 Supercar 0W-40 Synthetic Oil (208L Drum)</span>
+<span class="font-body-sm text-on-surface-variant">Porsche A40 / AMG 229.5 Bulk Consumable</span>
+</div>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-data-mono-num text-body-sm text-on-surface">Drum Bay D-01</span>
+<span class="font-body-sm text-on-surface-variant">Bunding Containment Area</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<div class="inline-flex flex-col items-center">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-num text-body-md text-on-surface font-semibold">2</span>
+<span class="text-body-sm text-on-surface-variant">drums (416L)</span>
+</div>
+<span class="font-body-sm text-on-surface-variant font-data-mono-num">Est. 18 days supply</span>
+</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-body-sm text-on-surface whitespace-nowrap">
+                  6,400.00
+                </td>
+<td class="py-3 px-3 text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">9,200.00</span>
+<span class="font-label-caps text-label-caps text-tertiary">+43.7% Margin</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-body-sm text-body-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Optimal
+                  </span>
+</td>
+<td class="py-3 px-space-md text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-medium transition-colors">
+                      Dispense Litres
+                    </button>
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 5: Ferrari F8 Titanium Header (Out of Stock / On Order) -->
+<tr class="hover:bg-surface-container/60 transition-colors bg-secondary/5">
+<td class="py-3 px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-data-mono-num text-body-sm text-secondary font-semibold">#SKU-FER-F8-EXH</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">FER-OEM-349811</span>
+</div>
+<span class="font-body-md text-on-surface font-medium truncate max-w-xs">Ferrari F8 Tributo Titanium Exhaust Header (OEM)</span>
+<span class="font-body-sm text-secondary">Inbound PO #2025-PO-0428 • Direct Factory Maranello</span>
+</div>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-data-mono-num text-body-sm text-on-surface-variant">Rack A-12-Transit</span>
+<span class="font-body-sm text-secondary">Pre-assigned Bin</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<div class="inline-flex flex-col items-center">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-num text-body-md text-on-surface-variant font-semibold">0</span>
+<span class="text-body-sm text-on-surface-variant">on hand</span>
+</div>
+<span class="font-body-sm text-secondary font-medium font-data-mono-num">1 On Order (ETA 3d)</span>
+</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-body-sm text-on-surface whitespace-nowrap">
+                  38,900.00
+                </td>
+<td class="py-3 px-3 text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">51,500.00</span>
+<span class="font-label-caps text-label-caps text-tertiary">+32.3% Margin</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/15 text-secondary font-body-sm text-body-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> On Order
+                  </span>
+</td>
+<td class="py-3 px-space-md text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-secondary text-body-sm font-medium transition-colors">
+                      Track Bayan
+                    </button>
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 6: Mercedes-AMG Oil Cooler -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">#SKU-MB-M177-OC</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps">A177-180-02-00</span>
+</div>
+<span class="font-body-md text-on-surface font-medium truncate max-w-xs">Mercedes-AMG M177 Biturbo Oil Cooler Assembly</span>
+<span class="font-body-sm text-on-surface-variant">AMG GT R / C63 S • Gargash Enterprises</span>
+</div>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="font-data-mono-num text-body-sm text-on-surface">Rack A-08-2</span>
+<span class="font-body-sm text-on-surface-variant">Engine Subassembly Aisle</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<div class="inline-flex flex-col items-center">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-num text-body-md text-on-surface font-semibold">3</span>
+<span class="text-body-sm text-on-surface-variant">on hand</span>
+</div>
+<span class="font-body-sm text-tertiary font-data-mono-num">3 avail (0 res)</span>
+</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-body-sm text-on-surface whitespace-nowrap">
+                  4,900.00
+                </td>
+<td class="py-3 px-3 text-right whitespace-nowrap">
+<div class="flex flex-col items-end">
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">6,850.00</span>
+<span class="font-label-caps text-label-caps text-tertiary">+39.7% Margin</span>
+</div>
+</td>
+<td class="py-3 px-3 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-body-sm text-body-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Optimal
+                  </span>
+</td>
+<td class="py-3 px-space-md text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-medium transition-colors">
+                      Allocate RO
+                    </button>
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Telemetry Bar -->
+<div class="p-space-sm px-space-md bg-surface-container-lowest/80 flex flex-wrap items-center justify-between gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary"></span> EPC Live Sync Active</span>
+<span class="text-outline">|</span>
+<span>VAT Treatment: UAE Standard 5% Applicable on Retail Draw</span>
+</div>
+<div class="flex items-center gap-2">
+<span>Page 1 of 237</span>
+<div class="inline-flex rounded-md shadow-sm">
+<button class="px-2 py-1 rounded-l bg-surface-container hover:bg-surface-container-high text-on-surface">Prev</button>
+<button class="px-2 py-1 rounded-r bg-surface-container hover:bg-surface-container-high text-on-surface">Next</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Marque EPC Visual Teaser Card (Photo Rich) -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md relative overflow-hidden flex flex-col md:flex-row items-center gap-space-lg">
+<div class="w-full md:w-56 h-36 rounded-lg overflow-hidden shrink-0 relative bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="High-contrast technical photograph of a disassembled Porsche 911 GT3 RS carbon-ceramic brake assembly and titanium suspension upright on a sterile engineering workbench under soft directional studio light, deep obsidian shadows with subtle gold reflections." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6pUM7uTTIJe1806nZZnhp0jbNE_oSZ7Hcl2-h3oU8IxZihh1TpWseYlGMkwriCwjrkG22Gsx7Hi7kVnrTW5zdjbVdylgEGdM_aeTGX0oJRTAC4lad90D3fxHhL5PFsDVDRVTVyNPiZxsuEJFJmRmuXQUEyJkyP6AHow85FGfS4SS5UVTvGG9UNgMRxenCqdlaHkS-7HSfL7uHmb0UcZBRtIz0568z-OkpLUGGvhDw1QuUoCpbqSe_"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+<span class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-surface-container-lowest/90 font-label-caps text-label-caps text-primary uppercase font-semibold">EPC Exploded Diagram</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-[18px]">hub</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Direct Factory EPC Microcat Connectivity</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-sm">
+            Phase 1 DMS connects directly to Porsche PET2, Ferrari ModisCS, and Mercedes WIS/ASRA networks. Real-time superseded part number reconciliation prevents incorrect shop bay draws.
+          </p>
+<div class="flex flex-wrap items-center gap-space-md text-body-sm text-on-surface-variant font-data-mono-num">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span> Automated VIN-to-SKU Decoding</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span> Real-time DWC Bonded Warehouse Feeds</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT PANEL: Inbound PO Procurement Drawer & Vendor SLA (4 cols) -->
+<div class="xl:col-span-4 flex flex-col gap-space-md">
+<!-- Active Inbound Consignment Card -->
+<div class="rounded-xl bg-surface-container-low shadow-xl overflow-hidden">
+<div class="p-space-md bg-surface-container/60 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">local_shipping</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Active Inbound Shipment</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-label-caps text-label-caps uppercase font-semibold">
+            Bayan Pre-Cleared
+          </span>
+</div>
+<div class="p-space-md flex flex-col gap-space-sm">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-data-mono-num text-body-sm text-primary font-semibold">PO #2025-PO-0428</span>
+<div class="font-body-md text-on-surface font-semibold mt-0.5">Porsche AG Logistics Centre</div>
+<div class="font-body-sm text-on-surface-variant">DWC Free Zone Bonded Terminal, Dubai</div>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Total Value</span>
+<div class="font-data-mono-num text-body-lg text-on-surface font-bold">AED 142,600</div>
+</div>
+</div>
+<!-- Customs Clearance Badge Box -->
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col gap-1">
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">shield</span> UAE Federal Customs Bayan Ref:
+              </span>
+<span class="font-data-mono-num text-on-surface font-semibold">#BAY-98124</span>
+</div>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface-variant">Estimated Dock Arrival:</span>
+<span class="font-body-sm text-tertiary font-semibold">Tomorrow, 11:00 GST</span>
+</div>
+<div class="font-body-sm text-on-surface-variant text-[11px] pt-1">
+              Transport: Transguard Armored &amp; Bonded Logistics • 8 High-Priority Line Items
+            </div>
+</div>
+<!-- Inbound Manifest Preview -->
+<div class="flex flex-col gap-1.5 pt-1">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Manifest Highlights (8 Lines):</span>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container/40 text-body-sm">
+<div class="min-w-0 pr-2">
+<div class="font-body-sm text-on-surface font-medium truncate">GT3 RS Weissach Carbon Wing Uprights</div>
+<div class="text-on-surface-variant text-[11px] font-data-mono-num">2 Units • OEM #992-827-901</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-caps text-label-caps uppercase">Verified</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container/40 text-body-sm">
+<div class="min-w-0 pr-2">
+<div class="font-body-sm text-on-surface font-medium truncate">Titanium Roll Cage Bolt Kit (M8 x 45)</div>
+<div class="text-on-surface-variant text-[11px] font-data-mono-num">12 Kits • OEM #992-008-622</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-caps text-label-caps uppercase">Verified</span>
+</div>
+</div>
+<!-- Inbound Action Buttons -->
+<div class="grid grid-cols-2 gap-2 pt-2">
+<button class="py-2 px-3 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-semibold transition-colors flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+<span>Packing Slip</span>
+</button>
+<button class="py-2 px-3 rounded-lg bg-tertiary text-on-tertiary font-semibold text-body-sm hover:opacity-90 transition-colors flex items-center justify-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+<span>Scan Intake QR</span>
+</button>
+</div>
+<button class="w-full py-1.5 text-center text-error hover:text-error/80 font-body-sm text-body-sm transition-colors flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[15px]">flag</span>
+<span>Flag Customs or Line Discrepancy</span>
+</button>
+</div>
+</div>
+<!-- Automated Replenishment & Authorized UAE Agency Vendors -->
+<div class="rounded-xl bg-surface-container-low shadow-xl p-space-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Tier-1 Agency Vendors</h4>
+</div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">UAE SLA</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Automated purchasing algorithms trigger dispatch requests based on current workshop repair orders (RO) &amp; scheduled test drives.
+        </p>
+<!-- Vendor 1: Al Nabooda -->
+<div class="p-space-sm rounded-lg bg-surface-container/60 hover:bg-surface-container transition-colors flex items-center justify-between">
+<div class="min-w-0 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="font-body-md text-on-surface font-semibold">Al Nabooda Automobiles</span>
+<span class="px-1 py-0.2 rounded bg-primary/10 text-primary font-label-caps text-[10px]">PORSCHE</span>
+</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Direct Jebel Ali Hub dispatch • 24h cycle</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-data-mono-num text-tertiary text-body-sm font-bold">98% On-Time</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">Avg 24h SLA</div>
+</div>
+</div>
+<!-- Vendor 2: Al Tayer -->
+<div class="p-space-sm rounded-lg bg-surface-container/60 hover:bg-surface-container transition-colors flex items-center justify-between">
+<div class="min-w-0 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="font-body-md text-on-surface font-semibold">Al Tayer Motors</span>
+<span class="px-1 py-0.2 rounded bg-error/10 text-error font-label-caps text-[10px]">FERRARI</span>
+</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Direct Maranello / Al Manara dispatch</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-data-mono-num text-secondary text-body-sm font-bold">94% On-Time</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">Avg 48h SLA</div>
+</div>
+</div>
+<!-- Vendor 3: Gargash -->
+<div class="p-space-sm rounded-lg bg-surface-container/60 hover:bg-surface-container transition-colors flex items-center justify-between">
+<div class="min-w-0 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="font-body-md text-on-surface font-semibold">Gargash Enterprises</span>
+<span class="px-1 py-0.2 rounded bg-secondary/10 text-secondary font-label-caps text-[10px]">AMG</span>
+</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">JAFZA Distribution Centre courier</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-data-mono-num text-tertiary text-body-sm font-bold">99% On-Time</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">Same-Day</div>
+</div>
+</div>
+<!-- Quick PO Creation Direct Link -->
+<button class="w-full mt-1 py-2 px-3 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-primary font-body-sm text-body-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+<span>View All 24 Active Vendor Contracts</span>
+</button>
+</div>
+<!-- Workshop Bay Material Draw Mini Widget -->
+<div class="p-space-md rounded-xl bg-surface-container-low shadow-xl flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Active Repair Order Demands</span>
+<span class="material-symbols-outlined text-primary text-[18px]">build</span>
+</div>
+<div class="font-body-md text-on-surface font-medium">Bays 1 &amp; 4: GT3 RS 10,000 KM Major Service</div>
+<div class="font-body-sm text-on-surface-variant">
+          Assigned to Master Technician Tariq M. • 4 parts allocated, awaiting carbon brake sensor clip.
+        </div>
+<div class="w-full bg-surface-container rounded-full h-1.5 mt-2 overflow-hidden">
+<div class="bg-tertiary h-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Interactive Demonstrator Dock / State Switcher -->
+<div class="sticky bottom-4 z-30 mx-auto max-w-3xl w-full p-2 rounded-2xl bg-surface-container-high/90 backdrop-blur-xl shadow-2xl flex items-center justify-between gap-2 border border-outline-variant/30">
+<div class="flex items-center gap-2 pl-space-sm min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0"></span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface font-semibold truncate">
+        P1 Prototype State:
+      </span>
+</div>
+<div class="flex items-center gap-1.5 overflow-x-auto">
+<button class="demo-state-btn px-3 py-1.5 rounded-lg bg-primary text-on-primary font-headline-sm text-body-sm font-semibold whitespace-nowrap shadow-sm" data-filter="all">
+        Populated Inventory
+      </button>
+<button class="demo-state-btn px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors font-body-sm text-body-sm whitespace-nowrap" data-filter="low-stock">
+        Low Stock &amp; Urgent
+      </button>
+<button class="demo-state-btn px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors font-body-sm text-body-sm whitespace-nowrap" data-filter="inbound">
+        Inbound PO Staging
+      </button>
+<button class="demo-state-btn px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors font-body-sm text-body-sm whitespace-nowrap" data-filter="audit">
+        Annual Stocktake Audit
+      </button>
+</div>
+<div class="pr-space-xs hidden sm:block">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] cursor-pointer hover:text-primary transition-colors" title="Toggle Concept Specs Info">
+        info
+      </span>
+</div>
+</div>
+</div>
+<script>
+  // Interactive prototype demonstrations for the Concept Template
+  document.addEventListener('DOMContentLoaded', () => {
+    const demoButtons = document.querySelectorAll('.demo-state-btn');
+    const tableRows = document.querySelectorAll('#parts-table tbody tr');
+    const searchInput = document.getElementById('parts-search-input');
+
+    demoButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        demoButtons.forEach(b => {
+          b.className = 'demo-state-btn px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors font-body-sm text-body-sm whitespace-nowrap';
+        });
+        btn.className = 'demo-state-btn px-3 py-1.5 rounded-lg bg-primary text-on-primary font-headline-sm text-body-sm font-semibold whitespace-nowrap shadow-sm';
+
+        const filterMode = btn.dataset.filter;
+        
+        if (filterMode === 'low-stock') {
+          tableRows.forEach(row => {
+            if (row.innerHTML.includes('Low Stock') || row.innerHTML.includes('Safety Breach')) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+          if (searchInput) searchInput.value = 'Critical safety threshold items';
+        } else if (filterMode === 'inbound') {
+          tableRows.forEach(row => {
+            if (row.innerHTML.includes('On Order') || row.innerHTML.includes('PO #')) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+          if (searchInput) searchInput.value = 'Pending arrivals & PO consignments';
+        } else {
+          tableRows.forEach(row => {
+            row.style.display = '';
+          });
+          if (searchInput) searchInput.value = 'PCCB Front Rotor';
+        }
+      });
+    });
+  });
+</script></main></div></body></html>

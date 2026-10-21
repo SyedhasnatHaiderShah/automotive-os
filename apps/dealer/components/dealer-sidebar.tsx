@@ -177,6 +177,20 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
               {isArabic ? 'ورشة العمل وتوزيع المنصات' : 'Workshop & Bays'}
             </span>
           </Link>
+
+          <Link
+            href="/parts"
+            className={`flex items-center gap-3 px-3.5 py-2 rounded-lg transition-all text-xs sm:text-sm ${
+              pathname?.startsWith('/parts')
+                ? 'bg-primary-container text-on-primary-container font-semibold shadow-md'
+                : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]">precision_manufacturing</span>
+            <span className="font-body-md">
+              {isArabic ? 'قطع الغيار والتوريد' : 'Parts & Procurement'}
+            </span>
+          </Link>
         </nav>
       </div>
 
