@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-low": "#181c21", "primary-container": "#d4af37", "surface": "#101419", "on-tertiary-container": "#005035", "on-error-container": "#ffdad6", "tertiary-fixed-dim": "#4edea3", "on-tertiary": "#003824", "on-secondary-fixed": "#001e2c", "on-primary-container": "#554300", "on-primary-fixed": "#241a00", "on-secondary": "#00354a", "on-tertiary-fixed": "#002113", "error": "#ffb4ab", "tertiary-container": "#33ca90", "on-secondary-fixed-variant": "#004c69", "on-tertiary-fixed-variant": "#005236", "on-surface": "#e0e2ea", "on-background": "#e0e2ea", "secondary-container": "#00a6e0", "background": "#101419", "surface-bright": "#36393f", "surface-variant": "#31353b", "surface-container-high": "#262a30", "primary": "#f2ca50", "on-surface-variant": "#d0c5af", "inverse-on-surface": "#2d3136", "surface-dim": "#101419", "tertiary-fixed": "#6ffbbe", "outline": "#99907c", "inverse-primary": "#735c00", "surface-container-highest": "#31353b", "secondary-fixed": "#c4e7ff", "secondary-fixed-dim": "#7bd0ff", "tertiary": "#58e7aa", "primary-fixed": "#ffe088", "surface-container-lowest": "#0a0e13", "on-secondary-container": "#00374d", "outline-variant": "#4d4635", "primary-fixed-dim": "#e9c349", "on-primary-fixed-variant": "#574500", "error-container": "#93000a", "on-primary": "#3c2f00", "surface-tint": "#e9c349", "on-error": "#690005", "surface-container": "#1c2025", "inverse-surface": "#e0e2ea", "secondary": "#7bd0ff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-desktop-wide": "2rem", "gutter": "1.5rem", "margin-mobile": "1rem", "space-3xl": "4rem", "gutter-mobile": "0.75rem", "space-sm": "0.5rem", "space-md": "1rem", "space-xs": "0.25rem", "margin": "2rem", "margin-desktop-wide": "3rem", "space-2xl": "3rem", "space-lg": "1.5rem", "space-xl": "2rem" }, "fontFamily": { "headline-sm": [ "Outfit" ], "headline-xl": [ "Outfit" ], "body-md": [ "Inter" ], "headline-md": [ "Outfit" ], "body-sm": [ "Inter" ], "headline-xl-mobile": [ "Outfit" ], "label-caps": [ "Inter" ], "display-hero-mobile": [ "Outfit" ], "data-mono-num": [ "JetBrains Mono" ], "body-lg": [ "Inter" ], "data-currency-lg": [ "Outfit" ], "headline-lg": [ "Outfit" ], "display-hero": [ "Outfit" ] }, "fontSize": { "headline-sm": [ "18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" } ], "headline-xl": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "body-md": [ "14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" } ], "headline-md": [ "22px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "500" } ], "body-sm": [ "12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" } ], "headline-xl-mobile": [ "28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-caps": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" } ], "display-hero-mobile": [ "36px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "data-mono-num": [ "13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "body-lg": [ "16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" } ], "data-currency-lg": [ "32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-lg": [ "28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "display-hero": [ "56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" } ] } } } };</script></head><body class="bg-background font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen"><aside class="fixed left-0 top-0 h-full w-60 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-50 flex flex-col justify-between"><div class="flex flex-col flex-1 overflow-y-auto"><div class="h-16 px-space-md flex items-center gap-space-sm bg-surface-container-lowest"><div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[20px]">shield_with_house</span></div><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase truncate">Automotive OS</span><span class="font-label-caps text-label-caps text-outline uppercase tracking-wider truncate">Platform Ops Hub</span></div></div><div class="p-space-md flex flex-col gap-space-lg"><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-outline px-space-sm uppercase tracking-wider">Supervision &amp; Governance</span><nav class="flex flex-col gap-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium rounded-lg"><a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="operations-command" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">monitoring</span><span class="font-body-sm text-body-sm">Operations Command</span></div></a><a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="kyb-dealer-verification" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">verified_user</span><span class="font-body-sm text-body-sm">KYB Verification</span></div><span class="bg-surface-container-highest text-primary font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">6</span></a><a aria-current="page" class="flex items-center justify-between px-space-sm py-2 transition-colors bg-surface-container-high text-primary font-medium rounded-lg" data-path="listing-moderation" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">policy</span><span class="font-body-sm text-body-sm">Listing Moderation</span></div><span class="bg-surface-container-highest text-secondary font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">14</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="disputes-and-enforcement" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">gavel</span><span class="font-body-sm text-body-sm">Disputes &amp; Sanctions</span></div><span class="bg-error-container text-on-error-container font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">2</span></a></nav></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-outline px-space-sm uppercase tracking-wider">Platform Infrastructure</span><nav class="flex flex-col gap-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium rounded-lg"><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="dealer-subscriptions-and-tariffs" href="#"><span class="material-symbols-outlined text-[18px]">receipt_long</span><span class="font-body-sm text-body-sm">Dealer Tariffs</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="immutable-audit-ledger" href="#"><span class="material-symbols-outlined text-[18px]">lock_clock</span><span class="font-body-sm text-body-sm">Audit Activity Ledger</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="sovereign-api-and-gateways" href="#"><span class="material-symbols-outlined text-[18px]">hub</span><span class="font-body-sm text-body-sm">Sovereign Gateways</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="platform-rbac-and-keyring" href="#"><span class="material-symbols-outlined text-[18px]">key</span><span class="font-body-sm text-body-sm">RBAC &amp; Keyring</span></a></nav></div></div></div><div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm"><div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs"><div class="flex items-center gap-space-xs text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span><span class="font-label-caps text-label-caps tracking-wider uppercase">Air-Gapped HSM Keystore</span></div><span class="font-data-mono-num text-body-sm text-on-surface-variant">#DXB-ADM-9941</span><span class="font-body-sm text-body-sm text-outline">Auto-lock in 12m</span></div><button class="w-full h-8 px-space-sm rounded bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-body-sm text-body-sm flex items-center justify-center gap-space-xs transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">lock_reset</span><span>Emergency Freeze</span></button></div></aside><div class="pl-60"><header class="fixed top-0 left-60 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-40 px-gutter"><div class="h-16 w-full flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md min-w-0 flex-1"><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-label-caps text-label-caps text-primary uppercase tracking-wider font-semibold">Platform Governance &amp; Trust Ops</span><span class="px-1.5 py-0.5 rounded bg-surface-container-high font-data-mono-num text-body-sm text-on-surface-variant">Tier-0 Clearance</span></div><div class="flex items-center gap-space-xs text-outline text-body-sm"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="font-data-mono-num text-body-sm">DIFC Vault Node 01 • RTA Gateway 9ms</span></div></div><div class="relative max-w-md w-full hidden xl:block"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span class="material-symbols-outlined text-outline text-[18px]">search</span></div><input class="w-full h-9 pl-9 pr-4 rounded-lg bg-surface-container-high text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary-container" placeholder="Query VIN, Case #, Dealership, DED License..." type="text"/></div></div><div class="flex items-center gap-space-md flex-shrink-0"><div class="hidden lg:flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-surface-container"><span class="w-2 h-2 rounded-full bg-tertiary"></span><span class="font-body-sm text-body-sm text-on-surface-variant">Dubai Police • DED Active</span></div><div class="flex items-center bg-surface-container-high rounded p-0.5 font-label-caps text-label-caps"><button class="px-2 py-0.5 rounded bg-surface-bright text-on-surface font-semibold">EN</button><button class="px-2 py-0.5 rounded text-outline hover:text-on-surface transition-colors">عربي</button></div><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-4 h-4 bg-error text-on-error font-data-mono-num text-body-sm rounded-full flex items-center justify-center text-[10px]">4</span></button><div class="flex items-center gap-space-sm pl-space-sm"><div class="flex flex-col text-right hidden sm:flex"><span class="font-body-sm text-body-sm text-on-surface font-medium truncate max-w-[160px]">Dr. Maya Al-Falasi</span><span class="font-label-caps text-label-caps text-primary truncate max-w-[160px]">Platform SuperAdmin</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-16 bg-background px-gutter py-space-lg"><div class="flex flex-col w-full">
+<!-- Top Super-Governance Sticky Audit Strip -->
+<div class="relative w-full rounded-xl bg-surface-container-low shadow-xl p-space-lg mb-space-lg overflow-hidden">
+<div class="absolute -right-20 -top-20 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute left-1/3 -bottom-24 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Header Tier: Breadcrumbs & Status Flag -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-md">
+<div class="flex items-center gap-space-xs font-label-caps text-label-caps text-outline tracking-wider">
+<span class="hover:text-on-surface cursor-pointer transition-colors">LISTING MODERATION &amp; VERIFICATION</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="hover:text-on-surface cursor-pointer transition-colors">MODERATION QUEUE</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-data-mono-num font-semibold">AUDIT #MOD-9921</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container/40 text-error font-data-mono-num text-body-sm font-semibold tracking-tight shadow-sm">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+          ACTION REQUIRED • Automated Discrepancy Flagged
+        </span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-data-mono-num text-body-sm text-on-surface-variant">
+          Priority: P1-Regulatory
+        </span>
+</div>
+</div>
+<!-- Primary Title & Dealer Metadata -->
+<div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-md pt-space-xs">
+<div class="space-y-1 min-w-0">
+<div class="flex flex-wrap items-center gap-space-sm">
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">
+            Vehicle Listing Audit: 2024 Porsche 911 GT3 RS Weissach Package
+          </h1>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-secondary font-data-mono-num text-body-sm">
+            MY2024 • 992.1
+          </span>
+</div>
+<div class="flex flex-wrap items-center gap-space-md text-body-sm text-outline">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[16px]">storefront</span>
+<span class="text-on-surface">Submitted by:</span>
+<span class="text-primary font-semibold underline decoration-primary/40 underline-offset-4">Apex GT Motors FZCO</span>
+<span class="px-1.5 py-0.2 rounded bg-primary/10 text-primary font-label-caps text-label-caps">Tier-1 Accredited</span>
+</div>
+<span class="text-surface-variant">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Received: <span class="text-on-surface font-data-mono-num">22 Feb 2025 • 14:18 GST</span></span>
+</div>
+<span class="text-surface-variant">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary text-[16px]">verified</span>
+<span class="text-tertiary">DED Valid #741092</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Controls -->
+<div class="flex flex-wrap items-center gap-space-sm pt-space-xs xl:pt-0">
+<button class="h-10 px-4 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm font-medium transition-all flex items-center gap-2 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">chat_bubble_outline</span>
+<span>Request Dealer Clarification</span>
+</button>
+<button class="h-10 px-4 rounded-lg bg-error-container hover:bg-error text-on-error-container hover:text-on-error font-body-sm font-medium transition-all flex items-center gap-2 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">block</span>
+<span>Reject &amp; De-list</span>
+</button>
+<button class="h-10 px-5 rounded-lg bg-tertiary-container hover:bg-tertiary text-on-tertiary-container hover:text-on-tertiary font-body-sm font-semibold transition-all flex items-center gap-2 shadow-md hover:shadow-lg" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Approve &amp; Publish to Marketplace</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main Asymmetric 2-Column Investigation Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg mb-space-xl">
+<!-- LEFT COLUMN (55% -> 7 cols on lg): Submission, Photos, Media Metadata, Specs & Docs -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<!-- Photo Grid & EXIF / Tamper Assurance -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">photo_library</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Physical Showroom Media Audit</h2>
+<p class="font-body-sm text-body-sm text-outline">6 of 24 High-Resolution Telemetry Plates Captured</p>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-tertiary/10 text-tertiary font-data-mono-num text-body-sm">
+<span class="material-symbols-outlined text-[14px]">pin_drop</span>
+            GPS &amp; EXIF MATCHED
+          </span>
+</div>
+<!-- 6-Photo Mosaic -->
+<div class="grid grid-cols-3 gap-space-xs rounded-lg overflow-hidden bg-surface-container-lowest p-1.5">
+<!-- Primary Studio Hero Shot -->
+<div class="col-span-2 row-span-2 relative group overflow-hidden rounded">
+<img class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A pristine 2024 Porsche 911 GT3 RS Weissach in Arctic Grey with carbon accents parked under dramatic showroom lighting in Al Quoz Dubai. Professional automotive editorial photography, low-angle studio front three-quarter view, high-contrast reflections, obsidian floor with hairline champagne backlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUXlI2LIgxlb2_4CCE3wH-q6UT3k4g35hTtD36FYzbV8DKVPp-xQFg5W_XUn5JxlSM-MsgWl25pywJPKPGUZkPvlBm_SktrlzqmUPl0peLT9ic9w5UHYupqYpLme3H3hMQ1BZXIpZ-NGa72t0T7f3ST0RqoB9skSgBDUgUlTGCTUJekgWuxU97w1FLRcYAcq4jBIwFUzzEybG8QMy8yMCrZnU9iGEx3yh83IDjije9IOCHyW7V964T"/>
+<div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-surface/90 text-on-surface font-label-caps text-label-caps flex items-center gap-1 backdrop-blur-md">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Plate 01 • Front 3/4 Studio
+            </div>
+</div>
+<!-- Secondary detail plates -->
+<div class="relative group overflow-hidden rounded">
+<img class="w-full h-31 object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Close-up detail shot of the Weissach carbon fiber rear swan-neck wing and titanium roll cage inside the Porsche 911 GT3 RS. Macro automotive lighting, carbon weave clearly visible, clean studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwkjNgqC91kNFbjdH9w5b7w49FzktGiMQTlFyZzy7Ym3_tm_NtGLc6iOz78t03excD_ONnu7GZ8gb_5ZE_YeGlMTiusvE1IzjFjMjWorIwFTKHu8KgLM-8_TG4IeHrUfZSQWjbx-YUeU_Q05Ho5yvERMOX5w9Ym1OLeH8eOpdszBZc9GOkilePtoVclH57VA3mOBXoGjAOS-ZWJmiZgnZVja14CpSvmuA5aOhy_91kZ4Q7CI1klLzB"/>
+<div class="absolute bottom-1 right-1 px-1.5 py-0.2 rounded bg-surface/80 text-on-surface font-label-caps text-label-caps">Plate 02 • Aero</div>
+</div>
+<div class="relative group overflow-hidden rounded">
+<img class="w-full h-31 object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Interior driver cabin view of 2024 Porsche 911 GT3 RS, showing Race-Tex carbon bucket seats, Weissach headrest embroidery, and digital Porsche instrument cluster showing 1850 KM. Sharp, crisp studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOdp6MOsMu_b8RU4dkACq7elgtKuIGi2LfxTkFrG1moCSeC-Kdmo_ubJhKG0ZSmg3krLj8LsEaR1CqpcHBgkchlrL4YKg8WsD-8c00mR5XwjN73Tj3KQj0uhz7TTlVF5daw4RaXdNfGXHpkQtE5CXbVjLUwgfmq24JBQFujRiQhsKKBH_Cw8w7g4f5LVsKvsuCr_EGsPvmv-CFFVYkaLduSd6TLtvgEidxSqnVJCOTuhGW-cHRV_BA"/>
+<div class="absolute bottom-1 right-1 px-1.5 py-0.2 rounded bg-surface/80 text-on-surface font-label-caps text-label-caps">Plate 03 • Cockpit</div>
+</div>
+<div class="relative group overflow-hidden rounded">
+<img class="w-full h-28 object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Close up photo of the Porsche 911 GT3 RS magnesium lightweight rim and yellow Porsche Ceramic Composite Brake PCCB calipers. Clean studio floor, reflection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0bfWShNxGRnIdLx2Hc8DggYd5f4I_bmlWO54NsWCEYLMeaW-gpWxR441k_Y6-5LwpagyeUwnemwZRnleu9KOzuLNAq7XNq73GmXuikdRv5H9oXH3raWYIQ7K3elTsoNf_08WFyAwO9nGbxBwjA6WB2AQ-E71WDivSvT6ZqbkPuBf5HxAlvLqrNrmJCig71NRTcSyMx5UHQuc1O4vB54lB8IMGG5x4GZvuhDXv170aOFYpTX2BOyHD"/>
+<div class="absolute bottom-1 right-1 px-1.5 py-0.2 rounded bg-surface/80 text-on-surface font-label-caps text-label-caps">Plate 04 • PCCB</div>
+</div>
+<div class="relative group overflow-hidden rounded">
+<img class="w-full h-28 object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Underhood chassis plate and engine bay cover detailing Weissach RS 4.0 litre naturally aspirated boxer insignia. High-tech, metallic, crisp focus on aluminum serial stamps." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJJ93YpZCV2vO_a_tGGD0UFxmrY_xqA_KGdB26tXDGKhoufLQeTsSKRkPgtJf7y0L25M_JAEVm3spUnc3Y8YY8o2_1qSVC00-NL6eZp90FBYw8SITRQC9qze-92XIsdge5HpAG1mo8xwfZBffW5NcVgXecw_89VqwyL_Q8BQsgkG2plm1ZZ6bJyn9s6RnhTYzSIk1oU2mcs5nIGmnZsavNI8PDISaGBdVjwYuPmuBbV7Q1EgCdSI8H"/>
+<div class="absolute bottom-1 right-1 px-1.5 py-0.2 rounded bg-surface/80 text-on-surface font-label-caps text-label-caps">Plate 05 • Bay</div>
+</div>
+<div class="relative group overflow-hidden rounded">
+<img class="w-full h-28 object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Physical vehicle VIN barcode and metal door jamb sticker with WP0AF2A97RS289012 etched clearly. Flash illumination verifying no tampering or double-stamping." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIlS7sF1JUReXn8uj7_jxyopCUvVy8sqJLarjegdVJmfLLLV6gwfMStehF-nboUmbTGXmtOZmxeNBV5_sW0bSKPBL73RGkEk3AjsZMThgHwkwlSgJn3gJSOdMgtAdqB0XxMBsJ9R6Vr7TfcIaPeeumsY5rGufJu7CIxl7gp3OW-3ejCohXXAPB8268mqkcKcRo63qiE1ZU1ThGl9bnadbhjepH5WtZ0ZY7CMY8v8Wf3_PouKyoA8yS"/>
+<div class="absolute bottom-1 right-1 px-1.5 py-0.2 rounded bg-surface/80 text-on-surface font-label-caps text-label-caps">Plate 06 • VIN Tag</div>
+</div>
+</div>
+<!-- EXIF & GPS Metadata Certificate Banner -->
+<div class="rounded-lg bg-surface-container p-space-md grid grid-cols-1 md:grid-cols-3 gap-space-sm text-body-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-[20px]">fmd_good</span>
+<div class="min-w-0">
+<span class="font-label-caps text-label-caps text-outline block">GEOLOCATION VERIFICATION</span>
+<span class="text-on-surface font-data-mono-num truncate block">25.1328° N, 55.2289° E</span>
+<span class="text-tertiary font-body-sm text-[11px]">Apex Bay 3, Al Quoz 1, DXB</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">camera</span>
+<div class="min-w-0">
+<span class="font-label-caps text-label-caps text-outline block">CAMERA EXIF SIGNATURE</span>
+<span class="text-on-surface font-data-mono-num truncate block">Sony ILCE-7RM5 • 35mm GM</span>
+<span class="text-outline font-body-sm text-[11px]">No generative inpainting detected</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">history_toggle_off</span>
+<div class="min-w-0">
+<span class="font-label-caps text-label-caps text-outline block">CAPTURE TIMESTAMP</span>
+<span class="text-on-surface font-data-mono-num truncate block">22 Feb 2025 • 11:34:02 GST</span>
+<span class="text-tertiary font-body-sm text-[11px]">Freshness: 2.8 hrs ago</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Listed Specifications vs Regulatory Attestation Table -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">rule</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Specification &amp; Telemetry Attestation</h2>
+<p class="font-body-sm text-body-sm text-outline">Cross-referenced against RTA, Tasjeel Shamil, and Porsche AG records</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container font-data-mono-num text-body-sm text-primary">
+            4 of 5 Validated
+          </span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm">
+<thead>
+<tr class="text-outline font-label-caps text-label-caps bg-surface-container-lowest/50">
+<th class="py-2.5 px-3">PARAMETER</th>
+<th class="py-2.5 px-3">DEALER CLAIM</th>
+<th class="py-2.5 px-3">OFFICIAL REGISTRY SOURCE</th>
+<th class="py-2.5 px-3 text-right">AUDIT STATUS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high/40">
+<!-- VIN Check -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">qr_code_2</span>
+                  Chassis / VIN
+                </td>
+<td class="py-3 px-3 font-data-mono-num text-on-surface">
+                  WP0AF2A97RS289012
+                </td>
+<td class="py-3 px-3 font-data-mono-num text-outline">
+                  Dubai Police • Interpol Clear
+                </td>
+<td class="py-3 px-3 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> CLEAN &amp; UNMASKED
+                  </span>
+</td>
+</tr>
+<!-- Regional Spec Check (FLAGGED) -->
+<tr class="bg-primary/5 hover:bg-primary/10 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">public</span>
+                  Regional Spec
+                </td>
+<td class="py-3 px-3 font-semibold text-primary">
+                  GCC Official Spec (Ali &amp; Sons)
+                </td>
+<td class="py-3 px-3 text-on-surface-variant font-data-mono-num">
+                  Porsche AG: German Spec (C00) w/ Retrofit
+                </td>
+<td class="py-3 px-3 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/20 text-primary font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[12px]">warning</span> SPEC MISMATCH
+                  </span>
+</td>
+</tr>
+<!-- Asking Price & Anti-Gouging Range -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">payments</span>
+                  Asking Valuation
+                </td>
+<td class="py-3 px-3 font-data-mono-num font-semibold text-on-surface">
+                  AED 1,420,000
+                </td>
+<td class="py-3 px-3 text-outline">
+                  Market Median: <span class="font-data-mono-num text-on-surface">AED 1,460,000</span> (±2.8% Delta)
+                </td>
+<td class="py-3 px-3 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> FAIR VALUE COMPLIANT
+                  </span>
+</td>
+</tr>
+<!-- Odometer Mileage Log -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">speed</span>
+                  Odometer Mileage
+                </td>
+<td class="py-3 px-3 font-data-mono-num text-on-surface font-semibold">
+                  1,850 KM
+                </td>
+<td class="py-3 px-3 font-data-mono-num text-outline">
+                  Tasjeel Telemetry: 1,842 KM (20 Feb)
+                </td>
+<td class="py-3 px-3 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> CERTIFIED ACCURATE
+                  </span>
+</td>
+</tr>
+<!-- Factory Engine Output -->
+<tr class="hover:bg-surface-container/40 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">tune</span>
+                  Engine &amp; Aero Config
+                </td>
+<td class="py-3 px-3 text-on-surface">
+                  4.0L Boxer-6 • 518 BHP • Weissach
+                </td>
+<td class="py-3 px-3 text-outline font-data-mono-num">
+                  ECU Stage-0 Factory Flash (Zero Tuner Logs)
+                </td>
+<td class="py-3 px-3 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> OEM UNMODIFIED
+                  </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Attached Digital Regulatory Documents -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-md flex flex-col gap-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Cryptographically Attached Dossier</h3>
+<p class="font-body-sm text-body-sm text-outline">Signed by government authorities and OEM authorized distributors</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm pt-space-xs">
+<!-- Doc 1 -->
+<div class="rounded-lg bg-surface-container p-space-sm hover:bg-surface-container-high transition-colors flex flex-col justify-between gap-space-xs cursor-pointer group">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-primary text-[24px]">assignment_turned_in</span>
+<span class="font-data-mono-num text-[11px] px-1.5 py-0.5 rounded bg-tertiary/10 text-tertiary">99/100 TIER-1</span>
+</div>
+<div>
+<span class="font-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors block">Tasjeel 150-Point Inspection</span>
+<span class="text-outline text-[11px] font-data-mono-num">#TSJ-2025-99810 • PDF 4.2 MB</span>
+</div>
+<div class="flex items-center justify-between text-outline text-[11px] pt-1">
+<span>Signed via UAE Pass</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">open_in_new</span>
+</div>
+</div>
+<!-- Doc 2 -->
+<div class="rounded-lg bg-surface-container p-space-sm hover:bg-surface-container-high transition-colors flex flex-col justify-between gap-space-xs cursor-pointer group">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-secondary text-[24px]">badge</span>
+<span class="font-data-mono-num text-[11px] px-1.5 py-0.5 rounded bg-surface-container-highest text-secondary">RTA ACTIVE</span>
+</div>
+<div>
+<span class="font-body-sm font-semibold text-on-surface group-hover:text-secondary transition-colors block">UAE Mulkiya Registration</span>
+<span class="text-outline text-[11px] font-data-mono-num">Plate DXB R-7080 • Private</span>
+</div>
+<div class="flex items-center justify-between text-outline text-[11px] pt-1">
+<span>Direct RTA Hash verified</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">open_in_new</span>
+</div>
+</div>
+<!-- Doc 3 -->
+<div class="rounded-lg bg-surface-container p-space-sm hover:bg-surface-container-high transition-colors flex flex-col justify-between gap-space-xs cursor-pointer group">
+<div class="flex items-start justify-between">
+<span class="material-symbols-outlined text-tertiary text-[24px]">security</span>
+<span class="font-data-mono-num text-[11px] px-1.5 py-0.5 rounded bg-tertiary/10 text-tertiary">VALID TO 2027</span>
+</div>
+<div>
+<span class="font-body-sm font-semibold text-on-surface group-hover:text-tertiary transition-colors block">Porsche Factory Warranty</span>
+<span class="text-outline text-[11px] font-data-mono-num">Porsche Centre Dubai Extension</span>
+</div>
+<div class="flex items-center justify-between text-outline text-[11px] pt-1">
+<span>Agency Transferable</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">open_in_new</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (45% -> 5 cols on lg): Discrepancy Engine, Fraud Risk Checks & Adjudication Terminal -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg">
+<!-- Critical Discrepancy Alert Card (Gold/Amber Halo) -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-xl relative overflow-hidden">
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-primary tracking-wider uppercase block font-semibold">Discrepancy Engine Telemetry</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Cooling Code Mismatch</h3>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded bg-primary-container text-on-primary-container font-label-caps text-label-caps font-semibold">
+            MODERATE RISK
+          </span>
+</div>
+<div class="space-y-space-sm text-body-sm text-on-surface-variant">
+<p class="leading-relaxed">
+            Dealer declared <strong class="text-on-surface">"GCC Official Specification (Ali &amp; Sons)"</strong>. RTA Gateway confirms initial registration in UAE; however, the Porsche AG Factory Build Sheet records the vehicle as:
+          </p>
+<div class="rounded-lg bg-surface-container-lowest p-space-sm font-data-mono-num text-[12px] space-y-1">
+<div class="flex justify-between text-outline">
+<span>Build Order:</span>
+<span class="text-on-surface">Stuttgart Zuffenhausen • Dest: C00 (Germany)</span>
+</div>
+<div class="flex justify-between text-outline">
+<span>Tropical Package (PR-8Z4):</span>
+<span class="text-primary font-semibold">RETROFIT BY OFFICIAL DEALER #0412</span>
+</div>
+<div class="flex justify-between text-outline">
+<span>Radiator Dual-Core Code:</span>
+<span class="text-tertiary">992-121-253-G (OEM GCC Spec Standard)</span>
+</div>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">policy</span>
+<div class="text-[12px] text-on-surface-variant leading-tight">
+<span class="font-semibold text-on-surface block">Mandatory Adjudication Guideline:</span>
+              Not fraudulent as mechanical cooling is genuine OEM retrofitted. However, UAE Fair Trade Consumer Protection Act forbids "Original GCC Spec" designation without clarification. Must append <span class="text-primary font-medium font-data-mono-num">"GCC Agency Retrofit"</span> badge on public dossier.
+            </div>
+</div>
+</div>
+</div>
+<!-- VIN Cloning, Phantom Listing & Financial Encumbrance Checks -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">fingerprint</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Integrity &amp; Anti-Fraud Scans</h2>
+<p class="font-body-sm text-body-sm text-outline">Multi-registry syndicated checks</p>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<!-- Check 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-7 h-7 rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px]">travel_explore</span>
+</div>
+<div class="min-w-0">
+<span class="font-body-sm font-medium text-on-surface block truncate">Cross-Platform Duplicate Search</span>
+<span class="text-[11px] text-outline block truncate">DubiCars, YallaMotor, CarSwitch, OpenSooq</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-data-mono-num text-[11px] shrink-0 font-semibold">
+              0 DUPLICATES
+            </span>
+</div>
+<!-- Check 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-7 h-7 rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px]">sensors</span>
+</div>
+<div class="min-w-0">
+<span class="font-body-sm font-medium text-on-surface block truncate">Physical Showroom Floor Telemetry</span>
+<span class="text-[11px] text-outline block truncate">Tasjeel BLE Beacon Node #DXB-98-3</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-data-mono-num text-[11px] shrink-0 font-semibold">
+              BAY 3 CONFIRMED
+            </span>
+</div>
+<!-- Check 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-7 h-7 rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px]">account_balance</span>
+</div>
+<div class="min-w-0">
+<span class="font-body-sm font-medium text-on-surface block truncate">Central Bank Lien Registry</span>
+<span class="text-[11px] text-outline block truncate">Hypothecation / Mortgage encumbrance</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-data-mono-num text-[11px] shrink-0 font-semibold">
+              0 ACTIVE LIENS
+            </span>
+</div>
+</div>
+</div>
+<!-- Sovereign Adjudication Terminal -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-xl flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Adjudication Determination</h2>
+<p class="font-body-sm text-body-sm text-outline">Operator clearance execution</p>
+</div>
+</div>
+<span class="font-data-mono-num text-[11px] text-outline">Tier-0 Gate</span>
+</div>
+<!-- Radio Decision Matrix -->
+<div class="flex flex-col gap-space-xs">
+<!-- Option A (Recommended) -->
+<label class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high cursor-pointer flex items-start gap-space-sm transition-colors group">
+<input checked="" class="mt-1 accent-primary focus:ring-0" name="adjudication_choice" type="radio"/>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                  Option A: Approve with Mandatory Disclose Badge
+                </span>
+<span class="px-1.5 py-0.2 rounded bg-primary/10 text-primary font-label-caps text-label-caps">RECOMMENDED</span>
+</div>
+<p class="text-[12px] text-outline mt-0.5">
+                Automatically appends "GCC Retrofit Verified" badge to the buyer specification dossier and adjusts the listing search filters.
+              </p>
+</div>
+</label>
+<!-- Option B -->
+<label class="p-space-sm rounded-lg bg-surface-container/60 hover:bg-surface-container cursor-pointer flex items-start gap-space-sm transition-colors">
+<input class="mt-1 accent-primary focus:ring-0" name="adjudication_choice" type="radio"/>
+<div class="min-w-0">
+<span class="font-body-sm font-medium text-on-surface block">
+                Option B: Approve as Full GCC Spec (Override Flag)
+              </span>
+<p class="text-[12px] text-outline mt-0.5">
+                Requires manual high-clearance override reason; logs entry into immutable audit activity ledger.
+              </p>
+</div>
+</label>
+<!-- Option C -->
+<label class="p-space-sm rounded-lg bg-surface-container/60 hover:bg-surface-container cursor-pointer flex items-start gap-space-sm transition-colors">
+<input class="mt-1 accent-error focus:ring-0" name="adjudication_choice" type="radio"/>
+<div class="min-w-0">
+<span class="font-body-sm font-medium text-error block">
+                Option C: Reject Submission (Inaccurate Specification)
+              </span>
+<p class="text-[12px] text-outline mt-0.5">
+                Returns listing draft back to dealer inventory with 48h deadline to update documentation.
+              </p>
+</div>
+</label>
+<!-- Option D -->
+<label class="p-space-sm rounded-lg bg-surface-container/60 hover:bg-surface-container cursor-pointer flex items-start gap-space-sm transition-colors">
+<input class="mt-1 accent-outline focus:ring-0" name="adjudication_choice" type="radio"/>
+<div class="min-w-0">
+<span class="font-body-sm font-medium text-on-surface block">
+                Option D: Temporary Freeze Pending Physical Inspector Dispatch
+              </span>
+<p class="text-[12px] text-outline mt-0.5">
+                Dispatches a Sovereign Field Auditor to Bay 3 Al Quoz for live ECU port interrogation.
+              </p>
+</div>
+</label>
+</div>
+<!-- Citation Reason Box -->
+<div class="space-y-1">
+<label class="font-label-caps text-label-caps text-outline uppercase tracking-wider block">
+            Generated Regulatory Citation Notice to Dealer
+          </label>
+<textarea class="w-full rounded-lg bg-surface-container-highest/60 p-space-sm font-data-mono-num text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed" rows="3">Article 14-C UAE Consumer Protection: Vehicle has been approved with mandatory label [GCC Agency Retrofit (Ali &amp; Sons 2024)] based on Factory Build Sheet (C00 Germany) cooling kit upgrade verification.</textarea>
+</div>
+<!-- Operator Mandatory Attestation Checklist -->
+<div class="space-y-1.5 pt-space-xs">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider block">
+            SuperAdmin Compliance Attestation
+          </span>
+<div class="space-y-1 text-body-sm text-on-surface-variant">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded accent-tertiary" type="checkbox"/>
+<span class="text-[12px]">Photos verified physically on premise via Al Quoz beacon</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded accent-tertiary" type="checkbox"/>
+<span class="text-[12px]">Central Bank mortgage and hypothecation registry cleared</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded accent-tertiary" type="checkbox"/>
+<span class="text-[12px]">VIN cryptographically cleared against Dubai Police Stolen Database</span>
+</label>
+</div>
+</div>
+<!-- Final Execution Button -->
+<button class="w-full h-11 rounded-lg bg-primary hover:bg-primary-fixed-dim text-on-primary font-body-sm font-semibold transition-all flex items-center justify-center gap-2 shadow-lg" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Commit Adjudication &amp; Sign with HSM Key</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Pipeline Horizon: Moderation Queue Pipeline -->
+<div class="w-full rounded-xl bg-surface-container-low p-space-lg shadow-md flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">queue</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Moderation Queue Pipeline</h2>
+<p class="font-body-sm text-body-sm text-outline">13 other vehicles pending cryptographic and regulatory clearance</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container font-label-caps text-label-caps text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>4 Critical Flares</span>
+</div>
+<button class="px-3 py-1 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm text-body-sm flex items-center gap-1 transition-colors" type="button">
+<span>View All 14 Items</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Horizontal Fast-Triage Strip -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-sm">
+<!-- Queue Item 1 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col justify-between gap-space-sm cursor-pointer border-l-2 border-primary">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-outline block font-data-mono-num">#MOD-9922 • FERRARI DXB</span>
+<span class="font-body-sm font-semibold text-on-surface block">2024 Ferrari 296 GTB Assetto</span>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-data-mono-num text-[11px] font-semibold">
+            ±18.4%
+          </span>
+</div>
+<div class="flex items-center justify-between text-[12px]">
+<span class="text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">price_change</span> High Price Variance
+          </span>
+<span class="text-outline font-data-mono-num">AED 1,890,000</span>
+</div>
+</div>
+<!-- Queue Item 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col justify-between gap-space-sm cursor-pointer border-l-2 border-error">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-outline block font-data-mono-num">#MOD-9923 • ROYAL MOTORS</span>
+<span class="font-body-sm font-semibold text-on-surface block">2023 Mercedes-AMG G63</span>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-error/10 text-error font-data-mono-num text-[11px] font-semibold">
+            MISSING DOC
+          </span>
+</div>
+<div class="flex items-center justify-between text-[12px]">
+<span class="text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">description</span> Missing Tasjeel PDF
+          </span>
+<span class="text-outline font-data-mono-num">12,400 KM</span>
+</div>
+</div>
+<!-- Queue Item 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col justify-between gap-space-sm cursor-pointer border-l-2 border-tertiary">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-outline block font-data-mono-num">#MOD-9924 • EXOTIC LINE</span>
+<span class="font-body-sm font-semibold text-on-surface block">2022 Rolls-Royce Cullinan BB</span>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-tertiary/10 text-tertiary font-data-mono-num text-[11px] font-semibold">
+            READY
+          </span>
+</div>
+<div class="flex items-center justify-between text-[12px]">
+<span class="text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Approved Pending Push
+          </span>
+<span class="text-outline font-data-mono-num">AED 2,150,000</span>
+</div>
+</div>
+<!-- Queue Item 4 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col justify-between gap-space-sm cursor-pointer border-l-2 border-secondary">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-outline block font-data-mono-num">#MOD-9925 • VIP PERFORMANCE</span>
+<span class="font-body-sm font-semibold text-on-surface block">2024 Lamborghini Revuelto</span>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-secondary/10 text-secondary font-data-mono-num text-[11px] font-semibold">
+            TELEMETRY
+          </span>
+</div>
+<div class="flex items-center justify-between text-[12px]">
+<span class="text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">satellite_alt</span> Hybrid Battery Attest
+          </span>
+<span class="text-outline font-data-mono-num">140 KM</span>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

@@ -1,0 +1,3 @@
+# Paste into SAME Stitch project after approving 04
+
+Design light-glass, dense-but-readable dealer SaaS screens: overview dashboard; inventory list; add/edit vehicle multi-step form (VIN, specification, GCC, pricing, media); listing submission/status; CRM lead pipeline + lead detail; test-drive calendar; dealer branch/team/settings. Show navigation rail, search, filters, bulk actions, permission-limited states, draft/under-review/published/rejected/sold statuses, optimistic save feedback. Desktop 1440 and tablet 1024, mobile 390 for critical screens. Each dealer can see only own tenant data. Reuse approved tokens.

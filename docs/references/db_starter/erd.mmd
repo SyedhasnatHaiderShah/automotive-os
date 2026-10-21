@@ -1,0 +1,20 @@
+erDiagram
+ USER ||--o| BUYER_PROFILE : owns
+ USER ||--o{ MEMBERSHIP : has
+ TENANT ||--o{ MEMBERSHIP : employs
+ TENANT ||--o{ BRANCH : operates
+ TENANT ||--o| DEALER_VERIFICATION : verified_by
+ TENANT ||--o{ VEHICLE : owns_stock
+ BRANCH ||--o{ VEHICLE : stores
+ MAKE ||--o{ CAR_MODEL : contains
+ CAR_MODEL ||--o{ VEHICLE : categorizes
+ VEHICLE ||--o{ VEHICLE_MEDIA : has
+ VEHICLE ||--o| LISTING : published_as
+ LISTING ||--o{ LEAD : generates
+ USER ||--o{ LEAD : submits
+ LEAD ||--o| LEAD_DATA_GRANT : authorizes
+ LEAD ||--o{ APPOINTMENT : schedules
+ USER ||--o{ FAVORITE : saves
+ LISTING ||--o{ FAVORITE : saved_as
+ TENANT ||--o{ SUBSCRIPTION : purchases
+ SUBSCRIPTION_PLAN ||--o{ SUBSCRIPTION : selected

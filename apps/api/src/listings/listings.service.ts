@@ -1,0 +1,693 @@
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from '../database/prisma.service';
+import { AuditService } from '../audit/audit.service';
+import { CreateDraftListingDto } from './dto/create-draft-listing.dto';
+import {
+  AdminListingDecisionDto,
+  AdminModerationDecision,
+} from './dto/admin-listing-decision.dto';
+import { ListingResponseDto } from './dto/listing-response.dto';
+import { PublicListingQueryDto } from './dto/public-listing-query.dto';
+import {
+  PublicListingDetailDto,
+  PublicListingSearchResponseDto,
+  PublicListingSummaryDto,
+} from './dto/public-listing-response.dto';
+import {
+  ListingStatus,
+  MediaKind,
+  StockStatus,
+  TenantStatus,
+  VerificationStatus,
+} from '@automotive-os/database';
+
+import { ListingSearchSyncService } from './listing-search-sync.service';
+
+@Injectable()
+export class ListingsService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+    private readonly searchSyncService: ListingSearchSyncService
+  ) {}
+
+  /**
+   * Dealer creates or updates a DRAFT listing for their vehicle.
+   * Enforces 1 active listing per physical vehicle.
+   */
+  async createDraftListing(
+    tenantId: string,
+    vehicleId: string,
+    dto: CreateDraftListingDto,
+    actorUserId?: string
+  ): Promise<ListingResponseDto> {
+    // 1. Verify vehicle belongs to tenant
+    const vehicle = await this.prisma.vehicle.findUnique({
+      where: {
+        tenantId_id: {
+          tenantId,
+          id: vehicleId,
+        },
+      },
+      include: {
+        make: true,
+        model: true,
+        listing: true,
+      },
+    });
+
+    if (!vehicle) {
+      throw new NotFoundException(`Vehicle ${vehicleId} not found in this dealership`);
+    }
+
+    // 2. Check existing listing constraint (1 listing per physical vehicle)
+    if (vehicle.listing) {
+      if (
+        vehicle.listing.status === ListingStatus.PUBLISHED ||
+        vehicle.listing.status === ListingStatus.PENDING_REVIEW
+      ) {
+        throw new ConflictException(
+          `Vehicle already has an active or pending listing (${vehicle.listing.status})`
+        );
+      }
+
+      // If existing listing is DRAFT or REJECTED or PAUSED, update it
+      const askingPriceFils =
+        dto.askingPriceFils !== undefined
+          ? BigInt(dto.askingPriceFils)
+          : vehicle.askingPriceFils;
+
+      const title =
+        dto.title ||
+        `${vehicle.modelYear} ${vehicle.make.name} ${vehicle.model.name}${
+          vehicle.trim ? ' ' + vehicle.trim : ''
+        }`;
+
+      const updated = await this.prisma.listing.update({
+        where: {
+          tenantId_id: {
+            tenantId,
+            id: vehicle.listing.id,
+          },
+        },
+        data: {
+          title,
+          description: dto.description || vehicle.listing.description,
+          askingPriceFils,
+          status: ListingStatus.DRAFT,
+        },
+      });
+
+      return this.mapListingResponse(updated);
+    }
+
+    // 3. Generate unique slug and compute initial quality score
+    const slugBase = `${vehicle.modelYear}-${this.slugify(
+      vehicle.make.name
+    )}-${this.slugify(vehicle.model.name)}-${vehicleId.slice(0, 8)}`;
+
+    const existingSlug = await this.prisma.listing.findUnique({
+      where: { slug: slugBase },
+    });
+    const slug = existingSlug ? `${slugBase}-${Date.now().toString(36)}` : slugBase;
+
+    const title =
+      dto.title ||
+      `${vehicle.modelYear} ${vehicle.make.name} ${vehicle.model.name}${
+        vehicle.trim ? ' ' + vehicle.trim : ''
+      }`;
+
+    const askingPriceFils =
+      dto.askingPriceFils !== undefined
+        ? BigInt(dto.askingPriceFils)
+        : vehicle.askingPriceFils;
+
+    const qualityScore = this.calculateQualityScore(vehicle, dto.description);
+
+    const listing = await this.prisma.listing.create({
+      data: {
+        tenantId,
+        vehicleId,
+        slug,
+        title,
+        description: dto.description || null,
+        askingPriceFils,
+        status: ListingStatus.DRAFT,
+        qualityScore,
+      },
+    });
+
+    await this.auditService.logAction({
+      tenantId,
+      actorUserId: actorUserId || null,
+      action: 'LISTING_DRAFT_CREATED',
+      targetType: 'listing',
+      targetId: listing.id,
+      metadata: {
+        vehicleId,
+        slug: listing.slug,
+      },
+    });
+
+    return this.mapListingResponse(listing);
+  }
+
+  /**
+   * Dealer submits listing for moderation.
+   * Strictly enforces publish gates:
+   * 1. Dealership KYB verification is APPROVED
+   * 2. Dealership tenant is in ACTIVE status
+   * 3. Vehicle stockStatus is AVAILABLE
+   * 4. Asking price > 0
+   * 5. Media has at least 1 public exterior image
+   */
+  async submitForReview(
+    tenantId: string,
+    listingId: string,
+    actorUserId?: string
+  ): Promise<ListingResponseDto> {
+    const listing = await this.prisma.listing.findUnique({
+      where: {
+        tenantId_id: {
+          tenantId,
+          id: listingId,
+        },
+      },
+      include: {
+        vehicle: {
+          include: {
+            media: true,
+          },
+        },
+        tenant: {
+          include: {
+            verification: true,
+          },
+        },
+      },
+    });
+
+    if (!listing) {
+      throw new NotFoundException(`Listing ${listingId} not found in this dealership`);
+    }
+
+    if (listing.status === ListingStatus.PUBLISHED) {
+      throw new BadRequestException('Listing is already published');
+    }
+
+    if (listing.status === ListingStatus.PENDING_REVIEW) {
+      throw new BadRequestException('Listing is already pending review');
+    }
+
+    // Publish Gates Validation
+    this.validatePublishGates(listing);
+
+    // Atomically transition status to PENDING_REVIEW and write outbox event
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.listing.update({
+        where: {
+          tenantId_id: {
+            tenantId,
+            id: listingId,
+          },
+        },
+        data: {
+          status: ListingStatus.PENDING_REVIEW,
+        },
+      });
+
+      await tx.outboxEvent.create({
+        data: {
+          tenantId,
+          aggregateType: 'listing',
+          aggregateId: listingId,
+          eventType: 'listing.submitted_for_review',
+          payload: {
+            listingId,
+            vehicleId: listing.vehicleId,
+            tenantId,
+            title: listing.title,
+            askingPriceFils: listing.askingPriceFils.toString(),
+          },
+        },
+      });
+
+      return result;
+    });
+
+    await this.auditService.logAction({
+      tenantId,
+      actorUserId: actorUserId || null,
+      action: 'LISTING_SUBMITTED_FOR_REVIEW',
+      targetType: 'listing',
+      targetId: listingId,
+      metadata: {
+        vehicleId: listing.vehicleId,
+      },
+    });
+
+    return this.mapListingResponse(updated);
+  }
+
+  /**
+   * Platform Admin reviews listing (Approve or Reject with reason).
+   * Appends transactional outbox event and audit record.
+   */
+  async adminDecision(
+    adminUserId: string,
+    listingId: string,
+    dto: AdminListingDecisionDto
+  ): Promise<ListingResponseDto> {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
+      include: {
+        vehicle: {
+          include: {
+            media: true,
+          },
+        },
+        tenant: {
+          include: {
+            verification: true,
+          },
+        },
+      },
+    });
+
+    if (!listing) {
+      throw new NotFoundException(`Listing ${listingId} not found`);
+    }
+
+    if (dto.decision === AdminModerationDecision.APPROVE) {
+      // Re-verify publish gates prior to approval
+      this.validatePublishGates(listing);
+
+      const updated = await this.prisma.$transaction(async (tx) => {
+        const published = await tx.listing.update({
+          where: { id: listingId },
+          data: {
+            status: ListingStatus.PUBLISHED,
+            verifiedAt: new Date(),
+            publishedAt: new Date(),
+          },
+        });
+
+        // Transactional Outbox Event
+        await tx.outboxEvent.create({
+          data: {
+            tenantId: listing.tenantId,
+            aggregateType: 'listing',
+            aggregateId: listing.id,
+            eventType: 'listing.published',
+            payload: {
+              listingId: listing.id,
+              vehicleId: listing.vehicleId,
+              slug: listing.slug,
+              title: listing.title,
+              askingPriceFils: listing.askingPriceFils.toString(),
+              publishedAt: published.publishedAt?.toISOString(),
+            },
+          },
+        });
+
+        // Audit Record
+        await tx.auditEvent.create({
+          data: {
+            tenantId: listing.tenantId,
+            actorUserId: adminUserId,
+            action: 'LISTING_APPROVED',
+            targetType: 'listing',
+            targetId: listing.id,
+            metadata: {
+              qualityScore: listing.qualityScore,
+              publishedAt: published.publishedAt?.toISOString(),
+            },
+          },
+        });
+
+        return published;
+      });
+
+      // Synchronize public search projection
+      await this.searchSyncService.handleListingPublished({
+        listingId: listing.id,
+        vehicleId: listing.vehicleId,
+      });
+
+      return this.mapListingResponse(updated);
+    } else {
+      // REJECT Decision
+      if (!dto.reason || dto.reason.trim().length === 0) {
+        throw new BadRequestException('Rejection reason is required');
+      }
+
+      const updated = await this.prisma.$transaction(async (tx) => {
+        const rejected = await tx.listing.update({
+          where: { id: listingId },
+          data: {
+            status: ListingStatus.REJECTED,
+          },
+        });
+
+        // Transactional Outbox Event
+        await tx.outboxEvent.create({
+          data: {
+            tenantId: listing.tenantId,
+            aggregateType: 'listing',
+            aggregateId: listing.id,
+            eventType: 'listing.rejected',
+            payload: {
+              listingId: listing.id,
+              vehicleId: listing.vehicleId,
+              reason: dto.reason,
+            },
+          },
+        });
+
+        // Audit Record
+        await tx.auditEvent.create({
+          data: {
+            tenantId: listing.tenantId,
+            actorUserId: adminUserId,
+            action: 'LISTING_REJECTED',
+            targetType: 'listing',
+            targetId: listing.id,
+            metadata: {
+              reason: dto.reason,
+            },
+          },
+        });
+
+        return rejected;
+      });
+
+      // Synchronize public search projection eviction
+      await this.searchSyncService.handleListingRejected({
+        listingId: listing.id,
+        reason: dto.reason,
+      });
+
+      return this.mapListingResponse(updated);
+    }
+  }
+
+  /**
+   * Public Search & Filter for published listings.
+   * Redacts private dealer costs, private documents, private notes, and private VIN.
+   * Only returns stock where vehicle is AVAILABLE and tenant is ACTIVE.
+   */
+  async getPublicListings(
+    query: PublicListingQueryDto
+  ): Promise<PublicListingSearchResponseDto> {
+    const page = Math.max(1, query.page || 1);
+    const limit = Math.min(50, Math.max(1, query.limit || 20));
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      status: ListingStatus.PUBLISHED,
+      vehicle: {
+        stockStatus: StockStatus.AVAILABLE,
+      },
+      tenant: {
+        status: TenantStatus.ACTIVE,
+      },
+    };
+
+    if (query.emirate) {
+      where.vehicle.branch = {
+        emirate: {
+          equals: query.emirate,
+          mode: 'insensitive',
+        },
+      };
+    }
+
+    if (query.make) {
+      where.vehicle.make = {
+        OR: [
+          { slug: { equals: query.make, mode: 'insensitive' } },
+          { name: { equals: query.make, mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    if (query.model) {
+      where.vehicle.model = {
+        OR: [
+          { slug: { equals: query.model, mode: 'insensitive' } },
+          { name: { equals: query.model, mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    if (query.condition) {
+      where.vehicle.condition = query.condition;
+    }
+
+    if (query.gccSpec !== undefined) {
+      where.vehicle.gccSpec = query.gccSpec;
+    }
+
+    if (query.minPriceFils !== undefined) {
+      where.askingPriceFils = {
+        ...(where.askingPriceFils || {}),
+        gte: BigInt(query.minPriceFils),
+      };
+    }
+
+    if (query.maxPriceFils !== undefined) {
+      where.askingPriceFils = {
+        ...(where.askingPriceFils || {}),
+        lte: BigInt(query.maxPriceFils),
+      };
+    }
+
+    const [listings, total] = await Promise.all([
+      this.prisma.listing.findMany({
+        where,
+        include: {
+          tenant: {
+            include: {
+              verification: true,
+            },
+          },
+          vehicle: {
+            include: {
+              branch: true,
+              make: true,
+              model: true,
+              media: {
+                where: {
+                  isPublic: true,
+                },
+                orderBy: {
+                  sortOrder: 'asc',
+                },
+              },
+            },
+          },
+        },
+        orderBy: { publishedAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.listing.count({ where }),
+    ]);
+
+    return {
+      items: listings.map((l) => this.mapPublicSummary(l)),
+      total,
+      page,
+      limit,
+    };
+  }
+
+  /**
+   * Public Detail by slug.
+   * Redacts private dealer costs, private documents, private notes, and masks VIN.
+   */
+  async getPublicListingBySlug(slug: string): Promise<PublicListingDetailDto> {
+    const listing = await this.prisma.listing.findUnique({
+      where: { slug },
+      include: {
+        tenant: {
+          include: {
+            verification: true,
+          },
+        },
+        vehicle: {
+          include: {
+            branch: true,
+            make: true,
+            model: true,
+            media: {
+              where: {
+                isPublic: true,
+              },
+              orderBy: {
+                sortOrder: 'asc',
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (
+      !listing ||
+      listing.status !== ListingStatus.PUBLISHED ||
+      listing.vehicle.stockStatus !== StockStatus.AVAILABLE ||
+      listing.tenant.status !== TenantStatus.ACTIVE
+    ) {
+      throw new NotFoundException('Listing not found or no longer available');
+    }
+
+    return this.mapPublicDetail(listing);
+  }
+
+  /**
+   * Publish gates validator
+   */
+  private validatePublishGates(listing: any): void {
+    // Gate 1: Active Dealer KYB verification
+    if (listing.tenant?.verification?.status !== VerificationStatus.APPROVED) {
+      throw new BadRequestException(
+        'Publish gate failed: Dealership KYB verification is not approved'
+      );
+    }
+
+    // Gate 2: Dealership status is ACTIVE
+    if (listing.tenant?.status !== TenantStatus.ACTIVE) {
+      throw new BadRequestException(
+        'Publish gate failed: Dealership tenant is not active'
+      );
+    }
+
+    // Gate 3: Physical vehicle stock status must be AVAILABLE
+    if (listing.vehicle?.stockStatus !== StockStatus.AVAILABLE) {
+      throw new BadRequestException(
+        `Publish gate failed: Physical vehicle stock status must be AVAILABLE (currently ${listing.vehicle?.stockStatus})`
+      );
+    }
+
+    // Gate 4: Asking price must be greater than zero
+    if (listing.askingPriceFils <= BigInt(0)) {
+      throw new BadRequestException(
+        'Publish gate failed: Asking price must be greater than zero'
+      );
+    }
+
+    // Gate 5: Media requirement - at least 1 public exterior image
+    const media = listing.vehicle?.media || [];
+    const hasPublicExterior = media.some(
+      (m: any) => m.kind === MediaKind.EXTERIOR && m.isPublic === true
+    );
+
+    if (!hasPublicExterior) {
+      throw new BadRequestException(
+        'Publish gate failed: Listing requires at least one public exterior photo'
+      );
+    }
+  }
+
+  private calculateQualityScore(vehicle: any, description?: string): number {
+    let score = 50;
+    if (description && description.length >= 20) score += 15;
+    if (vehicle.mileageKm !== null && vehicle.mileageKm !== undefined) score += 10;
+    if (vehicle.gccSpec) score += 10;
+    if (vehicle.colorExterior) score += 5;
+    if (vehicle.condition) score += 10;
+    return Math.min(100, score);
+  }
+
+  private slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  private mapListingResponse(listing: any): ListingResponseDto {
+    return {
+      id: listing.id,
+      tenantId: listing.tenantId,
+      vehicleId: listing.vehicleId,
+      slug: listing.slug,
+      title: listing.title,
+      description: listing.description,
+      askingPriceFils: listing.askingPriceFils.toString(),
+      status: listing.status,
+      qualityScore: listing.qualityScore,
+      verifiedAt: listing.verifiedAt ? listing.verifiedAt.toISOString() : null,
+      publishedAt: listing.publishedAt ? listing.publishedAt.toISOString() : null,
+      createdAt: listing.createdAt.toISOString(),
+      updatedAt: listing.updatedAt.toISOString(),
+    };
+  }
+
+  private mapPublicSummary(listing: any): PublicListingSummaryDto {
+    const cdnBase = process.env.S3_PUBLIC_CDN_URL || 'https://cdn.automotive-os.ae';
+
+    return {
+      id: listing.id,
+      slug: listing.slug,
+      title: listing.title,
+      price: {
+        currency: 'AED',
+        amountFils: listing.askingPriceFils.toString(),
+      },
+      year: listing.vehicle.modelYear,
+      mileageKm: listing.vehicle.mileageKm,
+      condition: listing.vehicle.condition,
+      emirate: listing.vehicle.branch?.emirate || 'UAE',
+      seller: {
+        id: listing.tenant.id,
+        slug: listing.tenant.slug,
+        displayName: listing.tenant.displayName,
+        emirate: listing.vehicle.branch?.emirate || 'UAE',
+        city: listing.vehicle.branch?.city || 'UAE',
+        verified: listing.tenant.verification?.status === VerificationStatus.APPROVED,
+      },
+      media: (listing.vehicle.media || []).map((m: any) => ({
+        id: m.id,
+        kind: m.kind,
+        url: `${cdnBase}/${m.objectKey}`,
+        altText: m.altText,
+        sortOrder: m.sortOrder,
+      })),
+      publishedAt: listing.publishedAt
+        ? listing.publishedAt.toISOString()
+        : listing.createdAt.toISOString(),
+    };
+  }
+
+  private mapPublicDetail(listing: any): PublicListingDetailDto {
+    const summary = this.mapPublicSummary(listing);
+    const vehicle = listing.vehicle;
+
+    // Redacted VIN: Show prefix only, mask chassis sequence
+    const maskedVin = vehicle.vin
+      ? `${vehicle.vin.substring(0, 9)}********`
+      : null;
+
+    return {
+      ...summary,
+      description: listing.description,
+      makeName: vehicle.make?.name || 'Unknown',
+      modelName: vehicle.model?.name || 'Unknown',
+      trim: vehicle.trim,
+      colorExterior: vehicle.colorExterior,
+      fuel: vehicle.fuel,
+      transmission: vehicle.transmission,
+      gccSpec: vehicle.gccSpec,
+      maskedVin,
+    };
+  }
+}

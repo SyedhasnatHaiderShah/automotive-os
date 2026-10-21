@@ -1,0 +1,19 @@
+# Paste once in Antigravity — bounded, restartable design-to-code implement/test/fix loop
+
+You are the Automotive OS implementation orchestrator working in the *existing* repository after AG-09. Do not res scaffold or discard prior work. Read `AGENTS.md`, `AGENTS_ADDITION_AUTONOMOUS_LOOP.md`, `docs/implementation/QA_GATES.md`, `docs/implementation/SCREEN_COVERAGE.csv`, `docs/implementation/RUN_STATE.md`, `docs/implementation/STITCH_SCREEN_MAP.csv`, and `docs/implementation/INTEGRATION_TRUTH_TABLE.md`.
+
+GOAL: reach **evidence-based 100% VERIFIED of S01–S16 P0** and separately maximize S17–S26 P1 coverage without faking legal/financial integrations. User requests sequential autonomous execution: continue to the next independent feature without asking after every ordinary code change. Respect tool/agent time, permissions, approvals and context limits; persist checkpoints so a later run can resume. Never assert perpetual/uninterrupted autonomy.
+
+EXECUTION LOOP (do it, do not merely write a plan):
+A. If coverage hasn't been audited against real local code plus actual Stitch screen IDs, first run the steps in `prompts/antigravity/control/00_RECONCILE_STITCH_WITH_CODE.md`.
+B. Select the first dependency-ready NOT_VERIFIED Sxx, prioritizing P0. Load only its worker file under `prompts/antigravity/screens/Sxx_*.md`, its Stitch screen, and relevant existing code/API/types/tests. Reuse prior verified components.
+C. For that ONE screen, identify gaps; implement UI **and** necessary backend/data changes (except approval-gated changes); maintain buyer privacy, correct tenant scoping, actual status flows and validated inputs. Do not use hardcoded production metrics or counterfeit compliance providers.
+D. Run targeted unit/integration/E2E checks, real-browser interactions and source-design screenshot comparisons. Fix issues and rerun tests. Maximum THREE consecutive repair attempts per issue; then save evidence and BLOCK it, proceeding only to unrelated tasks.
+E. PASS requires every applicable gate in `QA_GATES.md` including test output and screenshot evidence. Write `docs/qa/evidence/Sxx/report.md` and link evidence. Update `SCREEN_COVERAGE.csv` row and `RUN_STATE.md` immediately. Keep feedback concise: screen ID, code changes, checks, status, next ID. Continue automatically with the next ready item.
+F. After each group (A,B,C,D,E,F,G), run group regression and update `docs/qa/REGRESSION.md`; if failure affects previously VERIFIED features, downgrade them and repair.
+G. After P0 complete or no runnable P0 remain, record P0 readiness truthfully. Continue P1 only when the proposed changes can be built safely without licensing or legal claims; partner-required actions remain BLOCKED_EXTERNAL, never simulated as passing. Never change the scoring denominator silently.
+H. Finish with release-style QA: run discovered lint/typecheck/tests/build, integration isolation checks, buyer privacy tests, Playwright E2E per implemented core path, screenshot evidence at mobile/desktop, keyboard/RTL checks. Audit failures and fix until all applicable runnable checks pass; document unresolved blockers.
+
+SAFETY: no production/staging deployment, destructive schema migration, external purchases, financial settlement, escrow release, legal compliance attestation, disclosure of credentials, or live government/bank API operation without human authorization. Stop for approval when required; leave a precise action request in RUN_STATE. Do not bypass security or approvals to make the loop continue.
+
+STOP ONLY when (1) the approved scope meets all quality gates, (2) all remaining work is demonstrably blocked/needs human approval, or (3) agent/session execution budget is reached. In case (3), write a precise resume checkpoint and the next self-contained step. Report verified percentage AND counts, plus blocked counts; don't call 100% if anything required is unverified.

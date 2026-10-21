@@ -1,0 +1,3 @@
+# Antigravity prompt: AFTER explicit schema approval
+
+Apply ONLY approved MVP schema to local DEVELOPMENT PostgreSQL using reviewed Prisma migrations. Implement and test RLS for tenant-owned tables with non-bypass app role, transaction-local tenant context, public redacted read projection, buyer-owned resource policies and audited platform access. Add seeds with fictional data; verify foreign keys and negative tests: dealer A cannot read/change dealer B assets, buyer A cannot see buyer B profile, sold/suspended vehicles do not remain public. Never target production; report test outputs/migration IDs and unresolved security gaps.

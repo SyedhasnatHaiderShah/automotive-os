@@ -1,0 +1,3 @@
+# Antigravity prompt: release-gate verification
+
+Test exactly the P0 end-to-end journey: admin approves dealer KYB → dealer creates vehicle → submits for moderation → admin approves → buyer searches/view detail → buyer consents and enquires → dealer receives scoped lead → buyer books test drive → dealer updates status. Run automated E2E, unauthorized cross-tenant/buyer tests, mobile/desktop/Arabic RTL checks, a11y checks, failed media/queue/retry checks. No production release. Write `docs/QA_REPORT.md` with executable commands, PASS/FAIL/NOT RUN and severity-ranked blockers. Do not claim passing tests that were not executed.

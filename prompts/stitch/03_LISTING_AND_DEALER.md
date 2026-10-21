@@ -1,0 +1,3 @@
+# Paste into SAME Stitch project after approving 02
+
+Design 3 responsive dark marketplace screens using approved tokens: (1) listing detail with media gallery, AED price, UAE emirate, VIN-safe specs, GCC/non-GCC disclosure, condition/inspection provenance, seller identity, enquiry and test-drive CTAs; (2) verified dealership storefront with stock, branch details, trust disclosures; (3) enquiry/test-drive modal with sign-in and consent disclosure showing exactly what buyer information is shared. Include sticky mobile contact CTA and loading/success/error states. No invented inspection guarantees.

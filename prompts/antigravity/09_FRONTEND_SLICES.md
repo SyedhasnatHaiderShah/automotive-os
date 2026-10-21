@@ -1,0 +1,3 @@
+# Antigravity prompt: run ONE named screen group at a time
+
+Implement [SCREEN GROUP: e.g. vehicle-detail+enquiry] in [APP: marketplace/dealer/admin] using specific approved Stitch screen IDs from `docs/design/DESIGN_HANDOFF.md`, shared `packages/ui` and generated API contracts. Preserve visual spacing, typography, assets, forms and states; do not redesign. Complete loading/empty/error/success, responsive, Arabic RTL, semantic HTML, accessibility. Wire real API (no silent mock fallback). Run typecheck, relevant tests and browser visual comparison. Report changed files and screenshot discrepancies. Stop after this group.

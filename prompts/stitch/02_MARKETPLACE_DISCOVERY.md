@@ -1,0 +1,3 @@
+# Paste into SAME Stitch project after approving 01
+
+Using the approved Automotive OS design system, design **4 connected responsive screens**: (1) marketplace home with prominent car search, (2) results with filters (emirate, make/model, price AED, year, mileage km, condition, GCC specs), sorting & dealer cards, (3) mobile filters overlay, (4) compare 2–3 cars. Premium dark theme, rich vehicle photos, verified-dealer labeling only when proven, desktop 1440px and mobile 390px. Show real interaction hierarchy and empty/loading/error states. Keep design tokens unchanged. Do not add features beyond UAE dealer-listed vehicles.

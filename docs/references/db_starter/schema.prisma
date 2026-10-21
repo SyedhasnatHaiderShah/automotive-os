@@ -1,0 +1,353 @@
+// Architectural STARTER schema for UAE-first automotive marketplace + dealership SaaS.
+// Review with engineering before migrations. This file describes the MVP domains,
+// not the full Keyloop-inspired DMS roadmap.
+// Prisma 7/8 config is supplied separately in prisma.config.ts.
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CountryCode { AE }
+enum TenantStatus { PENDING ACTIVE SUSPENDED CLOSED }
+enum VerificationStatus { NOT_SUBMITTED IN_REVIEW APPROVED REJECTED EXPIRED }
+enum MembershipRole { OWNER ADMIN SALES_MANAGER SALES_AGENT INVENTORY_MANAGER SERVICE_ADVISOR FINANCE_MANAGER VIEWER }
+enum VehicleCondition { NEW USED CERTIFIED_USED }
+enum StockStatus { INTAKE AVAILABLE RESERVED SOLD TRANSFERRED ARCHIVED }
+enum FuelType { PETROL DIESEL HYBRID PLUG_IN_HYBRID ELECTRIC OTHER }
+enum Transmission { AUTOMATIC MANUAL OTHER }
+enum ListingStatus { DRAFT PENDING_REVIEW PUBLISHED REJECTED PAUSED SOLD ARCHIVED }
+enum LeadStatus { NEW CONTACTED QUALIFIED TEST_DRIVE_NEGOTIATION WON LOST SPAM }
+enum ContactPreference { PHONE EMAIL WHATSAPP }
+enum AppointmentStatus { REQUESTED CONFIRMED CANCELLED COMPLETED NO_SHOW }
+enum SubscriptionStatus { TRIALING ACTIVE PAST_DUE CANCELED SUSPENDED }
+enum OutboxStatus { PENDING PROCESSING SENT FAILED }
+enum MediaKind { EXTERIOR INTERIOR DOCUMENT VIDEO }
+
+model User {
+  id                String   @id @default(uuid()) @db.Uuid
+  identitySubject   String   @unique @map("identity_subject") // external OIDC sub
+  email             String?  @unique
+  phoneE164         String?  @unique @map("phone_e164")
+  displayName       String   @map("display_name")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  buyer             BuyerProfile?
+  memberships       Membership[]
+  favorites         Favorite[]
+  savedSearches     SavedSearch[]
+  buyerLeads        Lead[]
+  appointments      Appointment[]
+  @@map("users")
+}
+
+model BuyerProfile {
+  userId             String    @id @map("user_id") @db.Uuid
+  preferredLanguage  String    @default("en") @map("preferred_language")
+  preferredEmirate   String?   @map("preferred_emirate")
+  budgetMinFils      BigInt?   @map("budget_min_fils")
+  budgetMaxFils      BigInt?   @map("budget_max_fils")
+  preferredMakes     String[]  @default([]) @map("preferred_makes")
+  marketingConsentAt DateTime? @map("marketing_consent_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("buyer_profiles")
+}
+
+model Tenant {
+  id            String        @id @default(uuid()) @db.Uuid
+  slug          String        @unique
+  legalName     String        @map("legal_name")
+  displayName   String        @map("display_name")
+  country       CountryCode   @default(AE)
+  currency      String        @default("AED")
+  status        TenantStatus  @default(PENDING)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  branches      Branch[]
+  memberships   Membership[]
+  verification  DealerVerification?
+  vehicles      Vehicle[]
+  media         VehicleMedia[]
+  listings      Listing[]
+  leads         Lead[]
+  grants        LeadDataGrant[]
+  appointments  Appointment[]
+  subscriptions Subscription[]
+  auditEvents   AuditEvent[]
+  @@map("tenants")
+}
+
+model Membership {
+  id        String         @id @default(uuid()) @db.Uuid
+  tenantId  String         @map("tenant_id") @db.Uuid
+  userId    String         @map("user_id") @db.Uuid
+  role      MembershipRole
+  active    Boolean        @default(true)
+  createdAt DateTime       @default(now()) @map("created_at")
+  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([tenantId, userId])
+  @@index([userId, active])
+  @@map("memberships")
+}
+
+model DealerVerification {
+  tenantId          String             @id @map("tenant_id") @db.Uuid
+  status            VerificationStatus @default(NOT_SUBMITTED)
+  tradeLicenseRef   String?            @map("trade_license_ref") // private encrypted identifier
+  licenseExpiry     DateTime?          @map("license_expiry") @db.Date
+  jurisdiction      String?
+  reviewedByUserId  String?            @map("reviewed_by_user_id") @db.Uuid
+  reviewedAt        DateTime?          @map("reviewed_at")
+  reviewNotes       String?            @map("review_notes")
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  @@map("dealer_verifications")
+}
+
+model Branch {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  name      String
+  emirate   String
+  city      String
+  address   String?
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+  isActive  Boolean  @default(true) @map("is_active")
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  vehicles  Vehicle[]
+  @@unique([tenantId, id])
+  @@index([tenantId, emirate])
+  @@map("branches")
+}
+
+model Make {
+  id      String  @id @default(uuid()) @db.Uuid
+  name    String  @unique
+  slug    String  @unique
+  models  CarModel[]
+  vehicles Vehicle[]
+  @@map("makes")
+}
+
+model CarModel {
+  id       String @id @default(uuid()) @db.Uuid
+  makeId   String @map("make_id") @db.Uuid
+  name     String
+  slug     String
+  make     Make   @relation(fields: [makeId], references: [id])
+  vehicles Vehicle[]
+  @@unique([makeId, slug])
+  @@map("car_models")
+}
+
+model Vehicle {
+  id             String            @id @default(uuid()) @db.Uuid
+  tenantId       String            @map("tenant_id") @db.Uuid
+  branchId       String            @map("branch_id") @db.Uuid
+  makeId         String            @map("make_id") @db.Uuid
+  modelId        String            @map("model_id") @db.Uuid
+  vin            String?           @db.VarChar(17) // private; NEVER expose full VIN publicly by default
+  stockNumber    String            @map("stock_number")
+  trim           String?
+  modelYear      Int               @map("model_year")
+  condition      VehicleCondition
+  mileageKm      Int?              @map("mileage_km")
+  colorExterior  String?           @map("color_exterior")
+  fuel           FuelType?
+  transmission   Transmission?
+  gccSpec        Boolean?          @map("gcc_spec")
+  firstRegistered DateTime?        @map("first_registered") @db.Date
+  purchaseCostFils BigInt?         @map("purchase_cost_fils") // NEVER public
+  askingPriceFils BigInt           @map("asking_price_fils")
+  stockStatus    StockStatus       @default(INTAKE) @map("stock_status")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  tenant         Tenant            @relation(fields: [tenantId], references: [id])
+  branch         Branch            @relation(fields: [tenantId, branchId], references: [tenantId, id])
+  make           Make              @relation(fields: [makeId], references: [id])
+  model          CarModel          @relation(fields: [modelId], references: [id])
+  media          VehicleMedia[]
+  listing        Listing?
+  @@unique([tenantId, id])
+  @@unique([tenantId, stockNumber])
+  @@unique([tenantId, vin])
+  @@index([tenantId, stockStatus, updatedAt])
+  @@map("vehicles")
+}
+
+model VehicleMedia {
+  id        String    @id @default(uuid()) @db.Uuid
+  tenantId  String    @map("tenant_id") @db.Uuid
+  vehicleId String    @map("vehicle_id") @db.Uuid
+  kind      MediaKind @default(EXTERIOR)
+  objectKey String    @map("object_key") // signed URL generated server-side
+  altText   String?   @map("alt_text")
+  sortOrder Int       @default(0) @map("sort_order")
+  isPublic  Boolean   @default(false) @map("is_public")
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  vehicle   Vehicle   @relation(fields: [tenantId, vehicleId], references: [tenantId, id])
+  @@index([tenantId, vehicleId, sortOrder])
+  @@map("vehicle_media")
+}
+
+model Listing {
+  id                  String        @id @default(uuid()) @db.Uuid
+  tenantId            String        @map("tenant_id") @db.Uuid
+  vehicleId           String        @unique @map("vehicle_id") @db.Uuid
+  slug                String        @unique
+  title               String
+  description         String?
+  askingPriceFils     BigInt        @map("asking_price_fils")
+  status              ListingStatus @default(DRAFT)
+  qualityScore        Int           @default(0) @map("quality_score")
+  verifiedAt          DateTime?     @map("verified_at")
+  publishedAt         DateTime?     @map("published_at")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  tenant              Tenant        @relation(fields: [tenantId], references: [id])
+  vehicle             Vehicle       @relation(fields: [tenantId, vehicleId], references: [tenantId, id])
+  favorites           Favorite[]
+  leads               Lead[]
+  @@unique([tenantId, id])
+  @@index([status, publishedAt])
+  @@index([tenantId, status])
+  @@map("listings")
+}
+
+model Favorite {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  listingId String   @map("listing_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  @@unique([userId, listingId])
+  @@map("favorites")
+}
+
+model SavedSearch {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  name           String
+  filterJson     Json     @map("filter_json")
+  alertsEnabled  Boolean  @default(false) @map("alerts_enabled")
+  createdAt      DateTime @default(now()) @map("created_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@map("saved_searches")
+}
+
+model Lead {
+  id                   String            @id @default(uuid()) @db.Uuid
+  tenantId             String            @map("tenant_id") @db.Uuid
+  listingId            String            @map("listing_id") @db.Uuid
+  buyerUserId          String            @map("buyer_user_id") @db.Uuid
+  status               LeadStatus        @default(NEW)
+  intent               String            // ENQUIRY / TEST_DRIVE / OFFER (API validation)
+  preferredContact     ContactPreference @map("preferred_contact")
+  buyerMessage         String?           @map("buyer_message")
+  assignedMembershipId String?           @map("assigned_membership_id") @db.Uuid
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+  tenant               Tenant            @relation(fields: [tenantId], references: [id])
+  listing              Listing           @relation(fields: [tenantId, listingId], references: [tenantId, id])
+  buyer                User              @relation(fields: [buyerUserId], references: [id])
+  grant                LeadDataGrant?
+  appointments         Appointment[]
+  @@unique([tenantId, id])
+  @@index([tenantId, status, createdAt])
+  @@index([buyerUserId, createdAt])
+  @@map("leads")
+}
+
+model LeadDataGrant {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenantId        String    @map("tenant_id") @db.Uuid
+  leadId          String    @unique @map("lead_id") @db.Uuid
+  fieldsGranted   String[]  @map("fields_granted") // e.g. ["name","phone"]
+  purpose         String
+  consentTextVer  String    @map("consent_text_ver")
+  grantedAt       DateTime  @default(now()) @map("granted_at")
+  revokedAt       DateTime? @map("revoked_at")
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  lead            Lead      @relation(fields: [tenantId, leadId], references: [tenantId, id])
+  @@map("lead_data_grants")
+}
+
+model Appointment {
+  id          String            @id @default(uuid()) @db.Uuid
+  tenantId    String            @map("tenant_id") @db.Uuid
+  leadId      String            @map("lead_id") @db.Uuid
+  buyerUserId String            @map("buyer_user_id") @db.Uuid
+  startsAt    DateTime          @map("starts_at")
+  endsAt      DateTime          @map("ends_at")
+  status      AppointmentStatus @default(REQUESTED)
+  note        String?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  tenant      Tenant            @relation(fields: [tenantId], references: [id])
+  lead        Lead              @relation(fields: [tenantId, leadId], references: [tenantId, id])
+  buyer       User              @relation(fields: [buyerUserId], references: [id])
+  @@index([tenantId, startsAt])
+  @@map("appointments")
+}
+
+model SubscriptionPlan {
+  id                  String   @id @default(uuid()) @db.Uuid
+  code                String   @unique
+  title               String
+  monthlyFeeFils      BigInt   @map("monthly_fee_fils")
+  listingLimit        Int      @map("listing_limit")
+  active              Boolean  @default(true)
+  subscriptions       Subscription[]
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id                 String             @id @default(uuid()) @db.Uuid
+  tenantId           String             @map("tenant_id") @db.Uuid
+  planId             String             @map("plan_id") @db.Uuid
+  paymentProviderRef String?            @map("payment_provider_ref")
+  status             SubscriptionStatus @default(TRIALING)
+  startsAt           DateTime           @map("starts_at")
+  endsAt             DateTime?          @map("ends_at")
+  tenant             Tenant             @relation(fields: [tenantId], references: [id])
+  plan               SubscriptionPlan   @relation(fields: [planId], references: [id])
+  @@index([tenantId, status])
+  @@map("subscriptions")
+}
+
+model AuditEvent {
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId       String?  @map("tenant_id") @db.Uuid
+  actorUserId    String?  @map("actor_user_id") @db.Uuid
+  action         String
+  targetType     String   @map("target_type")
+  targetId       String   @map("target_id")
+  correlationId  String?  @map("correlation_id")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at")
+  tenant         Tenant?  @relation(fields: [tenantId], references: [id])
+  @@index([tenantId, createdAt])
+  @@map("audit_events")
+}
+
+model OutboxEvent {
+  id            String       @id @default(uuid()) @db.Uuid
+  aggregateType String       @map("aggregate_type")
+  aggregateId   String       @map("aggregate_id")
+  tenantId      String?      @map("tenant_id") @db.Uuid
+  eventType     String       @map("event_type")
+  payload       Json
+  status        OutboxStatus @default(PENDING)
+  attempts      Int          @default(0)
+  occurredAt    DateTime     @default(now()) @map("occurred_at")
+  processedAt   DateTime?    @map("processed_at")
+  @@index([status, occurredAt])
+  @@map("outbox_events")
+}

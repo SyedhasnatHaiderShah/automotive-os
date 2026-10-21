@@ -1,0 +1,3 @@
+# Antigravity prompt: single vertical module
+
+Implement tenant-scoped vehicle inventory CRUD, private media upload pattern, dealer listing submission, admin approve/reject (with reason) and public redacted listing search/detail. Stock remains authoritative; one active listing per physical vehicle; publish gates require active dealer KYB, stock availability, validated attributes/media and moderation. Use transactional outbox and idempotent projection sync; sold or suspended vehicles promptly unpublish. Follow API contracts and DB design, add OpenAPI + unit/integration/tenant-isolation tests. Avoid unrelated UI changes.

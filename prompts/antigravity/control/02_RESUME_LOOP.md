@@ -1,0 +1,3 @@
+# Paste into a new session if the agent stops or context expires
+
+Resume Automotive OS from files, NOT conversation history. Read `AGENTS.md`, `AGENTS_ADDITION_AUTONOMOUS_LOOP.md`, `docs/implementation/RUN_STATE.md`, `docs/implementation/SCREEN_COVERAGE.csv`, `docs/implementation/QA_GATES.md`, and `prompts/antigravity/control/01_AUTONOMOUS_MASTER_LOOP.md`. Verify the last checkpoint against actual git diff and QA evidence. Do not repeat VERIFIED work. Continue the next dependency-ready screen with the one-screen implement→test→fix→evidence→checkpoint loop, with three-attempt repair cap and same safety gates. End only on true completion, explicit blocker, or execution limit. Keep notes compact.

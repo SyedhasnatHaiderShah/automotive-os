@@ -1,0 +1,3 @@
+# Antigravity prompt: design-to-code; after Stitch handoff
+
+Use `docs/design/DESIGN_HANDOFF.md` AND approved Stitch MCP screens as sole VISUAL source; `docs/PRODUCT_BRIEF.md` for behavior. Build shared TypeScript/Tailwind design tokens, semantic typography, controls, cards, navigation and status states in `packages/ui`. Support dark marketplace and light-glass dashboards, Arabic RTL, keyboard focus and contrast. Implement only marketplace home + search as responsive Next.js pages. No invented designs. Compare desktop/mobile against Stitch in browser and report visible differences. Keep all API calls typed and real or explicitly fixture-marked.

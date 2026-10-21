@@ -1,0 +1,3 @@
+# Antigravity prompt: database design BEFORE migrations
+
+Use `docs/references/db_starter/schema.prisma`, `docs/references/engineering/ARCHITECTURE.md`, `docs/PRODUCT_BRIEF.md`, and only relevant FRD sections. Audit draft schema; propose production MVP ERD and changes for users, buyers, tenants/roles/branches, KYB, vehicles/media, listing moderation/projection, favorites, consent-granted CRM leads, appointments, subscriptions, audit/outbox. Require tenant-safe composite FKs, indices, constraints, status enums, money in integer fils, and UTC timestamps. Write `docs/DATABASE_DESIGN.md`, updated schema and migration plan; do NOT apply migrations until I approve. Flag unimplemented RLS and buyer resource authorization.

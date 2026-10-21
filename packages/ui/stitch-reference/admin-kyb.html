@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-low": "#181c21", "primary-container": "#d4af37", "surface": "#101419", "on-tertiary-container": "#005035", "on-error-container": "#ffdad6", "tertiary-fixed-dim": "#4edea3", "on-tertiary": "#003824", "on-secondary-fixed": "#001e2c", "on-primary-container": "#554300", "on-primary-fixed": "#241a00", "on-secondary": "#00354a", "on-tertiary-fixed": "#002113", "error": "#ffb4ab", "tertiary-container": "#33ca90", "on-secondary-fixed-variant": "#004c69", "on-tertiary-fixed-variant": "#005236", "on-surface": "#e0e2ea", "on-background": "#e0e2ea", "secondary-container": "#00a6e0", "background": "#101419", "surface-bright": "#36393f", "surface-variant": "#31353b", "surface-container-high": "#262a30", "primary": "#f2ca50", "on-surface-variant": "#d0c5af", "inverse-on-surface": "#2d3136", "surface-dim": "#101419", "tertiary-fixed": "#6ffbbe", "outline": "#99907c", "inverse-primary": "#735c00", "surface-container-highest": "#31353b", "secondary-fixed": "#c4e7ff", "secondary-fixed-dim": "#7bd0ff", "tertiary": "#58e7aa", "primary-fixed": "#ffe088", "surface-container-lowest": "#0a0e13", "on-secondary-container": "#00374d", "outline-variant": "#4d4635", "primary-fixed-dim": "#e9c349", "on-primary-fixed-variant": "#574500", "error-container": "#93000a", "on-primary": "#3c2f00", "surface-tint": "#e9c349", "on-error": "#690005", "surface-container": "#1c2025", "inverse-surface": "#e0e2ea", "secondary": "#7bd0ff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-desktop-wide": "2rem", "gutter": "1.5rem", "margin-mobile": "1rem", "space-3xl": "4rem", "gutter-mobile": "0.75rem", "space-sm": "0.5rem", "space-md": "1rem", "space-xs": "0.25rem", "margin": "2rem", "margin-desktop-wide": "3rem", "space-2xl": "3rem", "space-lg": "1.5rem", "space-xl": "2rem" }, "fontFamily": { "headline-sm": [ "Outfit" ], "headline-xl": [ "Outfit" ], "body-md": [ "Inter" ], "headline-md": [ "Outfit" ], "body-sm": [ "Inter" ], "headline-xl-mobile": [ "Outfit" ], "label-caps": [ "Inter" ], "display-hero-mobile": [ "Outfit" ], "data-mono-num": [ "JetBrains Mono" ], "body-lg": [ "Inter" ], "data-currency-lg": [ "Outfit" ], "headline-lg": [ "Outfit" ], "display-hero": [ "Outfit" ] }, "fontSize": { "headline-sm": [ "18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" } ], "headline-xl": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "body-md": [ "14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" } ], "headline-md": [ "22px", { "lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "500" } ], "body-sm": [ "12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" } ], "headline-xl-mobile": [ "28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-caps": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600" } ], "display-hero-mobile": [ "36px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "data-mono-num": [ "13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "body-lg": [ "16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" } ], "data-currency-lg": [ "32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-lg": [ "28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "display-hero": [ "56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" } ] } } } };</script></head><body class="bg-background font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen"><aside class="fixed left-0 top-0 h-full w-60 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-50 flex flex-col justify-between"><div class="flex flex-col flex-1 overflow-y-auto"><div class="h-16 px-space-md flex items-center gap-space-sm bg-surface-container-lowest"><div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[20px]">shield_with_house</span></div><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase truncate">Automotive OS</span><span class="font-label-caps text-label-caps text-outline uppercase tracking-wider truncate">Platform Ops Hub</span></div></div><div class="p-space-md flex flex-col gap-space-lg"><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-outline px-space-sm uppercase tracking-wider">Supervision &amp; Governance</span><nav class="flex flex-col gap-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium rounded-lg"><a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="operations-command" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">monitoring</span><span class="font-body-sm text-body-sm">Operations Command</span></div></a><a aria-current="page" class="flex items-center justify-between px-space-sm py-2 transition-colors bg-surface-container-high text-primary font-medium rounded-lg" data-path="kyb-dealer-verification" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">verified_user</span><span class="font-body-sm text-body-sm">KYB Verification</span></div><span class="bg-surface-container-highest text-primary font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">6</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="listing-moderation" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">policy</span><span class="font-body-sm text-body-sm">Listing Moderation</span></div><span class="bg-surface-container-highest text-secondary font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">14</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="disputes-and-enforcement" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px]">gavel</span><span class="font-body-sm text-body-sm">Disputes &amp; Sanctions</span></div><span class="bg-error-container text-on-error-container font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">2</span></a></nav></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-outline px-space-sm uppercase tracking-wider">Platform Infrastructure</span><nav class="flex flex-col gap-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium rounded-lg"><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="dealer-subscriptions-and-tariffs" href="#"><span class="material-symbols-outlined text-[18px]">receipt_long</span><span class="font-body-sm text-body-sm">Dealer Tariffs</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="immutable-audit-ledger" href="#"><span class="material-symbols-outlined text-[18px]">lock_clock</span><span class="font-body-sm text-body-sm">Audit Activity Ledger</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="sovereign-api-and-gateways" href="#"><span class="material-symbols-outlined text-[18px]">hub</span><span class="font-body-sm text-body-sm">Sovereign Gateways</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="platform-rbac-and-keyring" href="#"><span class="material-symbols-outlined text-[18px]">key</span><span class="font-body-sm text-body-sm">RBAC &amp; Keyring</span></a></nav></div></div></div><div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm"><div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs"><div class="flex items-center gap-space-xs text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span><span class="font-label-caps text-label-caps tracking-wider uppercase">Air-Gapped HSM Keystore</span></div><span class="font-data-mono-num text-body-sm text-on-surface-variant">#DXB-ADM-9941</span><span class="font-body-sm text-body-sm text-outline">Auto-lock in 12m</span></div><button class="w-full h-8 px-space-sm rounded bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-body-sm text-body-sm flex items-center justify-center gap-space-xs transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">lock_reset</span><span>Emergency Freeze</span></button></div></aside><div class="pl-60"><header class="fixed top-0 left-60 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-40 px-gutter"><div class="h-16 w-full flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md min-w-0 flex-1"><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-label-caps text-label-caps text-primary uppercase tracking-wider font-semibold">Platform Governance &amp; Trust Ops</span><span class="px-1.5 py-0.5 rounded bg-surface-container-high font-data-mono-num text-body-sm text-on-surface-variant">Tier-0 Clearance</span></div><div class="flex items-center gap-space-xs text-outline text-body-sm"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="font-data-mono-num text-body-sm">DIFC Vault Node 01 • RTA Gateway 9ms</span></div></div><div class="relative max-w-md w-full hidden xl:block"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span class="material-symbols-outlined text-outline text-[18px]">search</span></div><input class="w-full h-9 pl-9 pr-4 rounded-lg bg-surface-container-high text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary-container" placeholder="Query VIN, Case #, Dealership, DED License..." type="text"/></div></div><div class="flex items-center gap-space-md flex-shrink-0"><div class="hidden lg:flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-surface-container"><span class="w-2 h-2 rounded-full bg-tertiary"></span><span class="font-body-sm text-body-sm text-on-surface-variant">Dubai Police • DED Active</span></div><div class="flex items-center bg-surface-container-high rounded p-0.5 font-label-caps text-label-caps"><button class="px-2 py-0.5 rounded bg-surface-bright text-on-surface font-semibold">EN</button><button class="px-2 py-0.5 rounded text-outline hover:text-on-surface transition-colors">عربي</button></div><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-4 h-4 bg-error text-on-error font-data-mono-num text-body-sm rounded-full flex items-center justify-center text-[10px]">4</span></button><div class="flex items-center gap-space-sm pl-space-sm"><div class="flex flex-col text-right hidden sm:flex"><span class="font-body-sm text-body-sm text-on-surface font-medium truncate max-w-[160px]">Dr. Maya Al-Falasi</span><span class="font-label-caps text-label-caps text-primary truncate max-w-[160px]">Platform SuperAdmin</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-16 bg-background px-gutter py-space-lg"><div class="flex flex-col w-full">
+<!-- Top Command & Case Status Header -->
+<div class="flex flex-col gap-space-md mb-space-lg">
+<!-- Breadcrumb Bar & Rapid Navigation -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs font-label-caps text-label-caps tracking-wider text-outline uppercase">
+<span class="hover:text-primary cursor-pointer transition-colors">Platform Governance</span>
+<span class="text-outline-variant">/</span>
+<span class="hover:text-primary cursor-pointer transition-colors">KYB Verification &amp; Onboarding</span>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface font-data-mono-num font-semibold text-secondary">Case #KYB-2025-0842</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-data-mono-num text-body-sm shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>RPC Gateway: <strong class="text-tertiary">DED-SYNC #994</strong> (38ms)</span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-data-mono-num text-body-sm shadow-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">verified</span>
+<span>Cabinet Res. (58)/2020 Compliant</span>
+</div>
+</div>
+</div>
+<!-- Title & Action Command Center -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-xl flex flex-col xl:flex-row xl:items-center justify-between gap-space-lg relative overflow-hidden">
+<!-- Glow ambient accent -->
+<div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none blur-3xl"></div>
+<div class="flex flex-col gap-space-xs z-10 max-w-2xl">
+<div class="flex flex-wrap items-center gap-space-sm">
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-body-sm font-semibold flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+            Awaiting Tier-0 Operator Adjudication
+          </span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-highest text-secondary-fixed font-data-mono-num text-body-sm">
+            SLA Remaining: 02h 14m 51s
+          </span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-outline font-label-caps text-label-caps uppercase">
+            FZ-LLC Tier A
+          </span>
+</div>
+<div class="flex items-center gap-space-sm mt-1">
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">
+            Dealership KYB Verification: Royal Apex Motors FZCO
+          </h1>
+<span class="material-symbols-outlined text-primary text-[24px]" title="Validated Vault Dossier">gpp_maybe</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Comprehensive compliance validation dossier for high-volume GCC exotic vehicle marketplace accreditation. Dual-signoff required for DIFC smart contract sovereign settlement enablement.
+        </p>
+</div>
+<!-- Action Bar -->
+<div class="flex flex-wrap items-center gap-space-sm z-10">
+<button class="h-10 px-4 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm font-medium transition-all shadow-sm flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px] text-outline">contact_support</span>
+<span>Request Evidence</span>
+</button>
+<button class="h-10 px-4 rounded-lg bg-error-container/60 hover:bg-error-container text-on-error-container font-body-sm font-medium transition-all shadow-sm flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+<span>Reject Application</span>
+</button>
+<button class="h-10 px-5 rounded-lg bg-primary-container text-on-primary-container hover:bg-primary font-body-sm font-semibold tracking-wide transition-all shadow-lg flex items-center gap-2 group" id="btn-approve-dossier" type="button">
+<span class="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110">fingerprint</span>
+<span>Approve &amp; Issue Accreditation</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Primary Workspace: Two-Column High-Signal Architecture -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg mb-space-xl">
+<!-- LEFT COLUMN (62% ~ 7.5 Cols): Evidence Inspection & Regulatory Vault -->
+<div class="xl:col-span-7 flex flex-col gap-space-lg">
+<!-- Section 1: Commercial Registry & Legal Entity Validation -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">domain_verification</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Commercial Registry &amp; Legal Entity Validation</h2>
+<span class="font-body-sm text-body-sm text-outline">Cross-referenced with DET / DED Federal Registry • Node DIFC-04</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-tertiary-container/15 text-tertiary font-label-caps text-label-caps uppercase font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Live Webhook Validated
+          </span>
+</div>
+<!-- Entity Core Data Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm font-body-sm">
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Registered Legal Entity</span>
+<span class="font-body-md text-body-md text-on-surface font-medium truncate mt-0.5">Royal Apex Luxury Motor Vehicles Trading FZCO</span>
+<span class="font-data-mono-num text-body-sm text-on-surface-variant">Tax ID: TRN-100293481200003</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">DET / DED Commercial License</span>
+<div class="flex items-center justify-between mt-0.5">
+<span class="font-data-mono-num text-body-md text-secondary font-semibold">#984120</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-tertiary font-label-caps text-label-caps uppercase">Active • Clean</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline">Verified via UAE FedReg sync 4m ago</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Jurisdiction &amp; Entity Type</span>
+<span class="font-body-md text-body-md text-on-surface font-medium mt-0.5">Free Zone LLC (FZ-LLC)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dubai South Aviation &amp; Logistics Free Zone</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Showroom Physical Zoning</span>
+<div class="flex items-center justify-between mt-0.5">
+<span class="font-body-md text-body-md text-on-surface font-medium">Al Quoz Industrial 3</span>
+<span class="font-data-mono-num text-body-sm text-primary">Makani: 21948 83120</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline truncate">Showroom 04, Building 6, Sheikh Zayed Rd frontage</span>
+</div>
+</div>
+<!-- Embedded Document Preview Widget -->
+<div class="mt-space-xs p-space-md rounded-lg bg-surface-container-lowest flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">picture_as_pdf</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Commercial_License_DED_984120_Attested.pdf</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high text-outline font-data-mono-num text-body-sm">4.8 MB</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-body-sm text-body-sm transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">qr_code_2</span>
+<span>Audit DED QR</span>
+</button>
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-body-sm text-body-sm transition-colors flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+<span>Full Ledger</span>
+</button>
+</div>
+</div>
+<!-- Document Inspection Split Viewport Mock -->
+<div class="h-44 rounded-lg bg-surface-container-high p-space-md flex items-center justify-between gap-space-md relative overflow-hidden">
+<div class="flex flex-col justify-between h-full z-10 max-w-sm">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-tertiary"></span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-bold">Government of Dubai • DET Validated</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Commercial Register Attestation</span>
+<span class="font-data-mono-num text-body-sm text-outline">Sha-256 Hash: 9e884ac2...10db054c</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="px-2 py-0.5 rounded bg-surface-container text-tertiary font-data-mono-num text-body-sm font-medium">Dubai Chamber Stamp #9104</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-data-mono-num text-body-sm font-medium">Expiry: 14 Jan 2027</span>
+</div>
+</div>
+<!-- Stylized Certificate Preview Element -->
+<div class="w-48 h-full bg-surface-container rounded p-3 flex flex-col justify-between shadow-md relative">
+<div class="flex justify-between items-start">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<div class="w-10 h-10 rounded bg-surface-container-highest p-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-[24px]">qr_code</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="h-1.5 w-3/4 rounded bg-surface-variant"></div>
+<div class="h-1.5 w-1/2 rounded bg-surface-variant"></div>
+</div>
+<div class="flex justify-between items-center text-[10px] text-tertiary font-data-mono-num">
+<span>RTA REGISTERED</span>
+<span>PASSED</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Ultimate Beneficial Owner (UBO) & AML / CFT Screening -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Ultimate Beneficial Owner (UBO) &amp; AML/CFT Screening</h2>
+<span class="font-body-sm text-body-sm text-outline">Verified against Interpol, OFAC, UN Sanctions, and Central Bank goAML</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-highest text-secondary font-data-mono-num text-body-sm font-semibold">
+            100% Equity Accounted
+          </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- UBO 1 -->
+<div class="p-space-md rounded-lg bg-surface-container flex flex-col justify-between gap-space-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-11 h-11 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-headline-sm font-semibold">
+                  TA
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-body-md text-body-md text-on-surface font-semibold">Tariq Mansoor Al-Ketbi</span>
+<span class="material-symbols-outlined text-tertiary text-[16px]" title="UAE PASS Gold">check_circle</span>
+</div>
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold tracking-wider">Primary Shareholder (60%)</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-caps text-label-caps uppercase font-bold">
+                Clear • Tier 1
+              </span>
+</div>
+<div class="flex flex-col gap-1.5 font-body-sm">
+<div class="flex justify-between items-center py-1">
+<span class="text-outline">Emirates ID</span>
+<span class="font-data-mono-num text-on-surface">784-1981-•••••••-1 (Exp: 2028)</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-outline">Biometric Verification</span>
+<span class="text-tertiary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">badge</span> UAE PASS Gold
+                </span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-outline">PEP / Sanctions Search</span>
+<span class="text-tertiary font-data-mono-num">UN / OFAC NEGATIVE</span>
+</div>
+</div>
+</div>
+<!-- UBO 2 -->
+<div class="p-space-md rounded-lg bg-surface-container flex flex-col justify-between gap-space-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-11 h-11 rounded-full bg-surface-container-high flex items-center justify-center text-secondary font-headline-sm font-semibold">
+                  VV
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-body-md text-body-md text-on-surface font-semibold">Viktor Van Der Bilt</span>
+<span class="material-symbols-outlined text-tertiary text-[16px]" title="Passport Verified">check_circle</span>
+</div>
+<span class="font-label-caps text-label-caps text-secondary uppercase font-bold tracking-wider">Managing Partner (40%)</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-caps text-label-caps uppercase font-bold">
+                Clear • Level 1
+              </span>
+</div>
+<div class="flex flex-col gap-1.5 font-body-sm">
+<div class="flex justify-between items-center py-1">
+<span class="text-outline">Passport &amp; Residency</span>
+<span class="font-data-mono-num text-on-surface">Kingdom of NL • UAE Golden Visa</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-outline">Interpol Red Notice</span>
+<span class="text-tertiary font-data-mono-num">NEGATIVE (Global Check)</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-outline">Central Bank CBUAE Risk</span>
+<span class="text-tertiary font-data-mono-num">LEVEL 1 PASS (Zero Hits)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: Physical Showroom Grounding & Facility Inspection Audit -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">warehouse</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Physical Showroom Grounding &amp; Facility Audit</h2>
+<span class="font-body-sm text-body-sm text-outline">Joint inspection by Dubai Municipality &amp; Dubai Police Automotive Taskforce</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-highest text-tertiary font-data-mono-num text-body-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">verified</span> Passed 18 Feb 2025
+          </span>
+</div>
+<!-- Metric Bar -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm font-body-sm">
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Climate Storage Capacity</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold mt-1">35 Hypercars</span>
+<span class="font-body-sm text-body-sm text-tertiary">22°C Constant • Dehumidified</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Tasjeel Shamil Dyno/Hoist</span>
+<span class="font-headline-sm text-headline-sm text-secondary font-semibold mt-1">Bay #2 Certified</span>
+<span class="font-body-sm text-body-sm text-outline">Direct RTA telemetry uplink active</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Fire &amp; Halon Suppression</span>
+<span class="font-headline-sm text-headline-sm text-tertiary font-semibold mt-1">Civil Defense A+</span>
+<span class="font-body-sm text-body-sm text-outline">Certificate #DCD-2025-9921</span>
+</div>
+</div>
+<!-- Interactive Photo Evidence Carousel / Quad View -->
+<div class="flex flex-col gap-space-xs mt-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+              Photographic Evidence Dossier (On-Premises Inspector Capture)
+            </span>
+<span class="font-data-mono-num text-body-sm text-outline">4 of 4 Verified High-Res Stamps</span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-space-sm">
+<!-- Photo 1 -->
+<div class="group relative rounded-lg overflow-hidden bg-surface-container aspect-video cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="High-end exotic car showroom exterior facade in Dubai Al Quoz industrial area with clean architectural glass, illuminated Royal Apex Motors signage, and polished concrete entrance under clear twilight sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrTnuq35frPuucNGRB82CVIvk7f34TGoKlirrBMqiRIwWYFaiNFjAEPJnKAQ0K_XHISfYGACfq7bNgF1qLwU6lgDwJoY7u8YZ4caTTIhVgWOnqrqRDOiKcFtcnKFjpKbes5SxLkOYyQsXaT-bNnZK7I3e9zhzSkW7JMMoOC_stblKzHp3uIjdIiP7YFVcWaICkhcDC3TNNw0BaQOoBTui-3UMGSvwlPVoYj9Gz80CNL26a6aKdg0Ou"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-transparent to-transparent flex flex-col justify-end p-2">
+<span class="font-label-caps text-[10px] text-primary uppercase font-bold tracking-wider">1. Facade &amp; Geofence</span>
+<span class="font-data-mono-num text-[10px] text-outline">Lat 25.1328 Long 55.2281</span>
+</div>
+</div>
+<!-- Photo 2 -->
+<div class="group relative rounded-lg overflow-hidden bg-surface-container aspect-video cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Indoor secure luxury automotive vault with immaculate epoxy resin floors showcasing rows of covered supercars under soft diffuse LED gallery illumination and carbon fiber accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgJCglA6MIh8daq8M2criHONJytqRO89NOriKDFyvN9EQSGKsO616kfrPMt457qSvw0H0IndrdiTVs1vgzLxO1e692JAviqoFiMUBoUPkpUDE7xK1wYbFs78T92IGgMF3n247g7fxcCW2_ghdiE_kxxEVg4yA7Lu5A4Ib2m2kXJo9WKN-VWyYD2M5zcRO_Fx23Q7NZznVAPaZoT1DvMz9w3NMLaRMR6kAl7pG3cCXKb9ih9fSKzTxA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-transparent to-transparent flex flex-col justify-end p-2">
+<span class="font-label-caps text-[10px] text-primary uppercase font-bold tracking-wider">2. Gated Vault Bays</span>
+<span class="font-data-mono-num text-[10px] text-outline">35 Car Grid Capacity</span>
+</div>
+</div>
+<!-- Photo 3 -->
+<div class="group relative rounded-lg overflow-hidden bg-surface-container aspect-video cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Commercial grade cleanroom service bay with automated hydraulic automotive hoist and high-tech Tasjeel diagnostic dynamometer computer console" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpmkIsXN9Uf7Ex4S-L9GDmScXuissmBBq2JDJAmpRoSwf9hLvBeUB09dfIEn2q-80AxbxIkDtrECUjYvmMfq1NDVcdFG-0zluBY7iWZv_ViqJdF9Pk9RJfCOJ4vqeFkyvdsCnzjBbip5sFhmzxpuvEFElZfMD7U7Fmq2zegWpW-LpTmm-sk6mPh9JJNe-94RvqynO6jInzVSQSz10MIgMB0aNz93KQi3GVnDGDD_esrXEbLdDmc9Pb"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-transparent to-transparent flex flex-col justify-end p-2">
+<span class="font-label-caps text-[10px] text-primary uppercase font-bold tracking-wider">3. RTA Shamil Diagnostic</span>
+<span class="font-data-mono-num text-[10px] text-outline">Direct Telemetry Link</span>
+</div>
+</div>
+<!-- Photo 4 -->
+<div class="group relative rounded-lg overflow-hidden bg-surface-container aspect-video cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="High luxury dealership private client reception lounge with Italian leather seating, espresso bar, and biometric security entrance door" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiDxD55QgKZ8uZPoFDIHkK4R4ZASFO4rAqEqWJiOP5hNOlbBq18DNrjf4opLg-jZwdlMVyAHyVe1940YFzvZu2cQxMFiKN2f0h0YeqYtXInelFtJyY2kBoqx60st0hMwSnqLRfHwNkFY4KmerNVsw4hymqtj49M4iktu_czRdV6nGq-VQrN3o1swqAIyqm1pkcJTlXWgeiByP4wSsub7dqJQUXBVA2eo4PknIsD9HVqWbbKb-aXoGl"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-transparent to-transparent flex flex-col justify-end p-2">
+<span class="font-label-caps text-[10px] text-primary uppercase font-bold tracking-wider">4. VIP Escrow Lounge</span>
+<span class="font-data-mono-num text-[10px] text-outline">Encrypted Contract Terminal</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (38% ~ 4.5 Cols): Risk Matrix & Adjudication Terminal -->
+<div class="xl:col-span-5 flex flex-col gap-space-lg">
+<!-- Card A: Automated Risk Scoring Engine -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Automated Risk Scoring Engine</h2>
+<span class="font-body-sm text-body-sm text-outline">Real-time Bayesian AML &amp; Integrity Vector</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">info</span>
+</div>
+<!-- High Signal Composite Score Banner -->
+<div class="p-space-md rounded-xl bg-surface-container flex items-center justify-between shadow-inner">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">Composite Trust Rating</span>
+<div class="flex items-baseline gap-2 mt-0.5">
+<span class="font-headline-xl text-headline-xl text-tertiary font-bold tracking-tight">12</span>
+<span class="font-body-md text-body-md text-outline">/ 100 Risk</span>
+</div>
+<span class="font-body-sm text-body-sm text-tertiary font-medium">TIER-1 EXCELLENCE • APPROVED</span>
+</div>
+<!-- Inline SVG Visual Progress Gauge -->
+<div class="relative w-20 h-20 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-highest" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-tertiary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="88, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="material-symbols-outlined text-tertiary text-[20px]">shield</span>
+</div>
+</div>
+</div>
+<!-- Granular Risk Metric Rows -->
+<div class="flex flex-col gap-space-sm font-body-sm">
+<div class="p-space-sm rounded-lg bg-surface-container-lowest flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface font-medium">Shell / Synthetic Entity Prob.</span>
+<span class="text-outline text-body-sm">Physical site inspection verified by taskforce</span>
+</div>
+<div class="text-right">
+<span class="font-data-mono-num text-tertiary font-semibold text-body-md">0.2%</span>
+<span class="block text-[10px] text-tertiary uppercase font-bold">Ultra Low</span>
+</div>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-lowest flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface font-medium">Document Forgery / Tamper Risk</span>
+<span class="text-outline text-body-sm">Cryptographic handshake with Dubai DED API</span>
+</div>
+<div class="text-right">
+<span class="font-data-mono-num text-tertiary font-semibold text-body-md">0.0%</span>
+<span class="block text-[10px] text-tertiary uppercase font-bold">Gov Verified</span>
+</div>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-lowest flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface font-medium">Capital Proof &amp; Liquidity Buffer</span>
+<span class="text-outline text-body-sm">Tier-1 Bank Letter (Emirates NBD Corporate)</span>
+</div>
+<div class="text-right">
+<span class="font-data-mono-num text-primary font-semibold text-body-md">AED 25,000,000</span>
+<span class="block text-[10px] text-outline uppercase font-bold">Paid-up Capital</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card B: Adjudication Decision Panel & Multi-Signature Sign-off -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-xl flex flex-col gap-space-md relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">how_to_reg</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Adjudication &amp; Sign-Off Panel</h2>
+<span class="font-body-sm text-body-sm text-outline">Tier-0 Cryptographic Accreditation Terminal</span>
+</div>
+</div>
+</div>
+<!-- Form Element 1: Tier Selector -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+            Select Dealer Accreditation Tier
+          </label>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-xs">
+<label class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col gap-1 ring-1 ring-primary/40">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-primary font-semibold">Tier-1 Sovereign</span>
+<input checked="" class="accent-primary" name="dealer_tier" type="radio" value="tier-1"/>
+</div>
+<span class="text-[11px] text-on-surface-variant leading-tight">
+                Full Escrow API access, Unlimited Inventory, Direct RTA transfer integration.
+              </span>
+</label>
+<label class="p-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer flex flex-col gap-1 opacity-70">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">Tier-2 Probationary</span>
+<input class="accent-primary" name="dealer_tier" type="radio" value="tier-2"/>
+</div>
+<span class="text-[11px] text-outline leading-tight">
+                Escrow only, 5-vehicle active listing limit, manual transfer audits.
+              </span>
+</label>
+</div>
+</div>
+<!-- Form Element 2: Reason Codes Dropdown -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+            Regulatory Authority Reason Code
+          </label>
+<div class="relative">
+<select class="w-full h-11 px-3 pr-8 rounded-lg bg-surface-container text-on-surface font-body-sm text-body-sm appearance-none focus:outline-none focus:ring-1 focus:ring-primary-container">
+<option selected="">All DET &amp; RTA criteria satisfied under Cabinet Resolution No. (58) of 2020 on Beneficial Ownership</option>
+<option>Full UBO and Physical Showroom Compliance Verified (Direct Board Ratification)</option>
+<option>Conditional Pilot Authorization (Bond Guaranteed AED 50M)</option>
+</select>
+<span class="material-symbols-outlined text-outline absolute right-2.5 top-3 pointer-events-none text-[18px]">expand_more</span>
+</div>
+</div>
+<!-- Form Element 3: Mandatory Audit Log Note -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-outline uppercase tracking-wider font-semibold">
+              Mandatory Operator Audit Note
+            </label>
+<span class="font-data-mono-num text-[11px] text-outline">Immutable Ledger Entry</span>
+</div>
+<textarea class="w-full p-space-sm rounded-lg bg-surface-container text-on-surface font-data-mono-num text-body-sm focus:outline-none focus:ring-1 focus:ring-primary-container resize-none" rows="3">Physical inspection report #DXB-INSP-2025 validated against municipal geofence. UBO and banking liquidity buffer cleared at AED 25,000,000. Recommend immediate Tier-1 sovereign minting.</textarea>
+</div>
+<!-- Form Element 4: Two-Officer Cryptographic Key Sign-off Matrix -->
+<div class="p-space-sm rounded-lg bg-surface-container-lowest flex flex-col gap-space-xs">
+<div class="flex items-center justify-between pb-1">
+<span class="font-label-caps text-label-caps text-outline uppercase font-semibold">Dual-Operator Protocol</span>
+<span class="font-data-mono-num text-[11px] text-primary">Required Clearance: 2/2</span>
+</div>
+<!-- Signer 1 (Signed) -->
+<div class="flex items-center justify-between p-2 rounded bg-surface-container">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-6 h-6 rounded-full bg-tertiary-container/30 text-tertiary flex items-center justify-center text-[12px]">
+<span class="material-symbols-outlined text-[14px]">key</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Dr. Maya Al-Falasi (SuperAdmin)</span>
+<span class="font-data-mono-num text-[10px] text-outline truncate">Key: 0x8a92f09...d8a2 (Signed at 14:22:09 UTC)</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary-container/20 text-tertiary font-label-caps text-label-caps uppercase font-bold shrink-0">
+              Signed
+            </span>
+</div>
+<!-- Signer 2 (Pending) -->
+<div class="flex items-center justify-between p-2 rounded bg-surface-container">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-6 h-6 rounded-full bg-surface-container-high text-outline flex items-center justify-center text-[12px]">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Tariq Al-Nuaimi (Risk Officer)</span>
+<span class="font-data-mono-num text-[10px] text-outline truncate">Smart Contract Key Awaiting Biometric Challenge</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-primary font-label-caps text-label-caps uppercase font-bold shrink-0 animate-pulse">
+              Pending
+            </span>
+</div>
+</div>
+<!-- Terminal Confirmation Trigger -->
+<button class="w-full h-11 rounded-lg bg-primary text-on-primary hover:bg-primary-fixed-dim font-body-sm font-semibold tracking-wider uppercase transition-colors shadow-lg flex items-center justify-center gap-2 mt-1" id="btn-mint-credentials" type="button">
+<span class="material-symbols-outlined text-[20px]">security_update_good</span>
+<span>Commit Sovereign Accreditation to Ledger</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Fast-Switch Secondary Context Drawer: Verification Queue Ribbon -->
+<div class="w-full rounded-xl bg-surface-container-low shadow-xl p-space-md flex flex-col gap-space-sm mb-space-lg">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">queue</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Active Verification Queue</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-secondary font-data-mono-num text-body-sm">
+          5 Pending Applications
+        </span>
+</div>
+<div class="flex items-center gap-space-sm font-body-sm">
+<span class="text-outline">Sort: SLA Urgency</span>
+<button class="text-primary hover:underline font-medium">Expand Full Registry →</button>
+</div>
+</div>
+<!-- Queue Ribbon Items Carousel / Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-space-sm">
+<!-- Current Active (Highlight) -->
+<div class="p-space-sm rounded-lg bg-surface-container-high flex flex-col gap-1 ring-1 ring-primary/40 relative">
+<div class="flex items-center justify-between">
+<span class="font-data-mono-num text-[11px] text-secondary">#KYB-2025-0842</span>
+<span class="px-1.5 py-0.2 rounded bg-primary/20 text-primary font-label-caps text-[10px] font-bold">Active Focus</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold truncate">Royal Apex Motors FZCO</span>
+<div class="flex justify-between items-center text-[11px] text-outline mt-1 font-data-mono-num">
+<span>Score: 12/100</span>
+<span class="text-tertiary">SLA: 2h 14m</span>
+</div>
+</div>
+<!-- Queue Item 2 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-data-mono-num text-[11px] text-outline">#KYB-2025-0843</span>
+<span class="px-1.5 py-0.2 rounded bg-tertiary-container/20 text-tertiary font-label-caps text-[10px]">Under Review</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Emirates Prestige Auto LLC</span>
+<div class="flex justify-between items-center text-[11px] text-outline mt-1 font-data-mono-num">
+<span>Score: 18/100</span>
+<span>SLA: 4h 30m</span>
+</div>
+</div>
+<!-- Queue Item 3 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-data-mono-num text-[11px] text-outline">#KYB-2025-0844</span>
+<span class="px-1.5 py-0.2 rounded bg-error-container/30 text-error font-label-caps text-[10px]">PEP Flag</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Gulf Hypercar Concierge</span>
+<div class="flex justify-between items-center text-[11px] text-outline mt-1 font-data-mono-num">
+<span>Score: 68/100</span>
+<span class="text-error">SLA: 5h 02m</span>
+</div>
+</div>
+<!-- Queue Item 4 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-data-mono-num text-[11px] text-outline">#KYB-2025-0845</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-highest text-outline font-label-caps text-[10px]">Docs Ingestion</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Al Marmoom Classics Co</span>
+<div class="flex justify-between items-center text-[11px] text-outline mt-1 font-data-mono-num">
+<span>Score: Pending</span>
+<span>SLA: 8h 15m</span>
+</div>
+</div>
+<!-- Queue Item 5 -->
+<div class="p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-data-mono-num text-[11px] text-outline">#KYB-2025-0846</span>
+<span class="px-1.5 py-0.2 rounded bg-secondary-container/20 text-secondary font-label-caps text-[10px]">Site Visit OK</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Oasis Boulevard Exotic LLC</span>
+<div class="flex justify-between items-center text-[11px] text-outline mt-1 font-data-mono-num">
+<span>Score: 24/100</span>
+<span>SLA: 11h 40m</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Biometric Two-Factor Authorization Modal (Hidden by Default) -->
+<div class="fixed inset-0 bg-background/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-space-md" id="biometric-modal">
+<div class="w-full max-w-lg p-space-lg rounded-xl bg-surface-container-low shadow-2xl flex flex-col gap-space-md relative overflow-hidden">
+<!-- Glow ambient -->
+<div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-primary/10 blur-2xl pointer-events-none"></div>
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-primary-container/20 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">fingerprint</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Tier-0 Biometric Attestation</h3>
+<span class="font-body-sm text-body-sm text-outline">HSM Node: #DXB-ADM-9941</span>
+</div>
+</div>
+<button class="p-1 rounded text-outline hover:text-on-surface transition-colors" id="btn-close-modal" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        You are about to issue a sovereign dealer smart credential to <strong class="text-on-surface">Royal Apex Luxury Motor Vehicles Trading FZCO</strong>. This grants automated RTA title transfers and DIFC custodial escrow privileges.
+      </p>
+<div class="p-space-md rounded-lg bg-surface-container flex flex-col gap-space-xs font-data-mono-num text-body-sm">
+<div class="flex justify-between">
+<span class="text-outline">Assigned Tier:</span>
+<span class="text-primary font-bold">Tier-1 Sovereign Dealer</span>
+</div>
+<div class="flex justify-between">
+<span class="text-outline">Trade License ID:</span>
+<span class="text-on-surface">#984120 (DET Dubai)</span>
+</div>
+<div class="flex justify-between">
+<span class="text-outline">Smart Contract Hash:</span>
+<span class="text-secondary truncate max-w-[200px]">0x77d84f...c9012</span>
+</div>
+</div>
+<!-- Biometric scanner simulation box -->
+<div class="h-28 rounded-lg bg-surface-container-lowest flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-surface-container transition-all group">
+<span class="material-symbols-outlined text-primary text-[36px] group-hover:scale-110 transition-transform">fingerprint</span>
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider group-hover:text-primary transition-colors">
+          Tap Hardware YubiKey or Sensor to Sign
+        </span>
+</div>
+<div class="flex items-center justify-end gap-space-sm pt-space-xs">
+<button class="px-4 py-2 rounded-lg bg-surface-container text-on-surface font-body-sm font-medium hover:bg-surface-container-high transition-colors" id="btn-cancel-modal" type="button">
+          Cancel
+        </button>
+<button class="px-5 py-2 rounded-lg bg-primary text-on-primary font-body-sm font-semibold hover:bg-primary-fixed-dim transition-colors flex items-center gap-1.5 shadow-md" id="btn-confirm-sign" type="button">
+<span class="material-symbols-outlined text-[18px]">lock_open</span>
+<span>Execute Cryptographic Sign</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Interactive Logic Hook -->
+<script>
+    (function initKYBWorkspace() {
+      const modal = document.getElementById('biometric-modal');
+      const approveBtn = document.getElementById('btn-approve-dossier');
+      const mintBtn = document.getElementById('btn-mint-credentials');
+      const closeBtn = document.getElementById('btn-close-modal');
+      const cancelBtn = document.getElementById('btn-cancel-modal');
+      const confirmSignBtn = document.getElementById('btn-confirm-sign');
+
+      function openModal() {
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      function closeModal() {
+        if (modal) modal.classList.add('hidden');
+      }
+
+      if (approveBtn) approveBtn.addEventListener('click', openModal);
+      if (mintBtn) mintBtn.addEventListener('click', openModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+      if (confirmSignBtn) {
+        confirmSignBtn.addEventListener('click', () => {
+          confirmSignBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span> Broadcasting...';
+          setTimeout(() => {
+            confirmSignBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span> Accredited';
+            setTimeout(() => {
+              closeModal();
+            }, 800);
+          }, 1200);
+        });
+      }
+    })();
+  </script>
+</div></main></div></body></html>

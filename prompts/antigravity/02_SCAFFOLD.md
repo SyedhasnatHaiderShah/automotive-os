@@ -1,0 +1,3 @@
+# Antigravity prompt: after architecture approval
+
+Using `AGENTS.md`, `docs/PRODUCT_BRIEF.md`, `docs/decisions/ADR-0001-proposed-stack.md`, scaffold the pnpm/Turborepo monorepo only: `apps/{marketplace,dealer,admin,api}` and `packages/{ui,contracts,config,database}`. Install compatible stable Next.js/NestJS/Prisma/TypeScript versions; record exact versions and commands in README. Health endpoints, shared lint/typecheck/test scripts, env examples, docker compose for local Postgres/Redis, basic CI. No domain functionality or demo business data. Run install, lint, typecheck/build if available; report exact results.

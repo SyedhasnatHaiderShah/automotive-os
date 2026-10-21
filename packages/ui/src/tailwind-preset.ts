@@ -1,0 +1,131 @@
+/**
+ * Tailwind CSS Preset for Automotive OS
+ * Configures exact color palette, semantic typography, and spacing from Stitch Obsidian theme.
+ */
+
+export const automotiveTailwindPreset = {
+  darkMode: 'class' as const,
+  theme: {
+    extend: {
+      colors: {
+        // Core surfaces
+        surface: '#101419',
+        background: '#101419',
+        'surface-dim': '#101419',
+        'surface-bright': '#36393f',
+        'surface-container-lowest': '#0a0e13',
+        'surface-container-low': '#181c21',
+        'surface-container': '#1c2025',
+        'surface-container-high': '#262a30',
+        'surface-container-highest': '#31353b',
+        'surface-variant': '#31353b',
+
+        // On-surfaces
+        'on-surface': '#e0e2ea',
+        'on-surface-variant': '#d0c5af',
+        'on-background': '#e0e2ea',
+        'inverse-surface': '#e0e2ea',
+        'inverse-on-surface': '#2d3136',
+
+        // Structural borders
+        outline: '#99907c',
+        'outline-variant': '#4d4635',
+
+        // Brand Gold Primary
+        primary: '#f2ca50',
+        'primary-container': '#d4af37',
+        'primary-fixed': '#ffe088',
+        'primary-fixed-dim': '#e9c349',
+        'on-primary': '#3c2f00',
+        'on-primary-container': '#554300',
+        'on-primary-fixed': '#241a00',
+        'on-primary-fixed-variant': '#574500',
+        'inverse-primary': '#735c00',
+
+        // Telemetry Azure Secondary
+        secondary: '#7bd0ff',
+        'secondary-container': '#00a6e0',
+        'secondary-fixed': '#c4e7ff',
+        'secondary-fixed-dim': '#7bd0ff',
+        'on-secondary': '#00354a',
+        'on-secondary-container': '#00374d',
+        'on-secondary-fixed': '#001e2c',
+        'on-secondary-fixed-variant': '#004c69',
+
+        // Verified Emerald Tertiary
+        tertiary: '#58e7aa',
+        'tertiary-container': '#33ca90',
+        'tertiary-fixed': '#6ffbbe',
+        'tertiary-fixed-dim': '#4edea3',
+        'on-tertiary': '#003824',
+        'on-tertiary-container': '#005035',
+        'on-tertiary-fixed': '#002113',
+        'on-tertiary-fixed-variant': '#005236',
+
+        // Critical Error
+        error: '#ffb4ab',
+        'error-container': '#93000a',
+        'on-error': '#690005',
+        'on-error-container': '#ffdad6',
+
+        // Studio Glass (Light mode for DMS / Admin)
+        'glass-canvas': '#f8fafc',
+        'glass-border': '#e2e8f0',
+        'glass-text-primary': '#0f172a',
+        'glass-text-secondary': '#64748b',
+      },
+      borderRadius: {
+        DEFAULT: '0.25rem',
+        lg: '0.5rem',
+        xl: '0.75rem',
+        '2xl': '1rem',
+        full: '9999px',
+      },
+      spacing: {
+        gutter: '1.5rem',
+        margin: '2rem',
+        'margin-desktop-wide': '3rem',
+        'margin-mobile': '1rem',
+        'space-xs': '0.25rem',
+        'space-sm': '0.5rem',
+        'space-md': '1rem',
+        'space-lg': '1.5rem',
+        'space-xl': '2rem',
+        'space-2xl': '3rem',
+        'space-3xl': '4rem',
+      },
+      fontFamily: {
+        display: ['Outfit', 'IBM Plex Sans Arabic', 'sans-serif'],
+        body: ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+        'display-hero': ['Outfit', 'IBM Plex Sans Arabic', 'sans-serif'],
+        'headline-xl': ['Outfit', 'IBM Plex Sans Arabic', 'sans-serif'],
+        'headline-lg': ['Outfit', 'IBM Plex Sans Arabic', 'sans-serif'],
+        'headline-md': ['Outfit', 'IBM Plex Sans Arabic', 'sans-serif'],
+        'headline-sm': ['Outfit', 'IBM Plex Sans Arabic', 'sans-serif'],
+        'body-lg': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+        'body-md': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+        'body-sm': ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+        'data-currency-lg': ['Outfit', 'sans-serif'],
+        'data-mono-num': ['JetBrains Mono', 'monospace'],
+        'label-caps': ['Inter', 'sans-serif'],
+      },
+      fontSize: {
+        'display-hero': ['56px', { lineHeight: '64px', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'display-hero-mobile': ['36px', { lineHeight: '44px', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'headline-xl': ['40px', { lineHeight: '48px', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'headline-lg': ['28px', { lineHeight: '36px', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'headline-md': ['22px', { lineHeight: '28px', letterSpacing: '-0.005em', fontWeight: '500' }],
+        'headline-sm': ['18px', { lineHeight: '24px', letterSpacing: '0em', fontWeight: '500' }],
+        'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '-0.005em', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0em', fontWeight: '400' }],
+        'body-sm': ['12px', { lineHeight: '16px', letterSpacing: '0em', fontWeight: '400' }],
+        'data-currency-lg': ['32px', { lineHeight: '36px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'data-mono-num': ['13px', { lineHeight: '18px', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'label-caps': ['11px', { lineHeight: '14px', letterSpacing: '0.08em', fontWeight: '600' }],
+      },
+    },
+  },
+};
+
+export default automotiveTailwindPreset;
