@@ -1744,3 +1744,324 @@ export const VERIFIED_FINANCE_DESK_FIXTURE: FinanceDeskData = {
 export async function fetchFinanceDeskData(): Promise<FinanceDeskData> {
   return VERIFIED_FINANCE_DESK_FIXTURE;
 }
+
+/**
+ * ==============================================================================
+ * S22: FTA Tax Invoices & Accounting Settlement (Screen 481e7a7007f64c8c8c76e7e7ad5ec63d)
+ * ==============================================================================
+ */
+
+export interface TaxInvoiceLineItem {
+  id: string;
+  descriptionEn: string;
+  descriptionAr: string;
+  subText: string;
+  taxCategory: 'STANDARD_5' | 'ZERO_RATED' | 'EXEMPT';
+  unitPriceAed: number;
+  vatRatePct: number;
+  vatAmountAed: number;
+  totalPayableAed: number;
+}
+
+export interface FtaTaxInvoiceDetail {
+  invoiceNumber: string;
+  issueDate: string;
+  taxPointDate: string;
+  deedRef: string;
+  status: 'CLEARED' | 'PENDING' | 'RECONCILED' | 'ZERO_RATED_EXPORT';
+  seller: {
+    nameEn: string;
+    nameAr: string;
+    trn: string;
+    addressEn: string;
+    addressAr: string;
+  };
+  buyer: {
+    nameEn: string;
+    nameAr: string;
+    trn: string;
+    address: string;
+    entityType: string;
+  };
+  lines: TaxInvoiceLineItem[];
+  reconciliation: {
+    subtotalExclVatAed: number;
+    vatAmountAed: number;
+    grossTotalAed: number;
+    tradeInDeductionAed: number;
+    netEscrowDisbursementAed: number;
+    escrowAccountName: string;
+  };
+  tlvQrData: {
+    sellerName: string;
+    sellerTrn: string;
+    timestamp: string;
+    totalWithVat: string;
+    vatTotal: string;
+    sha256Hash: string;
+    batchRef: string;
+  };
+}
+
+export interface DualLedgerMatcherData {
+  escrowBalanceAed: number;
+  securityDepositWireAed: number;
+  adcbFinanceProceedsAed: number;
+  escrowHoldbackAed: number;
+  glTotalReceivableAed: number;
+  glGrossInvoiceAed: number;
+  glTradeInOffsetAed: number;
+  varianceAed: number;
+  tZeroDisbursementReady: boolean;
+  rtaTransferRef: string;
+}
+
+export interface CorporateTaxEngineData {
+  statutoryThresholdAed: number;
+  taxRatePct: number;
+  ytdTaxableNetIncomeAed: number;
+  accruedCtProvisionAed: number;
+  qfzpStatus: string;
+  mainlandSupplyPct: number;
+  bondedExportPct: number;
+}
+
+export interface RecentJournalInvoice {
+  id: string;
+  invoiceNumber: string;
+  issueDate: string;
+  buyerName: string;
+  buyerTrn: string;
+  vehicleTitle: string;
+  vin: string;
+  grossAmountAed: number;
+  vatAmountAed: number;
+  vatLabel: string;
+  settlementChannel: string;
+  channelBadgeClass: string;
+  ftaStatus: string;
+  ftaBadgeClass: string;
+}
+
+export interface AccountingDeskData {
+  kpis: {
+    clearedRevenueMtdAed: number;
+    closedSalesCount: number;
+    momRevenueGrowthPct: number;
+    pendingEscrowReleaseAed: number;
+    pendingDisbursementsCount: number;
+    netVatPayableAed: number;
+    filingDeadlineDescription: string;
+    eInvoicingIntegrityPct: number;
+    hsmStatusText: string;
+  };
+  activeInvoice: FtaTaxInvoiceDetail;
+  dualLedger: DualLedgerMatcherData;
+  corporateTax: CorporateTaxEngineData;
+  recentJournal: RecentJournalInvoice[];
+}
+
+export const VERIFIED_ACCOUNTING_DESK_FIXTURE: AccountingDeskData = {
+  kpis: {
+    clearedRevenueMtdAed: 34890000,
+    closedSalesCount: 14,
+    momRevenueGrowthPct: 18.4,
+    pendingEscrowReleaseAed: 9450000,
+    pendingDisbursementsCount: 3,
+    netVatPayableAed: 1744500,
+    filingDeadlineDescription: '28 Apr 2025 (T-14)',
+    eInvoicingIntegrityPct: 100.0,
+    hsmStatusText: 'Hardware Security Module (HSM) Signed',
+  },
+  activeInvoice: {
+    invoiceNumber: 'INV-2025-0142',
+    issueDate: 'Today • 11:42 GST',
+    taxPointDate: '14 Apr 2025',
+    deedRef: 'DMS-SL-8841',
+    status: 'CLEARED',
+    seller: {
+      nameEn: 'SilberArrows Luxury Motor Cars FZCO',
+      nameAr: 'سيلبر آروز لتجارة السيارات الفاخرة ش.م.ح',
+      trn: '100293847500003',
+      addressEn: 'Vault Hub 04, Sheikh Zayed Road, Al Quoz Industrial 1, Dubai, United Arab Emirates • P.O. Box 49102',
+      addressAr: 'صالة العرض ٠٤، شارع الشيخ زايد، القوز الصناعية الأولى، دبي، الإمارات العربية المتحدة',
+    },
+    buyer: {
+      nameEn: 'Al Maktoum Family Office LLC',
+      nameAr: 'مكتب آل مكتوم العائلي ش.ذ.م.م',
+      trn: '100481928300003',
+      address: 'Gate Precinct 4, Level 5, DIFC, Dubai',
+      entityType: 'DIFC Non-Designated Mainland Tax Entity',
+    },
+    lines: [
+      {
+        id: 'line-01',
+        descriptionEn: '2024 Porsche 911 GT3 RS Weissach Package',
+        descriptionAr: 'بورشه 911 جي تي 3 آر إس وايزاخ 2024',
+        subText: 'VIN: WP0AF2A97RS289012 • Engine: 4.0L NA 518hp • Odo: 840 km',
+        taxCategory: 'STANDARD_5',
+        unitPriceAed: 1420000,
+        vatRatePct: 5.0,
+        vatAmountAed: 71000,
+        totalPayableAed: 1491000,
+      },
+      {
+        id: 'line-02',
+        descriptionEn: 'Bespoke Full-Body STEK DynoShield Paint Protection Film (PPF)',
+        descriptionAr: 'حماية كاملة لهيكل السيارة بأفلام الحماية الفائقة STEK DynoShield',
+        subText: 'Self-healing ceramic topcoat & 10-year sovereign warranty transfer',
+        taxCategory: 'STANDARD_5',
+        unitPriceAed: 48500,
+        vatRatePct: 5.0,
+        vatAmountAed: 2425,
+        totalPayableAed: 50925,
+      },
+      {
+        id: 'line-03',
+        descriptionEn: 'Pre-Delivery Inspection (PDI) & Tasjeel Passing Certification',
+        descriptionAr: 'الفحص الميكانيكي الفني واختبار تسجيل المعتمد لدى شرطة دبي وهيئة الطرق RTA',
+        subText: 'Official Dubai Police & RTA mechanical emission audit',
+        taxCategory: 'STANDARD_5',
+        unitPriceAed: 2200,
+        vatRatePct: 5.0,
+        vatAmountAed: 110,
+        totalPayableAed: 2310,
+      },
+      {
+        id: 'line-04',
+        descriptionEn: 'GCC Customs Transit & Bond Custody Clearance',
+        descriptionAr: 'تخليص الترانزيت الجمركي لدول مجلس التعاون ونقل الحضانة الجمركية',
+        subText: 'Customs Declaration #DXB-B-99812-25 • Direct Out-of-Scope Transit',
+        taxCategory: 'ZERO_RATED',
+        unitPriceAed: 0,
+        vatRatePct: 0.0,
+        vatAmountAed: 0,
+        totalPayableAed: 0,
+      },
+    ],
+    reconciliation: {
+      subtotalExclVatAed: 1470700,
+      vatAmountAed: 73535,
+      grossTotalAed: 1544235,
+      tradeInDeductionAed: -490000,
+      netEscrowDisbursementAed: 1054235,
+      escrowAccountName: 'First Abu Dhabi Bank (FAB) Vault Account',
+    },
+    tlvQrData: {
+      sellerName: 'SilberArrows Luxury Motor Cars FZCO',
+      sellerTrn: '100293847500003',
+      timestamp: '2025-04-14T11:42:00Z',
+      totalWithVat: '1544235.00',
+      vatTotal: '73535.00',
+      sha256Hash: '8f9a2b5e0c34a17932d8471e8bb529e7104b6dc9aa4618e5229db972c3886f41',
+      batchRef: '#FAB-ESCR-00984',
+    },
+  },
+  dualLedger: {
+    escrowBalanceAed: 1054235,
+    securityDepositWireAed: 210847,
+    adcbFinanceProceedsAed: 843388,
+    escrowHoldbackAed: 0,
+    glTotalReceivableAed: 1054235,
+    glGrossInvoiceAed: 1544235,
+    glTradeInOffsetAed: -490000,
+    varianceAed: 0.0,
+    tZeroDisbursementReady: true,
+    rtaTransferRef: '#DXB-PASS-2881',
+  },
+  corporateTax: {
+    statutoryThresholdAed: 375000,
+    taxRatePct: 9.0,
+    ytdTaxableNetIncomeAed: 4820400,
+    accruedCtProvisionAed: 399861,
+    qfzpStatus: 'QFZP Status Active (0% Qualifying)',
+    mainlandSupplyPct: 72,
+    bondedExportPct: 28,
+  },
+  recentJournal: [
+    {
+      id: 'inv-01',
+      invoiceNumber: 'INV-2025-0142',
+      issueDate: 'Today • 11:42 GST',
+      buyerName: 'Al Maktoum Family Office LLC',
+      buyerTrn: 'TRN: 100481928300003',
+      vehicleTitle: '2024 Porsche 911 GT3 RS',
+      vin: 'VIN: WP0AF2A97RS289012',
+      grossAmountAed: 1544235,
+      vatAmountAed: 73535,
+      vatLabel: 'AED 73,535.00',
+      settlementChannel: 'FAB Escrow',
+      channelBadgeClass: 'bg-secondary/15 text-secondary',
+      ftaStatus: 'XML Filed & Cleared',
+      ftaBadgeClass: 'bg-tertiary/15 text-tertiary',
+    },
+    {
+      id: 'inv-02',
+      invoiceNumber: 'INV-2025-0141',
+      issueDate: '12 Apr 2025',
+      buyerName: 'Emaar Hospitality Assets Ltd',
+      buyerTrn: 'TRN: 100238491800003',
+      vehicleTitle: '2023 Rolls-Royce Phantom VIII EWB',
+      vin: 'VIN: SCA668S52PU198421',
+      grossAmountAed: 2890000,
+      vatAmountAed: 137619.05,
+      vatLabel: 'AED 137,619.05',
+      settlementChannel: 'Direct Wire Transfer',
+      channelBadgeClass: 'bg-tertiary/15 text-tertiary',
+      ftaStatus: 'Reconciled',
+      ftaBadgeClass: 'bg-tertiary/15 text-tertiary',
+    },
+    {
+      id: 'inv-03',
+      invoiceNumber: 'INV-2025-0140',
+      issueDate: '10 Apr 2025',
+      buyerName: 'Al-Rajhi Prestige Fleet (Riyadh, KSA)',
+      buyerTrn: 'VAT Reg (KSA): 300184918200003',
+      vehicleTitle: '2024 Ferrari SF90 XX Stradale',
+      vin: 'Export Bayan #SA-981240-DXB',
+      grossAmountAed: 4200000,
+      vatAmountAed: 0,
+      vatLabel: 'AED 0.00 (0%)',
+      settlementChannel: 'Bank Guarantee (LC)',
+      channelBadgeClass: 'bg-primary/15 text-primary',
+      ftaStatus: 'Zero-Rated Export',
+      ftaBadgeClass: 'bg-secondary/15 text-secondary',
+    },
+    {
+      id: 'inv-04',
+      invoiceNumber: 'INV-2025-0139',
+      issueDate: '08 Apr 2025',
+      buyerName: 'Sheikh Hamdan Investment Trust',
+      buyerTrn: 'TRN: 100918291000003',
+      vehicleTitle: '2023 Mercedes-AMG ONE Formula 1',
+      vin: 'VIN: W1N98492018894102',
+      grossAmountAed: 13500000,
+      vatAmountAed: 642857.14,
+      vatLabel: 'AED 642,857.14',
+      settlementChannel: 'FAB Escrow',
+      channelBadgeClass: 'bg-secondary/15 text-secondary',
+      ftaStatus: 'Reconciled',
+      ftaBadgeClass: 'bg-tertiary/15 text-tertiary',
+    },
+    {
+      id: 'inv-05',
+      invoiceNumber: 'INV-2025-0138',
+      issueDate: '04 Apr 2025',
+      buyerName: 'Dr. Tariq Bin Zayed Al Nahyan',
+      buyerTrn: 'Private High-Net Collector (Retail)',
+      vehicleTitle: '2023 Aston Martin Valkyrie AMR Pro',
+      vin: 'VIN: SCFA3847291084201',
+      grossAmountAed: 11200000,
+      vatAmountAed: 533333.33,
+      vatLabel: 'AED 533,333.33',
+      settlementChannel: 'FAB Escrow',
+      channelBadgeClass: 'bg-secondary/15 text-secondary',
+      ftaStatus: 'Reconciled',
+      ftaBadgeClass: 'bg-tertiary/15 text-tertiary',
+    },
+  ],
+};
+
+export async function fetchAccountingDeskData(): Promise<AccountingDeskData> {
+  return VERIFIED_ACCOUNTING_DESK_FIXTURE;
+}
