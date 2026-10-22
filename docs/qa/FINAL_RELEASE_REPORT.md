@@ -1,43 +1,86 @@
 # Automotive OS — Final QA & Release Evaluation Report
 
-**Document Version:** 1.0.0-PROD-STAGING  
-**Date (UTC):** 2026-10-21 10:45:00  
-**Git Commit Checkpoint:** `5ab63ce` (All 26 screens committed)  
-**Branch:** `main`  
-**Stitch MCP Project ID:** `4467699827252507387` (26 / 26 screens mapped)  
+**Document Version:** 1.1.0-STAGING-RELEASE  
+**Date (UTC):** 2026-10-22 06:45:00  
 **Evaluator:** Autonomous QA Orchestrator (Antigravity)  
-**Release Gate Standard:** [`docs/implementation/QA_GATES.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/QA_GATES.md) & [`AGENTS.md`](file:///h:/Personal/Automotiv%20OS/AGENTS.md)
+**Standard Reference:** [`docs/implementation/QA_GATES.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/QA_GATES.md), [`AGENTS.md`](file:///h:/Personal/Automotiv%20OS/AGENTS.md), [`INTEGRATION_TRUTH_TABLE.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/INTEGRATION_TRUTH_TABLE.md)  
+**Stitch MCP Project ID:** `4467699827252507387` (26 / 26 screens mapped)  
+**Git Checkpoint:** `2dd14f5` (Clean working tree)
 
 ---
 
 ## 1. Executive Summary & Verification Metrics
 
-Automotive OS has successfully completed its autonomous implementation and deterministic QA verification loop across all designated scopes. Every screen has been audited against approved Stitch design exports, implemented in Next.js 15 and NestJS with strict TypeScript types, tested via Playwright browser automations across multiple viewports and Arabic RTL, and verified with on-disk high-resolution screenshots.
+Automotive OS has completed comprehensive re-verification across all layers of the monorepo: TypeScript compilation, linting, production build compilation, unit and integration tests, PostgreSQL RLS multi-tenant isolation, and end-to-end Playwright browser automation across desktop (1440px), tablet (1024px), mobile (390px), and Arabic RTL directionality.
 
 ```
 ========================================================================================
-                      AUTOMOTIVE OS — MONOREPO QUALITY METRICS
+                      AUTOMOTIVE OS — RE-VERIFICATION METRICS (2026-10-22)
 ========================================================================================
   Target Cohort P0 (Launch Critical):   16 / 16 screens VERIFIED (100.0%) [PASS]
   Target Cohort P1 (Advanced Ops):       10 / 10 screens VERIFIED (100.0%) [PASS]
   Total Monorepo Screen Coverage:        26 / 26 screens VERIFIED (100.0%) [PASS]
   Stitch Visual Parity Index:            26 / 26 screens MATCHED  (100.0%) [PASS]
   Typecheck Status (Turbo monorepo):     10 / 10 tasks successful  (0 errors) [PASS]
-  Monorepo Automated Test Suites:        10 / 10 tasks successful  (0 failures) [PASS]
-  API Unit & E2E Integration Tests:      93 / 93 tests passing     (0 failures) [PASS]
+  Monorepo Linting Status:               10 / 10 tasks successful  (0 errors) [PASS]
+  Monorepo Production Build:              7 / 7 tasks successful   (0 errors) [PASS]
+  API Unit & Integration Tests:          93 / 93 tests passing     (0 failures) [PASS]
   PostgreSQL RLS & Tenancy Tests:        16 / 16 tests passing     (0 failures) [PASS]
-  Active Regressions:                    0 detected (Group A–G all passing)
+  Playwright End-to-End Test Suite:      25 / 25 test runners pass (0 failures) [PASS]
+  Active Regressions:                    0 detected (Groups A through G all passing)
   Critical / High Open Defects:          0 open defects
 ========================================================================================
-  RELEASE EVALUATION VERDICT:            GO / READY FOR STAGING ENVIRONMENT
+  UAE PILOT RECOMMENDATION:              GO (FOR CONTROLLED CLOSED DEALER PILOT)
 ========================================================================================
 ```
 
 ---
 
-## 2. Monorepo Screen Coverage & Audit Matrix (26/26 Screens)
+## 2. Test Commands, Exit Codes & Verification Results
 
-| Screen ID | Group | Screen Title | Route | App | Delivery Tier | Stitch ID | QA Status | Evidence Path |
+All tests were re-executed deterministically against the current codebase:
+
+| Verification Stage | Command Executed | Exit Code | Results Summary | Gate Status |
+|---|---|---|---|---|
+| **Linting** | `pnpm run lint` | `0` | 10 tasks across 8 packages clean. | **PASS** |
+| **Typecheck** | `pnpm run typecheck` | `0` | 10 tasks across 8 packages (TypeScript strict). | **PASS** |
+| **Monorepo Build** | `pnpm run build` | `0` | Next.js 15 apps (`marketplace`, `dealer`, `admin`) and NestJS `api` compiled production assets cleanly. | **PASS** |
+| **API & Security Tests** | `pnpm run test` (Jest) | `0` | 8 test suites, 93 tests passing: buyer privacy grants, outbox synchronization, auth guards, tenant access control. | **PASS** |
+| **Database Multi-Tenancy & RLS** | `npx -y tsx test/rls-isolation.test.ts` | `0` | 16/16 tests passing: composite FK constraints, non-bypass cross-tenant denial, buyer profile isolation, public projection redaction. | **PASS** |
+| **Playwright Full E2E Suite** | `node scripts/run-all-verifications.js` | `0` | 25 test scripts executed, all 25 passing across all 26 screens (S01–S26). | **PASS** |
+
+### Individual Playwright Screen Runners (25 Scripts / 26 Screens)
+- `verify-s01.js` (S01): **PASS** (11/11 checks, 17.64s)
+- `verify-s02-s03.js` (S02 & S03): **PASS** (14/14 checks, 5.17s)
+- `verify-s04.js` (S04): **PASS** (13/13 checks, 6.00s)
+- `verify-s05.js` (S05): **PASS** (16/16 checks, 14.74s)
+- `verify-s06.js` (S06): **PASS** (15/15 checks, 7.82s)
+- `verify-s07.js` (S07): **PASS** (15/15 checks, 11.22s)
+- `verify-s08.js` (S08): **PASS** (15/15 checks, 7.02s)
+- `verify-s09.js` (S09): **PASS** (16/16 checks, 8.36s)
+- `verify-s10.js` (S10): **PASS** (15/15 checks, 7.08s)
+- `verify-s11.js` (S11): **PASS** (16/16 checks, 6.83s)
+- `verify-s12.js` (S12): **PASS** (15/15 checks, 5.92s)
+- `verify-s13.js` (S13): **PASS** (16/16 checks, 7.05s)
+- `verify-s14.js` (S14): **PASS** (16/16 checks, 8.33s)
+- `verify-s15.js` (S15): **PASS** (17/17 checks, 9.12s)
+- `verify-s16.js` (S16): **PASS** (17/17 checks, 8.72s)
+- `verify-s17.js` (S17): **PASS** (15/15 checks, 14.91s)
+- `verify-s18.js` (S18): **PASS** (15/15 checks, 9.39s)
+- `verify-s19.js` (S19): **PASS** (14/14 checks, 9.06s)
+- `verify-s20.js` (S20): **PASS** (17/17 checks, 10.70s)
+- `verify-s21.js` (S21): **PASS** (17/17 checks, 10.98s)
+- `verify-s22.js` (S22): **PASS** (18/18 checks, 10.59s)
+- `verify-s23.js` (S23): **PASS** (19/19 checks, 13.81s)
+- `verify-s24.js` (S24): **PASS** (19/19 checks, 12.55s)
+- `verify-s25.js` (S25): **PASS** (22/22 checks, 18.99s)
+- `verify-s26.js` (S26): **PASS** (21/21 checks, 10.92s)
+
+---
+
+## 3. Monorepo Screen Coverage & Audit Matrix (26 / 26 Screens)
+
+| Screen ID | Group | Screen Title | Route | App | Tier | Stitch Screen ID | Status | QA Evidence |
 |---|---|---|---|---|---|---|---|---|
 | **S01** | A | Marketplace Home & Car Search | `/` | `marketplace` | P0 | `5f05e07d66314d02ba903a3e9635e5e0` | **VERIFIED** | [`docs/qa/evidence/S01/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S01/report.md) |
 | **S02** | A | Search Results & Dealer Filters | `/cars` | `marketplace` | P0 | `25f8c91796994dafa16e145333eb0cc0` | **VERIFIED** | [`docs/qa/evidence/S02/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S02/report.md) |
@@ -47,132 +90,83 @@ Automotive OS has successfully completed its autonomous implementation and deter
 | **S06** | B | Verified Dealership Storefront | `/dealers/[slug]` | `marketplace` | P0 | `a6d81d9621e44e26a1c232ee6b5af777` | **VERIFIED** | [`docs/qa/evidence/S06/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S06/report.md) |
 | **S07** | B | VIP Enquiry & Consent Flow | `/cars/[slug]/enquiry` | `marketplace` | P0 | `1ff78cd6f95845538cc81b3849e62c88` | **VERIFIED** | [`docs/qa/evidence/S07/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S07/report.md) |
 | **S08** | C | Buyer Enquiry Status Timeline | `/account/enquiries` | `marketplace` | P0 | `a22fe42f09924bcf85ec90f61abcf9b7` | **VERIFIED** | [`docs/qa/evidence/S08/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S08/report.md) |
-| **S09** | C | Appointments, Test Drives & Virtual Garage | `/account/garage` | `marketplace` | P0 | `ad4e47810bc64f479b9f6a871187c52c` | **VERIFIED** | [`docs/qa/evidence/S09/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S09/report.md) |
+| **S09** | C | Appointments & Virtual Garage | `/account/garage` | `marketplace` | P0 | `ad4e47810bc64f479b9f6a871187c52c` | **VERIFIED** | [`docs/qa/evidence/S09/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S09/report.md) |
 | **S10** | C | Saved Searches & Favorites | `/account/saved` | `marketplace` | P0 | `f01f7d612a404834a9d371d8c38945e2` | **VERIFIED** | [`docs/qa/evidence/S10/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S10/report.md) |
 | **S11** | C | Buyer Profile & Privacy Permissions | `/account/profile` | `marketplace` | P0 | `569db08de4024230815eb363576d3554` | **VERIFIED** | [`docs/qa/evidence/S11/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S11/report.md) |
 | **S12** | D | Dealer Executive Overview Dashboard | `/dashboard` | `dealer` | P0 | `d36891533e434d269961e108cff842e2` | **VERIFIED** | [`docs/qa/evidence/S12/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S12/report.md) |
 | **S13** | D | Vehicle Inventory Management Grid | `/inventory` | `dealer` | P0 | `68e3e92ee73344beaddb67201f3db443` | **VERIFIED** | [`docs/qa/evidence/S13/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S13/report.md) |
-| **S14** | E | Platform Operations & Governance Command | `/` | `admin` | P0 | `4404fdad57e3414992311b05009d6c7c` | **VERIFIED** | [`docs/qa/evidence/S14/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S14/report.md) |
+| **S14** | E | Platform Operations Command | `/` | `admin` | P0 | `4404fdad57e3414992311b05009d6c7c` | **VERIFIED** | [`docs/qa/evidence/S14/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S14/report.md) |
 | **S15** | E | KYB Dealer Verification & Audit Dossier | `/verifications/[id]` | `admin` | P0 | `c66fabd239274215933c237649699f1d` | **VERIFIED** | [`docs/qa/evidence/S15/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S15/report.md) |
-| **S16** | E | Vehicle Listing Moderation & VIN Risk Review | `/moderation/listings/[id]` | `admin` | P0 | `8ac37f225c8e44ff8d99e824c784ccd7` | **VERIFIED** | [`docs/qa/evidence/S16/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S16/report.md) |
-| **S17** | E | Seller Sanctions & Escrow Dispute Review | `/disputes` | `admin` | P1-GATED | `10ebda02e492484d9444279dcbfdaa23` | **VERIFIED** | [`docs/qa/evidence/S17/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S17/QA_REPORT.md) |
+| **S16** | E | Listing Moderation & VIN Risk Review | `/moderation/listings/[id]` | `admin` | P0 | `8ac37f225c8e44ff8d99e824c784ccd7` | **VERIFIED** | [`docs/qa/evidence/S16/report.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S16/report.md) |
+| **S17** | E | Seller Sanctions & Dispute Review | `/disputes` | `admin` | P1-GATED | `10ebda02e492484d9444279dcbfdaa23` | **VERIFIED** | [`docs/qa/evidence/S17/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S17/QA_REPORT.md) |
 | **S18** | F | Sales Orders & Quotations Studio | `/sales` | `dealer` | P1 | `e5eba1a68cca4c94b95a19b4c01c5312` | **VERIFIED** | [`docs/qa/evidence/S18/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S18/QA_REPORT.md) |
-| **S19** | F | Workshop Job Card & Bay Operations Calendar | `/workshop` | `dealer` | P1 | `fb12b426f33b4543875b91044d10dd82` | **VERIFIED** | [`docs/qa/evidence/S19/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S19/QA_REPORT.md) |
-| **S20** | F | Parts Inventory & Automated Procurement | `/parts` | `dealer` | P1 | `962b5df669c94fe29940311699ce33b4` | **VERIFIED** | [`docs/qa/evidence/S20/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S20/QA_REPORT.md) |
-| **S21** | F | Finance & Insurance Referral & Banking Desk | `/finance` | `dealer` | P1-GATED | `2de2a58f7a914c94a7cf093d8a1984df` | **VERIFIED** | [`docs/qa/evidence/S21/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S21/QA_REPORT.md) |
-| **S22** | F | FTA Tax Invoices & Accounting Settlement | `/accounting` | `dealer` | P1-GATED | `481e7a7007f64c8c8c76e7e7ad5ec63d` | **VERIFIED** | [`docs/qa/evidence/S22/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S22/QA_REPORT.md) |
-| **S23** | F | Corporate Fleet Accounts & VIP Consignment Portfolio | `/fleet` | `dealer` | P1 | `09331cdd3c704e419e8aba6f6b87ccae` | **VERIFIED** | [`docs/qa/evidence/S23/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S23/QA_REPORT.md) |
-| **S24** | G | Zero-Rated GCC Export & Customs Bond Discrepancy | `/accounting/exception/export` | `dealer` | P1-GATED | `f2549d0dc269410ebc65bcfa2240280c` | **VERIFIED** | [`docs/qa/evidence/S24/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S24/QA_REPORT.md) |
-| **S25** | G | F&I Subprime DBR Exception & Underwriting Hard-Lock | `/finance/exception` | `dealer` | P1-GATED | `569de90e9e7143f6b47dc5994dd3a098` | **VERIFIED** | [`docs/qa/evidence/S25/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S25/QA_REPORT.md) |
-| **S26** | G | Consignment Custody Freeze & Judicial Injunction | `/fleet/exception` | `dealer` | P1-GATED | `c0870d6ef04d45d6879d621f438ba4cb` | **VERIFIED** | [`docs/qa/evidence/S26/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S26/QA_REPORT.md) |
+| **S19** | F | Workshop Job Card & Bay Calendar | `/workshop` | `dealer` | P1 | `fb12b426f33b4543875b91044d10dd82` | **VERIFIED** | [`docs/qa/evidence/S19/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S19/QA_REPORT.md) |
+| **S20** | F | Parts Inventory & Procurement | `/parts` | `dealer` | P1 | `962b5df669c94fe29940311699ce33b4` | **VERIFIED** | [`docs/qa/evidence/S20/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S20/QA_REPORT.md) |
+| **S21** | F | F&I Referral & Banking Desk | `/finance` | `dealer` | P1-GATED | `2de2a58f7a914c94a7cf093d8a1984df` | **VERIFIED** | [`docs/qa/evidence/S21/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S21/QA_REPORT.md) |
+| **S22** | F | FTA Tax Invoices & Accounting | `/accounting` | `dealer` | P1-GATED | `481e7a7007f64c8c8c76e7e7ad5ec63d` | **VERIFIED** | [`docs/qa/evidence/S22/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S22/QA_REPORT.md) |
+| **S23** | F | Fleet Accounts & Consignment | `/fleet` | `dealer` | P1 | `09331cdd3c704e419e8aba6f6b87ccae` | **VERIFIED** | [`docs/qa/evidence/S23/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S23/QA_REPORT.md) |
+| **S24** | G | GCC Export & Customs Bond Desk | `/accounting/exception/export` | `dealer` | P1-GATED | `f2549d0dc269410ebc65bcfa2240280c` | **VERIFIED** | [`docs/qa/evidence/S24/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S24/QA_REPORT.md) |
+| **S25** | G | F&I Subprime DBR Hard-Lock | `/finance/exception` | `dealer` | P1-GATED | `569de90e9e7143f6b47dc5994dd3a098` | **VERIFIED** | [`docs/qa/evidence/S25/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S25/QA_REPORT.md) |
+| **S26** | G | Consignment Freeze & Injunction | `/fleet/exception` | `dealer` | P1-GATED | `c0870d6ef04d45d6879d621f438ba4cb` | **VERIFIED** | [`docs/qa/evidence/S26/QA_REPORT.md`](file:///h:/Personal/Automotiv%20OS/docs/qa/evidence/S26/QA_REPORT.md) |
 
 ---
 
-## 3. Core Architectural & Multi-Tenant Guarantees
+## 4. Provider Integrations Truth Table
 
-### 3.1 Defense-in-Depth Multi-Tenancy & PostgreSQL RLS
-- **Database Row-Level Security:** Verified through `packages/database/test/rls-isolation.test.ts` (16/16 tests passing). Non-bypass database connections are strictly prevented from querying or altering foreign tenant rows.
-- **Composite Foreign Keys:** Physical constraints `(tenant_id, id)` on all operational child tables prevent cross-tenant record linking even in raw SQL insertions.
-- **Composite Key Routing:** Every dealer endpoint verifies `tenant_id` from the authenticated JWT session claim; body-provided tenant IDs are strictly ignored and rejected if divergent.
+Per [`INTEGRATION_TRUTH_TABLE.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/INTEGRATION_TRUTH_TABLE.md), no fake certifications or mock APIs are marked live in production:
 
-### 3.2 Buyer Privacy & UAE PDPL (Federal Decree-Law No. 45/2021)
-- **Buyer-Owned Identity:** Collector identities and Virtual Garage collections belong exclusively to the buyer account. Dealerships cannot browse or harvest consumer profiles.
-- **Field-Level Data Grants:** Explicit consent tokens are required for lead transmission (Phone, Email, UAE PASS verification status).
-- **Instant Revocation:** A buyer can revoke access at any time; active leads in dealership cockpits immediately redact contact information upon revocation.
-
-### 3.3 RBAC Least-Privilege & Commercial Margin Protection
-- **Role Scoping:** Roles (`DEALER_PRINCIPAL`, `SALES_MANAGER`, `SALES_EXECUTIVE`, `SERVICE_ADVISOR`, `F_I_MANAGER`, `ACCOUNTANT`, `COMPLIANCE_OFFICER`) are enforced at the API controller guard level.
-- **Margin Encryption:** Acquisition costs and gross margins are encrypted/redacted for `SALES_EXECUTIVE` personas to prevent commercial leakage; only Dealership Principals and General Managers possess the cryptographic clearance to review acquisition ledgers.
-- **VIN Obfuscation:** Vehicle chassis numbers are displayed with interactive partial masking (`••••••`) in public and standard dealer views.
-
-### 3.4 Transactional Outbox & Real-Time Search Projection Sync
-- **Atomic Operations:** Inventory updates and transactional outbox events are committed in the same database transaction (`prisma.$transaction`).
-- **Instant Public Delisting:** Vehicles marked as `SOLD`, `RESERVED`, or `SEQUESTERED` are automatically unpublished from the public marketplace projection engine within the same event cycle.
-
----
-
-## 4. Regulatory, Statutory & Judicial Governance Evaluation
-
-| Domain | Regulation / Statute | Implementation Mechanics | Verification Evidence |
+| Integration Rail | Status Category | Current Behavior in Monorepo | Requirement for Live Production |
 |---|---|---|---|
-| **Tax Invoicing & E-Invoicing** | UAE Federal Decree-Law No. 8 of 2017 & Cabinet Decision No. 52 | Bilingual FTA-compliant tax invoices, Base64 TLV cryptographic QR code, Peppol BIS Billing 3.0 UBL XML export, TRN 100294817500003 validation. | S22 (`verify-s22.js` 18/18 checks pass) |
-| **GCC Export VAT Exemption** | FTA VAT Executive Regulations Article 30 | 90-day statutory countdown timer, Dubai Customs Exit/Entry Certificate tracking, ZATCA import declaration reconciliation, AED 87,500 VAT clawback contingency. | S24 (`verify-s24.js` 19/19 checks pass) |
-| **Credit & Underwriting Limits** | Central Bank of the UAE (CBUAE) Notice No. 29/2011 & Circular 2023/44 | Automated 50% Debt Burden Ratio (DBR) hard-lock, 85% LTV ceiling enforcement, Open Banking bilateral referral flag, dual cure pathways (30% down payment vs Sovereign Wealth Exemption), CRO dual committee SHA-256 digital stamp. | S25 (`verify-s25.js` 22/22 checks pass) |
-| **Consignment Bailment & Judicial Freezes** | UAE Federal Decree-Law No. 50 of 2022 & UAE Civil Procedure Code Art. 99 | Dubai Courts Execution Order #DXB-EXEC-2025-8841 handling, physical sequestering to Vault Bay 01-12, DUAL-PIN biometric custody seal, marketplace delisting, restricted Allianz floater insurance (#DXB-CUST-889), and Article 99 Interpleader escrow motion depositing AED 1,650,000 to discharge bailee liability. | S26 (`verify-s26.js` 21/21 checks pass) |
-| **Biometric & Identity Telemetry** | UAE Federal Decree-Law No. 45/2021 & DIFC Data Protection | Hardware Keystore Signed telemetry (Apple Secure Enclave & UAE PASS HSM simulation) at 96% confidence score; strict audit logging of all sensitive administrative actions. | S11, S15, S17 |
+| **UAE PASS SSO** | `SANDBOX / ADAPTER` | Local passwordless and session login; UI indicates connection status; token claims mapped. | Bilateral OIDC client credentials from UAE Digital Government Authority. |
+| **DED / KYB Registry** | `SANDBOX / MANUAL REVIEW` | Reviewers manually inspect trade license attachments and record verification events. | Authorized electronic feed with UAE economic departments. |
+| **RTA Tasjeel Inspection** | `SANDBOX / ATTESTED` | 34-point MPI inspection display; certificates shown only with attached provenance documents. | Contracted RTA Tasjeel B2B telematics API agreement. |
+| **VIN Salvage / Stolen Registry** | `SANDBOX / EVIDENCE-BASED` | Manual risk review desk with configurable checklist; no fake auto-approval badge. | Commercial API license (e.g. Carfax/Autocheck/police stolen registry). |
+| **AECB Credit Bureau Soft Check** | `DISABLED / CONSENT CAPTURE` | Captures buyer consent and tracks referral stages; automated soft check trigger is disabled. | Contracted AECB API provider credentials and explicit subscriber consent agreement. |
+| **Lender Live Underwriting / DBR** | `SANDBOX / POLICY ENGINE` | Configurable 50% DBR / 85% LTV rules engine with indicative disclaimer; no direct bank lending. | Bilateral lender API integration agreements and licensed broker status. |
+| **FTA E-Invoicing / Peppol** | `SANDBOX / ENCODING VERIFIED` | Base64 TLV cryptographic QR code and Peppol BIS 3.0 UBL XML generator working; draft status. | Accredited Peppol E-Invoicing Service Provider (EESP) connection and tax counsel review. |
+| **Third-Party Escrow Custody** | `DISABLED / STATE TRACKING` | Dispute tracking and internal case management; live disbursement button disabled. | Central Bank of the UAE licensed escrow custody partner agreement. |
+| **Dubai Courts Execution Orders** | `SANDBOX / PROCEDURE WORKFLOW` | Handles court execution orders, quarantine lock, and Article 99 interpleader escrow bond filing. | Integration or verified protocol with Dubai Courts Electronic Case Management. |
+| **Dubai Customs Export Mirsal 2** | `SANDBOX / CONFIGURABLE RULES` | 90-day statutory countdown timer and customs bond reconciliation checklist. | Dubai Customs B2B Mirsal gateway access. |
 
 ---
 
-## 5. Integration Truth Table & Staging Disclosures
+## 5. Visual, Accessibility & Arabic RTL Evidence
 
-Per `docs/implementation/INTEGRATION_TRUTH_TABLE.md`, the platform does not falsify live government credentials or banking rails without bilateral staging agreements. The runtime behavior is transparently disclosed below:
-
-| Integration Rail | Designated Provider | Current Implementation Truth | Production Requirement |
-|---|---|---|---|
-| **Identity & Authentication** | UAE PASS / OIDC | Simulated cryptographic HSM token handshake with valid JWT verification. | Bilateral OIDC client registration with UAE Digital Government Authority. |
-| **Credit Scoring & Banking** | Al Etihad Credit Bureau (AECB) & UAE Open Finance | High-fidelity rate syndication engine with simulated DBR/LTV response envelopes. | Signed CBUAE Open Finance API sandbox credentials. |
-| **E-Invoicing & Customs** | UAE Federal Tax Authority (FTA) & Dubai Customs Mirsal 2 | Valid Base64 TLV QR generator; Peppol BIS 3.0 XML exporter; mock customs certificate validator. | Live FTA e-Invoicing Peppol Access Point & Dubai Customs B2B gateway token. |
-| **Judicial Feeds** | Dubai Courts Execution Department | High-fidelity simulated execution order intake, bailiff PIN interlock, and interpleader escrow filing workflow. | Dubai Courts electronic notary/case management system API integration. |
-| **Vehicle Inspection & Telemetry** | RTA Tasjeel / Emirates Transport | Structured 34-point MPI inspection ledger and mock technical certificate validator. | Direct RTA B2B vehicle inspection telematics feed. |
+All 26 screens satisfy the visual and accessibility requirements in [`QA_GATES.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/QA_GATES.md):
+- **Stitch Obsidian Dark Tokens:** Primary surface `#101419` / `#0a0e13`, Studio Glass borders `#1e2630` / `#2d3748`, metallic gold `#d4af37` / `#f2ca50`.
+- **Typography:** `Outfit` display headings, `Inter` UI body text, `JetBrains Mono` for currency amounts, VINs, and chassis codes.
+- **Responsive Viewports:** Every screen tested and confirmed responsive across 1440px desktop, 1024px tablet, and 390px mobile.
+- **Bi-Directional RTL:** Toggling Arabic switches the DOM container to `dir="rtl"`, appropriately flipping sidebar layouts, navigation headers, search forms, and data grids without visual distortion or overflow clipping.
+- **Keyboard & A11y:** Focus rings visible on interactive elements; modal traps functional; aria-labels provided on filter sheets, sort menus, and icon triggers.
 
 ---
 
-## 6. Monorepo Quality & Regression Verification
+## 6. Outstanding Compliance & Operational Blockers (Staging Pre-requisites)
 
-### 6.1 TypeScript Verification (`turbo run typecheck`)
-- **Status:** **PASS** (10 tasks successful, 0 errors)
-- **Packages Evaluated:** `@automotive-os/config`, `@automotive-os/contracts`, `@automotive-os/database`, `@automotive-os/ui`, `apps/marketplace`, `apps/dealer`, `apps/admin`, `apps/api`.
+Before opening the platform to public buyers or real monetary custody, the following external items must be completed by human owners:
 
-### 6.2 Monorepo Automated Tests (`turbo run test`)
-- **Status:** **PASS** (10 tasks successful, 0 failures)
-- **API Test Suite (`apps/api`):** 8 test suites, 93 tests (0 failures).
-  - `auth-tenancy.spec.ts` (14 tests) — PASS
-  - `inventory-listings.spec.ts` (24 tests) — PASS
-  - `buyer-leads-grants.spec.ts` (27 tests) — PASS
-  - `outbox-search-sync.spec.ts` (15 tests) — PASS
-  - `tenant-access.guard.spec.ts` (3 tests) — PASS
-  - `platform-admin.guard.spec.ts` (4 tests) — PASS
-  - `public-dealers.controller.spec.ts` (4 tests) — PASS
-  - `health.controller.spec.ts` (2 tests) — PASS
-- **Database Multi-Tenancy & RLS Suite (`packages/database`):** 16 tests (0 failures).
-  - Composite FK branch & lead-listing constraints — PASS
-  - Dealer A vs Dealer B cross-tenant denial — PASS
-  - Buyer profile privacy isolation — PASS
-  - Public redacted projection & sold exclusion — PASS
-  - Platform admin cross-tenant inspection with audit — PASS
-
-### 6.3 Next.js Static & Dynamic Route Compilation
-- `apps/marketplace`: 8 static/dynamic routes compiled cleanly (Next.js 15 App Router).
-- `apps/dealer`: 17 static/dynamic routes compiled cleanly (Next.js 15 App Router).
-- `apps/admin`: 7 static/dynamic routes compiled cleanly (Next.js 15 App Router).
+1. **External Legal & Tax Counsel Review:**
+   - Formal verification of FTA 5% VAT invoice calculation rules and Peppol XML schema against current UAE legislation.
+   - Review of buyer data consent agreements under UAE Federal Decree-Law No. 45/2021 (PDPL).
+2. **Commercial Partner Agreements:**
+   - UAE PASS OIDC production credentials from UAE DGA.
+   - Escrow banking partnership agreement for custody of vehicle reservation and purchase deposits.
+   - AECB bureau access credentials for credit score verification.
+3. **Infrastructure & Staging Setup:**
+   - Provision production-grade managed PostgreSQL with connection pooling.
+   - Apply schema migrations via automated CI/CD pipeline.
 
 ---
 
-## 7. Evidence Directory Registry
+## 7. Pilot Recommendation: **GO (For Controlled UAE Dealership Pilot)**
 
-Full browser automation logs, JSON assertion dumps, and high-resolution PNG captures (Desktop 1440px, Mobile 390px, Arabic RTL layout, and Interactive Modals) are stored locally in the following directories:
+### Recommendation: **GO (Controlled Closed Pilot)**
+The software is **READY** to begin a limited, closed-cohort UAE pilot with 2–5 verified dealership partners under the following operational guidelines:
+- **Vehicle Catalog & Storefronts:** Fully functional for real public listing search, dealer showroom browsing, and vehicle comparisons.
+- **Enquiries & Appointments:** Live buyer lead submission with explicit privacy consent grants.
+- **Dealer Backoffice:** Active for vehicle inventory management, quote generation, and workshop job scheduling.
+- **Financial & Escrow Guardrails:** Settlement payments handled via certified bank transfer/cheque out of platform until escrow custody provider agreements are finalized; no automated fund custody claims.
+- **Dispute & Legal Desks:** Operated with manual verification workflows as implemented.
 
-- **Group A (Public Discovery):** `docs/qa/evidence/S01/`, `S02/`, `S03/`, `S04/`
-- **Group B (Listing & Dealer):** `docs/qa/evidence/S05/`, `S06/`, `S07/`
-- **Group C (Buyer Workspace):** `docs/qa/evidence/S08/`, `S09/`, `S10/`, `S11/`
-- **Group D (Dealer Cockpit):** `docs/qa/evidence/S12/`, `S13/`
-- **Group E (Platform Admin):** `docs/qa/evidence/S14/`, `S15/`, `S16/`
-- **Group F (Advanced Workflows):** `docs/qa/evidence/S17/`, `S18/`, `S19/`, `S20/`, `S21/`, `S22/`, `S23/`
-- **Group G (Exception Desks & Sequestration):** `docs/qa/evidence/S24/`, `S25/`, `S26/`
-
----
-
-## 8. Release Evaluation & Deployment Recommendation
-
-### Verdict: **GO / READY FOR STAGING ENVIRONMENT**
-
-**Justification:**
-1. **100% Deterministic Verification:** All 26 Stitch design screens (16 P0 screens + 10 P1 screens) have been implemented and verified with zero skipped or mocked tests.
-2. **Strict Multi-Tenancy & Privacy:** Defense-in-depth database RLS, composite foreign keys, and UAE PDPL field-level consent guarantees have passed all automated negative security attacks.
-3. **Statutory & Regulatory Alignment:** Real-world UAE business logic (FTA 5% VAT, customs bond tracking, CBUAE 50% DBR limits, and UAE Decree-Law No. 50/2022 bailment procedures) is fully encoded without shortcuts.
-4. **Zero Open Regressions:** Full monorepo typecheck, unit tests, E2E integration tests, and build compilation pass with zero errors.
-
-**Next Recommended Actions for Human Project Owner:**
-1. Initiate staging environment provisioning with cloud PostgreSQL instance.
-2. Complete bilateral onboarding with UAE PASS Digital Identity Authority and AECB staging sandbox.
-3. Submit FTA tax invoice templates and TLV QR generator for official specialist legal review.
+> [!IMPORTANT]
+> This evaluation strictly certifies software quality, multi-tenant isolation, test coverage, and design parity against Stitch specifications. It does not constitute or imply official government, tax, or financial licensing or certification.
