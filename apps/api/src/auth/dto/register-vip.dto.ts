@@ -99,14 +99,23 @@ export class RegisterVipResponseDto {
   @ApiProperty({ description: 'Provisioned user identifier' })
   userId!: string;
 
+  @ApiProperty({ description: 'Pending registration identifier', required: false })
+  registrationId?: string;
+
   @ApiProperty({ description: 'Registered email' })
   email!: string;
 
   @ApiProperty({ description: 'Assigned tier', enum: ClientTier })
   tier!: ClientTier;
 
-  @ApiProperty({ description: 'JWT authentication token' })
-  accessToken!: string;
+  @ApiProperty({ description: 'Account verification status', example: 'PENDING_VERIFICATION' })
+  status!: string;
+
+  @ApiProperty({ description: 'Indicates verification requirement before session activation', example: true })
+  requiresVerification!: boolean;
+
+  @ApiProperty({ description: 'JWT authentication token (omitted for unverified registrations)', required: false })
+  accessToken?: string;
 
   @ApiProperty({ description: 'Registration confirmation message' })
   message!: string;
