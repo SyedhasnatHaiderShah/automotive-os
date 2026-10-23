@@ -352,10 +352,19 @@ export async function fetchDealerInventory(
   stats: InventoryStats;
 }> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  const isProdOrStaging =
+    process.env.NODE_ENV === "production" ||
+    (process.env.NODE_ENV as string) === "staging";
   const targetTenantId =
     tenantId ||
     process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID ||
-    "11111111-1111-1111-1111-111111111111";
+    (!isProdOrStaging ? "11111111-1111-1111-1111-111111111111" : undefined);
+
+  if (!targetTenantId) {
+    throw new Error(
+      "TENANT_CONTEXT_REQUIRED: No tenantId provided. Default fallback tenant IDs are forbidden in production and staging.",
+    );
+  }
 
   const isDev = process.env.NODE_ENV === "development";
   const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
@@ -372,7 +381,7 @@ export async function fetchDealerInventory(
       `${apiUrl}/api/v1/tenants/${targetTenantId}/vehicles`,
       {
         headers,
-        next: { revalidate: 10 },
+        cache: "no-store",
         signal: AbortSignal.timeout(3000),
       },
     );
@@ -382,17 +391,30 @@ export async function fetchDealerInventory(
       const rawItems = Array.isArray(data.items) ? data.items : [];
 
       // Dynamic DB data mapping - no simulated or hardcoded values
-      const items = rawItems.map((item: any) => ({
-        ...item,
-        mediaUrl:
-          item.media?.[0]?.objectKey ||
-          item.mediaUrl ||
-          "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
-        rtaVerified: Boolean(item.rtaVerified || item.listingStatus === "PUBLISHED"),
-        inquiriesCount: typeof item.inquiriesCount === "number" ? item.inquiriesCount : 0,
-        vipBookingsCount: typeof item.vipBookingsCount === "number" ? item.vipBookingsCount : 0,
-        isFixture: false,
-      }));
+      const items = rawItems.map((item: any) => {
+        // RTA verification strictly requires genuine inspection evidence with certificate provenance.
+        // A published listing state NEVER implies or substitutes for an official technical inspection certificate.
+        const hasInspectionEvidence = Boolean(
+          item.inspectionCertificateId ||
+          item.inspectionCertificateNumber ||
+          item.tasjeelTestNumber ||
+          (item.rtaVerified === true && item.inspectionProvenanced === true)
+        );
+        const rtaVerified = Boolean(item.rtaVerified && hasInspectionEvidence);
+
+        return {
+          ...item,
+          mediaUrl:
+            item.media?.[0]?.objectKey ||
+            item.mediaUrl ||
+            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
+          rtaVerified,
+          tasjeelScore: rtaVerified ? item.tasjeelScore || "Certified Pass" : "Not Certified",
+          inquiriesCount: typeof item.inquiriesCount === "number" ? item.inquiriesCount : 0,
+          vipBookingsCount: typeof item.vipBookingsCount === "number" ? item.vipBookingsCount : 0,
+          isFixture: false,
+        };
+      });
 
       const totalFloor = items.reduce(
         (acc: number, item: any) =>
@@ -459,10 +481,19 @@ export async function fetchDealerLeads(
   token?: string,
 ): Promise<DealerLeadItem[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  const isProdOrStaging =
+    process.env.NODE_ENV === "production" ||
+    (process.env.NODE_ENV as string) === "staging";
   const targetTenantId =
     tenantId ||
     process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID ||
-    "11111111-1111-1111-1111-111111111111";
+    (!isProdOrStaging ? "11111111-1111-1111-1111-111111111111" : undefined);
+
+  if (!targetTenantId) {
+    throw new Error(
+      "TENANT_CONTEXT_REQUIRED: No tenantId provided. Default fallback tenant IDs are forbidden in production and staging.",
+    );
+  }
 
   const isDev = process.env.NODE_ENV === "development";
   const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
@@ -479,7 +510,7 @@ export async function fetchDealerLeads(
       `${apiUrl}/api/v1/tenants/${targetTenantId}/leads`,
       {
         headers,
-        next: { revalidate: 10 },
+        cache: "no-store",
         signal: AbortSignal.timeout(3000),
       },
     );
@@ -566,14 +597,30 @@ export async function createDealerVehicle(
         ...data,
         mediaUrl:
           "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
-        rtaVerified: true,
+        rtaVerified: false,
+        tasjeelScore: "Not Certified",
         inquiriesCount: 0,
         vipBookingsCount: 0,
         isFixture: false,
       };
     }
-  } catch (_err) {
-    // Fallback to optimistic fixture
+
+    const isDev = process.env.NODE_ENV === "development";
+    const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
+    if (!isDev || !enableFixtures) {
+      throw new Error(
+        `Failed to intake vehicle: backend service returned HTTP ${response.status}.`,
+      );
+    }
+  } catch (err: any) {
+    const isDev = process.env.NODE_ENV === "development";
+    const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
+    if (!isDev || !enableFixtures) {
+      throw new Error(
+        err?.message ||
+          "Failed to intake vehicle: backend service unavailable.",
+      );
+    }
   }
 
   return {

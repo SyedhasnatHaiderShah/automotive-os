@@ -689,11 +689,19 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                                 <span className="material-symbols-outlined text-[15px]">content_copy</span>
                               </button>
                             </div>
-                            <div className="flex items-center gap-1 text-[11px]">
-                              <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
-                              <span className="text-tertiary font-medium">RTA Verified</span>
-                              <span className="text-on-surface-variant">{vehicle.tasjeelScore || 'Pass 150-Pt'}</span>
-                            </div>
+                            {vehicle.rtaVerified ? (
+                              <div className="flex items-center gap-1 text-[11px]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
+                                <span className="text-tertiary font-medium">RTA Verified</span>
+                                <span className="text-on-surface-variant">{vehicle.tasjeelScore || 'Certified Pass'}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1 text-[11px] text-outline">
+                                <span className="w-1.5 h-1.5 rounded-full bg-outline/40" />
+                                <span className="font-normal text-on-surface-variant/80">RTA Inspection:</span>
+                                <span className="italic">{vehicle.tasjeelScore || 'Not Certified'}</span>
+                              </div>
+                            )}
                           </div>
                         </td>
 

@@ -55,7 +55,7 @@ describe('VIP Registration & Account Settings Suite (E2E Integration Tests)', ()
   });
 
   describe('1. VIP Lead Intake & Registration (POST /api/v1/auth/register)', () => {
-    it('should successfully register a VIP Collector with UAE PASS Emirates ID and return JWT', async () => {
+    it('should register a VIP Collector in pending state with NO authenticated JWT', async () => {
       const payload = {
         tier: ClientTier.COLLECTOR,
         legalName: 'Sheikh Mansoor Al-Ketbi',
@@ -75,12 +75,13 @@ describe('VIP Registration & Account Settings Suite (E2E Integration Tests)', ()
       expect(res.body.success).toBe(true);
       expect(res.body.tier).toBe('collector');
       expect(res.body.email).toBe('mansoor.alketbi@sovereign-test.ae');
-      expect(res.body.accessToken).toBeDefined();
+      expect(res.body.status).toBe('PENDING_VERIFICATION');
+      expect(res.body.requiresVerification).toBe(true);
+      expect(res.body.accessToken).toBeUndefined();
 
-      testBuyerToken = res.body.accessToken;
       testUserId = res.body.userId;
 
-      // Verify database record
+      // Verify database record: Self-reported Emirates ID is NEVER trusted as UAE PASS identity
       const dbUser = await prisma.user.findUnique({
         where: { id: testUserId },
         include: { buyer: true },
@@ -89,6 +90,30 @@ describe('VIP Registration & Account Settings Suite (E2E Integration Tests)', ()
       expect(dbUser?.displayName).toBe('Sheikh Mansoor Al-Ketbi');
       expect(dbUser?.buyer?.preferredEmirate).toBe('Dubai');
       expect(dbUser?.buyer?.preferredMakes).toContain('Ferrari');
+      expect(dbUser?.identitySubject).not.toMatch(/^uae_pass_/);
+      expect(dbUser?.identitySubject).toMatch(/^pending_reg_/);
+
+      // Negative Test: Unverified pending registration token CANNOT authenticate on protected resources
+      const unverifiedToken = authService.generateDevToken({
+        identitySubject: dbUser!.identitySubject,
+        email: 'mansoor.alketbi@sovereign-test.ae',
+        name: 'Sheikh Mansoor Al-Ketbi',
+      });
+      await request(app.getHttpServer())
+        .get('/api/v1/me/settings')
+        .set('Authorization', `Bearer ${unverifiedToken}`)
+        .expect(401);
+
+      // Verified OIDC token activates session for subsequent settings tests
+      testBuyerToken = authService.generateDevToken({
+        identitySubject: 'auth0|verified_mansoor_alketbi',
+        email: 'mansoor.alketbi@sovereign-test.ae',
+        name: 'Sheikh Mansoor Al-Ketbi',
+      });
+      await prisma.user.update({
+        where: { id: testUserId },
+        data: { identitySubject: 'auth0|verified_mansoor_alketbi' },
+      });
     });
 
     it('should reject registration when PDPL consent is missing or invalid', async () => {

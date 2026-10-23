@@ -1,14 +1,18 @@
-name: Monorepo CI - Quality Gate
+name: Monorepo CI - Quality & Security Gates
 
 on:
   pull_request:
     branches: [main, master, develop]
   push:
-    branches: [develop, "feature/**", "fix/**", "release/**"]
+    branches: [main, develop, "feature/**", "fix/**", "release/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  verify:
-    name: Lint, Typecheck, Test & Build
+  quality-gate:
+    name: Code Quality & Static Typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,16 +47,119 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm --filter @automotive-os/database run prisma:generate
 
-      - name: Lint
+      - name: Lint Verification
         run: pnpm run lint
 
-      - name: Typecheck
+      - name: Static Typecheck Verification
         run: pnpm run typecheck
 
-      - name: Unit & Integration Tests
+  security-and-rls-tests:
+    name: Security, Tenancy & RLS Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: automotive_os
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.15.9
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @automotive-os/database run prisma:generate
+
+      - name: Push Schema & Seed Test Fixtures
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public
+        run: |
+          pnpm --filter @automotive-os/database exec prisma db push --skip-generate
+          pnpm --filter @automotive-os/database exec tsx prisma/seed.ts
+
+      - name: Execute Full Test Suites (API, RLS & Negative Security)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public
+          NODE_ENV: test
+          JWT_SECRET: dev-jwt-secret-replace-in-production-min-32-chars-long
+          CORS_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002"
         run: pnpm run test
 
-      - name: Monorepo Production Build
+  production-build:
+    name: Monorepo Production Build Verification
+    runs-on: ubuntu-latest
+    needs: [quality-gate]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.15.9
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @automotive-os/database run prisma:generate
+
+      - name: Production Build (Next.js Apps & NestJS API)
+        env:
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: 1
         run: pnpm run build
 
   manifest-validate:

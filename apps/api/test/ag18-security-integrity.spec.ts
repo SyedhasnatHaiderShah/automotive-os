@@ -209,8 +209,21 @@ describe("AG-18 Security Remediation & Data Integrity Verification Suite", () =>
           });
 
         expect([403, 404]).toContain(res.status);
+
+        // Even if ENABLE_DEV_TOKEN is set accidentally in production/staging, it MUST still be rejected
+        process.env.ENABLE_DEV_TOKEN = "true";
+        const resWithOverride = await request(app.getHttpServer())
+          .post("/api/v1/auth/token")
+          .send({
+            identitySubject: "attacker_sub",
+            email: "attacker@exploit.ae",
+            name: "Attacker",
+          });
+
+        expect([403, 404]).toContain(resWithOverride.status);
       } finally {
         process.env.NODE_ENV = origEnv;
+        delete process.env.ENABLE_DEV_TOKEN;
       }
     });
 
@@ -496,7 +509,10 @@ describe("AG-18 Security Remediation & Data Integrity Verification Suite", () =>
 
       const mapped = {
         ...liveVehicleFromDb,
-        rtaVerified: Boolean((liveVehicleFromDb as any).rtaVerified || liveVehicleFromDb.listingStatus === "PUBLISHED"),
+        rtaVerified: Boolean(
+          (liveVehicleFromDb as any).rtaVerified &&
+          (liveVehicleFromDb as any).inspectionCertificateNumber
+        ),
         inquiriesCount: typeof (liveVehicleFromDb as any).inquiriesCount === "number" ? (liveVehicleFromDb as any).inquiriesCount : 0,
         vipBookingsCount: typeof (liveVehicleFromDb as any).vipBookingsCount === "number" ? (liveVehicleFromDb as any).vipBookingsCount : 0,
         isFixture: false,

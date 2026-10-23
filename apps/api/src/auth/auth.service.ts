@@ -44,6 +44,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid token: missing subject claim (sub)');
     }
 
+    if (payload.sub.startsWith('pending_reg_')) {
+      throw new UnauthorizedException(
+        'Account registration is pending verification. Authenticated sessions require verified UAE PASS OIDC or email ownership.',
+      );
+    }
+
     // 1. Resolve user from database by identitySubject
     let user = await this.prisma.user.findUnique({
       where: { identitySubject: payload.sub },
@@ -143,13 +149,14 @@ export class AuthService {
       );
     }
 
-    const identitySubject = dto.emiratesId
-      ? `uae_pass_${dto.emiratesId.replace(/-/g, '')}`
-      : `vip_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    // 2. NEVER trust self-reported Emirates ID as a UAE PASS identity!
+    // Unverified public registrations receive an isolated pending registration subject.
+    // Official uae_pass_* identity subjects can ONLY be assigned upon verified UAE PASS OIDC callback.
+    const pendingIdentitySubject = `pending_reg_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
 
     const user = await this.prisma.user.create({
       data: {
-        identitySubject,
+        identitySubject: pendingIdentitySubject,
         email: dto.email,
         phoneE164: formattedPhone,
         displayName: dto.legalName,
@@ -167,20 +174,17 @@ export class AuthService {
       },
     });
 
-    const token = this.generateDevToken({
-      id: user.id,
-      identitySubject: user.identitySubject,
-      email: user.email || undefined,
-      name: user.displayName,
-    });
-
+    // 3. NO authenticated JWT for unverified registrations.
+    // Session activation requires verified UAE PASS OIDC or proven email/phone ownership.
     return {
       success: true,
       userId: user.id,
+      registrationId: user.id,
       email: user.email || dto.email,
       tier: dto.tier,
-      accessToken: token,
-      message: `VIP ${dto.tier.toUpperCase()} registration completed under UAE PDPL consent framework`,
+      status: 'PENDING_VERIFICATION',
+      requiresVerification: true,
+      message: `Registration received under UAE Federal PDPL consent framework. Account is pending verification via UAE PASS before activation.`,
     };
   }
 }

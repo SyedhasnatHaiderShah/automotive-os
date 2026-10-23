@@ -12,16 +12,15 @@ export class AuthController {
 
   @Public()
   @Post('token')
-  @ApiOperation({ summary: 'Obtain test JWT token for development and integration test suites' })
+  @ApiOperation({ summary: 'Obtain test JWT token for local development and test builds only' })
   @ApiResponse({ status: 200, type: AuthTokenResponseDto })
   async getDevToken(@Body() dto: DevLoginDto): Promise<AuthTokenResponseDto> {
     const isProductionOrStaging =
       process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
-    const isDevTokenEnabled = process.env.ENABLE_DEV_TOKEN === 'true';
 
-    if (isProductionOrStaging && !isDevTokenEnabled) {
+    if (isProductionOrStaging) {
       throw new ForbiddenException(
-        'Development JWT token issuance is strictly disabled in staging and production environments'
+        'Development JWT token issuance is strictly prohibited in staging and production environments'
       );
     }
 
