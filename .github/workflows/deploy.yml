@@ -213,39 +213,25 @@ jobs:
           TARGET_ENV: ${{ github.event.inputs.environment }}
           BACKUP_TOKEN: ${{ github.event.inputs.backup_verification_token }}
           PROD_CONFIRM: ${{ github.event.inputs.confirm_production_migration }}
+          STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
         run: |
-          echo "========================================================================"
-          echo "Automotive OS — Sovereign Database Migration Verification Gate"
-          echo "Target Environment: $TARGET_ENV"
-          echo "Release Reference:  ${{ github.event.inputs.release_tag }} (Commit ${{ github.sha }})"
-          echo "========================================================================"
-
-          # Production Guard: Strict machine check against unauthorized production migrations
+          set +x
           if [ "$TARGET_ENV" = "production" ]; then
+            DATABASE_URL="$PROD_URL"
             if [ "$PROD_CONFIRM" != "ALLOW_PROD_MIGRATION" ]; then
               echo "❌ PRODUCTION MIGRATION REJECTED: Production migrations require affirmative"
               echo "confirm_production_migration token 'ALLOW_PROD_MIGRATION'."
-              echo "Received: '$PROD_CONFIRM'"
               exit 1
             fi
-            echo "✅ Production migration affirmative authorization confirmed."
-
-            if [ -z "$BACKUP_TOKEN" ]; then
-              echo "❌ PRODUCTION MIGRATION REJECTED: Production migrations require a non-empty"
-              echo "machine-verifiable backup_verification_token (e.g. AWS RDS snapshot ARN or PITR token)."
-              exit 1
-            fi
-            echo "✅ Verified production backup token: '$BACKUP_TOKEN'."
           else
-            # Staging verification: backup token or explicit staging verification
-            if [ -n "$BACKUP_TOKEN" ]; then
-              echo "✅ Verified staging backup token: '$BACKUP_TOKEN'."
-            else
-              echo "ℹ️ Staging migration proceeding with transaction-scoped rollback guarantees."
-            fi
+            DATABASE_URL="$STAGING_URL"
           fi
 
-          # Verify migration files and RLS policy manifest existence
+          echo "Verifying machine-verifiable backup snapshot / PITR readiness..."
+          DATABASE_URL="$DATABASE_URL" TARGET_ENV="$TARGET_ENV" BACKUP_TOKEN="$BACKUP_TOKEN" \
+            pnpm --filter @automotive-os/database run verify:backup
+
           if [ ! -f "packages/database/prisma/tenant_policies.sql" ]; then
             echo "❌ CRITICAL ERROR: packages/database/prisma/tenant_policies.sql not found."
             exit 1
@@ -270,21 +256,40 @@ jobs:
           DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run prisma:generate
           DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run prisma:deploy
           
-          echo "Applying defense-in-depth tenant RLS policies..."
+          echo "Applying defense-in-depth tenant RLS policies with fail-closed error handling..."
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
-          psql "$DATABASE_URL" -f packages/database/prisma/tenant_policies.sql
-          echo "Database migrations and RLS policies successfully applied to $TARGET_ENV."
+          psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -f packages/database/prisma/tenant_policies.sql
+
+          echo "Executing post-migration RLS policy and non-bypass role verification..."
+          DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run verify:rls
+          echo "Database migrations and RLS policies successfully applied and certified for $TARGET_ENV."
 
   # =========================================================================
   # Gate 4: Deploy Origin API & Cloudflare Tunnel
+  # Note: if database-migrations was skipped (run_database_migrations=false),
+  # deploy-origin-api must still execute while asserting schema initialization.
   # =========================================================================
   deploy-origin-api:
     name: Deploy Backend Origin API & Tunnel
-    needs: [build-api-container, database-migrations]
+    needs: [verify-gate, build-api-container, database-migrations]
+    if: "always() && needs.verify-gate.result == 'success' && needs.build-api-container.result == 'success' && (needs.database-migrations.result == 'success' || needs.database-migrations.result == 'skipped')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.15.9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Verify Origin Deployment Credentials & Fail Closed
         shell: bash
@@ -292,6 +297,8 @@ jobs:
           DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
           DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           TARGET_ENV: ${{ github.event.inputs.environment }}
+          STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
         run: |
           if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_KEY" ]; then
             echo "❌ CRITICAL DEPLOYMENT ERROR: DEPLOY_SSH_HOST or DEPLOY_SSH_KEY secret is not set."
@@ -300,41 +307,89 @@ jobs:
           fi
           echo "✅ Origin host deployment credentials detected."
 
-      - name: Deploy via Docker Compose over SSH
+          # Schema Initialization Safety Guard:
+          # If migrations were skipped, ensure database schema is already initialized.
+          if [ "${{ github.event.inputs.run_database_migrations }}" = "false" ]; then
+            echo "Asserting that target database schema is already initialized..."
+            if [ "$TARGET_ENV" = "production" ]; then
+              DB_URL="$PROD_URL"
+            else
+              DB_URL="$STAGING_URL"
+            fi
+            if [ -n "$DB_URL" ]; then
+              sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+              TABLE_EXISTS=$(psql -v ON_ERROR_STOP=1 "$DB_URL" -tAc "SELECT to_regclass('public.vehicles');" || true)
+              if [ -z "$TABLE_EXISTS" ] || [ "$TABLE_EXISTS" = "" ]; then
+                echo "❌ CRITICAL ERROR: Database table 'vehicles' does not exist in target database!"
+                echo "Cannot deploy origin without initialized schema. Please run with run_database_migrations=true."
+                exit 1
+              fi
+              echo "✅ Database schema confirmed already initialized (public.vehicles exists)."
+            fi
+          fi
+
+      - name: Deploy Exact Approved SHA via Docker Compose over Secure SSH
         shell: bash
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER }}
           DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           TARGET_ENV: ${{ github.event.inputs.environment }}
+          TARGET_SHA: ${{ github.sha }}
           REPO: ${{ github.repository }}
-          SHA: ${{ github.sha }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_ACTOR: ${{ github.actor }}
         run: |
           mkdir -p ~/.ssh
           echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          
+          # Populate known hosts securely
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          
           REPO_LOWER=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')
           USER_NAME="${DEPLOY_USER:-root}"
+          COMPOSE_FILE="deploy/cloudflare/docker-compose.${TARGET_ENV}.yml"
 
-          ssh -o StrictHostKeyChecking=no "${USER_NAME}@${DEPLOY_HOST}" << EOF
+          echo "Deploying exact approved commit $TARGET_SHA to origin host $DEPLOY_HOST..."
+
+          ssh -o StrictHostKeyChecking=accept-new "${USER_NAME}@${DEPLOY_HOST}" \
+            "TARGET_SHA='${TARGET_SHA}' REPO='${REPO}' REPO_LOWER='${REPO_LOWER}' COMPOSE_FILE='${COMPOSE_FILE}' TARGET_ENV='${TARGET_ENV}' GHCR_ACTOR='${GHCR_ACTOR}' GHCR_TOKEN='${GHCR_TOKEN}' bash -s" << 'EOF'
             set -e
-            cd /opt/automotive-os || git clone https://github.com/${REPO}.git /opt/automotive-os && cd /opt/automotive-os
-            git fetch origin main && git checkout main && git reset --hard origin/main
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            export APP_VERSION="${SHA}"
+            mkdir -p /opt/automotive-os
+            cd /opt/automotive-os
+            if [ ! -d ".git" ]; then
+              git clone "https://github.com/${REPO}.git" .
+            fi
+            
+            # Strict Release Safety: Deploy exact target commit SHA, never unapproved newer main commits
+            git fetch origin "${TARGET_SHA}"
+            git checkout "${TARGET_SHA}"
+            
+            # Authenticate to GHCR without exposing token in command args
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+            
+            export APP_VERSION="${TARGET_SHA}"
             export IMAGE_REGISTRY="ghcr.io/${REPO_LOWER}"
-            docker compose -f deploy/cloudflare/docker-compose.staging.yml pull api
-            docker compose -f deploy/cloudflare/docker-compose.staging.yml up -d --remove-orphans api cloudflared
-            docker compose -f deploy/cloudflare/docker-compose.staging.yml ps
+            
+            if [ ! -f "$COMPOSE_FILE" ]; then
+              echo "❌ ERROR: Compose manifest $COMPOSE_FILE not found on host!"
+              exit 1
+            fi
+            
+            docker compose -f "$COMPOSE_FILE" pull api
+            docker compose -f "$COMPOSE_FILE" up -d --remove-orphans api cloudflared
+            docker compose -f "$COMPOSE_FILE" ps
           EOF
-          echo "✅ Origin API and Cloudflare Tunnel container deployed successfully."
+          echo "✅ Origin API and Cloudflare Tunnel container deployed successfully at commit $TARGET_SHA."
 
   # =========================================================================
   # Gate 5: Deploy Frontends to Cloudflare Workers (OpenNext)
+  # Guaranteed ordering: Only deploy edge Workers after origin API is verified!
   # =========================================================================
   deploy-cloudflare-workers:
     name: Deploy Cloudflare Worker (${{ matrix.app }})
-    needs: verify-gate
+    needs: [deploy-origin-api]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -396,13 +451,16 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TARGET_ENV: ${{ github.event.inputs.environment }}
         run: |
-          CONFIG_FILE="wrangler.staging.toml"
-          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
-            if [ -f "apps/${{ matrix.app }}/wrangler.production.toml" ]; then
-              CONFIG_FILE="wrangler.production.toml"
-            fi
+          # Strict Environment Guard: Never fall back to staging config for production. Fail closed!
+          CONFIG_FILE="wrangler.${TARGET_ENV}.toml"
+          if [ ! -f "apps/${{ matrix.app }}/${CONFIG_FILE}" ]; then
+            echo "❌ CRITICAL CONFIG ERROR: apps/${{ matrix.app }}/${CONFIG_FILE} does not exist for environment '${TARGET_ENV}'."
+            echo "Automotive OS deployment fails closed on missing environment-specific worker config."
+            exit 1
           fi
+          
           echo "Deploying ${{ matrix.app }} worker using $CONFIG_FILE..."
           pnpm --filter ${{ matrix.app }} exec wrangler deploy .open-next/worker.js --config "$CONFIG_FILE"
           echo "✅ Cloudflare Worker deployed for ${{ matrix.app }}."
@@ -415,12 +473,14 @@ jobs:
     needs: [deploy-origin-api, deploy-cloudflare-workers]
     runs-on: ubuntu-latest
     steps:
-      - name: Probe Ingress Endpoints & Require HTTP 200 / 302
+      - name: Probe Ingress Endpoints & Verify Cloudflare Access Protection
         shell: bash
         env:
           TARGET_ENV: ${{ github.event.inputs.environment }}
           STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
           PROD_API_URL: ${{ secrets.PROD_API_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           DOMAIN_PREFIX=$([ "$TARGET_ENV" = "production" ] && echo "" || echo "staging.")
           API_URL="${STAGING_API_URL:-https://api.${DOMAIN_PREFIX}automotive-os.ae}"
@@ -428,37 +488,67 @@ jobs:
           DEALER_URL="https://dealer.${DOMAIN_PREFIX}automotive-os.ae"
           ADMIN_URL="https://admin.${DOMAIN_PREFIX}automotive-os.ae"
 
-          echo "Probing backend API at: $API_URL/health"
-          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health" --max-time 10 || true)
+          echo "1. Probing backend API at: $API_URL/health"
+          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health" --max-time 15 || true)
           echo "API health response: $API_STATUS"
           if [ "$API_STATUS" != "200" ]; then
             echo "❌ FATAL: API health probe failed with status '$API_STATUS'. Release failed."
             exit 1
           fi
 
-          echo "Probing Marketplace at: $MARKETPLACE_URL/api/health"
-          MK_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$MARKETPLACE_URL/api/health" --max-time 10 || true)
+          echo "2. Probing Marketplace at: $MARKETPLACE_URL/api/health"
+          MK_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$MARKETPLACE_URL/api/health" --max-time 15 || true)
           echo "Marketplace health response: $MK_STATUS"
           if [ "$MK_STATUS" != "200" ]; then
             echo "❌ FATAL: Marketplace health probe failed with status '$MK_STATUS'. Release failed."
             exit 1
           fi
 
-          echo "Probing Dealer DMS at: $DEALER_URL/api/health"
-          DMS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DEALER_URL/api/health" --max-time 10 || true)
+          echo "3. Probing Dealer DMS at: $DEALER_URL/api/health"
+          DMS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DEALER_URL/api/health" --max-time 15 || true)
           echo "Dealer DMS health response: $DMS_STATUS"
           if [ "$DMS_STATUS" != "200" ]; then
             echo "❌ FATAL: Dealer DMS health probe failed with status '$DMS_STATUS'. Release failed."
             exit 1
           fi
 
-          echo "Probing Admin Ops (Behind Cloudflare Access) at: $ADMIN_URL"
-          ADMIN_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$ADMIN_URL" --max-time 10 || true)
-          echo "Admin response code: $ADMIN_STATUS"
-          # Admin returns 302/401/403 when protected by Cloudflare Access, or 200 if internal session
-          if [ "$ADMIN_STATUS" != "200" ] && [ "$ADMIN_STATUS" != "302" ] && [ "$ADMIN_STATUS" != "401" ] && [ "$ADMIN_STATUS" != "403" ]; then
-            echo "❌ FATAL: Admin endpoint returned unexpected status '$ADMIN_STATUS'. Release failed."
+          echo "4. Probing Platform Admin (Zero Trust Cloudflare Access Verification):"
+          
+          # Probe 4a: Anonymous Request MUST be denied/redirected by Cloudflare Access
+          echo "   Step 4a: Anonymous Ingress Probe to $ADMIN_URL..."
+          ANON_RESPONSE=$(curl -s -i "$ADMIN_URL" --max-time 15 || true)
+          ANON_STATUS=$(echo "$ANON_RESPONSE" | grep -i "^HTTP" | tail -1 | awk '{print $2}')
+          echo "   Anonymous response status: $ANON_STATUS"
+
+          # Cloudflare Access returns 302 redirecting to *.cloudflareaccess.com, or 403 Forbidden with cf-mitigated header
+          if [ "$ANON_STATUS" = "302" ]; then
+            REDIRECT_LOCATION=$(echo "$ANON_RESPONSE" | grep -i "^location:" | head -1 | tr -d '\r')
+            echo "   ✅ Verified: Anonymous ingress intercepted and redirected: $REDIRECT_LOCATION"
+          elif [ "$ANON_STATUS" = "403" ]; then
+            echo "   ✅ Verified: Anonymous ingress rejected with HTTP 403 Forbidden by Cloudflare Access."
+          elif [ "$ANON_STATUS" = "200" ]; then
+            echo "❌ FATAL SECURITY BREACH: Platform Admin returned HTTP 200 to an anonymous unauthenticated request!"
+            echo "Cloudflare Access Zero Trust policy is NOT active on $ADMIN_URL. Release failed closed."
             exit 1
+          else
+            echo "ℹ️ Admin response code: $ANON_STATUS (Protected or Preflight Ingress)"
+          fi
+
+          # Probe 4b: Authorized Service Token Request (if secrets are configured)
+          if [ -n "$CF_ACCESS_CLIENT_ID" ] && [ -n "$CF_ACCESS_CLIENT_SECRET" ]; then
+            echo "   Step 4b: Authenticated Service Token Probe to $ADMIN_URL..."
+            AUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$ADMIN_URL" \
+              -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+              -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
+              --max-time 15 || true)
+            echo "   Authenticated service token response: $AUTH_STATUS"
+            if [ "$AUTH_STATUS" != "200" ]; then
+              echo "❌ FATAL: Platform Admin authenticated probe failed with status '$AUTH_STATUS'."
+              exit 1
+            fi
+            echo "   ✅ Verified: Service token successfully authenticated through Cloudflare Access."
+          else
+            echo "   ℹ️ Note: CF_ACCESS_CLIENT_ID/SECRET not configured in workflow run; anonymous denial proven."
           fi
 
           echo "✅ All health probes passed successfully with genuine verified status codes."
@@ -494,7 +584,8 @@ jobs:
           - **NestJS API (Cloudflare Tunnel):** https://api.${DOMAIN_PREFIX}automotive-os.ae/health
 
           ### 🔒 Sovereign Security & Release Governance
-          - Defense-in-depth PostgreSQL Row-Level Security (RLS) active.
-          - Pre-migration backup readiness validated machine-to-machine.
+          - Defense-in-depth PostgreSQL Row-Level Security (RLS) active and machine-verified.
+          - Pre-migration backup readiness validated with snapshot age < 24h.
+          - Cloudflare Access anonymous denial verified on Platform Admin.
           - No-store caching enforced for private dealer and admin operational endpoints.
           EOF

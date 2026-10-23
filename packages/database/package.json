@@ -8,10 +8,12 @@
     "prisma:generate": "prisma generate",
     "prisma:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
+    "verify:backup": "tsx scripts/verify-backup-snapshot.ts",
+    "verify:rls": "tsx scripts/verify-rls-post-migration.ts",
     "build": "prisma generate && tsc",
     "typecheck": "tsc --noEmit",
     "lint": "echo \"database lint passed\"",
-    "test": "tsx test/rls-isolation.test.ts",
+    "test": "tsx test/rls-isolation.test.ts && tsx test/backup-and-rls-verification.test.ts",
     "clean": "rimraf dist"
   },
   "dependencies": {

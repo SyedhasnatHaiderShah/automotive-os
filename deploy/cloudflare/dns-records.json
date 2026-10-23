@@ -6,37 +6,72 @@
     {
       "type": "CNAME",
       "name": "api.staging",
-      "content": "${TUNNEL_ID}.cfargotunnel.com",
+      "content": "${TUNNEL_ID_STAGING}.cfargotunnel.com",
       "proxied": true,
-      "comment": "Cloudflare Tunnel Ingress to Sovereign UAE Origin Node 22 API"
+      "comment": "Cloudflare Tunnel Ingress to Staging UAE Origin Node 22 API"
     },
     {
       "type": "CNAME",
       "name": "marketplace.staging",
       "content": "automotive-os-marketplace-staging.syedhasnathaidershah.workers.dev",
       "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Buyer Marketplace"
+      "comment": "Cloudflare Worker Custom Domain for Staging Buyer Marketplace"
     },
     {
       "type": "CNAME",
       "name": "dealer.staging",
       "content": "automotive-os-dealer-staging.syedhasnathaidershah.workers.dev",
       "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Dealer DMS Cockpit"
+      "comment": "Cloudflare Worker Custom Domain for Staging Dealer DMS Cockpit"
     },
     {
       "type": "CNAME",
       "name": "admin.staging",
       "content": "automotive-os-admin-staging.syedhasnathaidershah.workers.dev",
       "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Platform Admin (Zero Trust Access Gated)"
+      "comment": "Cloudflare Worker Custom Domain for Staging Platform Admin (Zero Trust Access Gated)"
     },
     {
       "type": "CNAME",
       "name": "media.staging",
       "content": "public.r2.dev",
       "proxied": true,
-      "comment": "Cloudflare R2 Custom Domain for Public Vehicle Media"
+      "comment": "Cloudflare R2 Custom Domain for Staging Public Vehicle Media"
+    },
+    {
+      "type": "CNAME",
+      "name": "api",
+      "content": "${TUNNEL_ID_PROD}.cfargotunnel.com",
+      "proxied": true,
+      "comment": "Cloudflare Tunnel Ingress to Production Sovereign UAE Origin Node 22 API"
+    },
+    {
+      "type": "CNAME",
+      "name": "marketplace",
+      "content": "automotive-os-marketplace-production.syedhasnathaidershah.workers.dev",
+      "proxied": true,
+      "comment": "Cloudflare Worker Custom Domain for Production Buyer Marketplace"
+    },
+    {
+      "type": "CNAME",
+      "name": "dealer",
+      "content": "automotive-os-dealer-production.syedhasnathaidershah.workers.dev",
+      "proxied": true,
+      "comment": "Cloudflare Worker Custom Domain for Production Dealer DMS Cockpit"
+    },
+    {
+      "type": "CNAME",
+      "name": "admin",
+      "content": "automotive-os-admin-production.syedhasnathaidershah.workers.dev",
+      "proxied": true,
+      "comment": "Cloudflare Worker Custom Domain for Production Platform Admin (Zero Trust Access Gated)"
+    },
+    {
+      "type": "CNAME",
+      "name": "media",
+      "content": "public.r2.dev",
+      "proxied": true,
+      "comment": "Cloudflare R2 Custom Domain for Production Public Vehicle Media"
     }
   ]
 }

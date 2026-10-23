@@ -2,7 +2,7 @@
   "$schema": "https://developers.cloudflare.com/cloudflare-one/policies/access/",
   "version": "2026-10-23",
   "application": {
-    "name": "Automotive OS — Platform Admin Staging",
+    "name": "Automotive OS — Platform Admin",
     "domain": "admin.staging.automotive-os.ae",
     "type": "self_hosted",
     "session_duration": "12h",
@@ -31,6 +31,17 @@
         {
           "login_method": {
             "require_mfa": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Allow Synthetic CI/CD Monitoring Service Token",
+      "decision": "non_identity",
+      "include": [
+        {
+          "service_token": {
+            "token_id": "${CF_ACCESS_SERVICE_TOKEN_ID}"
           }
         }
       ]
