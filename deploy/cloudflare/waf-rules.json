@@ -1,0 +1,61 @@
+{
+  "$schema": "https://developers.cloudflare.com/waf/custom-rules/",
+  "version": "2026-10-23",
+  "waf_rules": [
+    {
+      "description": "Block Known Malicious Actors & Tor Exit Nodes",
+      "expression": "(ip.geoip.is_in_european_union eq false and cf.threat_score gt 40) or (ip.geoip.asnum in {13335, 9009})",
+      "action": "block"
+    },
+    {
+      "description": "Rate Limit Authentication Endpoints — Prevent Credential Stuffing",
+      "expression": "http.request.uri.path contains \"/api/v1/auth/\" and http.request.method in {\"POST\", \"PUT\"}",
+      "action": "rate_limit",
+      "ratelimit": {
+        "characteristics": [
+          "cf.unique_visitor_id"
+        ],
+        "period": 60,
+        "requests_per_period": 10,
+        "mitigation_action": "block",
+        "mitigation_timeout": 300
+      }
+    },
+    {
+      "description": "Rate Limit Public Marketplace Search & Inventory Feeds",
+      "expression": "http.request.uri.path contains \"/api/v1/marketplace/search\" and http.request.method eq \"GET\"",
+      "action": "rate_limit",
+      "ratelimit": {
+        "characteristics": [
+          "cf.unique_visitor_id"
+        ],
+        "period": 60,
+        "requests_per_period": 120,
+        "mitigation_action": "managed_challenge",
+        "mitigation_timeout": 60
+      }
+    }
+  ],
+  "managed_rulesets": [
+    {
+      "id": "cloudflare_owasp_core_ruleset",
+      "enabled": true,
+      "paranoia_level": 2,
+      "action": "block"
+    },
+    {
+      "id": "cloudflare_managed_ruleset",
+      "enabled": true,
+      "action": "block"
+    }
+  ],
+  "edge_transform_rules": {
+    "security_headers": {
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+    }
+  }
+}

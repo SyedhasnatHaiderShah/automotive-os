@@ -27,7 +27,7 @@ permissions:
   deployments: write
 
 concurrency:
-  group: deployment-${{ inputs.environment }}
+  group: deployment-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
   # Gate 1: Monorepo Release Verification & Mandatory Quality Assurance
   # =========================================================================
   verify-gate:
-    name: Mandatory Quality & Release Gate (${{ inputs.environment }})
+    name: Mandatory Quality & Release Gate
     runs-on: ubuntu-latest
     steps:
       - name: Verify Affirmative Release Confirmation
@@ -163,7 +163,7 @@ jobs:
   # Gate 3: Database Migrations & Defense-in-Depth RLS Policies (Gated)
   # =========================================================================
   database-migrations:
-    name: Apply Database Migrations & RLS (${{ inputs.environment }})
+    name: Apply Database Migrations & RLS
     needs: verify-gate
     runs-on: ubuntu-latest
     environment:
@@ -205,9 +205,17 @@ jobs:
       - name: Execute Prisma Migration Deploy & Apply RLS Policies
         shell: bash
         env:
-          DATABASE_URL: ${{ inputs.environment == 'production' && secrets.PROD_DATABASE_URL || secrets.STAGING_DATABASE_URL }}
+          TARGET_ENV: ${{ inputs.environment }}
+          STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
         run: |
           set +x
+          if [ "$TARGET_ENV" = "production" ]; then
+            DATABASE_URL="$PROD_URL"
+          else
+            DATABASE_URL="$STAGING_URL"
+          fi
+
           if [ -n "$DATABASE_URL" ]; then
             echo "Target environment database secret detected. Running Prisma migration deploy..."
             pnpm --filter @automotive-os/database run prisma:generate
@@ -216,9 +224,9 @@ jobs:
             echo "Applying defense-in-depth tenant RLS policies..."
             sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
             psql "$DATABASE_URL" -f packages/database/prisma/tenant_policies.sql
-            echo "Database migrations and RLS policies successfully applied to ${{ inputs.environment }}."
+            echo "Database migrations and RLS policies successfully applied to $TARGET_ENV."
           else
-            echo "NOTICE: Database secret for environment '${{ inputs.environment }}' is not configured."
+            echo "NOTICE: Database secret for environment '$TARGET_ENV' is not configured."
             echo "Validating migration integrity and Prisma client generation locally..."
             pnpm --filter @automotive-os/database run prisma:generate
             echo "Schema syntax and migration manifests validated successfully."
@@ -228,12 +236,11 @@ jobs:
   # Gate 4: Controlled Infrastructure Deployment Rollout
   # =========================================================================
   deploy-infrastructure:
-    name: Deploy to ${{ inputs.environment }} Environment
+    name: Deploy Infrastructure Rollout
     needs: [build-and-push-images, database-migrations]
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ inputs.environment == 'production' && 'https://marketplace.automotive-os.ae' || 'https://marketplace.staging.automotive-os.ae' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -340,23 +347,25 @@ jobs:
   # Gate 5: Post-Deployment Liveness & Readiness Probes
   # =========================================================================
   health-probes:
-    name: Post-Deployment Health Probes (${{ inputs.environment }})
+    name: Post-Deployment Health Probes
     needs: deploy-infrastructure
     runs-on: ubuntu-latest
     steps:
       - name: Probe API Health Endpoint
         shell: bash
+        env:
+          TARGET_ENV: ${{ inputs.environment }}
+          STAGING_URL: ${{ secrets.STAGING_API_URL }}
+          PROD_URL: ${{ secrets.PROD_API_URL }}
         run: |
-          ENV="${{ inputs.environment }}"
-          if [ "$ENV" = "production" ]; then
+          if [ "$TARGET_ENV" = "production" ]; then
             DEFAULT_URL="https://api.automotive-os.ae"
-            SECRET_URL="${{ secrets.PROD_API_URL }}"
+            PROBE_URL="${PROD_URL:-$DEFAULT_URL}"
           else
             DEFAULT_URL="https://api.staging.automotive-os.ae"
-            SECRET_URL="${{ secrets.STAGING_API_URL }}"
+            PROBE_URL="${STAGING_URL:-$DEFAULT_URL}"
           fi
           
-          PROBE_URL="${SECRET_URL:-$DEFAULT_URL}"
           echo "Testing API probe at $PROBE_URL/health..."
 
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PROBE_URL/health" --max-time 5 || true)
