@@ -1,12 +1,12 @@
 # Automotive OS — Monorepo Release Manifest
 
-**Release Version:** `1.2.0-staging.2`  
-**Git Baseline Commit:** `6accba5` (Merged Security Hardening PR #1)  
+**Release Version:** `1.2.0-staging.3`  
+**Git Baseline Commit:** `d0de094` (Merged Security Hardening PR #1)  
 **Target Environment:** Staging / Controlled Pilot (UAE Region: `me-central-1`)  
 **Release Engineering Lead:** Autonomous Release Orchestrator (Antigravity)  
 **Standard Governance:** [`docs/implementation/QA_GATES.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/QA_GATES.md) & [`docs/implementation/INTEGRATION_TRUTH_TABLE.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/INTEGRATION_TRUTH_TABLE.md)  
 **Reference Design System:** Stitch Obsidian & Studio Glass (Project `4467699827252507387`, 31 Screens Mapped)  
-**Release Hardening Branch:** `fix/final-release-hardening`  
+**Release Hardening Branch:** `fix/ag20-ci-deployment-safety`  
 
 ---
 

@@ -1,0 +1,30 @@
+# ==============================================================================
+# Cloudflare Pages / Workers Staging Manifest — Dealer Cockpit (DMS)
+# Application: apps/dealer
+# Target: https://dealer.staging.automotive-os.ae
+# ==============================================================================
+
+name = "automotive-os-dealer-staging"
+compatibility_date = "2026-10-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Build output configuration for OpenNext (@opennextjs/cloudflare)
+pages_build_output_dir = ".vercel/output/static"
+
+[vars]
+NEXT_PUBLIC_APP_ENV = "staging"
+NEXT_PUBLIC_API_URL = "https://api.staging.automotive-os.ae"
+NEXT_PUBLIC_STORAGE_URL = "https://media.staging.automotive-os.ae"
+NEXT_PUBLIC_DEALER_URL = "https://dealer.staging.automotive-os.ae"
+NEXT_PUBLIC_DEFAULT_LOCALE = "en"
+NEXT_PUBLIC_SUPPORTED_LOCALES = "en,ar"
+NEXT_PUBLIC_DEFAULT_CURRENCY = "AED"
+
+# Observability and edge logs
+[observability]
+enabled = true
+
+# Route bindings (configured via Cloudflare Dashboard or CI deploy)
+# [[routes]]
+# pattern = "dealer.staging.automotive-os.ae/*"
+# zone_name = "automotive-os.ae"

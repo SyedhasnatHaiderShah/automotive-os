@@ -6,22 +6,25 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "prisma:generate": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy",
+    "seed": "tsx prisma/seed.ts",
     "build": "prisma generate && tsc",
     "typecheck": "tsc --noEmit",
     "lint": "echo \"database lint passed\"",
-    "test": "npx -y tsx test/rls-isolation.test.ts",
+    "test": "tsx test/rls-isolation.test.ts",
     "clean": "rimraf dist"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1"
   },
   "prisma": {
-    "seed": "npx -y tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "devDependencies": {
     "@automotive-os/config": "workspace:*",
     "prisma": "^6.4.1",
     "rimraf": "^6.0.1",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   }
 }
