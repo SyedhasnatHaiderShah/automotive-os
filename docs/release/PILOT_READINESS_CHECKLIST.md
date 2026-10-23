@@ -36,17 +36,17 @@
 - [x] **Timezone Standard:** Timestamps persisted in UTC (`TIMESTAMPTZ`) and rendered in `Asia/Dubai` (UTC+4).
 - [x] **Bi-Directional RTL:** English (`en`, LTR) and Arabic (`ar`, RTL) switch dynamically via root `dir="rtl"`.
 
-### 1.4 Third-Party Integrations & Guardrail Safety Flags
-- [x] **UAE PASS SSO:** `FEATURE_FLAG_UAE_PASS_LIVE=false` — OIDC adapter active with local session fallback; displays "Sandbox" badge.
-- [x] **DED Commercial Registry:** `FEATURE_FLAG_DED_LIVE=false` — Manual trade license audit dossier with reviewer logging.
-- [x] **RTA Tasjeel Inspections:** `FEATURE_FLAG_RTA_TASJEEL_LIVE=false` — 34-point MPI inspection display; certificates shown only with attached provenance documents.
-- [x] **VIN Salvage / Stolen Registry:** `FEATURE_FLAG_VIN_REGISTRY_LIVE=false` — Manual inspection review desk; no counterfeit "cleared" badges.
-- [x] **AECB Credit Bureau:** `FEATURE_FLAG_AECB_LIVE=false` — Consent capture active; automated credit check button disabled.
-- [x] **Lender Underwriting / DBR:** `FEATURE_FLAG_BANK_OFFERS_LIVE=false` — 50% DBR / 85% LTV rules engine with indicative disclaimer.
-- [x] **FTA E-Invoicing / Peppol:** `FEATURE_FLAG_FTA_PEPPOL_LIVE=false` — Base64 TLV QR code and Peppol UBL XML exported in draft/staging status.
-- [x] **Escrow Banking Custody:** `FEATURE_FLAG_ESCROW_CUSTODY_LIVE=false` — Dispute case state machine active; automated disbursement disabled.
-- [x] **Dubai Courts Injunctions:** `FEATURE_FLAG_COURTS_FEED_LIVE=false` — Execution order intake and Article 99 interpleader escrow filing workflow.
-- [x] **Dubai Customs Export Mirsal:** `FEATURE_FLAG_CUSTOMS_MIRSAL_LIVE=false` — Configurable 90-day statutory countdown timer.
+### 1.4 Third-Party Integrations & Guardrail Safety Flags ("Coming Soon" Go-Live Posture)
+- [x] **UAE PASS SSO:** `FEATURE_FLAG_UAE_PASS_LIVE=false` — Badged as "Live Rail: Coming Soon" / "قريباً: الربط المباشر"; local username/password & safe sandbox session active.
+- [x] **DED Commercial Registry:** `FEATURE_FLAG_DED_LIVE=false` — Badged as "Registry Feed: Coming Soon"; manual trade license audit dossier with reviewer logging.
+- [x] **RTA Tasjeel Inspections:** `FEATURE_FLAG_RTA_TASJEEL_LIVE=false` — Badged as "Live Inspection Sync: Coming Soon"; 34-point MPI inspection display active only with attached provenance documents.
+- [x] **VIN Salvage / Stolen Registry:** `FEATURE_FLAG_VIN_REGISTRY_LIVE=false` — Badged as "Salvage Feed: Coming Soon"; manual inspection review desk active.
+- [x] **AECB Credit Bureau:** `FEATURE_FLAG_AECB_LIVE=false` — Badged as "Direct Bureau Feed: Coming Soon"; consent capture active, automated query button disabled.
+- [x] **Lender Underwriting / DBR:** `FEATURE_FLAG_BANK_OFFERS_LIVE=false` — Badged as "Live Syndicate API: Coming Soon"; 50% DBR / 85% LTV rules engine with indicative disclaimer.
+- [x] **FTA E-Invoicing / Peppol:** `FEATURE_FLAG_FTA_PEPPOL_LIVE=false` — Badged as "Live Peppol Exchange: Coming Soon"; Base64 TLV QR code and Peppol UBL XML exported in draft/staging status.
+- [x] **Escrow Banking Custody:** `FEATURE_FLAG_ESCROW_CUSTODY_LIVE=false` — Badged as "Live Bank Escrow: Coming Soon"; dispute case state machine active; automated fund disbursement disabled.
+- [x] **Dubai Courts Injunctions:** `FEATURE_FLAG_COURTS_FEED_LIVE=false` — Badged as "Live Courts Feed: Coming Soon"; execution order intake and Article 99 interpleader escrow filing workflow.
+- [x] **Dubai Customs Export Mirsal:** `FEATURE_FLAG_CUSTOMS_MIRSAL_LIVE=false` — Badged as "Live Mirsal Sync: Coming Soon"; configurable 90-day statutory countdown timer.
 
 ---
 
@@ -87,10 +87,12 @@ For the duration of the controlled pilot (2–5 dealerships):
   Security & PostgreSQL Tenancy:          [APPROVED] 100% Pass (Forced RLS & Composite FKs)
   Sovereign Identity & Auth Suite:        [APPROVED] 100% Pass (UAE PASS / FIDO2 / PIN)
   Buyer Privacy & UAE PDPL:               [APPROVED] 100% Pass (Field-Level Consent Grants)
-  Integration Guardrails:                 [APPROVED] Safe Fallbacks Active (0 Fake Claims)
+  Integration Guardrails ("Coming Soon"): [APPROVED] "Coming Soon" Badges & Safe Fallbacks Active
   Localization & Currency:                [APPROVED] AED Fils & Asia/Dubai UTC+4
+  Container & DB Staging Pipeline:        [APPROVED] Docker CLI 29.9.2 Installed & DB Provisioned
 ========================================================================================
-  FORMAL VERDICT:                         GO FOR CONTROLLED UAE DEALERSHIP PILOT
+  FORMAL VERDICT:                         GO FOR UAE LAUNCH / CONTROLLED DEALERSHIP PILOT
+                                          (OPERATING WITH THIRD-PARTY RAILS "COMING SOON")
 ========================================================================================
 ```
 

@@ -32,7 +32,8 @@ This version (v1.2.0) incorporates the complete **5-screen Sovereign Identity & 
   Active Regressions:                    0 detected (Cohorts A through H all passing)
   Critical / High Open Defects:          0 open defects
 ========================================================================================
-  UAE PILOT RECOMMENDATION:              GO (FOR CONTROLLED CLOSED DEALER PILOT)
+  UAE PILOT RECOMMENDATION:              GO (FOR CONTROLLED DEALERSHIP PILOT)
+                                         (OPERATING WITH THIRD-PARTY RAILS "COMING SOON")
 ========================================================================================
 ```
 
@@ -123,9 +124,9 @@ All tests were re-executed deterministically against the current codebase:
 
 ---
 
-## 4. Provider Integrations Truth Table
+## 4. Provider Integrations Truth Table ("Coming Soon" Go-Live Posture)
 
-Per [`INTEGRATION_TRUTH_TABLE.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/INTEGRATION_TRUTH_TABLE.md), no fake certifications or mock APIs are marked live in production:
+Per leadership direction and [`INTEGRATION_TRUTH_TABLE.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/INTEGRATION_TRUTH_TABLE.md), the platform is authorized to **Go-Live immediately without live external rails**, with all third-party integrations explicitly designated in the UI as **"Coming Soon"** (or Arabic **"قريباً"**):
 
 | Integration Rail | Status Category | Current Behavior in Monorepo | Requirement for Live Production |
 |---|---|---|---|

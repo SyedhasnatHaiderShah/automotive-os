@@ -132,7 +132,7 @@ export default function RegisterPage() {
             <div className="hidden xl:flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full border border-tertiary/20">
               <ShieldCheck className="w-4 h-4 text-tertiary" />
               <span className="text-[11px] font-mono text-tertiary uppercase tracking-wider font-semibold">
-                {isArabic ? 'متوافق مع الهوية الرقمية UAE PASS' : 'UAE PASS Ready'}
+                {isArabic ? 'الهوية الرقمية: الربط المباشر قريباً' : 'UAE PASS Live Rail: Coming Soon'}
               </span>
             </div>
           </div>
@@ -472,6 +472,9 @@ export default function RegisterPage() {
                           </span>
                           <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider">
                             {isArabic ? 'تعبئة سريعة' : 'Fast-Fill'}
+                          </span>
+                          <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider">
+                            {isArabic ? 'الربط المباشر: قريباً' : 'Live Rail: Coming Soon'}
                           </span>
                         </div>
                         <p className="text-xs text-on-surface-variant mt-0.5">
@@ -996,8 +999,11 @@ export default function RegisterPage() {
                       <div className="flex items-start gap-2.5">
                         <Key className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                         <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-on-surface">
+                          <span className="text-xs font-semibold text-on-surface flex items-center gap-2">
                             {isArabic ? 'تسوية محمية بحساب الضمان' : 'Escrow-Shielded Settlement'}
+                            <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              {isArabic ? 'قريباً' : 'Coming Soon'}
+                            </span>
                           </span>
                           <span className="text-[11px] text-on-surface-variant">
                             {isArabic

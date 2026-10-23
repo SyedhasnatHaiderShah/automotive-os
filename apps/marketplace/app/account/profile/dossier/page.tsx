@@ -81,7 +81,7 @@ export default function UserProfileDossierPage() {
             <div className="hidden xl:flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full border border-tertiary/20">
               <ShieldCheck className="w-4 h-4 text-tertiary" />
               <span className="text-[11px] font-mono text-tertiary uppercase tracking-wider font-semibold">
-                {isArabic ? 'متوافق مع الهوية الرقمية UAE PASS' : 'UAE PASS Ready'}
+                {isArabic ? 'الهوية الرقمية المباشرة: قريباً' : 'UAE PASS Live Rail: Coming Soon'}
               </span>
             </div>
           </div>
@@ -314,8 +314,11 @@ export default function UserProfileDossierPage() {
               {/* Metric 3: Active Inquiries / Escrow */}
               <div className="bg-surface-container rounded-xl p-5 flex flex-col justify-between shadow-md border border-outline-variant/20 hover:bg-surface-container-high transition-all group">
                 <div className="flex items-center justify-between text-on-surface-variant">
-                  <span className="font-mono text-[10px] uppercase tracking-wider font-bold">
+                  <span className="font-mono text-[10px] uppercase tracking-wider font-bold flex items-center gap-1.5">
                     {isArabic ? 'الطلبات النشطة / الضمان' : 'Active Inquiries / Escrow'}
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {isArabic ? 'قريباً' : 'Coming Soon'}
+                    </span>
                   </span>
                   <div className="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
                     <Clock className="w-4 h-4" />
@@ -337,8 +340,11 @@ export default function UserProfileDossierPage() {
               {/* Metric 4: AECB Credit Bureau */}
               <div className="bg-surface-container rounded-xl p-5 flex flex-col justify-between shadow-md border border-outline-variant/20 hover:bg-surface-container-high transition-all group">
                 <div className="flex items-center justify-between text-on-surface-variant">
-                  <span className="font-mono text-[10px] uppercase tracking-wider font-bold">
+                  <span className="font-mono text-[10px] uppercase tracking-wider font-bold flex items-center gap-1.5">
                     {isArabic ? 'الاتحاد للمعلومات الائتمانية AECB' : 'AECB Credit Bureau'}
+                    <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {isArabic ? 'قريباً' : 'Coming Soon'}
+                    </span>
                   </span>
                   <div className="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-tertiary group-hover:scale-110 transition-transform">
                     <Gauge className="w-4 h-4" />

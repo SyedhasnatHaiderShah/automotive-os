@@ -142,7 +142,7 @@ export default function AccountSettingsPage() {
             <div className="hidden xl:flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full border border-tertiary/20">
               <ShieldCheck className="w-4 h-4 text-tertiary" />
               <span className="text-[11px] font-mono text-tertiary uppercase tracking-wider font-semibold">
-                {isArabic ? 'متوافق مع الهوية الرقمية UAE PASS' : 'UAE PASS Ready'}
+                {isArabic ? 'الهوية الرقمية المباشرة: قريباً' : 'UAE PASS Live Rail: Coming Soon'}
               </span>
             </div>
           </div>
@@ -374,7 +374,7 @@ export default function AccountSettingsPage() {
                     >
                       <div className="flex items-center gap-3">
                         <Landmark className="w-4 h-4" />
-                        <span>{isArabic ? 'المصارف وحساب الضمان' : 'Banking & Escrow'}</span>
+                        <span>{isArabic ? 'المصارف وحساب الضمان (قريباً)' : 'Banking & Escrow (Coming Soon)'}</span>
                       </div>
                       <span className="font-mono text-xs text-on-surface-variant">AED</span>
                     </button>
@@ -965,8 +965,11 @@ export default function AccountSettingsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl bg-surface-container border border-outline-variant/20 flex flex-col justify-between">
                       <div>
-                        <span className="text-[10px] font-mono text-on-surface-variant uppercase">
+                        <span className="text-[10px] font-mono text-on-surface-variant uppercase flex items-center gap-2">
                           {isArabic ? 'سقف تحرير الضمان الفوري' : 'Instant Escrow Release Cap'}
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            {isArabic ? 'قريباً' : 'Coming Soon'}
+                          </span>
                         </span>
                         <div className="font-display text-lg text-on-surface font-bold mt-1">
                           AED 5,000,000
@@ -1078,8 +1081,11 @@ export default function AccountSettingsPage() {
                           <ShieldCheck className="w-5 h-5" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-display text-sm font-bold text-on-surface">
+                          <span className="font-display text-sm font-bold text-on-surface flex items-center gap-2">
                             {isArabic ? 'تحديث التقييم الائتماني المباشر من شركة الاتحاد للمعلومات الائتمانية (AECB)' : 'Al Etihad Credit Bureau (AECB) Direct Score Refresh'}
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold uppercase">
+                              {isArabic ? 'قريباً' : 'Coming Soon'}
+                            </span>
                           </span>
                           <p className="text-xs text-on-surface-variant mt-0.5 leading-relaxed">
                             {isArabic

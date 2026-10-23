@@ -67,20 +67,20 @@ All 31 screens have been implemented, visually matched against Stitch exports, a
 
 ---
 
-## 3. Integration Truth Flags & Runtime Mode
+## 3. Integration Truth Flags & "Coming Soon" Runtime Mode
 
-| External System | Designated Provider | Staging Mode | Feature Flag Setting | User-Facing Disclosure |
+| External System | Designated Provider | Staging Mode | Feature Flag Setting | User-Facing Disclosure / Badge |
 |---|---|---|---|---|
-| **Digital Identity** | UAE PASS / OIDC | Simulated OIDC Adapter | `FEATURE_FLAG_UAE_PASS_LIVE=false` | "UAE PASS Sandbox Connection" badge; local fallback active. |
-| **Commercial Registry** | UAE DED / Ministry of Economy | Manual Document Dossier | `FEATURE_FLAG_DED_LIVE=false` | Manual reviewer attestation log recorded with officer identity. |
-| **Technical Inspection** | RTA Tasjeel / Emirates Transport | Attested Certificate Upload | `FEATURE_FLAG_RTA_TASJEEL_LIVE=false` | Inspection score displayed only when supported by uploaded PDF. |
-| **VIN Integrity** | Commercial Registry (Carfax/Police) | Manual Risk Review Desk | `FEATURE_FLAG_VIN_REGISTRY_LIVE=false` | Review checklist active; no automated certified guarantee. |
-| **Credit Scoring** | Al Etihad Credit Bureau (AECB) | Consent Capture Only | `FEATURE_FLAG_AECB_LIVE=false` | Live bureau query button disabled; referral tracking active. |
-| **Bank Lending / DBR** | CBUAE Open Finance | Indicative Policy Engine | `FEATURE_FLAG_BANK_OFFERS_LIVE=false` | 50% DBR / 85% LTV calculated with indicative disclaimer. |
-| **E-Invoicing** | FTA / Peppol BIS 3.0 | TLV QR & UBL XML Generator | `FEATURE_FLAG_FTA_PEPPOL_LIVE=false` | Valid Base64 TLV and XML exported in "Draft / Staging" mode. |
-| **Escrow & Settlement** | Licensed UAE Custody Bank | Dispute State Machine | `FEATURE_FLAG_ESCROW_CUSTODY_LIVE=false` | Case status and freeze tracking active; disbursement action disabled. |
-| **Judicial Injunctions** | Dubai Courts Execution Dept | Structured Judicial Intake | `FEATURE_FLAG_COURTS_FEED_LIVE=false` | Court order intake and Article 99 interpleader escrow filing workflow. |
-| **Customs Bonds** | Dubai Customs Mirsal 2 | Statutory Countdown Clock | `FEATURE_FLAG_CUSTOMS_MIRSAL_LIVE=false` | 90-day statutory export countdown tracked via configurable rules. |
+| **Digital Identity** | UAE PASS / OIDC | Simulated OIDC Adapter | `FEATURE_FLAG_UAE_PASS_LIVE=false` | `"Live Rail: Coming Soon"` badge; local fallback active. |
+| **Commercial Registry** | UAE DED / Ministry of Economy | Manual Document Dossier | `FEATURE_FLAG_DED_LIVE=false` | `"Registry Feed: Coming Soon"`; manual reviewer attestation log recorded. |
+| **Technical Inspection** | RTA Tasjeel / Emirates Transport | Attested Certificate Upload | `FEATURE_FLAG_RTA_TASJEEL_LIVE=false` | `"Live Inspection Sync: Coming Soon"`; score shown only with verified PDF. |
+| **VIN Integrity** | Commercial Registry (Carfax/Police) | Manual Risk Review Desk | `FEATURE_FLAG_VIN_REGISTRY_LIVE=false` | `"Salvage Feed: Coming Soon"`; review checklist active. |
+| **Credit Scoring** | Al Etihad Credit Bureau (AECB) | Consent Capture Only | `FEATURE_FLAG_AECB_LIVE=false` | `"Direct Bureau Feed: Coming Soon"`; live query button disabled. |
+| **Bank Lending / DBR** | CBUAE Open Finance | Indicative Policy Engine | `FEATURE_FLAG_BANK_OFFERS_LIVE=false` | `"Live Syndicate API: Coming Soon"`; 50% DBR / 85% LTV calculated with disclaimer. |
+| **E-Invoicing** | FTA / Peppol BIS 3.0 | TLV QR & UBL XML Generator | `FEATURE_FLAG_FTA_PEPPOL_LIVE=false` | `"Live Peppol Exchange: Coming Soon"`; exported in "Draft / Staging" mode. |
+| **Escrow & Settlement** | Licensed UAE Custody Bank | Dispute State Machine | `FEATURE_FLAG_ESCROW_CUSTODY_LIVE=false` | `"Live Bank Escrow: Coming Soon"`; automated disbursement action disabled. |
+| **Judicial Injunctions** | Dubai Courts Execution Dept | Structured Judicial Intake | `FEATURE_FLAG_COURTS_FEED_LIVE=false` | `"Live Courts Feed: Coming Soon"`; Article 99 interpleader escrow filing workflow. |
+| **Customs Bonds** | Dubai Customs Mirsal 2 | Statutory Countdown Clock | `FEATURE_FLAG_CUSTOMS_MIRSAL_LIVE=false` | `"Live Mirsal Sync: Coming Soon"`; 90-day statutory export countdown tracked. |
 
 ---
 

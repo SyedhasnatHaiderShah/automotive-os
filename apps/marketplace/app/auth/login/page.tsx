@@ -117,7 +117,7 @@ export default function LoginPage() {
             <div className="hidden xl:flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/30">
               <CheckCircle2 className="w-4 h-4 text-tertiary" />
               <span className="text-[11px] font-mono uppercase tracking-wider text-on-surface-variant">
-                UAE PASS Ready
+                {isArabic ? 'الهوية الرقمية المباشرة (قريباً)' : 'UAE PASS Live Rail (Coming Soon)'}
               </span>
             </div>
           </div>
@@ -360,6 +360,9 @@ export default function LoginPage() {
                             </span>
                             <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-tertiary text-on-tertiary-container">
                               OFFICIAL
+                            </span>
+                            <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              {isArabic ? 'قريباً: الربط المباشر' : 'Live Rail: Coming Soon'}
                             </span>
                           </div>
                           <span className="text-xs text-tertiary-fixed font-medium block">
