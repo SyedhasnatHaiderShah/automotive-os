@@ -31,6 +31,7 @@ const scripts = [
   'verify-s28.js',
   'verify-s29.js',
   'verify-s30.js',
+  'verify-s31.js',
 ];
 
 console.log('========================================================================');
