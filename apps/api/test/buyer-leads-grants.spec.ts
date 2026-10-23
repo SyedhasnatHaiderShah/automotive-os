@@ -110,6 +110,10 @@ describe('Buyer Profile, Favorites, CRM Leads & Data Grants (E2E Integration Tes
     dealerBStaffMembershipId = dealerBStaff.id;
 
     // Reset Buyer A profile preferences for test idempotency
+    await prisma.user.updateMany({
+      where: { identitySubject: 'auth0|dealer_a_tariq' },
+      data: { displayName: 'Tariq Al-Hashimi' },
+    });
     await prisma.buyerProfile.upsert({
       where: { userId: buyerAUserId },
       update: { preferredLanguage: 'ar', budgetMaxFils: BigInt(40000000) },

@@ -9,16 +9,36 @@ export const metadata: Metadata = {
 };
 
 export default async function DealerLeadsPage() {
-  const [{ items: vehicles, stats }, leads] = await Promise.all([
-    fetchDealerInventory(),
-    fetchDealerLeads(),
-  ]);
+  try {
+    const [{ items: vehicles, stats }, leads] = await Promise.all([
+      fetchDealerInventory(),
+      fetchDealerLeads(),
+    ]);
 
-  return (
-    <DashboardCockpitView
-      initialVehicles={vehicles}
-      initialLeads={leads}
-      stats={stats}
-    />
-  );
+    return (
+      <DashboardCockpitView
+        initialVehicles={vehicles}
+        initialLeads={leads}
+        stats={stats}
+      />
+    );
+  } catch (error: any) {
+    return (
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-6 text-on-surface">
+        <div className="bg-surface-container-high border border-error/30 rounded-2xl p-8 max-w-lg text-center flex flex-col items-center gap-4 shadow-2xl">
+          <span className="material-symbols-outlined text-5xl text-error">cloud_off</span>
+          <h2 className="text-xl font-bold font-headline">CRM Leads Service Unavailable</h2>
+          <p className="text-sm text-on-surface-variant font-body-md">
+            {error?.message || 'Unable to load CRM leads from API backend.'}
+          </p>
+          <a
+            href="/leads"
+            className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md font-semibold hover:opacity-90 transition-opacity"
+          >
+            Retry Connection
+          </a>
+        </div>
+      </div>
+    );
+  }
 }

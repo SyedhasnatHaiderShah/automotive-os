@@ -8,11 +8,19 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Security: Configurable explicit CORS allowlist
+  const isProductionOrStaging =
+    process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging";
   const rawCorsOrigins = process.env.CORS_ORIGINS || "";
   const allowedOrigins = rawCorsOrigins
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean);
+
+  if (isProductionOrStaging && allowedOrigins.length === 0) {
+    console.warn(
+      `[SECURITY_WARNING] CORS_ORIGINS is unset in ${process.env.NODE_ENV}. Strict fail-closed active: no cross-origin browser requests will be permitted.`
+    );
+  }
 
   app.enableCors({
     origin: (requestOrigin, callback) => {
@@ -20,14 +28,43 @@ async function bootstrap() {
       if (!requestOrigin) {
         return callback(null, true);
       }
+
+      if (isProductionOrStaging) {
+        // Fail closed if CORS_ORIGINS is empty
+        if (allowedOrigins.length === 0) {
+          return callback(
+            new Error(
+              `CORS_NOT_ALLOWED: Fail-closed active. No cross-origin requests permitted in ${process.env.NODE_ENV}.`,
+            ),
+            false,
+          );
+        }
+
+        // Must match explicitly configured origins and MUST be HTTPS (no localhost, no wildcard suffix)
+        const isExplicitlyAllowed = allowedOrigins.includes(requestOrigin);
+        const isHttps = requestOrigin.startsWith("https://");
+
+        if (isExplicitlyAllowed && isHttps) {
+          return callback(null, true);
+        }
+
+        return callback(
+          new Error(
+            `CORS_NOT_ALLOWED: Origin ${requestOrigin} is not in approved HTTPS allowlist`,
+          ),
+          false,
+        );
+      }
+
+      // Development / test fallback
       if (
         allowedOrigins.length === 0 ||
         allowedOrigins.includes(requestOrigin) ||
-        requestOrigin.startsWith("http://localhost:") ||
-        requestOrigin.endsWith(".automotive-os.ae")
+        requestOrigin.startsWith("http://localhost:")
       ) {
         return callback(null, true);
       }
+
       return callback(
         new Error(
           `CORS_NOT_ALLOWED: Origin ${requestOrigin} is not in approved allowlist`,
@@ -47,12 +84,19 @@ async function bootstrap() {
     maxAge: 86400,
   });
 
-  // Security: Defense-in-depth HTTP response headers
+  // Security: Defense-in-depth HTTP response headers & safe no-store cache headers
   app.use((_req: any, res: any, next: any) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate",
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.setHeader("Surrogate-Control", "no-store");
     next();
   });
 

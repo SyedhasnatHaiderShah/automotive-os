@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -19,6 +20,13 @@ import {
   StockStatus,
 } from "@automotive-os/database";
 
+const PRIVILEGED_COST_ROLES: MembershipRole[] = [
+  MembershipRole.OWNER,
+  MembershipRole.ADMIN,
+  MembershipRole.FINANCE_MANAGER,
+  MembershipRole.INVENTORY_MANAGER,
+];
+
 @Injectable()
 export class VehiclesService {
   constructor(
@@ -30,7 +38,18 @@ export class VehiclesService {
     tenantId: string,
     dto: CreateVehicleDto,
     actorUserId?: string,
+    callerRole?: MembershipRole,
   ): Promise<VehicleResponseDto> {
+    // Field-level permission check: Only privileged roles can submit purchaseCostFils
+    if (
+      dto.purchaseCostFils !== undefined &&
+      (!callerRole || !PRIVILEGED_COST_ROLES.includes(callerRole))
+    ) {
+      throw new ForbiddenException(
+        "Insufficient permissions: role lacks authorization to set vehicle purchaseCostFils",
+      );
+    }
+
     // 1. Verify branch belongs strictly to this tenant
     const branch = await this.prisma.branch.findUnique({
       where: {
@@ -102,7 +121,7 @@ export class VehiclesService {
         },
       });
 
-      return this.mapVehicleResponse(vehicle);
+      return this.mapVehicleResponse(vehicle, callerRole);
     } catch (error: any) {
       if (error.code === "P2002") {
         throw new ConflictException(
@@ -191,7 +210,18 @@ export class VehiclesService {
     id: string,
     dto: UpdateVehicleDto,
     actorUserId?: string,
+    callerRole?: MembershipRole,
   ): Promise<VehicleResponseDto> {
+    // Field-level permission check: Only privileged roles can modify purchaseCostFils
+    if (
+      dto.purchaseCostFils !== undefined &&
+      (!callerRole || !PRIVILEGED_COST_ROLES.includes(callerRole))
+    ) {
+      throw new ForbiddenException(
+        "Insufficient permissions: role lacks authorization to modify vehicle purchaseCostFils",
+      );
+    }
+
     // 1. Verify vehicle belongs to tenant
     const existing = await this.prisma.vehicle.findUnique({
       where: {
@@ -307,7 +337,7 @@ export class VehiclesService {
       },
     });
 
-    return this.mapVehicleResponse(updated);
+    return this.mapVehicleResponse(updated, callerRole);
   }
 
   async registerMediaUpload(
@@ -365,15 +395,10 @@ export class VehiclesService {
     vehicle: any,
     callerRole?: MembershipRole,
   ): VehicleResponseDto {
-    const privilegedCostRoles: MembershipRole[] = [
-      MembershipRole.OWNER,
-      MembershipRole.ADMIN,
-      MembershipRole.FINANCE_MANAGER,
-      MembershipRole.INVENTORY_MANAGER,
-    ];
-    // If role is provided, redact purchaseCostFils unless caller is privileged
-    const isCostAuthorized =
-      !callerRole || privilegedCostRoles.includes(callerRole);
+    // Defense-in-depth: Default to DENYING purchaseCostFils unless caller is explicitly verified as a privileged role
+    const isCostAuthorized = Boolean(
+      callerRole && PRIVILEGED_COST_ROLES.includes(callerRole),
+    );
     const purchaseCostFils =
       isCostAuthorized && vehicle.purchaseCostFils
         ? vehicle.purchaseCostFils.toString()

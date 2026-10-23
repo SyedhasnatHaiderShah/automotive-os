@@ -38,6 +38,16 @@ describe('VIP Registration & Account Settings Suite (E2E Integration Tests)', ()
 
     authService = app.get<AuthService>(AuthService);
     prisma = app.get<PrismaService>(PrismaService);
+
+    // Clean up test identities to ensure test idempotency
+    await prisma.user.deleteMany({
+      where: {
+        OR: [
+          { email: 'mansoor.alketbi@sovereign-test.ae' },
+          { identitySubject: 'uae_pass_784198849201941' },
+        ],
+      },
+    });
   });
 
   afterAll(async () => {
