@@ -357,6 +357,9 @@ export async function fetchDealerInventory(
     process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID ||
     "11111111-1111-1111-1111-111111111111";
 
+  const isDev = process.env.NODE_ENV === "development";
+  const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
+
   try {
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -376,48 +379,64 @@ export async function fetchDealerInventory(
 
     if (response.ok) {
       const data = await response.json();
-      if (data.items && data.items.length > 0) {
-        const items = data.items.map((item: any) => ({
-          ...item,
-          mediaUrl:
-            item.media?.[0]?.objectKey ||
-            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
-          rtaVerified: true,
-          inquiriesCount: 12,
-          vipBookingsCount: 2,
-          isFixture: false,
-        }));
+      const rawItems = Array.isArray(data.items) ? data.items : [];
 
-        const totalFloor = items.reduce(
-          (acc: number, item: any) =>
-            acc + Math.round(Number(item.askingPriceFils) / 100),
-          0,
-        );
+      // Dynamic DB data mapping - no simulated or hardcoded values
+      const items = rawItems.map((item: any) => ({
+        ...item,
+        mediaUrl:
+          item.media?.[0]?.objectKey ||
+          item.mediaUrl ||
+          "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
+        rtaVerified: Boolean(item.rtaVerified || item.listingStatus === "PUBLISHED"),
+        inquiriesCount: typeof item.inquiriesCount === "number" ? item.inquiriesCount : 0,
+        vipBookingsCount: typeof item.vipBookingsCount === "number" ? item.vipBookingsCount : 0,
+        isFixture: false,
+      }));
 
-        return {
-          items,
-          stats: {
-            totalUnits: items.length,
-            floorValuationAed: totalFloor,
-            publishedCount: items.filter(
-              (i: any) => i.listingStatus === "PUBLISHED",
-            ).length,
-            underReviewCount: items.filter(
-              (i: any) => i.listingStatus === "PENDING_REVIEW",
-            ).length,
-            escrowCount: items.filter((i: any) => i.stockStatus === "RESERVED")
-              .length,
-            draftCount: items.filter(
-              (i: any) => !i.listingStatus || i.listingStatus === "DRAFT",
-            ).length,
-          },
-        };
-      }
+      const totalFloor = items.reduce(
+        (acc: number, item: any) =>
+          acc + Math.round(Number(item.askingPriceFils || 0) / 100),
+        0,
+      );
+
+      return {
+        items,
+        stats: {
+          totalUnits: items.length,
+          floorValuationAed: totalFloor,
+          publishedCount: items.filter(
+            (i: any) => i.listingStatus === "PUBLISHED",
+          ).length,
+          underReviewCount: items.filter(
+            (i: any) => i.listingStatus === "PENDING_REVIEW",
+          ).length,
+          escrowCount: items.filter((i: any) => i.stockStatus === "RESERVED")
+            .length,
+          draftCount: items.filter(
+            (i: any) => !i.listingStatus || i.listingStatus === "DRAFT",
+          ).length,
+        },
+      };
     }
-  } catch (_err) {
-    // Graceful fallback to verified Stitch fixtures
+
+    // If API responded with an error in production/staging, fail explicitly
+    if (!isDev || !enableFixtures) {
+      throw new Error(
+        `Dealer inventory service returned HTTP ${response.status}. Connectivity to backend API failed.`,
+      );
+    }
+  } catch (err: any) {
+    // In production or staging, never mask an unavailable API with mock fixtures
+    if (!isDev || !enableFixtures) {
+      throw new Error(
+        err?.message ||
+          "Dealer inventory service is unavailable. Please verify API connectivity.",
+      );
+    }
   }
 
+  // Isolated development/test fixture fallback only when explicitly enabled
   const items = [...VERIFIED_DEALER_INVENTORY_FIXTURES];
   return {
     items,
@@ -445,6 +464,9 @@ export async function fetchDealerLeads(
     process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID ||
     "11111111-1111-1111-1111-111111111111";
 
+  const isDev = process.env.NODE_ENV === "development";
+  const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
+
   try {
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -464,16 +486,29 @@ export async function fetchDealerLeads(
 
     if (response.ok) {
       const data = await response.json();
-      const items = data.items || data;
-      if (items && items.length > 0) {
-        return items.map((item: any) => ({
-          ...item,
-          isFixture: false,
-        }));
-      }
+      const rawItems = Array.isArray(data.items)
+        ? data.items
+        : Array.isArray(data)
+        ? data
+        : [];
+      return rawItems.map((item: any) => ({
+        ...item,
+        isFixture: false,
+      }));
     }
-  } catch (_err) {
-    // Fallback to verified Stitch fixtures
+
+    if (!isDev || !enableFixtures) {
+      throw new Error(
+        `Dealer leads service returned HTTP ${response.status}. Connectivity to backend API failed.`,
+      );
+    }
+  } catch (err: any) {
+    if (!isDev || !enableFixtures) {
+      throw new Error(
+        err?.message ||
+          "Dealer leads service is unavailable. Please verify API connectivity.",
+      );
+    }
   }
 
   return [...VERIFIED_DEALER_LEADS_FIXTURES];

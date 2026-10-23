@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { DevLoginDto, AuthTokenResponseDto } from './dto/dev-login.dto';
@@ -15,6 +15,16 @@ export class AuthController {
   @ApiOperation({ summary: 'Obtain test JWT token for development and integration test suites' })
   @ApiResponse({ status: 200, type: AuthTokenResponseDto })
   async getDevToken(@Body() dto: DevLoginDto): Promise<AuthTokenResponseDto> {
+    const isProductionOrStaging =
+      process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+    const isDevTokenEnabled = process.env.ENABLE_DEV_TOKEN === 'true';
+
+    if (isProductionOrStaging && !isDevTokenEnabled) {
+      throw new ForbiddenException(
+        'Development JWT token issuance is strictly disabled in staging and production environments'
+      );
+    }
+
     const token = this.authService.generateDevToken({
       identitySubject: dto.identitySubject,
       email: dto.email,

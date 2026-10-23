@@ -593,6 +593,19 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                   id="inventory-table-body"
                   className="font-body-md text-xs sm:text-sm text-on-surface divide-y divide-white/[0.04]"
                 >
+                  {filteredVehicles.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="py-16 text-center text-on-surface-variant font-body-md">
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <span className="material-symbols-outlined text-5xl text-outline/60">inventory_2</span>
+                          <span className="text-base font-semibold text-on-surface">No vehicles found in dealership stock</span>
+                          <span className="text-xs text-on-surface-variant max-w-sm">
+                            The dealership stock ledger is empty or no vehicles match your active search filters.
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                   {filteredVehicles.map((vehicle) => {
                     const isSelected = selectedIds.has(vehicle.id);
                     const isVinRevealed = revealedVins.has(vehicle.id);

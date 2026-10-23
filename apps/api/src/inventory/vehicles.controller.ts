@@ -63,6 +63,7 @@ export class VehiclesController {
       tenant.tenantId,
       dto,
       actorUserId,
+      tenant.userRole,
     );
   }
 
@@ -116,6 +117,7 @@ export class VehiclesController {
       id,
       dto,
       actorUserId,
+      tenant.userRole,
     );
   }
 
