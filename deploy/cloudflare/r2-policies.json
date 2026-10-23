@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json.schemastore.org/cloudformation-template.json",
+  "version": "2026-10-23",
+  "description": "Cloudflare R2 Bucket Architectures and Access Boundaries for Automotive OS Staging",
+  "buckets": [
+    {
+      "name": "automotive-os-media-staging",
+      "purpose": "Public vehicle inventory photos, studio glass inspection images, dealer showroom branding",
+      "access": "PUBLIC_READ",
+      "custom_domain": "media.staging.automotive-os.ae",
+      "cors": [
+        {
+          "AllowedOrigins": [
+            "https://marketplace.staging.automotive-os.ae",
+            "https://dealer.staging.automotive-os.ae"
+          ],
+          "AllowedMethods": [
+            "GET",
+            "HEAD"
+          ],
+          "AllowedHeaders": [
+            "Content-Type",
+            "Range"
+          ],
+          "ExposeHeaders": [
+            "ETag",
+            "Content-Length"
+          ],
+          "MaxAgeSeconds": 86400
+        }
+      ],
+      "lifecycle_rules": [
+        {
+          "id": "DeleteTempUnprocessedUploads",
+          "enabled": true,
+          "prefix": "temp/",
+          "expire_days": 2
+        }
+      ]
+    },
+    {
+      "name": "automotive-os-kyb-staging",
+      "purpose": "Confidential dealer trade licenses, commercial registry documents, Emirates ID photocopies, dispute evidence",
+      "access": "STRICT_PRIVATE",
+      "custom_domain": null,
+      "public_url": false,
+      "allowed_access_methods": [
+        "S3_PRESIGNED_URL",
+        "BACKEND_STREAM_PROXY"
+      ],
+      "presigned_url_max_expiry_seconds": 900,
+      "cors": [
+        {
+          "AllowedOrigins": [
+            "https://dealer.staging.automotive-os.ae",
+            "https://admin.staging.automotive-os.ae"
+          ],
+          "AllowedMethods": [
+            "PUT"
+          ],
+          "AllowedHeaders": [
+            "Content-Type",
+            "x-amz-server-side-encryption"
+          ],
+          "MaxAgeSeconds": 3600
+        }
+      ],
+      "security_controls": {
+        "encryption": "AES-256 / SSE-S3",
+        "bucket_listing_disabled": true,
+        "access_audit_logging": true
+      }
+    }
+  ]
+}

@@ -9,7 +9,8 @@
     "lint": "echo \"marketplace lint passed\"",
     "typecheck": "tsc --noEmit",
     "test": "echo \"marketplace test passed\"",
-    "clean": "rimraf .next dist"
+    "build:worker": "opennextjs-cloudflare build",
+    "clean": "rimraf .next dist .open-next"
   },
   "dependencies": {
     "@automotive-os/contracts": "workspace:*",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@automotive-os/config": "workspace:*",
+    "@opennextjs/cloudflare": "^1.20.13",
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
@@ -28,6 +30,7 @@
     "postcss": "^8.4.49",
     "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "wrangler": "^4.152.0"
   }
 }

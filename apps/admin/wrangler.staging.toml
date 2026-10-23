@@ -1,18 +1,21 @@
 # ==============================================================================
-# Cloudflare Pages / Workers Staging Manifest — Platform Operations Command
+# Cloudflare Workers Staging Manifest — Platform Operations Command
 # Application: apps/admin
 # Target: https://admin.staging.automotive-os.ae
 # Security: Gated behind Cloudflare Zero Trust (Access) Application
 # ==============================================================================
 
 name = "automotive-os-admin-staging"
+main = ".open-next/worker.js"
 compatibility_date = "2026-10-23"
 compatibility_flags = ["nodejs_compat"]
 
-# Build output configuration for OpenNext (@opennextjs/cloudflare)
-pages_build_output_dir = ".vercel/output/static"
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
 
 [vars]
+NEXT_PRIVATE_MINIMAL_MODE = "1"
 NEXT_PUBLIC_APP_ENV = "staging"
 NEXT_PUBLIC_API_URL = "https://api.staging.automotive-os.ae"
 NEXT_PUBLIC_ADMIN_URL = "https://admin.staging.automotive-os.ae"
@@ -20,11 +23,5 @@ NEXT_PUBLIC_DEFAULT_LOCALE = "en"
 NEXT_PUBLIC_SUPPORTED_LOCALES = "en,ar"
 NEXT_PUBLIC_DEFAULT_CURRENCY = "AED"
 
-# Observability and edge logs
 [observability]
 enabled = true
-
-# Route bindings (configured via Cloudflare Dashboard or CI deploy)
-# [[routes]]
-# pattern = "admin.staging.automotive-os.ae/*"
-# zone_name = "automotive-os.ae"

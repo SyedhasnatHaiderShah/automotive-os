@@ -1,0 +1,32 @@
+# ==============================================================================
+# Cloudflare Tunnel Configuration — Automotive OS Staging Origin
+# Target: api.staging.automotive-os.ae -> Origin Port 4000
+# Zero inbound open ports required on origin host.
+# ==============================================================================
+
+tunnel: ${TUNNEL_ID}
+credentials-file: /etc/cloudflared/creds.json
+
+warp-routing:
+  enabled: false
+
+originRequest:
+  connectTimeout: 30s
+  tlsTimeout: 10s
+  tcpKeepAlive: 30s
+  noHappyEyeballs: false
+  keepAliveConnections: 100
+  keepAliveTimeout: 90s
+  httpHostHeader: api.staging.automotive-os.ae
+  originServerName: api.staging.automotive-os.ae
+
+ingress:
+  # 1. API Health Check and Endpoints
+  - hostname: api.staging.automotive-os.ae
+    service: http://api:4000
+    originRequest:
+      connectTimeout: 15s
+      noTLSVerify: false
+
+  # 2. Catch-all rule (must be last) - reject unmatched traffic
+  - service: http_status:404
