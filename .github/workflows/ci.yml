@@ -104,12 +104,12 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm --filter @automotive-os/database run prisma:generate
 
-      - name: Push Schema & Seed Test Fixtures
+      - name: Deploy Migrations & Seed Test Fixtures
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public
         run: |
-          pnpm --filter @automotive-os/database exec prisma db push --skip-generate
-          pnpm --filter @automotive-os/database exec tsx prisma/seed.ts
+          pnpm --filter @automotive-os/database run prisma:deploy
+          pnpm --filter @automotive-os/database run seed
 
       - name: Execute Full Test Suites (API, RLS & Negative Security)
         env:
