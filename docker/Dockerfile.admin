@@ -1,0 +1,41 @@
+# Multi-stage Dockerfile for Automotive OS Platform Admin Frontend
+FROM node:20-alpine AS base
+WORKDIR /app
+RUN npm install -g pnpm@9.15.9
+
+FROM base AS dependencies
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/admin/package.json ./apps/admin/
+COPY packages/contracts/package.json ./packages/contracts/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/config/package.json ./packages/config/
+RUN pnpm install --frozen-lockfile
+
+FROM dependencies AS builder
+WORKDIR /app
+COPY . .
+RUN pnpm --filter @automotive-os/contracts run build
+RUN pnpm --filter @automotive-os/ui run build
+RUN pnpm --filter admin run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=staging
+ENV PORT=3002
+RUN apk add --no-cache curl
+
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
+USER nextjs
+
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next ./apps/admin/.next
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/package.json ./apps/admin/package.json
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/packages ./packages
+
+EXPOSE 3002
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
+  CMD curl -f http://localhost:3002/api/health || exit 1
+
+CMD ["node_modules/.bin/next", "start", "apps/admin", "-p", "3002"]

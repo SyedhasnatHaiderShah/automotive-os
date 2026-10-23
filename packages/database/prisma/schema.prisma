@@ -158,17 +158,24 @@ model User {
 }
 
 model BuyerProfile {
-  userId             String    @id @map("user_id") @db.Uuid
-  preferredLanguage  String    @default("en") @map("preferred_language")
-  preferredEmirate   String?   @map("preferred_emirate")
-  budgetMinFils      BigInt?   @map("budget_min_fils")
-  budgetMaxFils      BigInt?   @map("budget_max_fils")
-  preferredMakes     String[]  @default([]) @map("preferred_makes")
-  marketingConsentAt DateTime? @map("marketing_consent_at")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  userId               String    @id @map("user_id") @db.Uuid
+  preferredLanguage    String    @default("en") @map("preferred_language")
+  preferredEmirate     String?   @map("preferred_emirate")
+  budgetMinFils        BigInt?   @map("budget_min_fils")
+  budgetMaxFils        BigInt?   @map("budget_max_fils")
+  preferredMakes       String[]  @default([]) @map("preferred_makes")
+  marketingConsentAt   DateTime? @map("marketing_consent_at")
+  corporateAffiliation String?   @map("corporate_affiliation")
+  trn                  String?   @map("trn")
+  settlementCurrency   String    @default("AED") @map("settlement_currency")
+  escrowIban           String?   @map("escrow_iban")
+  garageVisibility     Boolean   @default(true) @map("garage_visibility")
+  aecbRefreshConsent   Boolean   @default(true) @map("aecb_refresh_consent")
+  whatsappCommsConsent Boolean   @default(true) @map("whatsapp_comms_consent")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("buyer_profiles")
 }

@@ -1,7 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../database/prisma.service';
 import { MembershipRole } from '@automotive-os/database';
+import { RegisterVipLeadDto, RegisterVipResponseDto } from './dto/register-vip.dto';
 
 export interface OidcJwtPayload {
   sub: string;
@@ -107,5 +108,100 @@ export class AuthService {
       iss: 'https://auth.autonexa.ae',
       aud: 'autonexa-api',
     });
+  }
+
+  async registerVipLead(dto: RegisterVipLeadDto): Promise<RegisterVipResponseDto> {
+    if (dto.consentPdpl !== true) {
+      throw new BadRequestException('Explicit UAE Federal PDPL consent agreement (Law No. 45/2021) is required');
+    }
+
+    const cleanPhone = dto.phone.replace(/[\s-]/g, '');
+    const formattedPhone = cleanPhone.startsWith('+')
+      ? cleanPhone
+      : cleanPhone.startsWith('971')
+      ? `+${cleanPhone}`
+      : `+971${cleanPhone.replace(/^0/, '')}`;
+
+    // Check if user already exists
+    let user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: dto.email },
+          { phoneE164: formattedPhone },
+          ...(dto.emiratesId ? [{ identitySubject: `uae_pass_${dto.emiratesId.replace(/-/g, '')}` }] : []),
+        ],
+      },
+      include: {
+        buyer: true,
+      },
+    });
+
+    if (user) {
+      user = await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          displayName: dto.legalName || user.displayName,
+          phoneE164: formattedPhone,
+          buyer: {
+            upsert: {
+              create: {
+                preferredLanguage: 'en',
+                preferredEmirate: dto.emirate || 'Dubai',
+                preferredMakes: dto.marques || [],
+                marketingConsentAt: dto.consentPdpl ? new Date() : null,
+              },
+              update: {
+                preferredEmirate: dto.emirate || undefined,
+                preferredMakes: dto.marques && dto.marques.length > 0 ? dto.marques : undefined,
+                marketingConsentAt: dto.consentPdpl ? new Date() : undefined,
+              },
+            },
+          },
+        },
+        include: {
+          buyer: true,
+        },
+      });
+    } else {
+      const identitySubject = dto.emiratesId
+        ? `uae_pass_${dto.emiratesId.replace(/-/g, '')}`
+        : `vip_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+      user = await this.prisma.user.create({
+        data: {
+          identitySubject,
+          email: dto.email,
+          phoneE164: formattedPhone,
+          displayName: dto.legalName,
+          buyer: {
+            create: {
+              preferredLanguage: 'en',
+              preferredEmirate: dto.emirate || 'Dubai',
+              preferredMakes: dto.marques || [],
+              marketingConsentAt: dto.consentPdpl ? new Date() : null,
+            },
+          },
+        },
+        include: {
+          buyer: true,
+        },
+      });
+    }
+
+    const token = this.generateDevToken({
+      id: user.id,
+      identitySubject: user.identitySubject,
+      email: user.email || undefined,
+      name: user.displayName,
+    });
+
+    return {
+      success: true,
+      userId: user.id,
+      email: user.email || dto.email,
+      tier: dto.tier,
+      accessToken: token,
+      message: `VIP ${dto.tier.toUpperCase()} registration completed under UAE PDPL consent framework`,
+    };
   }
 }

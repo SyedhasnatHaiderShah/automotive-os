@@ -24,6 +24,10 @@ import {
   BuyerProfileResponseDto,
 } from './dto/me-response.dto';
 import { UpdateBuyerProfileDto } from './dto/update-buyer-profile.dto';
+import {
+  UpdateAccountSettingsDto,
+  AccountSettingsResponseDto,
+} from './dto/update-account-settings.dto';
 import { AddFavoriteDto, FavoriteResponseDto } from './dto/favorite.dto';
 import {
   CreateSavedSearchDto,
@@ -73,6 +77,29 @@ export class MeController {
     @Body() dto: UpdateBuyerProfileDto
   ): Promise<BuyerProfileResponseDto> {
     return this.meService.updateBuyerProfile(userId, dto);
+  }
+
+  // ==========================================
+  // Account Settings & Security (TRN / IBAN)
+  // ==========================================
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Get current user account settings, TRN, settlement currency and IBAN' })
+  @ApiResponse({ status: 200, type: AccountSettingsResponseDto })
+  async getSettings(
+    @CurrentUser('id') userId: string
+  ): Promise<AccountSettingsResponseDto> {
+    return this.meService.getAccountSettings(userId);
+  }
+
+  @Patch('settings')
+  @ApiOperation({ summary: 'Update user account settings, corporate TRN, settlement currency, and escrow IBAN' })
+  @ApiResponse({ status: 200, type: AccountSettingsResponseDto })
+  async updateSettings(
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateAccountSettingsDto
+  ): Promise<AccountSettingsResponseDto> {
+    return this.meService.updateAccountSettings(userId, dto);
   }
 
   // ==========================================

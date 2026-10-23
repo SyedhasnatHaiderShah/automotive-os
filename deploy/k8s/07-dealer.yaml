@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dealer-service
+  namespace: automotive-os-staging
+spec:
+  ports:
+    - port: 3001
+      targetPort: 3001
+      name: http
+  selector:
+    app: dealer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dealer
+  namespace: automotive-os-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dealer
+  template:
+    metadata:
+      labels:
+        app: dealer
+    spec:
+      containers:
+        - name: dealer
+          image: automotive-os/dealer:staging-1.2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+              name: http
+          envFrom:
+            - configMapRef:
+                name: automotive-os-staging-config
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 15

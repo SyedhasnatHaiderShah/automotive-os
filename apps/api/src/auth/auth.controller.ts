@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { DevLoginDto, AuthTokenResponseDto } from './dto/dev-login.dto';
+import { RegisterVipLeadDto, RegisterVipResponseDto } from './dto/register-vip.dto';
 import { Public } from '../common/decorators/public.decorator';
 
 @ApiTags('auth')
@@ -25,5 +26,13 @@ export class AuthController {
       tokenType: 'Bearer',
       subject: dto.identitySubject,
     };
+  }
+
+  @Public()
+  @Post('register')
+  @ApiOperation({ summary: 'VIP client registration and lead intake (Collector, Corporate, Dealership)' })
+  @ApiResponse({ status: 201, type: RegisterVipResponseDto })
+  async registerVipLead(@Body() dto: RegisterVipLeadDto): Promise<RegisterVipResponseDto> {
+    return this.authService.registerVipLead(dto);
   }
 }

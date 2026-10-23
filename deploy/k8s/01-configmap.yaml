@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: automotive-os-staging-config
+  namespace: automotive-os-staging
+data:
+  NODE_ENV: "staging"
+  API_PORT: "4000"
+  DEFAULT_LOCALE: "en"
+  DEFAULT_CURRENCY: "AED"
+  TZ: "Asia/Dubai"
+  API_HOST: "https://api.staging.automotive-os.ae"
+  NEXT_PUBLIC_API_URL: "https://api.staging.automotive-os.ae"
+  NEXT_PUBLIC_MARKETPLACE_URL: "https://marketplace.staging.automotive-os.ae"
+  NEXT_PUBLIC_DEALER_URL: "https://dealer.staging.automotive-os.ae"
+  NEXT_PUBLIC_ADMIN_URL: "https://admin.staging.automotive-os.ae"
+  CORS_ORIGINS: "https://marketplace.staging.automotive-os.ae,https://dealer.staging.automotive-os.ae,https://admin.staging.automotive-os.ae"
+  # Third-Party Integration Guardrails (All Live Actions Disabled)
+  FEATURE_FLAG_UAE_PASS_LIVE: "false"
+  FEATURE_FLAG_DED_LIVE: "false"
+  FEATURE_FLAG_RTA_TASJEEL_LIVE: "false"
+  FEATURE_FLAG_VIN_REGISTRY_LIVE: "false"
+  FEATURE_FLAG_AECB_LIVE: "false"
+  FEATURE_FLAG_BANK_OFFERS_LIVE: "false"
+  FEATURE_FLAG_FTA_PEPPOL_LIVE: "false"
+  FEATURE_FLAG_ESCROW_CUSTODY_LIVE: "false"
+  FEATURE_FLAG_COURTS_FEED_LIVE: "false"
+  FEATURE_FLAG_CUSTOMS_MIRSAL_LIVE: "false"

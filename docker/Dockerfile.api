@@ -1,0 +1,43 @@
+# Multi-stage Dockerfile for Automotive OS NestJS API Monolith
+FROM node:20-alpine AS base
+WORKDIR /app
+RUN npm install -g pnpm@9.15.9
+
+FROM base AS dependencies
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/contracts/package.json ./packages/contracts/
+COPY packages/database/package.json ./packages/database/
+COPY packages/config/package.json ./packages/config/
+COPY packages/ui/package.json ./packages/ui/
+RUN pnpm install --frozen-lockfile
+
+FROM dependencies AS builder
+WORKDIR /app
+COPY . .
+RUN pnpm --filter @automotive-os/database run prisma:generate
+RUN pnpm --filter @automotive-os/contracts run build
+RUN pnpm --filter @automotive-os/database run build
+RUN pnpm --filter api run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=staging
+ENV API_PORT=4000
+RUN apk add --no-cache curl
+
+# Security: Non-root user
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nestjs
+USER nestjs
+
+COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder --chown=nestjs:nodejs /app/packages ./packages
+
+EXPOSE 4000
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
+  CMD curl -f http://localhost:4000/health || exit 1
+
+CMD ["node", "apps/api/dist/src/main.js"]

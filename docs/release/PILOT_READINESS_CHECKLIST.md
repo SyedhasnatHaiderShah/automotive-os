@@ -14,7 +14,7 @@
 - [x] **Monorepo Build:** Next.js 15 apps (`marketplace`, `dealer`, `admin`) and NestJS `api` compile cleanly (`pnpm run build` exit code 0).
 - [x] **Strict TypeScript:** 10 / 10 Turbo tasks pass with zero compilation errors (`pnpm run typecheck` exit code 0).
 - [x] **Linting Integrity:** 10 / 10 Turbo tasks pass with zero warnings or errors (`pnpm run lint` exit code 0).
-- [x] **API Test Coverage:** 8 test suites, 93 / 93 unit and integration tests passing (`apps/api` exit code 0).
+- [x] **API Test Coverage:** 9 test suites, 98 / 98 unit and integration tests passing (`apps/api` exit code 0).
 - [x] **Database RLS & Tenancy:** 16 / 16 automated tests pass in `rls-isolation.test.ts`.
 - [x] **Playwright E2E Verification:** 30 test runners pass across all 31 screens (`scripts/run-all-verifications.js` exit code 0).
 - [x] **Stitch Design Parity:** 31 / 31 screens matched against approved Obsidian & Studio Glass exports.

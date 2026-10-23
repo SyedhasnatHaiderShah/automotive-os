@@ -89,7 +89,7 @@ All 31 screens have been implemented, visually matched against Stitch exports, a
 - **TypeScript Compilation:** 10 / 10 Turbo tasks pass (0 errors).
 - **ESLint Cleanliness:** 10 / 10 Turbo tasks pass (0 errors).
 - **Production Asset Build:** 7 / 7 Turbo tasks pass (Next.js 15 App Router static/dynamic pages compiled).
-- **Unit & Integration Tests:** 8 suites, 93 / 93 tests pass (NestJS API).
+- **Unit & Integration Tests:** 9 suites, 98 / 98 tests pass (NestJS API, including VIP Auth Intake & TRN/IBAN persistence).
 - **PostgreSQL RLS Multi-Tenancy:** 16 / 16 tests pass (`rls-isolation.test.ts`).
 - **Playwright Browser Suites:** 30 / 30 test runners pass across all 31 screens (`scripts/run-all-verifications.js`).
 - **Open Defects:** 0 Critical, 0 High, 0 Regressions.

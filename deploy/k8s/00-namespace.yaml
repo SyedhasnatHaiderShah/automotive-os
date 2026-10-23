@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: automotive-os-staging
+  labels:
+    app.kubernetes.io/name: automotive-os
+    app.kubernetes.io/part-of: automotive-os-monorepo
+    environment: staging
+    region: me-central-1

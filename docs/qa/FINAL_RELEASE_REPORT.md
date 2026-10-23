@@ -26,7 +26,7 @@ This version (v1.2.0) incorporates the complete **5-screen Sovereign Identity & 
   Typecheck Status (Turbo monorepo):     10 / 10 tasks successful  (0 errors) [PASS]
   Monorepo Linting Status:               10 / 10 tasks successful  (0 errors) [PASS]
   Monorepo Production Build:              7 / 7 tasks successful   (0 errors) [PASS]
-  API Unit & Integration Tests:          93 / 93 tests passing     (0 failures) [PASS]
+  API Unit & Integration Tests:          98 / 98 tests passing     (0 failures) [PASS]
   PostgreSQL RLS & Tenancy Tests:        16 / 16 tests passing     (0 failures) [PASS]
   Playwright End-to-End Test Suite:      30 / 30 test runners pass (0 failures) [PASS]
   Active Regressions:                    0 detected (Cohorts A through H all passing)
@@ -47,7 +47,7 @@ All tests were re-executed deterministically against the current codebase:
 | **Linting** | `pnpm run lint` | `0` | 10 tasks across 8 packages clean. | **PASS** |
 | **Typecheck** | `pnpm run typecheck` | `0` | 10 tasks across 8 packages (TypeScript strict). | **PASS** |
 | **Monorepo Build** | `pnpm run build` | `0` | Next.js 15 apps (`marketplace`, `dealer`, `admin`) and NestJS `api` compiled production assets cleanly. | **PASS** |
-| **API & Security Tests** | `pnpm run test` (Jest) | `0` | 8 test suites, 93 tests passing: buyer privacy grants, outbox synchronization, auth guards, tenant access control. | **PASS** |
+| **API & Security Tests** | `pnpm run test` (Jest) | `0` | 9 test suites, 98 tests passing: buyer privacy grants, outbox synchronization, auth guards, tenant access control, VIP registration intake, and TRN/IBAN persistence. | **PASS** |
 | **Database Multi-Tenancy & RLS** | `npx -y tsx test/rls-isolation.test.ts` | `0` | 16/16 tests passing: composite FK constraints, non-bypass cross-tenant denial, buyer profile isolation, public projection redaction. | **PASS** |
 | **Playwright Full E2E Suite** | `node scripts/run-all-verifications.js` | `0` | 30 test scripts executed, all 30 passing across all 31 screens (S01–S31). | **PASS** |
 

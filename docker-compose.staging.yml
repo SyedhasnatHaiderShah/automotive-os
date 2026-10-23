@@ -1,0 +1,137 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: automotive_staging_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-staging_secure_postgres_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-automotive_os}
+    ports:
+      - "5432:5432"
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d automotive_os"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - automotive_staging_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: automotive_staging_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - staging_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - automotive_staging_net
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: automotive_staging_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: staging
+      API_PORT: 4000
+      API_HOST: https://api.staging.automotive-os.ae
+      DATABASE_URL: postgresql://automotive_app:${APP_DB_PASSWORD:-app_staging_pass}@postgres:5432/automotive_os?schema=public
+      DIRECT_URL: postgresql://postgres:${POSTGRES_PASSWORD:-staging_secure_postgres_pass}@postgres:5432/automotive_os?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-staging-jwt-secret-min-32-chars-strictly-secure}
+      JWT_EXPIRATION: "24h"
+      CORS_ORIGINS: "https://marketplace.staging.automotive-os.ae,https://dealer.staging.automotive-os.ae,https://admin.staging.automotive-os.ae"
+      FEATURE_FLAG_UAE_PASS_LIVE: "false"
+      FEATURE_FLAG_DED_LIVE: "false"
+      FEATURE_FLAG_RTA_TASJEEL_LIVE: "false"
+      FEATURE_FLAG_VIN_REGISTRY_LIVE: "false"
+      FEATURE_FLAG_AECB_LIVE: "false"
+      FEATURE_FLAG_BANK_OFFERS_LIVE: "false"
+      FEATURE_FLAG_FTA_PEPPOL_LIVE: "false"
+      FEATURE_FLAG_ESCROW_CUSTODY_LIVE: "false"
+      FEATURE_FLAG_COURTS_FEED_LIVE: "false"
+      FEATURE_FLAG_CUSTOMS_MIRSAL_LIVE: "false"
+    ports:
+      - "4000:4000"
+    networks:
+      - automotive_staging_net
+
+  marketplace:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.marketplace
+    container_name: automotive_staging_marketplace
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: staging
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: https://api.staging.automotive-os.ae
+      NEXT_PUBLIC_MARKETPLACE_URL: https://marketplace.staging.automotive-os.ae
+      NEXT_PUBLIC_DEFAULT_LOCALE: en
+      NEXT_PUBLIC_DEFAULT_CURRENCY: AED
+    ports:
+      - "3000:3000"
+    networks:
+      - automotive_staging_net
+
+  dealer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dealer
+    container_name: automotive_staging_dealer
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: staging
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: https://api.staging.automotive-os.ae
+      NEXT_PUBLIC_DEALER_URL: https://dealer.staging.automotive-os.ae
+      NEXT_PUBLIC_DEFAULT_CURRENCY: AED
+    ports:
+      - "3001:3001"
+    networks:
+      - automotive_staging_net
+
+  admin:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.admin
+    container_name: automotive_staging_admin
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: staging
+      PORT: 3002
+      NEXT_PUBLIC_API_URL: https://api.staging.automotive-os.ae
+      NEXT_PUBLIC_ADMIN_URL: https://admin.staging.automotive-os.ae
+    ports:
+      - "3002:3002"
+    networks:
+      - automotive_staging_net
+
+networks:
+  automotive_staging_net:
+    driver: bridge
+
+volumes:
+  staging_postgres_data:
+  staging_redis_data:

@@ -9,6 +9,10 @@ import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/auth.service';
 import { MeResponseDto, BuyerProfileResponseDto } from './dto/me-response.dto';
 import { UpdateBuyerProfileDto } from './dto/update-buyer-profile.dto';
+import {
+  UpdateAccountSettingsDto,
+  AccountSettingsResponseDto,
+} from './dto/update-account-settings.dto';
 import { AddFavoriteDto, FavoriteResponseDto } from './dto/favorite.dto';
 import {
   CreateSavedSearchDto,
@@ -700,6 +704,99 @@ export class MeService {
     return {
       success: true,
       revokedAt: now.toISOString(),
+    };
+  }
+
+  async getAccountSettings(userId: string): Promise<AccountSettingsResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        buyer: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User identity not found');
+    }
+
+    const buyer = user.buyer;
+
+    return {
+      userId: user.id,
+      displayName: user.displayName,
+      email: user.email,
+      phoneE164: user.phoneE164,
+      affiliation: buyer?.corporateAffiliation || null,
+      trn: buyer?.trn || null,
+      settlementCurrency: buyer?.settlementCurrency || 'AED',
+      escrowIban: buyer?.escrowIban || null,
+      garageVisibility: buyer?.garageVisibility ?? true,
+      aecbRefreshConsent: buyer?.aecbRefreshConsent ?? true,
+      whatsappCommsConsent: buyer?.whatsappCommsConsent ?? true,
+      updatedAt: (buyer?.updatedAt || user.updatedAt).toISOString(),
+    };
+  }
+
+  async updateAccountSettings(
+    userId: string,
+    dto: UpdateAccountSettingsDto
+  ): Promise<AccountSettingsResponseDto> {
+    // 1. If firstName/lastName/handle provided, update user displayName
+    let displayNameUpdate: string | undefined;
+    if (dto.handle) {
+      displayNameUpdate = dto.handle;
+    } else if (dto.firstName || dto.lastName) {
+      displayNameUpdate = [dto.firstName, dto.lastName].filter(Boolean).join(' ');
+    }
+
+    if (displayNameUpdate) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { displayName: displayNameUpdate },
+      });
+    }
+
+    // 2. Upsert buyer settings
+    const buyer = await this.prisma.buyerProfile.upsert({
+      where: { userId },
+      create: {
+        userId,
+        corporateAffiliation: dto.affiliation,
+        trn: dto.trn,
+        settlementCurrency: dto.settlementCurrency || 'AED',
+        escrowIban: dto.escrowIban,
+        garageVisibility: dto.garageVisibility ?? true,
+        aecbRefreshConsent: dto.aecbRefresh ?? true,
+        whatsappCommsConsent: dto.whatsappComms ?? true,
+      },
+      update: {
+        corporateAffiliation: dto.affiliation !== undefined ? dto.affiliation : undefined,
+        trn: dto.trn !== undefined ? dto.trn : undefined,
+        settlementCurrency: dto.settlementCurrency !== undefined ? dto.settlementCurrency : undefined,
+        escrowIban: dto.escrowIban !== undefined ? dto.escrowIban : undefined,
+        garageVisibility: dto.garageVisibility !== undefined ? dto.garageVisibility : undefined,
+        aecbRefreshConsent: dto.aecbRefresh !== undefined ? dto.aecbRefresh : undefined,
+        whatsappCommsConsent: dto.whatsappComms !== undefined ? dto.whatsappComms : undefined,
+      },
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    return {
+      userId,
+      displayName: user?.displayName || displayNameUpdate || 'User',
+      email: user?.email || null,
+      phoneE164: user?.phoneE164 || null,
+      affiliation: buyer.corporateAffiliation,
+      trn: buyer.trn,
+      settlementCurrency: buyer.settlementCurrency,
+      escrowIban: buyer.escrowIban,
+      garageVisibility: buyer.garageVisibility,
+      aecbRefreshConsent: buyer.aecbRefreshConsent,
+      whatsappCommsConsent: buyer.whatsappCommsConsent,
+      updatedAt: buyer.updatedAt.toISOString(),
     };
   }
 
