@@ -1,6 +1,6 @@
 # ==============================================================================
 # Docker Compose — Automotive OS Staging Origin Backend Stack
-# Origin Host: UAE VPS / me-central-1 Private Node
+# Origin Host: UAE VPS / me-central-1 Private Compute Node
 # Ingress: Cloudflare Tunnel (cloudflared) sidecar only. Zero public open ports.
 # ==============================================================================
 
@@ -11,23 +11,29 @@ services:
   # NestJS Modular Monolith API (apps/api)
   # ----------------------------------------------------------------------------
   api:
-    image: automotive-os/api:${APP_VERSION:-staging-latest}
+    image: ${IMAGE_REGISTRY:-ghcr.io/syedhasnathaidershah}/api:${APP_VERSION:-staging-latest}
     restart: unless-stopped
     environment:
       - NODE_ENV=production
       - PORT=4000
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?schema=public
-      - DIRECT_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?schema=public
+      - DATABASE_URL=postgresql://${DB_USER:-automotive_user}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:-automotive_os_staging}?schema=public
+      - DIRECT_URL=postgresql://${DB_USER:-automotive_user}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:-automotive_os_staging}?schema=public
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set}
       - CORS_ORIGINS=https://marketplace.staging.automotive-os.ae,https://dealer.staging.automotive-os.ae,https://admin.staging.automotive-os.ae
-      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
-      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID:?R2_ACCESS_KEY_ID must be set}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY:?R2_SECRET_ACCESS_KEY must be set}
       - R2_BUCKET_NAME=${R2_BUCKET_NAME:-automotive-os-media-staging}
-      - R2_ENDPOINT=${R2_ENDPOINT}
+      - R2_KYB_BUCKET_NAME=${R2_KYB_BUCKET_NAME:-automotive-os-kyb-staging}
+      - R2_ENDPOINT=${R2_ENDPOINT:-https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com}
       - R2_PUBLIC_URL=https://media.staging.automotive-os.ae
       - RATE_LIMIT_TTL=60
       - RATE_LIMIT_MAX=100
+      # Sovereign UAE compliance & integration guards: Live financial/gov calls disabled
+      - ENABLE_LIVE_PAYMENTS=false
+      - ENABLE_RTA_LIVE_CERTIFICATION=false
+      - ENABLE_UAE_PASS_PRODUCTION=false
+      - STAGING_FIXTURE_ISOLATION=true
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,7 +46,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
-      start_period: 20s
+      start_period: 25s
 
   # ----------------------------------------------------------------------------
   # PostgreSQL 16 Database with RLS
@@ -50,8 +56,10 @@ services:
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${DB_USER:-automotive_user}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD must be set}
       - POSTGRES_DB=${DB_NAME:-automotive_os_staging}
+      # Transaction-scoped RLS pooling settings
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --lc-collate=C --lc-ctype=C
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -87,7 +95,7 @@ services:
     restart: unless-stopped
     command: tunnel run
     environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN must be set}
     depends_on:
       api:
         condition: service_healthy
@@ -100,4 +108,6 @@ networks:
 
 volumes:
   pgdata:
+    driver: local
   redisdata:
+    driver: local

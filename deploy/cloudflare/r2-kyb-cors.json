@@ -1,0 +1,29 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://dealer.staging.automotive-os.ae",
+          "https://admin.staging.automotive-os.ae"
+        ],
+        "methods": [
+          "PUT",
+          "GET",
+          "HEAD"
+        ],
+        "headers": [
+          "Content-Type",
+          "Content-MD5",
+          "x-amz-server-side-encryption",
+          "x-amz-user-agent"
+        ]
+      },
+      "exposed": {
+        "headers": [
+          "ETag"
+        ]
+      },
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

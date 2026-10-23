@@ -1,0 +1,42 @@
+{
+  "$schema": "https://developers.cloudflare.com/dns/manage-dns-records/how-to/create-dns-records/",
+  "version": "2026-10-23",
+  "zone_name": "automotive-os.ae",
+  "records": [
+    {
+      "type": "CNAME",
+      "name": "api.staging",
+      "content": "${TUNNEL_ID}.cfargotunnel.com",
+      "proxied": true,
+      "comment": "Cloudflare Tunnel Ingress to Sovereign UAE Origin Node 22 API"
+    },
+    {
+      "type": "CNAME",
+      "name": "marketplace.staging",
+      "content": "automotive-os-marketplace-staging.syedhasnathaidershah.workers.dev",
+      "proxied": true,
+      "comment": "Cloudflare Worker Custom Domain for Buyer Marketplace"
+    },
+    {
+      "type": "CNAME",
+      "name": "dealer.staging",
+      "content": "automotive-os-dealer-staging.syedhasnathaidershah.workers.dev",
+      "proxied": true,
+      "comment": "Cloudflare Worker Custom Domain for Dealer DMS Cockpit"
+    },
+    {
+      "type": "CNAME",
+      "name": "admin.staging",
+      "content": "automotive-os-admin-staging.syedhasnathaidershah.workers.dev",
+      "proxied": true,
+      "comment": "Cloudflare Worker Custom Domain for Platform Admin (Zero Trust Access Gated)"
+    },
+    {
+      "type": "CNAME",
+      "name": "media.staging",
+      "content": "public.r2.dev",
+      "proxied": true,
+      "comment": "Cloudflare R2 Custom Domain for Public Vehicle Media"
+    }
+  ]
+}
