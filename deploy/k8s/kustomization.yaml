@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: automotive-os-staging
+
+resources:
+  - 00-namespace.yaml
+  - 01-configmap.yaml
+  - 03-postgres.yaml
+  - 04-redis.yaml
+  - 05-api.yaml
+  - 06-marketplace.yaml
+  - 07-dealer.yaml
+  - 08-admin.yaml
+  - 09-ingress.yaml
+
+images:
+  - name: automotive-os/api
+    newName: ghcr.io/syedhasnathaidershah/automotive-os/api
+    newTag: staging
+  - name: automotive-os/marketplace
+    newName: ghcr.io/syedhasnathaidershah/automotive-os/marketplace
+    newTag: staging
+  - name: automotive-os/dealer
+    newName: ghcr.io/syedhasnathaidershah/automotive-os/dealer
+    newTag: staging
+  - name: automotive-os/admin
+    newName: ghcr.io/syedhasnathaidershah/automotive-os/admin
+    newTag: staging
