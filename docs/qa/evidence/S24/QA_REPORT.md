@@ -2,7 +2,7 @@
 
 **Screen:** S24 (`apps/dealer/app/accounting/exception/export/page.tsx`)  
 **Stitch Screen ID:** `f2549d0dc269410ebc65bcfa2240280c`  
-**Timestamp:** 2026-10-22T06:41:45.992Z  
+**Timestamp:** 2026-10-23T09:12:33.764Z  
 **Result:** VERIFIED_PASS (19/19 checks passed)
 
 ## Visual Parity & Evidence

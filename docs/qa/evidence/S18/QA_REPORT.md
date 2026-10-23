@@ -1,6 +1,6 @@
 # QA Test Report: S18 — Sales Orders & Quotations Studio
 
-**Timestamp:** 2026-10-22T06:40:38.286Z
+**Timestamp:** 2026-10-23T09:11:33.223Z
 **Target Route:** `http://localhost:3001/sales`
 **Stitch Screen ID:** `e5eba1a68cca4c94b95a19b4c01c5312`
 **Cohort:** P1 (Tax/legal/signature/escrow integration certified with provider disclaimers)
