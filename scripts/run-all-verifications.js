@@ -28,11 +28,12 @@ const scripts = [
   'verify-s25.js',
   'verify-s26.js',
   'verify-s27.js',
+  'verify-s28.js',
   'verify-s29.js',
 ];
 
 console.log('========================================================================');
-console.log('Automotive OS — Running Playwright Verification Suite for All 26 Screens');
+console.log('Automotive OS — Running Playwright Verification Suite for All Screens');
 console.log('========================================================================\n');
 
 const results = [];
