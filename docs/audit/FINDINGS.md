@@ -3,7 +3,7 @@
 **Target Git HEAD:** `a4be136`  
 **Monorepo:** [`SyedhasnatHaiderShah/automotive-os`](https://github.com/SyedhasnatHaiderShah/automotive-os.git)  
 **Lead Auditor:** Automotive OS Principal QA Architect & Application Security Engineer  
-**Audit Standard:** OWASP API Security Top 10 (2023), UAE Federal Decree-Law No. 45/2021 (PDPL), Tenant RLS Defense-in-Depth  
+**Audit Standard:** OWASP API Security Top 10 (2023), UAE Federal Decree-Law No. 45/2021 (PDPL), Tenant RLS Defense-in-Depth
 
 ---
 
@@ -11,20 +11,21 @@
 
 During the complete end-to-end audit across S01–S31 screens, 13 NestJS controllers, 45 endpoints, and 20 Prisma data models, 6 architectural and security findings were identified. Zero Critical RCE or SQL injection flaws were found due to forced PostgreSQL RLS and Prisma parameterized queries. The identified items have been classified and safe remediations prepared.
 
-| Finding ID | Severity | Category | Title | Status |
-|---|---|---|---|---|
-| **SEC-001** | High | CORS & Transport | Wildcard CORS reflection without explicit domain allowlist | **RESOLVED** |
-| **SEC-002** | Medium | Transport & Headers | Absence of HTTP defense-in-depth security response headers | **RESOLVED** |
-| **SEC-003** | Medium | Error Handling | Potential internal error message leakage in production exception filter | **RESOLVED** |
-| **PRIV-001** | High | Data Minimization | Wholesale acquisition cost exposed to non-management dealer roles | **RESOLVED** |
-| **DATA-001** | High | Data Lineage | Dealer DMS client route mismatch causing silent fixture fallback | **RESOLVED** |
-| **RATE-001** | Low | Resilience & Abuse | In-memory enquiry rate limiting not cluster-distributed | **DOCUMENTED** |
+| Finding ID   | Severity | Category            | Title                                                                   | Status         |
+| ------------ | -------- | ------------------- | ----------------------------------------------------------------------- | -------------- |
+| **SEC-001**  | High     | CORS & Transport    | Wildcard CORS reflection without explicit domain allowlist              | **RESOLVED**   |
+| **SEC-002**  | Medium   | Transport & Headers | Absence of HTTP defense-in-depth security response headers              | **RESOLVED**   |
+| **SEC-003**  | Medium   | Error Handling      | Potential internal error message leakage in production exception filter | **RESOLVED**   |
+| **PRIV-001** | High     | Data Minimization   | Wholesale acquisition cost exposed to non-management dealer roles       | **RESOLVED**   |
+| **DATA-001** | High     | Data Lineage        | Dealer DMS client route mismatch causing silent fixture fallback        | **RESOLVED**   |
+| **RATE-001** | Low      | Resilience & Abuse  | In-memory enquiry rate limiting not cluster-distributed                 | **DOCUMENTED** |
 
 ---
 
 ## Detailed Vulnerability & Remediation Records
 
 ### Finding SEC-001: Wildcard CORS Reflection Without Explicit Domain Allowlist
+
 - **Severity:** High (CVSS: 7.1)
 - **Vulnerability Class:** OWASP API7:2023 — Server-Side Request Forgery / Security Misconfiguration
 - **Location:** [`apps/api/src/main.ts`](file:///h:/Personal/Automotiv%20OS/apps/api/src/main.ts#L10)
@@ -35,6 +36,7 @@ During the complete end-to-end audit across S01–S31 screens, 13 NestJS control
 ---
 
 ### Finding SEC-002: Absence of HTTP Defense-in-Depth Security Response Headers
+
 - **Severity:** Medium (CVSS: 5.4)
 - **Vulnerability Class:** OWASP API8:2023 — Security Misconfiguration
 - **Location:** [`apps/api/src/main.ts`](file:///h:/Personal/Automotiv%20OS/apps/api/src/main.ts)
@@ -45,6 +47,7 @@ During the complete end-to-end audit across S01–S31 screens, 13 NestJS control
 ---
 
 ### Finding SEC-003: Potential Internal Error Message Leakage in Exception Filter
+
 - **Severity:** Medium (CVSS: 4.8)
 - **Vulnerability Class:** OWASP API9:2023 — Improper Inventory Management / Information Disclosure
 - **Location:** [`apps/api/src/common/filters/http-exception.filter.ts`](file:///h:/Personal/Automotiv%20OS/apps/api/src/common/filters/http-exception.filter.ts#L40)
@@ -55,6 +58,7 @@ During the complete end-to-end audit across S01–S31 screens, 13 NestJS control
 ---
 
 ### Finding PRIV-001: Wholesale Acquisition Cost Exposed to Non-Management Dealer Roles
+
 - **Severity:** High (CVSS: 6.5)
 - **Vulnerability Class:** OWASP API3:2023 — Broken Object Property Level Authorization (BOPLA)
 - **Location:** [`apps/api/src/inventory/vehicles.service.ts`](file:///h:/Personal/Automotiv%20OS/apps/api/src/inventory/vehicles.service.ts#L361)
@@ -65,6 +69,7 @@ During the complete end-to-end audit across S01–S31 screens, 13 NestJS control
 ---
 
 ### Finding DATA-001: Dealer DMS Route Mismatch Causing Silent Fixture Fallback
+
 - **Severity:** High (CVSS: 6.8)
 - **Vulnerability Class:** Data Lineage / Frontend-Backend Integration Defect
 - **Location:** [`apps/dealer/lib/api.ts`](file:///h:/Personal/Automotiv%20OS/apps/dealer/lib/api.ts#L337), [`apps/dealer/lib/api.ts`](file:///h:/Personal/Automotiv%20OS/apps/dealer/lib/api.ts#L399)
@@ -75,6 +80,7 @@ During the complete end-to-end audit across S01–S31 screens, 13 NestJS control
 ---
 
 ### Finding RATE-001: In-Memory Enquiry Rate Limiting Not Cluster-Distributed
+
 - **Severity:** Low (CVSS: 3.1)
 - **Vulnerability Class:** Scalability & Resilience
 - **Location:** [`apps/api/src/leads/enquiry-rate-limiter.service.ts`](file:///h:/Personal/Automotiv%20OS/apps/api/src/leads/enquiry-rate-limiter.service.ts)

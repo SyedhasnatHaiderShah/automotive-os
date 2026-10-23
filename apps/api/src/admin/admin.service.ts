@@ -1,32 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { OutboxService, OutboxMetricsDto } from '../listings/outbox.service';
-import { AdminTenantSummaryDto } from './dto/admin-tenant-summary.dto';
-import { UpdateTenantStatusDto } from './dto/update-tenant-status.dto';
-import { ListingStatus, TenantStatus } from '@automotive-os/database';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../database/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { OutboxService, OutboxMetricsDto } from "../listings/outbox.service";
+import { AdminTenantSummaryDto } from "./dto/admin-tenant-summary.dto";
+import { UpdateTenantStatusDto } from "./dto/update-tenant-status.dto";
+import { ListingStatus, TenantStatus } from "@automotive-os/database";
 
 @Injectable()
 export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
-    private readonly outboxService: OutboxService
+    private readonly outboxService: OutboxService,
   ) {}
 
   async listAllTenants(
     adminUserId: string,
-    correlationId?: string
+    correlationId?: string,
   ): Promise<AdminTenantSummaryDto[]> {
     // Audit hook: every platform administration inspection is recorded
     await this.auditService.logAction({
       tenantId: null,
       actorUserId: adminUserId,
-      action: 'PLATFORM_ADMIN_LIST_ALL_TENANTS',
-      targetType: 'tenants',
-      targetId: 'ALL',
+      action: "PLATFORM_ADMIN_LIST_ALL_TENANTS",
+      targetType: "tenants",
+      targetId: "ALL",
       correlationId: correlationId || null,
-      metadata: { reason: 'cross_tenant_platform_inspection' },
+      metadata: { reason: "cross_tenant_platform_inspection" },
     });
 
     const tenants = await this.prisma.tenant.findMany({
@@ -39,7 +39,7 @@ export class AdminService {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return tenants.map((t) => ({
@@ -48,11 +48,77 @@ export class AdminService {
       legalName: t.legalName,
       displayName: t.displayName,
       status: t.status,
-      verificationStatus: t.verification ? t.verification.status : 'NOT_SUBMITTED',
+      verificationStatus: t.verification
+        ? t.verification.status
+        : "NOT_SUBMITTED",
       staffCount: t._count.memberships,
       vehicleCount: t._count.vehicles,
       createdAt: t.createdAt.toISOString(),
     }));
+  }
+
+  async getTenantById(
+    adminUserId: string,
+    tenantId: string,
+    correlationId?: string,
+  ): Promise<any> {
+    await this.auditService.logAction({
+      tenantId: null,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_GET_TENANT",
+      targetType: "tenant",
+      targetId: tenantId,
+      correlationId: correlationId || null,
+      metadata: { reason: "cross_tenant_dossier_inspection" },
+    });
+
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        tenantId,
+      );
+    const tenant = await this.prisma.tenant.findFirst({
+      where: isUuid
+        ? { OR: [{ id: tenantId }, { slug: tenantId }] }
+        : { slug: tenantId },
+      include: {
+        verification: true,
+        branches: true,
+        memberships: {
+          where: { active: true },
+          include: { user: true },
+        },
+        _count: {
+          select: {
+            vehicles: true,
+            listings: true,
+          },
+        },
+      },
+    });
+
+    if (!tenant) {
+      throw new NotFoundException(`Tenant ${tenantId} not found`);
+    }
+
+    return {
+      id: tenant.id,
+      slug: tenant.slug,
+      legalName: tenant.legalName,
+      displayName: tenant.displayName,
+      status: tenant.status,
+      verificationStatus: tenant.verification
+        ? tenant.verification.status
+        : "NOT_SUBMITTED",
+      tradeLicenseNumber: tenant.verification?.tradeLicenseRef || null,
+      tradeLicenseExpiry: tenant.verification?.licenseExpiry
+        ? tenant.verification.licenseExpiry.toISOString()
+        : null,
+      branches: tenant.branches,
+      vehicleCount: tenant._count.vehicles,
+      listingCount: tenant._count.listings,
+      createdAt: tenant.createdAt.toISOString(),
+      updatedAt: tenant.updatedAt.toISOString(),
+    };
   }
 
   /**
@@ -64,7 +130,7 @@ export class AdminService {
     adminUserId: string,
     tenantId: string,
     dto: UpdateTenantStatusDto,
-    correlationId?: string
+    correlationId?: string,
   ): Promise<AdminTenantSummaryDto> {
     const existing = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
@@ -94,7 +160,10 @@ export class AdminService {
       });
 
       // If tenant is suspended or closed, unpublish all active listings
-      if (newStatus === TenantStatus.SUSPENDED || newStatus === TenantStatus.CLOSED) {
+      if (
+        newStatus === TenantStatus.SUSPENDED ||
+        newStatus === TenantStatus.CLOSED
+      ) {
         const publishedListings = await tx.listing.findMany({
           where: {
             tenantId,
@@ -118,13 +187,13 @@ export class AdminService {
             await tx.outboxEvent.create({
               data: {
                 tenantId,
-                aggregateType: 'listing',
+                aggregateType: "listing",
                 aggregateId: listing.id,
-                eventType: 'listing.unpublished',
+                eventType: "listing.unpublished",
                 payload: {
                   listingId: listing.id,
                   vehicleId: listing.vehicleId,
-                  reason: `Tenant suspended by platform admin: ${dto.reason || 'Regulatory action'}`,
+                  reason: `Tenant suspended by platform admin: ${dto.reason || "Regulatory action"}`,
                   previousStatus: ListingStatus.PUBLISHED,
                   newStatus: ListingStatus.PAUSED,
                 },
@@ -137,9 +206,9 @@ export class AdminService {
         await tx.outboxEvent.create({
           data: {
             tenantId,
-            aggregateType: 'tenant',
+            aggregateType: "tenant",
             aggregateId: tenantId,
-            eventType: 'tenant.suspended',
+            eventType: "tenant.suspended",
             payload: {
               tenantId,
               previousStatus,
@@ -155,8 +224,11 @@ export class AdminService {
         data: {
           tenantId,
           actorUserId: adminUserId,
-          action: newStatus === TenantStatus.SUSPENDED ? 'TENANT_SUSPENDED' : 'TENANT_STATUS_UPDATED',
-          targetType: 'tenant',
+          action:
+            newStatus === TenantStatus.SUSPENDED
+              ? "TENANT_SUSPENDED"
+              : "TENANT_STATUS_UPDATED",
+          targetType: "tenant",
           targetId: tenantId,
           correlationId: correlationId || null,
           metadata: {
@@ -176,7 +248,9 @@ export class AdminService {
       legalName: updated.legalName,
       displayName: updated.displayName,
       status: updated.status,
-      verificationStatus: updated.verification ? updated.verification.status : 'NOT_SUBMITTED',
+      verificationStatus: updated.verification
+        ? updated.verification.status
+        : "NOT_SUBMITTED",
       staffCount: updated._count.memberships,
       vehicleCount: updated._count.vehicles,
       createdAt: updated.createdAt.toISOString(),
@@ -189,14 +263,14 @@ export class AdminService {
   async processOutbox(
     adminUserId: string,
     limit = 50,
-    correlationId?: string
+    correlationId?: string,
   ): Promise<{ processedCount: number; metrics: OutboxMetricsDto }> {
     await this.auditService.logAction({
       tenantId: null,
       actorUserId: adminUserId,
-      action: 'PLATFORM_ADMIN_PROCESS_OUTBOX',
-      targetType: 'outbox',
-      targetId: 'ALL',
+      action: "PLATFORM_ADMIN_PROCESS_OUTBOX",
+      targetType: "outbox",
+      targetId: "ALL",
       correlationId: correlationId || null,
       metadata: { limit },
     });
@@ -220,14 +294,16 @@ export class AdminService {
   /**
    * Retry failed outbox events.
    */
-  async retryFailedOutboxEvents(adminUserId: string): Promise<{ retriedCount: number }> {
+  async retryFailedOutboxEvents(
+    adminUserId: string,
+  ): Promise<{ retriedCount: number }> {
     await this.auditService.logAction({
       tenantId: null,
       actorUserId: adminUserId,
-      action: 'PLATFORM_ADMIN_RETRY_OUTBOX',
-      targetType: 'outbox',
-      targetId: 'FAILED',
-      metadata: { reason: 'manual_admin_retry' },
+      action: "PLATFORM_ADMIN_RETRY_OUTBOX",
+      targetType: "outbox",
+      targetId: "FAILED",
+      metadata: { reason: "manual_admin_retry" },
     });
 
     const retriedCount = await this.outboxService.retryFailedEvents();
