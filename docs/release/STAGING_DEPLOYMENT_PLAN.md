@@ -1,7 +1,7 @@
 # Automotive OS — Staging Deployment Plan
 
 **Environment:** UAE Staging Sandbox (`me-central-1`)  
-**Target Release:** `v0.1.0-staging.1` (Git Checkpoint: `7659b67`)  
+**Target Release:** `v1.2.0-staging.1` (Git Checkpoint: `c1afa53`)  
 **Lead:** Autonomous Release Orchestrator (Antigravity)  
 **Standard Governance:** [`docs/implementation/QA_GATES.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/QA_GATES.md) & [`AGENTS.md`](file:///h:/Personal/Automotiv%20OS/AGENTS.md)
 
@@ -186,7 +186,7 @@ pnpm --filter @automotive-os/database run test
 
 ### Step 1: Clone Checkpoint & Verify Integrity
 ```powershell
-git checkout 7659b67
+git checkout c1afa53
 git status
 # Verify working tree is clean
 ```

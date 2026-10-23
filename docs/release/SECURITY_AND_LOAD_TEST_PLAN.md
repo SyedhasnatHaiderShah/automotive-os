@@ -1,9 +1,9 @@
 # Automotive OS — Security & Load Test Plan
 
-**Document Version:** 1.0.0-STAGING  
+**Document Version:** 1.2.0-STAGING  
 **Lead:** Autonomous Release Orchestrator (Antigravity)  
 **Standard Governance:** [`docs/implementation/QA_GATES.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/QA_GATES.md), UAE Federal Decree-Law No. 45 of 2021 (PDPL)  
-**Target Release:** `v0.1.0-staging.1` (Git Checkpoint: `7659b67`)
+**Target Release:** `v1.2.0-staging.1` (Git Checkpoint: `c1afa53`)
 
 ---
 
@@ -38,6 +38,13 @@ The security architecture of Automotive OS relies on a defense-in-depth model co
   - `ACCOUNTANT`: FTA tax invoice drafting, VAT reconciliation, export bonds.
   - `COMPLIANCE_OFFICER`: Audit review, dispute logs, judicial hold overrides.
 - **Admin Isolation:** Platform operators (`@PlatformAdminOnly()`) possess cross-tenant inspection rights, but **every administrative view or action triggers an immutable event** in the `audit_logs` table recording admin user ID, IP address, and target tenant.
+
+### 1.4 Sovereign Identity & Authentication Suite Hardening (S27–S31)
+- **UAE PASS Level 3 Biometrics:** Dual-rail login portal (S27) supports UAE PASS biometric challenge verification (#84) with automatic Emirates ID profile extraction, fallbacks for non-resident buyers, and strict sandbox flag enforcement.
+- **Sovereign Vault PIN & Cold Recovery (S29):** Dual-entropy recovery requires both a 6-digit segmented OTP and a cryptographic recovery seed phrase before authorizing a vault PIN reset.
+- **Mandatory 24-Hour Settlement Freeze:** Enforcing CBUAE anti-fraud circulars, any sovereign vault PIN or master credential reset triggers an automatic 24-hour statutory hold on high-value escrow disbursements (`AED > 250,000`).
+- **FIDO2 Passkey Management (S30):** VIP client security dashboard enables WebAuthn/FIDO2 hardware biometric key registration with concurrent multi-device session flushing.
+- **PDPL Article 13 Consent Ledger:** Granular consent toggles for commercial dealer referrals, AECB soft-pull scoring, and automated KYC refresh with instant revocation audit logs.
 
 ---
 

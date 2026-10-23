@@ -1,11 +1,11 @@
 # Automotive OS — Monorepo Release Manifest
 
-**Release Version:** `0.1.0-staging.1`  
-**Git Checkpoint Commit:** `7659b67` (Clean working tree)  
+**Release Version:** `1.2.0-staging.1`  
+**Git Checkpoint Commit:** `c1afa53` (Clean working tree; incorporating S27–S31 Sovereign Auth Suite)  
 **Target Environment:** Staging / Controlled Pilot (UAE Region: `me-central-1`)  
 **Release Engineering Lead:** Autonomous Release Orchestrator (Antigravity)  
 **Standard Governance:** [`docs/implementation/QA_GATES.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/QA_GATES.md) & [`docs/implementation/INTEGRATION_TRUTH_TABLE.md`](file:///h:/Personal/Automotiv%20OS/docs/implementation/INTEGRATION_TRUTH_TABLE.md)  
-**Reference Design System:** Stitch Obsidian & Studio Glass (Project `4467699827252507387`, 26 Screens Mapped)
+**Reference Design System:** Stitch Obsidian & Studio Glass (Project `4467699827252507387`, 31 Screens Mapped)
 
 ---
 
@@ -13,20 +13,20 @@
 
 | Service / Package | Package Path | Runtime Stack | Target Port | Deployment Type | Primary Responsibility |
 |---|---|---|---|---|---|
-| **`marketplace`** | `apps/marketplace` | Next.js 15.5.28, React 19, TypeScript strict | `3000` | Node.js Server / Edge SSR | Public discovery, faceted search, comparisons, buyer garage, VIP enquiries. |
-| **`dealer`** | `apps/dealer` | Next.js 15.5.28, React 19, TypeScript strict | `3001` | Node.js Server | Multi-tenant dealership SaaS, inventory, sales studio, workshop, parts, F&I, fleet, exception desks. |
-| **`admin`** | `apps/admin` | Next.js 15.5.28, React 19, TypeScript strict | `3002` | Node.js Server | Platform operations command, KYB dealership verification, listing moderation, seller sanctions/disputes. |
-| **`api`** | `apps/api` | NestJS 10.4.15, TypeScript strict | `4000` | Containerized Node.js Service | Modular monolith backend, OpenAPI Swagger (`/api/docs`), JWT auth, RBAC guards, transactional outbox processor. |
-| **`@automotive-os/database`** | `packages/database` | Prisma ORM 6.19.3, PostgreSQL 16 | `5432` | Internal Shared Package | Database client, RLS policies (`tenant_policies.sql`), migrations, test suites. |
+| **`marketplace`** | `apps/marketplace` | Next.js 15.5.28, React 19, TypeScript strict | `3000` | Node.js Server / Edge SSR | Public discovery, faceted search, vehicle comparisons, buyer garage, VIP enquiries, UAE PASS auth, sovereign PIN recovery, and client dossier. |
+| **`dealer`** | `apps/dealer` | Next.js 15.5.28, React 19, TypeScript strict | `3001` | Node.js Server | Multi-tenant dealership SaaS, inventory grid, sales studio, workshop job cards, parts procurement, F&I, fleet consignment, and statutory exception desks. |
+| **`admin`** | `apps/admin` | Next.js 15.5.28, React 19, TypeScript strict | `3002` | Node.js Server | Platform operations command, KYB dealership verification, listing moderation, seller sanctions, and Article 99 dispute adjudication. |
+| **`api`** | `apps/api` | NestJS 10.4.15, TypeScript strict | `4000` | Containerized Node.js Service | Modular monolith backend, OpenAPI Swagger (`/api/docs`), JWT auth, RBAC guards, transactional outbox processor, and telemetry endpoints. |
+| **`@automotive-os/database`** | `packages/database` | Prisma ORM 6.19.3, PostgreSQL 16 | `5432` | Internal Shared Package | Database client, RLS policies (`tenant_policies.sql`), composite constraints, migrations, test suites. |
 | **`@automotive-os/contracts`** | `packages/contracts` | TypeScript strict | N/A | Internal Shared Package | Shared domain contracts, DTOs, API error interfaces, health schemas. |
-| **`@automotive-os/ui`** | `packages/ui` | React 19, Tailwind CSS 3.4.17 | N/A | Internal Shared Package | Obsidian Dark design tokens, Studio Glass components, RTL wrappers. |
+| **`@automotive-os/ui`** | `packages/ui` | React 19, Tailwind CSS 3.4.17 | N/A | Internal Shared Package | Obsidian Dark design tokens, Studio Glass components, RTL wrappers, typography presets. |
 | **`@automotive-os/config`** | `packages/config` | Tooling Configs | N/A | Internal Shared Package | Shared ESLint, Prettier, and TypeScript base configurations. |
 
 ---
 
-## 2. Verified Screen Scope (26 / 26 Screens 100% PASS)
+## 2. Verified Screen Scope (31 / 31 Screens 100% PASS)
 
-All 26 screens have been implemented, visually matched against Stitch exports, and verified across 1440px desktop, 1024px tablet, 390px mobile, and Arabic RTL viewports:
+All 31 screens have been implemented, visually matched against Stitch exports, and verified across 1440px desktop, 1024px tablet, 390px mobile, and Arabic RTL viewports:
 
 ### 2.1 P0 Core Marketplace & Backoffice (16 / 16 Verified)
 - **S01** — `apps/marketplace/app/page.tsx` (`/`) — Marketplace Home & Car Search (`VERIFIED`)
@@ -58,6 +58,13 @@ All 26 screens have been implemented, visually matched against Stitch exports, a
 - **S25** — `apps/dealer/app/finance/exception/page.tsx` — F&I Subprime DBR Hard-Lock (`VERIFIED`)
 - **S26** — `apps/dealer/app/fleet/exception/page.tsx` — Consignment Freeze & Injunction Desk (`VERIFIED`)
 
+### 2.3 P0 Sovereign Identity & Authentication Suite (5 / 5 Verified)
+- **S27** — `apps/marketplace/app/auth/login/page.tsx` (`/auth/login`) — Sign In & UAE PASS Authentication (`VERIFIED`)
+- **S28** — `apps/marketplace/app/auth/register/page.tsx` (`/auth/register`) — VIP Registration & Sovereign Account Creation (`VERIFIED`)
+- **S29** — `apps/marketplace/app/auth/forgot-password/page.tsx` (`/auth/forgot-password`) — Forgot Password & Sovereign PIN Reset (`VERIFIED`)
+- **S30** — `apps/marketplace/app/account/settings/page.tsx` (`/account/settings`) — Account Details, Security & Settings Command (`VERIFIED`)
+- **S31** — `apps/marketplace/app/account/profile/dossier/page.tsx` (`/account/profile/dossier`) — User Profile & Identity Dossier (`VERIFIED`)
+
 ---
 
 ## 3. Integration Truth Flags & Runtime Mode
@@ -84,5 +91,5 @@ All 26 screens have been implemented, visually matched against Stitch exports, a
 - **Production Asset Build:** 7 / 7 Turbo tasks pass (Next.js 15 App Router static/dynamic pages compiled).
 - **Unit & Integration Tests:** 8 suites, 93 / 93 tests pass (NestJS API).
 - **PostgreSQL RLS Multi-Tenancy:** 16 / 16 tests pass (`rls-isolation.test.ts`).
-- **Playwright Browser Suites:** 25 / 25 test runners pass across all 26 screens (`run-all-verifications.js`).
+- **Playwright Browser Suites:** 30 / 30 test runners pass across all 31 screens (`scripts/run-all-verifications.js`).
 - **Open Defects:** 0 Critical, 0 High, 0 Regressions.
