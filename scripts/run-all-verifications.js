@@ -27,6 +27,8 @@ const scripts = [
   'verify-s24.js',
   'verify-s25.js',
   'verify-s26.js',
+  'verify-s27.js',
+  'verify-s29.js',
 ];
 
 console.log('========================================================================');
