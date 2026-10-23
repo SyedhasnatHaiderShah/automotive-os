@@ -1,0 +1,45 @@
+screen_component_field,API_response_path,service_source,DB_column_or_external_provider,data_classification,freshness_cache,tenant_buyer_filter,verified_status
+S01/Hero/AskingPrice,items[].price.amountFils,ListingsService.getPublicListings,listings.asking_price_fils,PUBLIC,Cache 10s,Only AVAILABLE stock,VERIFIED_DYNAMIC
+S01/Hero/MakeModel,items[].title,ListingsService.getPublicListings,makes.name + car_models.name,PUBLIC,Cache 10s,Only AVAILABLE stock,VERIFIED_DYNAMIC
+S01/Hero/DealerBadge,items[].seller.verified,ListingsService.getPublicListings,dealer_verifications.status,PUBLIC,Cache 10s,KYB APPROVED,VERIFIED_DYNAMIC
+S02/SearchGrid/ListingPrice,items[].price.amountFils,ListingsService.getPublicListings,listings.asking_price_fils,PUBLIC,Cache 10s,Published + AVAILABLE,VERIFIED_DYNAMIC
+S02/SearchGrid/GccSpec,items[].gccSpec,ListingsService.getPublicListings,vehicles.gcc_spec,PUBLIC,Cache 10s,Published + AVAILABLE,VERIFIED_DYNAMIC
+S02/SearchGrid/Mileage,items[].mileageKm,ListingsService.getPublicListings,vehicles.mileage_km,PUBLIC,Cache 10s,Published + AVAILABLE,VERIFIED_DYNAMIC
+S02/SearchGrid/TasjeelScore,items[].tasjeelScore,ListingsService.getPublicListings,RTA Tasjeel Adapter,INTERNAL_PROJECTION,Static fixture fallback,External rail Coming Soon,VERIFIED_ADAPTER_FALLBACK
+S04/Compare/TechnicalSpecs,compareItems[].specs,ListingsService.getPublicListingBySlug,"vehicles.fuel, transmission, trim",PUBLIC,On-demand,Published only,VERIFIED_DYNAMIC
+S05/Detail/MaskedVin,maskedVin,ListingsService.getPublicListingBySlug,vehicles.vin (Masked prefix only),CONFIDENTIAL,On-demand,Publicly masked,VERIFIED_DYNAMIC
+S05/Detail/MediaGallery,media[].url,ListingsService.getPublicListingBySlug,vehicle_media.object_key,PUBLIC,CDN Cached,is_public = true only,VERIFIED_DYNAMIC
+S05/Detail/WholesaleCost,NONE (Redacted),ListingsService.getPublicListingBySlug,vehicles.purchase_cost_fils,RESTRICTED_DEALER,Forbidden,EXCLUDED FROM PUBLIC DTO,VERIFIED_REDACTED
+S06/Storefront/TradeLicense,tradeLicenseNumber,TenantsService.getPublicDealerBySlug,dealer_verifications.trade_license_no,PUBLIC,Cache 60s,Public verified dealer,VERIFIED_DYNAMIC
+S06/Storefront/StockValuation,stockStats.totalFloorAed,TenantsService.getPublicDealerBySlug,SUM(listings.asking_price_fils),PUBLIC,Cache 60s,Tenant-scoped sum,VERIFIED_DYNAMIC
+S07/Enquiry/BuyerConsent,dataGrant.fieldsGranted,LeadsService.createLeadEnquiry,lead_data_grants.fields_granted,RESTRICTED_PII,Write-only,Purpose-scoped consent,VERIFIED_DYNAMIC
+S08/Timeline/Status,status,MeService.getBuyerEnquiries,leads.status,CONFIDENTIAL_BUYER,Real-time,buyer_user_id = caller,VERIFIED_DYNAMIC
+S08/Timeline/GrantState,grantStatus,MeService.getBuyerEnquiries,lead_data_grants.revoked_at,CONFIDENTIAL_BUYER,Real-time,buyer_user_id = caller,VERIFIED_DYNAMIC
+S09/Garage/Appointments,appointments[].startsAt,MeService.getBuyerAppointments,appointments.starts_at,CONFIDENTIAL_BUYER,Real-time,buyer_user_id = caller,VERIFIED_DYNAMIC
+S10/Saved/Favorites,favorites[].listingId,MeService.getFavorites,favorites.listing_id,CONFIDENTIAL_BUYER,Real-time,user_id = caller,VERIFIED_DYNAMIC
+S10/Saved/Radars,savedSearches[].criteria,MeService.getSavedSearches,saved_searches.criteria,CONFIDENTIAL_BUYER,Real-time,user_id = caller,VERIFIED_DYNAMIC
+S11/Profile/Preferences,budgetMaxFils,MeService.getBuyerProfile,buyer_profiles.budget_max_fils,CONFIDENTIAL_PII,Real-time,user_id = caller,VERIFIED_DYNAMIC
+S12/Dashboard/FloorValuation,stats.floorValuationAed,VehiclesService.listVehicles,SUM(vehicles.asking_price_fils),RESTRICTED_DEALER,Cache 10s,tenant_id = caller,VERIFIED_DYNAMIC
+S12/Dashboard/UnitCounts,stats.totalUnits,VehiclesService.listVehicles,COUNT(vehicles.id),RESTRICTED_DEALER,Cache 10s,tenant_id = caller,VERIFIED_DYNAMIC
+S13/Inventory/PurchaseCost,purchaseCostFils,VehiclesService.listVehicles,vehicles.purchase_cost_fils,RESTRICTED_DEALER,Real-time,Staff role allowlist (OWNER/ADMIN only),VERIFIED_ROLE_SCOPED
+S13/Inventory/VinChassis,vin,VehiclesService.listVehicles,vehicles.vin,INTERNAL_DEALER,Real-time,tenant_id = caller,VERIFIED_DYNAMIC
+S13/Inventory/StockStatus,stockStatus,VehiclesService.listVehicles,vehicles.stock_status,INTERNAL_DEALER,Real-time,tenant_id = caller,VERIFIED_DYNAMIC
+S14/Admin/TenantStatus,status,AdminService.listAllTenants,tenants.status,PLATFORM_GOVERNANCE,Real-time,Platform admin only,VERIFIED_DYNAMIC
+S14/Admin/OutboxMetrics,pendingCount,AdminService.getOutboxMetrics,outbox_events.status,PLATFORM_OPS,Real-time,Platform admin only,VERIFIED_DYNAMIC
+S15/KYB/LicenseVerification,verificationStatus,AdminService.listAllTenants,dealer_verifications.status,PLATFORM_GOVERNANCE,Real-time,Platform admin only,VERIFIED_DYNAMIC
+S16/Moderation/Decision,status,ListingsService.adminDecision,listings.status,PLATFORM_GOVERNANCE,Real-time,Platform admin only,VERIFIED_DYNAMIC
+S17/Disputes/EscrowHold,disputeCase.holdAmountAed,AdminService/Dispute Desk,External Escrow Partner,RESTRICTED_FINANCIAL,Static fixture fallback,External partner Coming Soon,VERIFIED_ADAPTER_FALLBACK
+S18/Sales/QuotationVat,vatAmountFils,Dealer DMS Sales Desk,quotations.vat_5_percent,RESTRICTED_DEALER,Calculated,tenant_id = caller,VERIFIED_DYNAMIC
+S19/Workshop/BayBooking,jobCards[].bayId,Dealer DMS Workshop Desk,workshop_jobs.bay_id,RESTRICTED_DEALER,Real-time,tenant_id = caller,VERIFIED_DYNAMIC
+S20/Parts/ReorderLevel,parts[].reorderPoint,Dealer DMS Parts Desk,spare_parts.reorder_level,RESTRICTED_DEALER,Real-time,tenant_id = caller,VERIFIED_DYNAMIC
+S21/Finance/DbrEstimate,indicativeDbrPercent,Dealer DMS F&I Desk,CBUAE 50% Rule,RESTRICTED_FINANCIAL,Calculated,Indicative without live AECB,VERIFIED_ADAPTER_FALLBACK
+S22/Accounting/TaxInvoice,invoices[].trn,Dealer DMS Accounting Desk,tenants.tax_registration_no,RESTRICTED_FINANCIAL,Real-time,tenant_id = caller,VERIFIED_DYNAMIC
+S23/Fleet/ConsignmentTerms,commissionPercent,Dealer DMS Fleet Desk,consignment_mandates.commission,RESTRICTED_DEALER,Real-time,tenant_id = caller,VERIFIED_DYNAMIC
+S24/Export/CustomsBondStatus,bondStatus,Dealer DMS Export Desk,Customs 90-Day SLA,RESTRICTED_FINANCIAL,Configurable Rule,Mirsal rail Coming Soon,VERIFIED_ADAPTER_FALLBACK
+S25/Subprime/UnderwritingLock,hardLockStatus,Dealer DMS F&I Desk,CBUAE Subprime Policy,RESTRICTED_FINANCIAL,Policy Rule,AECB live pull Coming Soon,VERIFIED_ADAPTER_FALLBACK
+S26/Freeze/JudicialInjunction,freezeStatus,Dealer DMS Fleet Desk,Dubai Courts Order,RESTRICTED_LEGAL,Policy Rule,Dubai Courts feed Coming Soon,VERIFIED_ADAPTER_FALLBACK
+S27/Login/DevAuthToken,accessToken,AuthService.generateDevToken,users.identity_subject,PUBLIC_BOOTSTRAP,Stateless JWT (24h),None,VERIFIED_DYNAMIC
+S28/Register/VipLead,leadId,AuthService.registerVipLead,leads.id,CONFIDENTIAL_BUYER,Real-time,Buyer onboarding,VERIFIED_DYNAMIC
+S29/ResetPin/Challenge,challengeId,AuthService/Recovery Desk,Recovery Session,CONFIDENTIAL_AUTH,Transient,Push challenge Coming Soon,VERIFIED_ADAPTER_FALLBACK
+S30/Settings/TrnIban,escrowIban,MeService.updateAccountSettings,buyer_profiles.escrow_iban,RESTRICTED_PII,Real-time,user_id = caller,VERIFIED_DYNAMIC
+S31/Dossier/ValuationBreakdown,valuationAed,MeService.getBuyerProfile,buyer_profiles (Derived garage valuation),CONFIDENTIAL_BUYER,Real-time,user_id = caller,VERIFIED_DYNAMIC

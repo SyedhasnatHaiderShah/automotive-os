@@ -3,26 +3,33 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { CreateVehicleDto } from './dto/create-vehicle.dto';
-import { UpdateVehicleDto } from './dto/update-vehicle.dto';
-import { CreateMediaUploadDto, MediaUploadResponseDto } from './dto/create-media-upload.dto';
-import { VehicleResponseDto } from './dto/vehicle-response.dto';
-import { ListingStatus, StockStatus } from '@automotive-os/database';
+} from "@nestjs/common";
+import { PrismaService } from "../database/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { CreateVehicleDto } from "./dto/create-vehicle.dto";
+import { UpdateVehicleDto } from "./dto/update-vehicle.dto";
+import {
+  CreateMediaUploadDto,
+  MediaUploadResponseDto,
+} from "./dto/create-media-upload.dto";
+import { VehicleResponseDto } from "./dto/vehicle-response.dto";
+import {
+  ListingStatus,
+  MembershipRole,
+  StockStatus,
+} from "@automotive-os/database";
 
 @Injectable()
 export class VehiclesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly auditService: AuditService
+    private readonly auditService: AuditService,
   ) {}
 
   async createVehicle(
     tenantId: string,
     dto: CreateVehicleDto,
-    actorUserId?: string
+    actorUserId?: string,
   ): Promise<VehicleResponseDto> {
     // 1. Verify branch belongs strictly to this tenant
     const branch = await this.prisma.branch.findUnique({
@@ -36,7 +43,7 @@ export class VehiclesService {
 
     if (!branch) {
       throw new BadRequestException(
-        `Branch ${dto.branchId} does not belong to dealership tenant ${tenantId}`
+        `Branch ${dto.branchId} does not belong to dealership tenant ${tenantId}`,
       );
     }
 
@@ -46,7 +53,7 @@ export class VehiclesService {
     });
 
     if (!model || model.makeId !== dto.makeId) {
-      throw new BadRequestException('Invalid make or car model reference');
+      throw new BadRequestException("Invalid make or car model reference");
     }
 
     // 3. Create canonical vehicle record
@@ -68,7 +75,9 @@ export class VehiclesService {
           transmission: dto.transmission || null,
           gccSpec: dto.gccSpec !== undefined ? dto.gccSpec : null,
           purchaseCostFils:
-            dto.purchaseCostFils !== undefined ? BigInt(dto.purchaseCostFils) : null,
+            dto.purchaseCostFils !== undefined
+              ? BigInt(dto.purchaseCostFils)
+              : null,
           askingPriceFils: BigInt(dto.askingPriceFils),
           stockStatus: dto.stockStatus || StockStatus.INTAKE,
         },
@@ -84,8 +93,8 @@ export class VehiclesService {
       await this.auditService.logAction({
         tenantId,
         actorUserId: actorUserId || null,
-        action: 'VEHICLE_CREATED',
-        targetType: 'vehicle',
+        action: "VEHICLE_CREATED",
+        targetType: "vehicle",
         targetId: vehicle.id,
         metadata: {
           stockNumber: vehicle.stockNumber,
@@ -95,16 +104,20 @@ export class VehiclesService {
 
       return this.mapVehicleResponse(vehicle);
     } catch (error: any) {
-      if (error.code === 'P2002') {
+      if (error.code === "P2002") {
         throw new ConflictException(
-          'Vehicle with this VIN or stock number already exists in dealership'
+          "Vehicle with this VIN or stock number already exists in dealership",
         );
       }
       throw error;
     }
   }
 
-  async getVehicleById(tenantId: string, id: string): Promise<VehicleResponseDto> {
+  async getVehicleById(
+    tenantId: string,
+    id: string,
+    callerRole?: MembershipRole,
+  ): Promise<VehicleResponseDto> {
     const vehicle = await this.prisma.vehicle.findUnique({
       where: {
         tenantId_id: {
@@ -116,7 +129,7 @@ export class VehiclesService {
         make: true,
         model: true,
         media: {
-          orderBy: { sortOrder: 'asc' },
+          orderBy: { sortOrder: "asc" },
         },
         listing: true,
       },
@@ -126,7 +139,7 @@ export class VehiclesService {
       throw new NotFoundException(`Vehicle ${id} not found in this dealership`);
     }
 
-    return this.mapVehicleResponse(vehicle);
+    return this.mapVehicleResponse(vehicle, callerRole);
   }
 
   async listVehicles(
@@ -137,7 +150,8 @@ export class VehiclesService {
       condition?: string;
       page?: number;
       limit?: number;
-    }
+    },
+    callerRole?: MembershipRole,
   ): Promise<{ items: VehicleResponseDto[]; total: number }> {
     const page = Math.max(1, filters?.page || 1);
     const limit = Math.min(50, Math.max(1, filters?.limit || 20));
@@ -159,7 +173,7 @@ export class VehiclesService {
           media: true,
           listing: true,
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: "desc" },
         skip,
         take: limit,
       }),
@@ -167,7 +181,7 @@ export class VehiclesService {
     ]);
 
     return {
-      items: vehicles.map((v) => this.mapVehicleResponse(v)),
+      items: vehicles.map((v) => this.mapVehicleResponse(v, callerRole)),
       total,
     };
   }
@@ -176,7 +190,7 @@ export class VehiclesService {
     tenantId: string,
     id: string,
     dto: UpdateVehicleDto,
-    actorUserId?: string
+    actorUserId?: string,
   ): Promise<VehicleResponseDto> {
     // 1. Verify vehicle belongs to tenant
     const existing = await this.prisma.vehicle.findUnique({
@@ -219,9 +233,13 @@ export class VehiclesService {
           transmission: dto.transmission,
           gccSpec: dto.gccSpec,
           purchaseCostFils:
-            dto.purchaseCostFils !== undefined ? BigInt(dto.purchaseCostFils) : undefined,
+            dto.purchaseCostFils !== undefined
+              ? BigInt(dto.purchaseCostFils)
+              : undefined,
           askingPriceFils:
-            dto.askingPriceFils !== undefined ? BigInt(dto.askingPriceFils) : undefined,
+            dto.askingPriceFils !== undefined
+              ? BigInt(dto.askingPriceFils)
+              : undefined,
           stockStatus: dto.stockStatus,
         },
         include: {
@@ -259,9 +277,9 @@ export class VehiclesService {
         await tx.outboxEvent.create({
           data: {
             tenantId,
-            aggregateType: 'listing',
+            aggregateType: "listing",
             aggregateId: existing.listing.id,
-            eventType: 'listing.unpublished',
+            eventType: "listing.unpublished",
             payload: {
               listingId: existing.listing.id,
               vehicleId: id,
@@ -280,8 +298,8 @@ export class VehiclesService {
     await this.auditService.logAction({
       tenantId,
       actorUserId: actorUserId || null,
-      action: 'VEHICLE_UPDATED',
-      targetType: 'vehicle',
+      action: "VEHICLE_UPDATED",
+      targetType: "vehicle",
       targetId: id,
       metadata: {
         stockStatus: dto.stockStatus,
@@ -295,7 +313,7 @@ export class VehiclesService {
   async registerMediaUpload(
     tenantId: string,
     vehicleId: string,
-    dto: CreateMediaUploadDto
+    dto: CreateMediaUploadDto,
   ): Promise<MediaUploadResponseDto> {
     // 1. Verify vehicle belongs to tenant
     const vehicle = await this.prisma.vehicle.findUnique({
@@ -308,16 +326,18 @@ export class VehiclesService {
     });
 
     if (!vehicle) {
-      throw new NotFoundException(`Vehicle ${vehicleId} not found in this dealership`);
+      throw new NotFoundException(
+        `Vehicle ${vehicleId} not found in this dealership`,
+      );
     }
 
-    const sanitizedFileName = dto.fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const sanitizedFileName = dto.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
     const objectKey = `tenants/${tenantId}/vehicles/${vehicleId}/${Date.now()}-${sanitizedFileName}`;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
     // In production, an S3 client generates pre-signed PUT URL. Here we construct the standard upload endpoint descriptor.
-    const s3Endpoint = process.env.S3_ENDPOINT || 'http://localhost:9000';
-    const s3Bucket = process.env.S3_BUCKET || 'automotive-os-media';
+    const s3Endpoint = process.env.S3_ENDPOINT || "http://localhost:9000";
+    const s3Bucket = process.env.S3_BUCKET || "automotive-os-media";
     const uploadUrl = `${s3Endpoint}/${s3Bucket}/${objectKey}?token=signed-upload-token-${Date.now()}`;
 
     const media = await this.prisma.vehicleMedia.create({
@@ -341,13 +361,30 @@ export class VehiclesService {
     };
   }
 
-  private mapVehicleResponse(vehicle: any): VehicleResponseDto {
+  private mapVehicleResponse(
+    vehicle: any,
+    callerRole?: MembershipRole,
+  ): VehicleResponseDto {
+    const privilegedCostRoles: MembershipRole[] = [
+      MembershipRole.OWNER,
+      MembershipRole.ADMIN,
+      MembershipRole.FINANCE_MANAGER,
+      MembershipRole.INVENTORY_MANAGER,
+    ];
+    // If role is provided, redact purchaseCostFils unless caller is privileged
+    const isCostAuthorized =
+      !callerRole || privilegedCostRoles.includes(callerRole);
+    const purchaseCostFils =
+      isCostAuthorized && vehicle.purchaseCostFils
+        ? vehicle.purchaseCostFils.toString()
+        : null;
+
     return {
       id: vehicle.id,
       tenantId: vehicle.tenantId,
       branchId: vehicle.branchId,
-      makeName: vehicle.make?.name || 'Unknown',
-      modelName: vehicle.model?.name || 'Unknown',
+      makeName: vehicle.make?.name || "Unknown",
+      modelName: vehicle.model?.name || "Unknown",
       vin: vehicle.vin,
       stockNumber: vehicle.stockNumber,
       trim: vehicle.trim,
@@ -358,7 +395,7 @@ export class VehiclesService {
       fuel: vehicle.fuel,
       transmission: vehicle.transmission,
       gccSpec: vehicle.gccSpec,
-      purchaseCostFils: vehicle.purchaseCostFils ? vehicle.purchaseCostFils.toString() : null,
+      purchaseCostFils,
       askingPriceFils: vehicle.askingPriceFils.toString(),
       stockStatus: vehicle.stockStatus,
       createdAt: vehicle.createdAt.toISOString(),

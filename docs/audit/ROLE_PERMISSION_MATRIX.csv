@@ -1,0 +1,43 @@
+actor,tenant,branch,resource,allowed_verbs,conditions,expected_denial
+GUEST,NONE,NONE,health,GET,Always permitted (Liveness probe),NONE
+GUEST,NONE,NONE,public_listings,GET,Published listings only (AVAILABLE stock + ACTIVE tenant),403 on draft/sold/private fields
+GUEST,NONE,NONE,public_dealers,GET,Public verified storefront profile only,404 if unapproved/suspended
+GUEST,NONE,NONE,auth_token,POST,Valid dev identity payload,400 on malformed input
+GUEST,NONE,NONE,auth_register,POST,VIP onboarding lead intake,400 on validation failure
+GUEST,NONE,NONE,protected_routes,GET/POST/PATCH/DELETE,None (Anonymous),401 Unauthorized
+BUYER,NONE,NONE,me_summary,GET,Authenticated user identity,401 if token invalid/expired
+BUYER,NONE,NONE,buyer_profile,GET/PATCH,Own profile (user_id match),403 on other buyer profile
+BUYER,NONE,NONE,buyer_settings,GET/PATCH,Own settings / TRN / IBAN,403 on other buyer settings
+BUYER,NONE,NONE,buyer_favorites,GET/POST/DELETE,Own saved cars only (user_id scoped),403 on other buyer favorites
+BUYER,NONE,NONE,buyer_saved_searches,GET/POST/DELETE,Own searches only (user_id scoped),403 on other buyer searches
+BUYER,NONE,NONE,buyer_enquiries,GET,Own submitted leads only,403 on other buyer leads
+BUYER,NONE,NONE,buyer_appointments,GET/POST,Own appointments / test-drive bookings,403 on other buyer bookings
+BUYER,NONE,NONE,grant_revocation,POST,Own lead data grants only,403 on other buyer grants
+BUYER,NONE,NONE,lead_submission,POST,Published listing + consent payload + anti-spam limits,429 if rate limit exceeded
+BUYER,NONE,NONE,dealer_routes,GET/POST/PATCH/DELETE,None (Buyer lacks dealer membership),403 Forbidden (TENANT_FORBIDDEN)
+BUYER,NONE,NONE,admin_routes,GET/POST/PATCH/DELETE,None (Buyer lacks platform admin role),403 Forbidden (Platform admin required)
+DEALER_OWNER,OWN_TENANT,ALL_BRANCHES,tenant_context,GET,Active membership in tenant,403 if membership/tenant inactive
+DEALER_OWNER,OWN_TENANT,ALL_BRANCHES,privileged_management,GET,Holds OWNER or ADMIN role,403 for non-management roles
+DEALER_OWNER,OWN_TENANT,ALL_BRANCHES,vehicles_inventory,GET/POST/PATCH,Scoped to own tenantId (includes purchase cost),403 on cross-tenant vehicle access
+DEALER_OWNER,OWN_TENANT,ALL_BRANCHES,vehicles_media,POST,Scoped to own tenantId,403 on other dealer vehicle
+DEALER_OWNER,OWN_TENANT,ALL_BRANCHES,listings_manage,POST,Draft & submit listing for own stock,403 on other dealer listing
+DEALER_OWNER,OWN_TENANT,ALL_BRANCHES,crm_leads,GET/PATCH,Own tenant leads; contact details consent-gated,403 on other dealer leads
+DEALER_OWNER,OWN_TENANT,ALL_BRANCHES,dealer_appointments,GET/PATCH,Own tenant test-drives,403 on other dealer appointments
+DEALER_ADMIN,OWN_TENANT,ALL_BRANCHES,vehicles_inventory,GET/POST/PATCH,Scoped to own tenantId (includes purchase cost),403 on cross-tenant vehicle access
+DEALER_ADMIN,OWN_TENANT,ALL_BRANCHES,privileged_management,GET,Holds OWNER or ADMIN role,403 for non-management roles
+DEALER_INVENTORY_MANAGER,OWN_TENANT,ALL_BRANCHES,vehicles_inventory,GET/POST/PATCH,Inventory operations permitted,403 on cross-tenant vehicle access
+DEALER_INVENTORY_MANAGER,OWN_TENANT,ALL_BRANCHES,privileged_management,GET,None,403 Forbidden (INSUFFICIENT_ROLE_PERMISSIONS)
+DEALER_SALES_MANAGER,OWN_TENANT,ALL_BRANCHES,vehicles_inventory,GET/POST/PATCH,Vehicle stock and pricing updates,403 on cross-tenant vehicle access
+DEALER_SALES_MANAGER,OWN_TENANT,ALL_BRANCHES,crm_leads,GET/PATCH,Lead status and staff assignment,403 on other dealer leads
+DEALER_SALES_AGENT,OWN_TENANT,ASSIGNED_BRANCH,vehicles_inventory,GET/POST,Can ingest vehicle; CANNOT update core ledger status,403 on updateVehicle
+DEALER_SALES_AGENT,OWN_TENANT,ASSIGNED_BRANCH,crm_leads,GET/PATCH,Can update lead status; CANNOT assign leads,403 on assignLead
+DEALER_SALES_AGENT,OWN_TENANT,ASSIGNED_BRANCH,cost_margin_data,GET,None (Wholesale purchase cost redacted),Redacted (null) in response DTO
+DEALER_SERVICE_ADVISOR,OWN_TENANT,WORKSHOP_BAY,vehicles_inventory,GET,Read-only vehicle stock inspection,403 on create/update vehicle
+DEALER_FINANCE_MANAGER,OWN_TENANT,ALL_BRANCHES,vehicles_inventory,GET,Financial audit; purchase cost visible,403 on cross-tenant vehicle access
+DEALER_VIEWER,OWN_TENANT,ALL_BRANCHES,vehicles_inventory,GET,Read-only stock browsing; purchase cost redacted,403 on mutation verbs
+PLATFORM_ADMIN,ANY_TENANT,ALL_BRANCHES,admin_tenants,GET/PATCH,Platform superuser; audited action log,403 for non-platform admin
+PLATFORM_ADMIN,ANY_TENANT,ALL_BRANCHES,admin_moderation,POST,Listing approval/rejection with outbox event,403 for non-platform admin
+PLATFORM_ADMIN,ANY_TENANT,ALL_BRANCHES,admin_outbox,GET/POST,Outbox queue metrics, processing, and retry,403 for non-platform admin
+PLATFORM_ADMIN,ANY_TENANT,ALL_BRANCHES,cross_tenant_inspect,GET,Bypasses tenant guard with audit log,Audited cross-tenant inspection
+DISABLED_USER,ANY_TENANT,NONE,all_protected_routes,ANY,None (User account disabled),401/403 Forbidden (User account inactive)
+SUSPENDED_TENANT,SUSPENDED,ALL_BRANCHES,dealer_operations,ANY,None (Dealership suspended by platform admin),403 Forbidden (TENANT_INACTIVE)
