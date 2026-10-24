@@ -1,6 +1,7 @@
 # Multi-stage Dockerfile for Automotive OS NestJS API Monolith
 FROM node:20-alpine AS base
 WORKDIR /app
+RUN apk add --no-cache openssl libc6-compat
 RUN npm install -g pnpm@9.15.9
 
 FROM base AS dependencies
@@ -24,8 +25,9 @@ RUN pnpm --filter api run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=staging
-ENV API_PORT=4000
-RUN apk add --no-cache curl
+ENV PORT=4000
+ENV NODE_PATH=/app/node_modules:/app/apps/api/node_modules
+RUN apk add --no-cache curl openssl libc6-compat
 
 # Security: Non-root user
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nestjs
@@ -38,6 +40,6 @@ COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
 
 EXPOSE 4000
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-4000}/health || exit 1
+  CMD curl -f http://127.0.0.1:${PORT:-4000}/health || exit 1
 
 CMD ["node", "apps/api/dist/src/main.js"]
