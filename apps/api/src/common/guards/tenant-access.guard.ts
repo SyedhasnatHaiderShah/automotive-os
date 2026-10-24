@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { MembershipRole } from '@automotive-os/database';
 import { REQUIRED_ROLES_KEY } from '../decorators/require-roles.decorator';
 import { AuthenticatedUser } from '../../auth/auth.service';
+import { dbContextStorage } from '../../database/prisma.service';
 
 export interface TenantContext {
   tenantId: string;
@@ -39,6 +40,11 @@ export class TenantAccessGuard implements CanActivate {
 
     // 1. Platform Admin Bypass: platform operators have audited cross-tenant access
     if (user.isPlatformAdmin) {
+      const store = dbContextStorage.getStore();
+      if (store) {
+        store.isAdmin = true;
+        store.tenantId = tenantId;
+      }
       request.tenantContext = {
         tenantId,
         tenantSlug: 'platform-admin-view',
@@ -57,6 +63,12 @@ export class TenantAccessGuard implements CanActivate {
       throw new ForbiddenException(
         `TENANT_FORBIDDEN: User has no membership in tenant ${tenantId}`
       );
+    }
+
+    const store = dbContextStorage.getStore();
+    if (store) {
+      store.tenantId = tenantId;
+      if (user.id) store.userId = user.id;
     }
 
     if (!membership.active) {

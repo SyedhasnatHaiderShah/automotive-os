@@ -155,6 +155,33 @@ async function main() {
     },
   });
 
+  // Explicitly ensure dealer verifications are APPROVED even if tenants pre-existed
+  await prisma.dealerVerification.upsert({
+    where: { tenantId: SEED_DATA.dealerA.tenantId },
+    update: { status: 'APPROVED' },
+    create: {
+      tenantId: SEED_DATA.dealerA.tenantId,
+      status: 'APPROVED',
+      tradeLicenseRef: 'TL-DXB-987654',
+      licenseExpiry: new Date('2028-12-31'),
+      jurisdiction: 'Dubai DED',
+      reviewNotes: 'Fully verified commercial dealership license.',
+    },
+  });
+
+  await prisma.dealerVerification.upsert({
+    where: { tenantId: SEED_DATA.dealerB.tenantId },
+    update: { status: 'APPROVED' },
+    create: {
+      tenantId: SEED_DATA.dealerB.tenantId,
+      status: 'APPROVED',
+      tradeLicenseRef: 'TL-SHJ-123456',
+      licenseExpiry: new Date('2027-10-15'),
+      jurisdiction: 'Sharjah SEDD',
+      reviewNotes: 'Verified Sharjah automotive trade license.',
+    },
+  });
+
   // 3. Users: Staff, Buyers, Admin
   // Dealer A Principal
   await prisma.user.upsert({

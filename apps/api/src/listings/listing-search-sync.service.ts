@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import {
   ListingStatus,
   StockStatus,
@@ -93,117 +93,119 @@ export class ListingSearchSyncService {
       throw new Error(`Invalid UUID format for listingId: ${listingId}`);
     }
 
-    const listing = await this.prisma.listing.findUnique({
-      where: { id: listingId },
-      include: {
-        tenant: {
-          include: {
-            verification: true,
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const listing = await this.prisma.listing.findUnique({
+        where: { id: listingId },
+        include: {
+          tenant: {
+            include: {
+              verification: true,
+            },
           },
-        },
-        vehicle: {
-          include: {
-            branch: true,
-            make: true,
-            model: true,
-            media: {
-              where: { isPublic: true },
-              orderBy: { sortOrder: 'asc' },
+          vehicle: {
+            include: {
+              branch: true,
+              make: true,
+              model: true,
+              media: {
+                where: { isPublic: true },
+                orderBy: { sortOrder: 'asc' },
+              },
             },
           },
         },
-      },
-    });
+      });
 
-    if (!listing) {
-      this.logger.warn(`Cannot project listing ${listingId}: not found in DB`);
-      this.evictFromProjection(listingId);
-      return false;
-    }
+      if (!listing) {
+        this.logger.warn(`Cannot project listing ${listingId}: not found in DB`);
+        this.evictFromProjection(listingId);
+        return false;
+      }
 
-    // Verify publish gates before admitting into public search projection
-    if (
-      listing.status !== ListingStatus.PUBLISHED ||
-      listing.vehicle.stockStatus !== StockStatus.AVAILABLE ||
-      listing.tenant.status !== TenantStatus.ACTIVE ||
-      listing.tenant.verification?.status !== VerificationStatus.APPROVED
-    ) {
-      this.logger.warn(
-        `Listing ${listingId} failed public projection gates (status=${listing.status}, stock=${listing.vehicle.stockStatus}, tenant=${listing.tenant.status}, kyb=${listing.tenant.verification?.status}). Evicting from search index.`
+      // Verify publish gates before admitting into public search projection
+      if (
+        listing.status !== ListingStatus.PUBLISHED ||
+        listing.vehicle.stockStatus !== StockStatus.AVAILABLE ||
+        listing.tenant.status !== TenantStatus.ACTIVE ||
+        listing.tenant.verification?.status !== VerificationStatus.APPROVED
+      ) {
+        this.logger.warn(
+          `Listing ${listingId} failed public projection gates (status=${listing.status}, stock=${listing.vehicle.stockStatus}, tenant=${listing.tenant.status}, kyb=${listing.tenant.verification?.status}). Evicting from search index.`
+        );
+        this.evictFromProjection(listingId);
+        return false;
+      }
+
+      const cdnBase = process.env.S3_PUBLIC_CDN_URL || 'https://cdn.automotive-os.ae';
+      const emirate = listing.vehicle.branch?.emirate || 'UAE';
+      const city = listing.vehicle.branch?.city || 'UAE';
+
+      // Construct sanitized, redacted projection document
+      const doc: ProjectedListingDoc = {
+        id: listing.id,
+        tenantId: listing.tenantId,
+        vehicleId: listing.vehicleId,
+        slug: listing.slug,
+        title: listing.title,
+        description: listing.description,
+        askingPriceFils: listing.askingPriceFils,
+        currency: 'AED',
+        year: listing.vehicle.modelYear,
+        modelYear: listing.vehicle.modelYear,
+        mileageKm: listing.vehicle.mileageKm,
+        condition: listing.vehicle.condition,
+        gccSpec: listing.vehicle.gccSpec,
+        colorExterior: listing.vehicle.colorExterior,
+        fuel: listing.vehicle.fuel,
+        transmission: listing.vehicle.transmission,
+        trim: listing.vehicle.trim,
+        qualityScore: listing.qualityScore,
+        publishedAt: listing.publishedAt || new Date(),
+        verifiedAt: listing.verifiedAt,
+        maskedVin: this.maskVin(listing.vehicle.vin),
+        emirate,
+        make: {
+          id: listing.vehicle.make.id,
+          slug: listing.vehicle.make.slug,
+          name: listing.vehicle.make.name,
+        },
+        model: {
+          id: listing.vehicle.model.id,
+          slug: listing.vehicle.model.slug,
+          name: listing.vehicle.model.name,
+        },
+        seller: {
+          id: listing.tenant.id,
+          slug: listing.tenant.slug,
+          displayName: listing.tenant.displayName,
+          emirate,
+          city,
+          verified: listing.tenant.verification?.status === VerificationStatus.APPROVED,
+        },
+        branch: {
+          id: listing.vehicle.branch.id,
+          name: listing.vehicle.branch.name,
+          emirate,
+          city,
+        },
+        media: listing.vehicle.media.map((m) => ({
+          id: m.id,
+          kind: m.kind,
+          url: `${cdnBase}/${m.objectKey}`,
+          altText: m.altText,
+          sortOrder: m.sortOrder,
+        })),
+      };
+
+      // Store in projection indices
+      this.projectionIndex.set(doc.id, doc);
+      this.slugIndex.set(doc.slug, doc.id);
+
+      this.logger.log(
+        `[Search Projection] Synced published listing [${doc.id}] (${doc.slug}) — Active in marketplace discovery.`
       );
-      this.evictFromProjection(listingId);
-      return false;
-    }
-
-    const cdnBase = process.env.S3_PUBLIC_CDN_URL || 'https://cdn.automotive-os.ae';
-    const emirate = listing.vehicle.branch?.emirate || 'UAE';
-    const city = listing.vehicle.branch?.city || 'UAE';
-
-    // Construct sanitized, redacted projection document
-    const doc: ProjectedListingDoc = {
-      id: listing.id,
-      tenantId: listing.tenantId,
-      vehicleId: listing.vehicleId,
-      slug: listing.slug,
-      title: listing.title,
-      description: listing.description,
-      askingPriceFils: listing.askingPriceFils,
-      currency: 'AED',
-      year: listing.vehicle.modelYear,
-      modelYear: listing.vehicle.modelYear,
-      mileageKm: listing.vehicle.mileageKm,
-      condition: listing.vehicle.condition,
-      gccSpec: listing.vehicle.gccSpec,
-      colorExterior: listing.vehicle.colorExterior,
-      fuel: listing.vehicle.fuel,
-      transmission: listing.vehicle.transmission,
-      trim: listing.vehicle.trim,
-      qualityScore: listing.qualityScore,
-      publishedAt: listing.publishedAt || new Date(),
-      verifiedAt: listing.verifiedAt,
-      maskedVin: this.maskVin(listing.vehicle.vin),
-      emirate,
-      make: {
-        id: listing.vehicle.make.id,
-        slug: listing.vehicle.make.slug,
-        name: listing.vehicle.make.name,
-      },
-      model: {
-        id: listing.vehicle.model.id,
-        slug: listing.vehicle.model.slug,
-        name: listing.vehicle.model.name,
-      },
-      seller: {
-        id: listing.tenant.id,
-        slug: listing.tenant.slug,
-        displayName: listing.tenant.displayName,
-        emirate,
-        city,
-        verified: listing.tenant.verification?.status === VerificationStatus.APPROVED,
-      },
-      branch: {
-        id: listing.vehicle.branch.id,
-        name: listing.vehicle.branch.name,
-        emirate,
-        city,
-      },
-      media: listing.vehicle.media.map((m) => ({
-        id: m.id,
-        kind: m.kind,
-        url: `${cdnBase}/${m.objectKey}`,
-        altText: m.altText,
-        sortOrder: m.sortOrder,
-      })),
-    };
-
-    // Store in projection indices
-    this.projectionIndex.set(doc.id, doc);
-    this.slugIndex.set(doc.slug, doc.id);
-
-    this.logger.log(
-      `[Search Projection] Synced published listing [${doc.id}] (${doc.slug}) — Active in marketplace discovery.`
-    );
-    return true;
+      return true;
+    });
   }
 
   /**
@@ -277,8 +279,7 @@ export class ListingSearchSyncService {
    */
   private maskVin(vin?: string | null): string | null {
     if (!vin) return null;
-    if (vin.length <= 9) return '*********';
-    return vin.slice(0, 9) + '*'.repeat(vin.length - 9);
+    return `${vin.slice(0, 9)}********`;
   }
 
   /**
@@ -431,31 +432,33 @@ export class ListingSearchSyncService {
    * Useful during startup or on-demand cache warm-up.
    */
   async syncAllActiveListings(): Promise<number> {
-    const activeListings = await this.prisma.listing.findMany({
-      where: {
-        status: ListingStatus.PUBLISHED,
-        vehicle: {
-          stockStatus: StockStatus.AVAILABLE,
-        },
-        tenant: {
-          status: TenantStatus.ACTIVE,
-          verification: {
-            status: VerificationStatus.APPROVED,
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const activeListings = await this.prisma.listing.findMany({
+        where: {
+          status: ListingStatus.PUBLISHED,
+          vehicle: {
+            stockStatus: StockStatus.AVAILABLE,
+          },
+          tenant: {
+            status: TenantStatus.ACTIVE,
+            verification: {
+              status: VerificationStatus.APPROVED,
+            },
           },
         },
-      },
-      select: { id: true },
+        select: { id: true },
+      });
+
+      let syncedCount = 0;
+      for (const item of activeListings) {
+        const ok = await this.handleListingPublished({ listingId: item.id });
+        if (ok) syncedCount++;
+      }
+
+      this.logger.log(
+        `[Search Projection] Full initial sync complete. Synced ${syncedCount}/${activeListings.length} eligible listings.`
+      );
+      return syncedCount;
     });
-
-    let syncedCount = 0;
-    for (const item of activeListings) {
-      const ok = await this.handleListingPublished({ listingId: item.id });
-      if (ok) syncedCount++;
-    }
-
-    this.logger.log(
-      `[Search Projection] Full initial sync complete. Synced ${syncedCount}/${activeListings.length} eligible listings.`
-    );
-    return syncedCount;
   }
 }
