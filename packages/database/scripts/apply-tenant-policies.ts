@@ -3,7 +3,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 async function applyPolicies() {
-  let databaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:postgres@127.0.0.1:5432/automotive_os?schema=public';
+  const isProductionOrStaging = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+  let databaseUrl = process.env.MIGRATION_DATABASE_URL || process.env.DATABASE_URL;
+
+  if (isProductionOrStaging && !databaseUrl) {
+    console.error(`❌ [SECURITY_FATAL] MIGRATION_DATABASE_URL or DATABASE_URL must be explicitly configured in '${process.env.NODE_ENV}' environment.`);
+    process.exit(1);
+  }
+
+  if (!databaseUrl) {
+    databaseUrl = 'postgresql://postgres:postgres@127.0.0.1:5432/automotive_os?schema=public';
+  }
+
   if (databaseUrl.includes('localhost')) {
     databaseUrl = databaseUrl.replace('localhost', '127.0.0.1');
   }

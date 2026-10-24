@@ -4,7 +4,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { OutboxStatus } from '@automotive-os/database';
 import { ListingSearchSyncService } from './listing-search-sync.service';
 
@@ -53,7 +53,8 @@ export class OutboxService implements OnModuleInit, OnModuleDestroy {
     this.isProcessing = true;
 
     try {
-      const pendingEvents = await this.prisma.outboxEvent.findMany({
+      return await runWithDbContext({ isAdmin: true }, async () => {
+        const pendingEvents = await this.prisma.outboxEvent.findMany({
         where: {
           status: OutboxStatus.PENDING,
         },
@@ -113,6 +114,7 @@ export class OutboxService implements OnModuleInit, OnModuleDestroy {
       }
 
       return processedCount;
+      });
     } finally {
       this.isProcessing = false;
     }
@@ -194,21 +196,23 @@ export class OutboxService implements OnModuleInit, OnModuleDestroy {
    * Returns current health & backlog metrics for Outbox queue.
    */
   async getMetrics(): Promise<OutboxMetricsDto> {
-    const [pending, processing, sent, failed, total] = await Promise.all([
-      this.prisma.outboxEvent.count({ where: { status: OutboxStatus.PENDING } }),
-      this.prisma.outboxEvent.count({ where: { status: OutboxStatus.PROCESSING } }),
-      this.prisma.outboxEvent.count({ where: { status: OutboxStatus.SENT } }),
-      this.prisma.outboxEvent.count({ where: { status: OutboxStatus.FAILED } }),
-      this.prisma.outboxEvent.count(),
-    ]);
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const [pending, processing, sent, failed, total] = await Promise.all([
+        this.prisma.outboxEvent.count({ where: { status: OutboxStatus.PENDING } }),
+        this.prisma.outboxEvent.count({ where: { status: OutboxStatus.PROCESSING } }),
+        this.prisma.outboxEvent.count({ where: { status: OutboxStatus.SENT } }),
+        this.prisma.outboxEvent.count({ where: { status: OutboxStatus.FAILED } }),
+        this.prisma.outboxEvent.count(),
+      ]);
 
-    return {
-      pending,
-      processing,
-      sent,
-      failed,
-      total,
-    };
+      return {
+        pending,
+        processing,
+        sent,
+        failed,
+        total,
+      };
+    });
   }
 
   /**

@@ -7,6 +7,8 @@
   "scripts": {
     "prisma:generate": "prisma generate",
     "prisma:deploy": "prisma migrate deploy",
+    "init:role": "tsx scripts/init-app-role.ts",
+    "apply:policies": "tsx scripts/apply-tenant-policies.ts",
     "seed": "tsx prisma/seed.ts",
     "verify:backup": "tsx scripts/verify-backup-snapshot.ts",
     "verify:rls": "tsx scripts/verify-rls-post-migration.ts",

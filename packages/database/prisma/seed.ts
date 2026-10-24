@@ -1,9 +1,18 @@
 import { PrismaClient, VehicleCondition, StockStatus, ListingStatus, LeadStatus, LeadIntent, ContactPreference, AppointmentStatus } from '@prisma/client';
 
+const isProductionOrStaging = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+const databaseUrl = process.env.DATABASE_URL;
+
+if (isProductionOrStaging && !databaseUrl) {
+  throw new Error(
+    `[SECURITY_FATAL] DATABASE_URL must be explicitly configured in '${process.env.NODE_ENV}' environment. Fail-open localhost defaults are strictly prohibited.`
+  );
+}
+
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public',
+      url: databaseUrl || 'postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public',
     },
   },
 });
@@ -143,6 +152,33 @@ async function main() {
           reviewNotes: 'Verified Sharjah automotive trade license.',
         },
       },
+    },
+  });
+
+  // Explicitly ensure dealer verifications are APPROVED even if tenants pre-existed
+  await prisma.dealerVerification.upsert({
+    where: { tenantId: SEED_DATA.dealerA.tenantId },
+    update: { status: 'APPROVED' },
+    create: {
+      tenantId: SEED_DATA.dealerA.tenantId,
+      status: 'APPROVED',
+      tradeLicenseRef: 'TL-DXB-987654',
+      licenseExpiry: new Date('2028-12-31'),
+      jurisdiction: 'Dubai DED',
+      reviewNotes: 'Fully verified commercial dealership license.',
+    },
+  });
+
+  await prisma.dealerVerification.upsert({
+    where: { tenantId: SEED_DATA.dealerB.tenantId },
+    update: { status: 'APPROVED' },
+    create: {
+      tenantId: SEED_DATA.dealerB.tenantId,
+      status: 'APPROVED',
+      tradeLicenseRef: 'TL-SHJ-123456',
+      licenseExpiry: new Date('2027-10-15'),
+      jurisdiction: 'Sharjah SEDD',
+      reviewNotes: 'Verified Sharjah automotive trade license.',
     },
   });
 

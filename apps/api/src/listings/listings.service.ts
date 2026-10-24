@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { PrismaService } from "../database/prisma.service";
+import { PrismaService, runWithDbContext } from "../database/prisma.service";
 import { AuditService } from "../audit/audit.service";
 import { CreateDraftListingDto } from "./dto/create-draft-listing.dto";
 import {
@@ -547,9 +547,56 @@ export class ListingsService {
       };
     }
 
-    const [listings, total] = await Promise.all([
-      this.prisma.listing.findMany({
-        where,
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const [listings, total] = await Promise.all([
+        this.prisma.listing.findMany({
+          where,
+          include: {
+            tenant: {
+              include: {
+                verification: true,
+              },
+            },
+            vehicle: {
+              include: {
+                branch: true,
+                make: true,
+                model: true,
+                media: {
+                  where: {
+                    isPublic: true,
+                  },
+                  orderBy: {
+                    sortOrder: "asc",
+                  },
+                },
+              },
+            },
+          },
+          orderBy: { publishedAt: "desc" },
+          skip,
+          take: limit,
+        }),
+        this.prisma.listing.count({ where }),
+      ]);
+
+      return {
+        items: listings.map((l) => this.mapPublicSummary(l)),
+        total,
+        page,
+        limit,
+      };
+    });
+  }
+
+  /**
+   * Public Detail by slug.
+   * Redacts private dealer costs, private documents, private notes, and masks VIN.
+   */
+  async getPublicListingBySlug(slug: string): Promise<PublicListingDetailDto> {
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const listing = await this.prisma.listing.findUnique({
+        where: { slug },
         include: {
           tenant: {
             include: {
@@ -572,62 +619,19 @@ export class ListingsService {
             },
           },
         },
-        orderBy: { publishedAt: "desc" },
-        skip,
-        take: limit,
-      }),
-      this.prisma.listing.count({ where }),
-    ]);
+      });
 
-    return {
-      items: listings.map((l) => this.mapPublicSummary(l)),
-      total,
-      page,
-      limit,
-    };
-  }
+      if (
+        !listing ||
+        listing.status !== ListingStatus.PUBLISHED ||
+        listing.vehicle.stockStatus !== StockStatus.AVAILABLE ||
+        listing.tenant.status !== TenantStatus.ACTIVE
+      ) {
+        throw new NotFoundException("Listing not found or no longer available");
+      }
 
-  /**
-   * Public Detail by slug.
-   * Redacts private dealer costs, private documents, private notes, and masks VIN.
-   */
-  async getPublicListingBySlug(slug: string): Promise<PublicListingDetailDto> {
-    const listing = await this.prisma.listing.findUnique({
-      where: { slug },
-      include: {
-        tenant: {
-          include: {
-            verification: true,
-          },
-        },
-        vehicle: {
-          include: {
-            branch: true,
-            make: true,
-            model: true,
-            media: {
-              where: {
-                isPublic: true,
-              },
-              orderBy: {
-                sortOrder: "asc",
-              },
-            },
-          },
-        },
-      },
+      return this.mapPublicDetail(listing);
     });
-
-    if (
-      !listing ||
-      listing.status !== ListingStatus.PUBLISHED ||
-      listing.vehicle.stockStatus !== StockStatus.AVAILABLE ||
-      listing.tenant.status !== TenantStatus.ACTIVE
-    ) {
-      throw new NotFoundException("Listing not found or no longer available");
-    }
-
-    return this.mapPublicDetail(listing);
   }
 
   /**
