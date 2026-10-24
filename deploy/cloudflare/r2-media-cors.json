@@ -15,13 +15,11 @@
           "Range"
         ]
       },
-      "exposed": {
-        "headers": [
-          "ETag",
-          "Content-Length",
-          "Content-Range"
-        ]
-      },
+      "exposeHeaders": [
+        "ETag",
+        "Content-Length",
+        "Content-Range"
+      ],
       "maxAgeSeconds": 86400
     }
   ]
