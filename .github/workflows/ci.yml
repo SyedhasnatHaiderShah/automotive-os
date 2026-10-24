@@ -104,19 +104,27 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm --filter @automotive-os/database run prisma:generate
 
-      - name: Deploy Migrations & Seed Test Fixtures
+      - name: Deploy Migrations, Seed Fixtures & Apply RLS Policies
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public
         run: |
           pnpm --filter @automotive-os/database run prisma:deploy
           pnpm --filter @automotive-os/database run seed
+          pnpm --filter @automotive-os/database exec tsx scripts/apply-tenant-policies.ts
 
       - name: Execute Full Test Suites (API, RLS & Negative Security)
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public
           NODE_ENV: test
+          BACKUP_PROVIDER_ADAPTER: mock
           JWT_SECRET: dev-jwt-secret-replace-in-production-min-32-chars-long
           CORS_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002"
+          R2_ACCESS_KEY_ID: test-r2-key
+          R2_SECRET_ACCESS_KEY: test-r2-secret-1234567890
+          R2_ENDPOINT: https://test-account.r2.cloudflarestorage.com
+          R2_BUCKET_NAME: automotive-os-media-staging
         run: pnpm run test
 
   production-build:

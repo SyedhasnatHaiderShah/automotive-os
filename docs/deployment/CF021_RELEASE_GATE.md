@@ -148,8 +148,11 @@ All checks were executed locally on the active repository workspace:
 
 ## 5. Next Steps for Cloud Provisioning Execution
 
+> [!NOTE]
+> Following CF-02.1 merge into `main` (`1eaa1e7`), CI run 40076642251 failed due to Turbo v2 `DATABASE_URL` stripping in test subprocesses. This was remediated in milestone **CF-02.2** (`fix/cf02.2-ci-database-safety`), introducing provider-backed AWS RDS/PITR adapters, universal RLS on all 20 tables, and static GitHub Environment approval gates. See [`CF022_RELEASE_GATE.md`](file:///H:/Personal/Automotiv%20OS/docs/deployment/CF022_RELEASE_GATE.md) for current certification.
+
 Upon receiving human approval:
-1. Merge `feature/cf02-staging-hardening` into `main`.
+1. Merge `fix/cf02.2-ci-database-safety` into `main`.
 2. Provision Cloudflare zone `automotive-os.ae` and bind DNS records from `deploy/cloudflare/dns-records.json`.
 3. Configure GitHub repository secrets:
    - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`

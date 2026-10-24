@@ -17,6 +17,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
+    "@aws-sdk/client-rds": "^3.758.0",
     "@prisma/client": "^6.4.1"
   },
   "prisma": {
@@ -24,6 +25,8 @@
   },
   "devDependencies": {
     "@automotive-os/config": "workspace:*",
+    "@types/pg": "^8.11.11",
+    "pg": "^8.13.1",
     "prisma": "^6.4.1",
     "rimraf": "^6.0.1",
     "tsx": "^4.19.3",
