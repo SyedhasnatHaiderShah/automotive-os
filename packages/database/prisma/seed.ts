@@ -1,9 +1,18 @@
 import { PrismaClient, VehicleCondition, StockStatus, ListingStatus, LeadStatus, LeadIntent, ContactPreference, AppointmentStatus } from '@prisma/client';
 
+const isProductionOrStaging = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+const databaseUrl = process.env.DATABASE_URL;
+
+if (isProductionOrStaging && !databaseUrl) {
+  throw new Error(
+    `[SECURITY_FATAL] DATABASE_URL must be explicitly configured in '${process.env.NODE_ENV}' environment. Fail-open localhost defaults are strictly prohibited.`
+  );
+}
+
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public',
+      url: databaseUrl || 'postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public',
     },
   },
 });

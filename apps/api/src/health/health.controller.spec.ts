@@ -18,10 +18,15 @@ describe('HealthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return health status', () => {
-    const result = controller.getHealth();
+  it('should return health status', async () => {
+    const result = await controller.getHealth();
     expect(result.status).toBe('ok');
     expect(result.service).toBe('api');
     expect(result.timestamp).toBeDefined();
+  });
+
+  it('should return readiness status', async () => {
+    const result = await controller.getReadiness();
+    expect(result.status).toBe('ready');
   });
 });
