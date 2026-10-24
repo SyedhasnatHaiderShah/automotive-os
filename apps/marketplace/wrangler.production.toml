@@ -1,0 +1,27 @@
+# ==============================================================================
+# Cloudflare Workers Production Manifest — Buyer Marketplace
+# Application: apps/marketplace
+# Target: https://marketplace.automotive-os.ae
+# ==============================================================================
+
+name = "automotive-os-marketplace-production"
+main = ".open-next/worker.js"
+compatibility_date = "2026-10-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[vars]
+NEXT_PRIVATE_MINIMAL_MODE = "1"
+NEXT_PUBLIC_APP_ENV = "production"
+NEXT_PUBLIC_API_URL = "https://api.automotive-os.ae"
+NEXT_PUBLIC_STORAGE_URL = "https://media.automotive-os.ae"
+NEXT_PUBLIC_MARKETPLACE_URL = "https://marketplace.automotive-os.ae"
+NEXT_PUBLIC_DEFAULT_LOCALE = "en"
+NEXT_PUBLIC_SUPPORTED_LOCALES = "en,ar"
+NEXT_PUBLIC_DEFAULT_CURRENCY = "AED"
+
+[observability]
+enabled = true

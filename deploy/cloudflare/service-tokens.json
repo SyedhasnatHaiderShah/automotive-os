@@ -1,0 +1,83 @@
+{
+  "$schema": "https://developers.cloudflare.com/fundamentals/api/how-to/create-via-api/",
+  "version": "2026-10-23",
+  "description": "Least-Privilege Cloudflare API Tokens & Service Token Architecture for Automotive OS",
+  "tokens": [
+    {
+      "name": "automotive-os-ci-deployer",
+      "purpose": "GitHub Actions deployment pipeline for Workers and Assets",
+      "policies": [
+        {
+          "effect": "allow",
+          "resources": {
+            "com.cloudflare.api.account": "${CLOUDFLARE_ACCOUNT_ID}"
+          },
+          "permission_groups": [
+            "Workers Scripts Write",
+            "Workers Routes Write",
+            "Workers KV Storage Write",
+            "Pages Write",
+            "Account Rule Lists Read"
+          ]
+        },
+        {
+          "effect": "allow",
+          "resources": {
+            "com.cloudflare.api.account.zone": "${ZONE_ID}"
+          },
+          "permission_groups": [
+            "DNS Write",
+            "Zone Read",
+            "SSL and Certificates Read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "automotive-os-origin-tunnel",
+      "purpose": "Outbound Tunnel Sidecar for Origin Node 22 API container",
+      "policies": [
+        {
+          "effect": "allow",
+          "resources": {
+            "com.cloudflare.api.account": "${CLOUDFLARE_ACCOUNT_ID}"
+          },
+          "permission_groups": [
+            "Argo Tunnel Write",
+            "Argo Tunnel Read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "automotive-os-backend-r2-s3",
+      "purpose": "Backend S3 SDK credentials for media uploads and presigned URL generation",
+      "type": "R2_BUCKET_CREDENTIALS",
+      "policies": [
+        {
+          "effect": "allow",
+          "buckets": [
+            "automotive-os-media-staging",
+            "automotive-os-kyb-staging"
+          ],
+          "permissions": [
+            "Object Read",
+            "Object Write",
+            "Object Delete"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "automotive-os-admin-probe-token",
+      "purpose": "Zero Trust Access Service Token for automated synthetic health checks",
+      "type": "ACCESS_SERVICE_TOKEN",
+      "application": "admin.staging.automotive-os.ae",
+      "headers": {
+        "id_header": "CF-Access-Client-Id",
+        "secret_header": "CF-Access-Client-Secret"
+      },
+      "session_duration": "Non-expiring (Revocable)"
+    }
+  ]
+}

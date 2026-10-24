@@ -4,7 +4,11 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
 } from "@nestjs/common";
+import { randomUUID } from "node:crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PrismaService } from "../database/prisma.service";
 import { AuditService } from "../audit/audit.service";
 import { CreateVehicleDto } from "./dto/create-vehicle.dto";
@@ -12,6 +16,9 @@ import { UpdateVehicleDto } from "./dto/update-vehicle.dto";
 import {
   CreateMediaUploadDto,
   MediaUploadResponseDto,
+  ALLOWED_MEDIA_CONTENT_TYPES,
+  MAX_IMAGE_SIZE_BYTES,
+  MAX_DOCUMENT_SIZE_BYTES,
 } from "./dto/create-media-upload.dto";
 import { VehicleResponseDto } from "./dto/vehicle-response.dto";
 import {
@@ -340,6 +347,26 @@ export class VehiclesService {
     return this.mapVehicleResponse(updated, callerRole);
   }
 
+  private getS3Client(): S3Client | null {
+    const accessKeyId = process.env.R2_ACCESS_KEY_ID || process.env.S3_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY || process.env.S3_SECRET_ACCESS_KEY;
+    const endpoint = process.env.R2_ENDPOINT || process.env.S3_ENDPOINT;
+
+    if (!accessKeyId || !secretAccessKey || !endpoint) {
+      return null;
+    }
+
+    return new S3Client({
+      region: process.env.R2_REGION || process.env.AWS_REGION || "auto",
+      endpoint,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+      forcePathStyle: true,
+    });
+  }
+
   async registerMediaUpload(
     tenantId: string,
     vehicleId: string,
@@ -361,15 +388,80 @@ export class VehiclesService {
       );
     }
 
-    const sanitizedFileName = dto.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const objectKey = `tenants/${tenantId}/vehicles/${vehicleId}/${Date.now()}-${sanitizedFileName}`;
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+    // 2. Validate content type and file extension matching
+    const allowedExts = {
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/png': ['.png'],
+      'image/webp': ['.webp'],
+      'application/pdf': ['.pdf'],
+    };
 
-    // In production, an S3 client generates pre-signed PUT URL. Here we construct the standard upload endpoint descriptor.
-    const s3Endpoint = process.env.S3_ENDPOINT || "http://localhost:9000";
-    const s3Bucket = process.env.S3_BUCKET || "automotive-os-media";
-    const uploadUrl = `${s3Endpoint}/${s3Bucket}/${objectKey}?token=signed-upload-token-${Date.now()}`;
+    const exts = allowedExts[dto.contentType];
+    if (!exts) {
+      throw new BadRequestException(
+        `Unsupported media content type: ${dto.contentType}. Allowed types: ${ALLOWED_MEDIA_CONTENT_TYPES.join(', ')}`,
+      );
+    }
 
+    const lowerFileName = dto.fileName.toLowerCase();
+    const hasValidExt = exts.some((ext) => lowerFileName.endsWith(ext));
+    if (!hasValidExt) {
+      throw new BadRequestException(
+        `File name '${dto.fileName}' does not match expected extension for ${dto.contentType} (${exts.join(', ')})`,
+      );
+    }
+
+    // 3. File size limit enforcement
+    if (dto.fileSizeBytes !== undefined) {
+      if (dto.contentType.startsWith('image/') && dto.fileSizeBytes > MAX_IMAGE_SIZE_BYTES) {
+        throw new BadRequestException(
+          `Image file size (${dto.fileSizeBytes} bytes) exceeds maximum limit of ${MAX_IMAGE_SIZE_BYTES / (1024 * 1024)}MB`,
+        );
+      }
+      if (dto.contentType === 'application/pdf' && dto.fileSizeBytes > MAX_DOCUMENT_SIZE_BYTES) {
+        throw new BadRequestException(
+          `Document file size (${dto.fileSizeBytes} bytes) exceeds maximum limit of ${MAX_DOCUMENT_SIZE_BYTES / (1024 * 1024)}MB`,
+        );
+      }
+    }
+
+    // 4. Object storage configuration verification
+    const s3Client = this.getS3Client();
+    const bucket = process.env.R2_BUCKET_NAME || process.env.S3_BUCKET;
+
+    if (!s3Client || !bucket) {
+      throw new ServiceUnavailableException(
+        'Object storage service is not configured on this server. Direct media uploads are disabled until valid R2/S3 credentials are provided.',
+      );
+    }
+
+    // 5. Construct tenant-scoped secure object key
+    const sanitizedFileName = dto.fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const uniqueId = randomUUID();
+    const objectKey = `tenants/${tenantId}/vehicles/${vehicleId}/${uniqueId}-${sanitizedFileName}`;
+    const expiresInSeconds = 900; // 15 mins
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+
+    // 6. Generate authentic pre-signed PUT command with SigV4
+    let uploadUrl;
+    try {
+      const command = new PutObjectCommand({
+        Bucket: bucket,
+        Key: objectKey,
+        ContentType: dto.contentType,
+        ...(dto.fileSizeBytes ? { ContentLength: dto.fileSizeBytes } : {}),
+      });
+
+      uploadUrl = await getSignedUrl(s3Client, command, {
+        expiresIn: expiresInSeconds,
+      });
+    } catch (err) {
+      throw new ServiceUnavailableException(
+        `Failed to generate secure object storage pre-signed URL: ${err?.message || 'unknown error'}`,
+      );
+    }
+
+    // 7. Record media in database
     const media = await this.prisma.vehicleMedia.create({
       data: {
         tenantId,

@@ -1,0 +1,27 @@
+# ==============================================================================
+# Cloudflare Workers Production Manifest — Platform Operations Command
+# Application: apps/admin
+# Target: https://admin.automotive-os.ae
+# Security: Gated behind Cloudflare Zero Trust (Access) Application
+# ==============================================================================
+
+name = "automotive-os-admin-production"
+main = ".open-next/worker.js"
+compatibility_date = "2026-10-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[vars]
+NEXT_PRIVATE_MINIMAL_MODE = "1"
+NEXT_PUBLIC_APP_ENV = "production"
+NEXT_PUBLIC_API_URL = "https://api.automotive-os.ae"
+NEXT_PUBLIC_ADMIN_URL = "https://admin.automotive-os.ae"
+NEXT_PUBLIC_DEFAULT_LOCALE = "en"
+NEXT_PUBLIC_SUPPORTED_LOCALES = "en,ar"
+NEXT_PUBLIC_DEFAULT_CURRENCY = "AED"
+
+[observability]
+enabled = true

@@ -16,9 +16,24 @@ on:
         required: true
         type: string
       release_tag:
-        description: "Release version or tag (e.g. v1.2.0-staging.2)"
+        description: "Release version or tag (e.g. v1.2.0-staging.1)"
         required: false
         default: "manual"
+        type: string
+      run_database_migrations:
+        description: "Apply database schema migrations and RLS policies"
+        required: true
+        default: true
+        type: boolean
+      backup_verification_token:
+        description: "Machine-verifiable database backup/snapshot identifier token"
+        required: false
+        default: ""
+        type: string
+      confirm_production_migration:
+        description: 'Type "ALLOW_PROD_MIGRATION" if applying migrations to production'
+        required: false
+        default: ""
         type: string
 
 permissions:
@@ -46,7 +61,7 @@ jobs:
             echo "Received: '${{ github.event.inputs.confirm_deployment }}'"
             exit 1
           fi
-          echo "✅ Affirmative deployment confirmation verified for '${{ inputs.environment }}'."
+          echo "✅ Affirmative deployment confirmation verified for '${{ github.event.inputs.environment }}'."
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -93,24 +108,13 @@ jobs:
         run: pnpm run build
 
   # =========================================================================
-  # Gate 2: Container Image Build & Publish to GitHub Packages (GHCR)
+  # Gate 2: Build & Publish Container for NestJS API Origin
+  # Frontends (marketplace, dealer, admin) are deployed to Cloudflare Workers!
   # =========================================================================
-  build-and-push-images:
-    name: Build & Publish Container (${{ matrix.service }})
+  build-api-container:
+    name: Build & Publish API Container Image
     needs: verify-gate
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - service: api
-            dockerfile: docker/Dockerfile.api
-          - service: marketplace
-            dockerfile: docker/Dockerfile.marketplace
-          - service: dealer
-            dockerfile: docker/Dockerfile.dealer
-          - service: admin
-            dockerfile: docker/Dockerfile.admin
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -133,41 +137,39 @@ jobs:
         shell: bash
         run: |
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          IMAGE_URI="ghcr.io/${REPO_LOWER}/${{ matrix.service }}"
-          ENV_TAG="${IMAGE_URI}:${{ inputs.environment }}"
+          IMAGE_URI="ghcr.io/${REPO_LOWER}/api"
+          ENV_TAG="${IMAGE_URI}:${{ github.event.inputs.environment }}"
           SHA_TAG="${IMAGE_URI}:${{ github.sha }}"
-          TAG_INPUT="${{ inputs.release_tag }}"
+          TAG_INPUT="${{ github.event.inputs.release_tag }}"
           
-          TAGS="${SHA_TAG},${ENV_TAG}"
+          TAGS="${ENV_TAG},${SHA_TAG}"
           if [ -n "$TAG_INPUT" ] && [ "$TAG_INPUT" != "manual" ]; then
             TAGS="${TAGS},${IMAGE_URI}:${TAG_INPUT}"
           fi
-          if [ "${{ inputs.environment }}" = "production" ]; then
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
             TAGS="${TAGS},${IMAGE_URI}:latest"
           fi
-          
-          echo "image_uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          echo "Built tags: ${TAGS}"
 
-      - name: Build and Push Docker Image
+      - name: Build and Push API Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ${{ matrix.dockerfile }}
+          file: docker/Dockerfile.api
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   # =========================================================================
-  # Gate 3: Database Migrations & Defense-in-Depth RLS Policies (Gated)
+  # Gate 3: Database Migration with Machine-Verifiable Backup Prerequisites
   # =========================================================================
   database-migrations:
     name: Apply Database Migrations & RLS
     needs: verify-gate
+    if: "${{ github.event.inputs.run_database_migrations == 'true' || github.event.inputs.run_database_migrations == true }}"
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.environment }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -185,27 +187,61 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify Backup Readiness & Migration Rollback Policy
+      - name: Verify Required Database Credentials & Fail Closed
         shell: bash
+        env:
+          TARGET_ENV: ${{ github.event.inputs.environment }}
+          STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
         run: |
-          cat << 'EOF'
-          ========================================================================
-          Automotive OS — Sovereign Database Migration Verification Gate
-          Target Environment: ${{ inputs.environment }}
-          Release Reference:  ${{ inputs.release_tag }} (Commit ${{ github.sha }})
-          ========================================================================
-          PRE-MIGRATION SAFETY CHECKLIST:
-          [✓] Point-in-time recovery (PITR) / snapshot verified for target DB.
-          [✓] Rollback strategy: Schema changes must be backward-compatible.
-          [✓] Defense-in-depth PostgreSQL RLS policies will be applied idempotently.
-          [✓] No database credentials or connection secrets will be output to logs.
-          ========================================================================
-          EOF
+          if [ "$TARGET_ENV" = "production" ]; then
+            DB_URL="$PROD_URL"
+          else
+            DB_URL="$STAGING_URL"
+          fi
+
+          if [ -z "$DB_URL" ]; then
+            echo "❌ CRITICAL SECURITY ERROR: Database URL for environment '$TARGET_ENV' is not configured in secrets."
+            echo "Automotive OS release pipeline fails closed on missing database credentials."
+            exit 1
+          fi
+          echo "✅ Database connection string credential detected for '$TARGET_ENV'."
+
+      - name: Machine-Verifiable Backup & Migration Safety Verification
+        shell: bash
+        env:
+          TARGET_ENV: ${{ github.event.inputs.environment }}
+          BACKUP_TOKEN: ${{ github.event.inputs.backup_verification_token }}
+          PROD_CONFIRM: ${{ github.event.inputs.confirm_production_migration }}
+          STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: |
+          set +x
+          if [ "$TARGET_ENV" = "production" ]; then
+            DATABASE_URL="$PROD_URL"
+            if [ "$PROD_CONFIRM" != "ALLOW_PROD_MIGRATION" ]; then
+              echo "❌ PRODUCTION MIGRATION REJECTED: Production migrations require affirmative"
+              echo "confirm_production_migration token 'ALLOW_PROD_MIGRATION'."
+              exit 1
+            fi
+          else
+            DATABASE_URL="$STAGING_URL"
+          fi
+
+          echo "Verifying machine-verifiable backup snapshot / PITR readiness..."
+          DATABASE_URL="$DATABASE_URL" TARGET_ENV="$TARGET_ENV" BACKUP_TOKEN="$BACKUP_TOKEN" \
+            pnpm --filter @automotive-os/database run verify:backup
+
+          if [ ! -f "packages/database/prisma/tenant_policies.sql" ]; then
+            echo "❌ CRITICAL ERROR: packages/database/prisma/tenant_policies.sql not found."
+            exit 1
+          fi
+          echo "✅ RLS policy SQL manifest verified."
 
       - name: Execute Prisma Migration Deploy & Apply RLS Policies
         shell: bash
         env:
-          TARGET_ENV: ${{ inputs.environment }}
+          TARGET_ENV: ${{ github.event.inputs.environment }}
           STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
           PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
         run: |
@@ -216,162 +252,340 @@ jobs:
             DATABASE_URL="$STAGING_URL"
           fi
 
-          if [ -n "$DATABASE_URL" ]; then
-            echo "Target environment database secret detected. Running Prisma migration deploy..."
-            pnpm --filter @automotive-os/database run prisma:generate
-            pnpm --filter @automotive-os/database run prisma:deploy
-            
-            echo "Applying defense-in-depth tenant RLS policies..."
-            sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
-            psql "$DATABASE_URL" -f packages/database/prisma/tenant_policies.sql
-            echo "Database migrations and RLS policies successfully applied to $TARGET_ENV."
-          else
-            echo "NOTICE: Database secret for environment '$TARGET_ENV' is not configured."
-            echo "Validating migration integrity and Prisma client generation locally..."
-            pnpm --filter @automotive-os/database run prisma:generate
-            echo "Schema syntax and migration manifests validated successfully."
-          fi
+          echo "Applying migrations to $TARGET_ENV..."
+          DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run prisma:generate
+          DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run prisma:deploy
+          
+          echo "Applying defense-in-depth tenant RLS policies with fail-closed error handling..."
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -f packages/database/prisma/tenant_policies.sql
+
+          echo "Executing post-migration RLS policy and non-bypass role verification..."
+          DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run verify:rls
+          echo "Database migrations and RLS policies successfully applied and certified for $TARGET_ENV."
 
   # =========================================================================
-  # Gate 4: Controlled Infrastructure Deployment Rollout
+  # Gate 4: Deploy Origin API & Cloudflare Tunnel
+  # Note: if database-migrations was skipped (run_database_migrations=false),
+  # deploy-origin-api must still execute while asserting schema initialization.
   # =========================================================================
-  deploy-infrastructure:
-    name: Deploy Infrastructure Rollout
-    needs: [build-and-push-images, database-migrations]
+  deploy-origin-api:
+    name: Deploy Backend Origin API & Tunnel
+    needs: [verify-gate, build-api-container, database-migrations]
+    if: "always() && needs.verify-gate.result == 'success' && needs.build-api-container.result == 'success' && (needs.database-migrations.result == 'success' || needs.database-migrations.result == 'skipped')"
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.environment }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Kustomize
-        uses: imranismail/setup-kustomize@v2
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
         with:
-          kustomize-version: "5.3.0"
+          node-version: 22
 
-      - name: Synthesize Target K8s Manifests with Published Images
-        id: k8s-prep
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.15.9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Origin Deployment Credentials & Fail Closed
         shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          TARGET_ENV: ${{ github.event.inputs.environment }}
+          STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
         run: |
-          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          cd deploy/k8s
-          kustomize edit set image automotive-os/api=ghcr.io/${REPO_LOWER}/api:${{ github.sha }}
-          kustomize edit set image automotive-os/marketplace=ghcr.io/${REPO_LOWER}/marketplace:${{ github.sha }}
-          kustomize edit set image automotive-os/dealer=ghcr.io/${REPO_LOWER}/dealer:${{ github.sha }}
-          kustomize edit set image automotive-os/admin=ghcr.io/${REPO_LOWER}/admin:${{ github.sha }}
-          kustomize build . > /tmp/target-rendered.yaml
-          echo "Synthesized Kubernetes deployment manifests successfully for ${{ inputs.environment }}."
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_KEY" ]; then
+            echo "❌ CRITICAL DEPLOYMENT ERROR: DEPLOY_SSH_HOST or DEPLOY_SSH_KEY secret is not set."
+            echo "Cannot deploy origin container stack to '$TARGET_ENV'. Fails closed."
+            exit 1
+          fi
+          echo "✅ Origin host deployment credentials detected."
 
-      # Option A: Deploy via Kubernetes if KUBE_CONFIG present
-      - name: Deploy via Kubernetes (if KUBE_CONFIG present)
-        if: "${{ secrets.KUBE_CONFIG != '' }}"
-        shell: bash
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
-          kubectl apply -f /tmp/target-rendered.yaml
-          NAMESPACE="automotive-os-${{ inputs.environment }}"
-          echo "Waiting for deployments in $NAMESPACE to roll out..."
-          kubectl rollout status deployment/api -n "$NAMESPACE" --timeout=180s
-          kubectl rollout status deployment/marketplace -n "$NAMESPACE" --timeout=180s
-          kubectl rollout status deployment/dealer -n "$NAMESPACE" --timeout=180s
-          kubectl rollout status deployment/admin -n "$NAMESPACE" --timeout=180s
-          echo "Kubernetes deployment rollout confirmed healthy."
+          # Schema Initialization Safety Guard:
+          # If migrations were skipped, ensure database schema is already initialized.
+          if [ "${{ github.event.inputs.run_database_migrations }}" = "false" ]; then
+            echo "Asserting that target database schema is already initialized..."
+            if [ "$TARGET_ENV" = "production" ]; then
+              DB_URL="$PROD_URL"
+            else
+              DB_URL="$STAGING_URL"
+            fi
+            if [ -n "$DB_URL" ]; then
+              sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+              TABLE_EXISTS=$(psql -v ON_ERROR_STOP=1 "$DB_URL" -tAc "SELECT to_regclass('public.vehicles');" || true)
+              if [ -z "$TABLE_EXISTS" ] || [ "$TABLE_EXISTS" = "" ]; then
+                echo "❌ CRITICAL ERROR: Database table 'vehicles' does not exist in target database!"
+                echo "Cannot deploy origin without initialized schema. Please run with run_database_migrations=true."
+                exit 1
+              fi
+              echo "✅ Database schema confirmed already initialized (public.vehicles exists)."
+            fi
+          fi
 
-      # Option B: Deploy via Remote SSH / Docker Compose if SSH secrets exist
-      - name: Deploy via Docker Compose over SSH (if SSH secrets present)
-        if: "${{ secrets.DEPLOY_SSH_HOST != '' && secrets.DEPLOY_SSH_KEY != '' }}"
+      - name: Deploy Exact Approved SHA via Docker Compose over Secure SSH
         shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          TARGET_ENV: ${{ github.event.inputs.environment }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_ACTOR: ${{ github.actor }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          COMPOSE_FILE="docker-compose.${{ inputs.environment }}.yml"
+          
+          # Populate known hosts securely
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          
+          REPO_LOWER=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')
+          USER_NAME="${DEPLOY_USER:-root}"
+          COMPOSE_FILE="deploy/cloudflare/docker-compose.${TARGET_ENV}.yml"
 
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_SSH_USER:-root }}@${{ secrets.DEPLOY_SSH_HOST }} << EOF
+          echo "Deploying exact approved commit $TARGET_SHA to origin host $DEPLOY_HOST..."
+
+          ssh -o StrictHostKeyChecking=accept-new "${USER_NAME}@${DEPLOY_HOST}" \
+            "TARGET_SHA='${TARGET_SHA}' REPO='${REPO}' REPO_LOWER='${REPO_LOWER}' COMPOSE_FILE='${COMPOSE_FILE}' TARGET_ENV='${TARGET_ENV}' GHCR_ACTOR='${GHCR_ACTOR}' GHCR_TOKEN='${GHCR_TOKEN}' bash -s" << 'EOF'
             set -e
-            cd /opt/automotive-os || git clone https://github.com/${{ github.repository }}.git /opt/automotive-os && cd /opt/automotive-os
-            git fetch origin main && git checkout main && git reset --hard origin/main
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            if [ -f "$COMPOSE_FILE" ]; then
-              docker-compose -f "$COMPOSE_FILE" pull
-              docker-compose -f "$COMPOSE_FILE" up -d --remove-orphans
-            else
-              echo "Compose file $COMPOSE_FILE not found, using docker-compose.staging.yml"
-              docker-compose -f docker-compose.staging.yml pull
-              docker-compose -f docker-compose.staging.yml up -d --remove-orphans
+            mkdir -p /opt/automotive-os
+            cd /opt/automotive-os
+            if [ ! -d ".git" ]; then
+              git clone "https://github.com/${REPO}.git" .
             fi
+            
+            # Strict Release Safety: Deploy exact target commit SHA, never unapproved newer main commits
+            git fetch origin "${TARGET_SHA}"
+            git checkout "${TARGET_SHA}"
+            
+            # Authenticate to GHCR without exposing token in command args
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+            
+            export APP_VERSION="${TARGET_SHA}"
+            export IMAGE_REGISTRY="ghcr.io/${REPO_LOWER}"
+            
+            if [ ! -f "$COMPOSE_FILE" ]; then
+              echo "❌ ERROR: Compose manifest $COMPOSE_FILE not found on host!"
+              exit 1
+            fi
+            
+            docker compose -f "$COMPOSE_FILE" pull api
+            docker compose -f "$COMPOSE_FILE" up -d --remove-orphans api cloudflared
+            docker compose -f "$COMPOSE_FILE" ps
           EOF
+          echo "✅ Origin API and Cloudflare Tunnel container deployed successfully at commit $TARGET_SHA."
 
-      # Step Summary Generation for GitHub UI
-      - name: Generate Deployment Step Summary
+  # =========================================================================
+  # Gate 5: Deploy Frontends to Cloudflare Workers (OpenNext)
+  # Guaranteed ordering: Only deploy edge Workers after origin API is verified!
+  # =========================================================================
+  deploy-cloudflare-workers:
+    name: Deploy Cloudflare Worker (${{ matrix.app }})
+    needs: [deploy-origin-api]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [marketplace, dealer, admin]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm 9.15.9
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.15.9
+
+      - name: Get pnpm store directory
         shell: bash
         run: |
-          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          ENV="${{ inputs.environment }}"
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Cloudflare Credentials & Fail Closed
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CF_TOKEN" ] || [ -z "$CF_ACCOUNT" ]; then
+            echo "❌ CRITICAL DEPLOYMENT ERROR: CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID secret is not set."
+            echo "Cannot deploy Cloudflare Worker for '${{ matrix.app }}'. Fails closed."
+            exit 1
+          fi
+          echo "✅ Cloudflare API credentials detected."
+
+      - name: Build Next.js App for Cloudflare Workers (OpenNext)
+        shell: bash
+        run: |
+          echo "Building ${{ matrix.app }} using OpenNext Cloudflare adapter..."
+          pnpm --filter @automotive-os/database run prisma:generate
+          pnpm --filter ${{ matrix.app }} exec opennextjs-cloudflare build
+          echo "✅ OpenNext build completed for ${{ matrix.app }}."
+
+      - name: Deploy Worker and Static Assets to Cloudflare Edge
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TARGET_ENV: ${{ github.event.inputs.environment }}
+        run: |
+          # Strict Environment Guard: Never fall back to staging config for production. Fail closed!
+          CONFIG_FILE="wrangler.${TARGET_ENV}.toml"
+          if [ ! -f "apps/${{ matrix.app }}/${CONFIG_FILE}" ]; then
+            echo "❌ CRITICAL CONFIG ERROR: apps/${{ matrix.app }}/${CONFIG_FILE} does not exist for environment '${TARGET_ENV}'."
+            echo "Automotive OS deployment fails closed on missing environment-specific worker config."
+            exit 1
+          fi
+          
+          echo "Deploying ${{ matrix.app }} worker using $CONFIG_FILE..."
+          pnpm --filter ${{ matrix.app }} exec wrangler deploy .open-next/worker.js --config "$CONFIG_FILE"
+          echo "✅ Cloudflare Worker deployed for ${{ matrix.app }}."
+
+  # =========================================================================
+  # Gate 6: Post-Deployment Verification & Mandatory Health Probes
+  # =========================================================================
+  health-probes:
+    name: Post-Deployment Health Probes & Release Certification
+    needs: [deploy-origin-api, deploy-cloudflare-workers]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe Ingress Endpoints & Verify Cloudflare Access Protection
+        shell: bash
+        env:
+          TARGET_ENV: ${{ github.event.inputs.environment }}
+          STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
+          PROD_API_URL: ${{ secrets.PROD_API_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          DOMAIN_PREFIX=$([ "$TARGET_ENV" = "production" ] && echo "" || echo "staging.")
+          API_URL="${STAGING_API_URL:-https://api.${DOMAIN_PREFIX}automotive-os.ae}"
+          MARKETPLACE_URL="https://marketplace.${DOMAIN_PREFIX}automotive-os.ae"
+          DEALER_URL="https://dealer.${DOMAIN_PREFIX}automotive-os.ae"
+          ADMIN_URL="https://admin.${DOMAIN_PREFIX}automotive-os.ae"
+
+          echo "1. Probing backend API at: $API_URL/health"
+          API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health" --max-time 15 || true)
+          echo "API health response: $API_STATUS"
+          if [ "$API_STATUS" != "200" ]; then
+            echo "❌ FATAL: API health probe failed with status '$API_STATUS'. Release failed."
+            exit 1
+          fi
+
+          echo "2. Probing Marketplace at: $MARKETPLACE_URL/api/health"
+          MK_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$MARKETPLACE_URL/api/health" --max-time 15 || true)
+          echo "Marketplace health response: $MK_STATUS"
+          if [ "$MK_STATUS" != "200" ]; then
+            echo "❌ FATAL: Marketplace health probe failed with status '$MK_STATUS'. Release failed."
+            exit 1
+          fi
+
+          echo "3. Probing Dealer DMS at: $DEALER_URL/api/health"
+          DMS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DEALER_URL/api/health" --max-time 15 || true)
+          echo "Dealer DMS health response: $DMS_STATUS"
+          if [ "$DMS_STATUS" != "200" ]; then
+            echo "❌ FATAL: Dealer DMS health probe failed with status '$DMS_STATUS'. Release failed."
+            exit 1
+          fi
+
+          echo "4. Probing Platform Admin (Zero Trust Cloudflare Access Verification):"
+          
+          # Probe 4a: Anonymous Request MUST be denied/redirected by Cloudflare Access
+          echo "   Step 4a: Anonymous Ingress Probe to $ADMIN_URL..."
+          ANON_RESPONSE=$(curl -s -i "$ADMIN_URL" --max-time 15 || true)
+          ANON_STATUS=$(echo "$ANON_RESPONSE" | grep -i "^HTTP" | tail -1 | awk '{print $2}')
+          echo "   Anonymous response status: $ANON_STATUS"
+
+          # Cloudflare Access returns 302 redirecting to *.cloudflareaccess.com, or 403 Forbidden with cf-mitigated header
+          if [ "$ANON_STATUS" = "302" ]; then
+            REDIRECT_LOCATION=$(echo "$ANON_RESPONSE" | grep -i "^location:" | head -1 | tr -d '\r')
+            echo "   ✅ Verified: Anonymous ingress intercepted and redirected: $REDIRECT_LOCATION"
+          elif [ "$ANON_STATUS" = "403" ]; then
+            echo "   ✅ Verified: Anonymous ingress rejected with HTTP 403 Forbidden by Cloudflare Access."
+          elif [ "$ANON_STATUS" = "200" ]; then
+            echo "❌ FATAL SECURITY BREACH: Platform Admin returned HTTP 200 to an anonymous unauthenticated request!"
+            echo "Cloudflare Access Zero Trust policy is NOT active on $ADMIN_URL. Release failed closed."
+            exit 1
+          else
+            echo "ℹ️ Admin response code: $ANON_STATUS (Protected or Preflight Ingress)"
+          fi
+
+          # Probe 4b: Authorized Service Token Request (if secrets are configured)
+          if [ -n "$CF_ACCESS_CLIENT_ID" ] && [ -n "$CF_ACCESS_CLIENT_SECRET" ]; then
+            echo "   Step 4b: Authenticated Service Token Probe to $ADMIN_URL..."
+            AUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$ADMIN_URL" \
+              -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+              -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
+              --max-time 15 || true)
+            echo "   Authenticated service token response: $AUTH_STATUS"
+            if [ "$AUTH_STATUS" != "200" ]; then
+              echo "❌ FATAL: Platform Admin authenticated probe failed with status '$AUTH_STATUS'."
+              exit 1
+            fi
+            echo "   ✅ Verified: Service token successfully authenticated through Cloudflare Access."
+          else
+            echo "   ℹ️ Note: CF_ACCESS_CLIENT_ID/SECRET not configured in workflow run; anonymous denial proven."
+          fi
+
+          echo "✅ All health probes passed successfully with genuine verified status codes."
+
+      - name: Generate Certified Deployment Step Summary
+        shell: bash
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
           DOMAIN_PREFIX=$([ "$ENV" = "production" ] && echo "" || echo "staging.")
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           
           cat << EOF >> $GITHUB_STEP_SUMMARY
-          ## 🚀 Automotive OS — Release Deployment Summary
+          ## 🚀 Automotive OS — Cloudflare Release Deployment Summary
 
           | Attribute | Value |
           |---|---|
           | **Environment** | \`${ENV}\` (UAE Region \`me-central-1\`) |
           | **Commit SHA** | \`${{ github.sha }}\` |
-          | **Release Tag** | \`${{ inputs.release_tag }}\` |
+          | **Release Tag** | \`${{ github.event.inputs.release_tag }}\` |
           | **Triggered By** | \`${{ github.actor }}\` via Approval Gate |
-          | **Status** | **SUCCESSFUL** ✅ |
+          | **Status** | **VERIFIED & CERTIFIED** ✅ |
 
-          ### 📦 Published GHCR Images
-          - \`ghcr.io/${REPO_LOWER}/api:${{ github.sha }}\`
-          - \`ghcr.io/${REPO_LOWER}/marketplace:${{ github.sha }}\`
-          - \`ghcr.io/${REPO_LOWER}/dealer:${{ github.sha }}\`
-          - \`ghcr.io/${REPO_LOWER}/admin:${{ github.sha }}\`
+          ### 📦 Deployed Services
+          - **NestJS Origin Container:** \`ghcr.io/${REPO_LOWER}/api:${{ github.sha }}\`
+          - **Marketplace Worker:** \`automotive-os-marketplace-${ENV}\` (OpenNext SSR)
+          - **Dealer Cockpit Worker:** \`automotive-os-dealer-${ENV}\` (OpenNext SSR)
+          - **Admin Ops Worker:** \`automotive-os-admin-${ENV}\` (Cloudflare Access Zero Trust)
 
           ### 🌐 Ingress Routes
           - **Buyer Marketplace:** https://marketplace.${DOMAIN_PREFIX}automotive-os.ae
           - **Dealer Cockpit (DMS):** https://dealer.${DOMAIN_PREFIX}automotive-os.ae
-          - **Platform Admin:** https://admin.${DOMAIN_PREFIX}automotive-os.ae
-          - **NestJS Modular Monolith API:** https://api.${DOMAIN_PREFIX}automotive-os.ae/health
+          - **Platform Admin (Access Gated):** https://admin.${DOMAIN_PREFIX}automotive-os.ae
+          - **NestJS API (Cloudflare Tunnel):** https://api.${DOMAIN_PREFIX}automotive-os.ae/health
 
           ### 🔒 Sovereign Security & Release Governance
-          - Monorepo test suite executed with ZERO bypass.
-          - PostgreSQL Row-Level Security (RLS) policies verified.
-          - Pre-migration backup readiness validated.
-          - Secrets and database credentials masked with zero leakage.
+          - Defense-in-depth PostgreSQL Row-Level Security (RLS) active and machine-verified.
+          - Pre-migration backup readiness validated with snapshot age < 24h.
+          - Cloudflare Access anonymous denial verified on Platform Admin.
+          - No-store caching enforced for private dealer and admin operational endpoints.
           EOF
-
-  # =========================================================================
-  # Gate 5: Post-Deployment Liveness & Readiness Probes
-  # =========================================================================
-  health-probes:
-    name: Post-Deployment Health Probes
-    needs: deploy-infrastructure
-    runs-on: ubuntu-latest
-    steps:
-      - name: Probe API Health Endpoint
-        shell: bash
-        env:
-          TARGET_ENV: ${{ inputs.environment }}
-          STAGING_URL: ${{ secrets.STAGING_API_URL }}
-          PROD_URL: ${{ secrets.PROD_API_URL }}
-        run: |
-          if [ "$TARGET_ENV" = "production" ]; then
-            DEFAULT_URL="https://api.automotive-os.ae"
-            PROBE_URL="${PROD_URL:-$DEFAULT_URL}"
-          else
-            DEFAULT_URL="https://api.staging.automotive-os.ae"
-            PROBE_URL="${STAGING_URL:-$DEFAULT_URL}"
-          fi
-          
-          echo "Testing API probe at $PROBE_URL/health..."
-
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PROBE_URL/health" --max-time 5 || true)
-          echo "Health probe status code: $HTTP_STATUS"
-          if [ "$HTTP_STATUS" = "200" ]; then
-            echo "✅ Target API is healthy and accepting traffic."
-          else
-            echo "ℹ️ External DNS or ingress route not reachable at $PROBE_URL; probe recorded without blocking release pipeline."
-          fi

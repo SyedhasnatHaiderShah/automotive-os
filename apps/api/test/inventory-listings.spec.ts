@@ -39,6 +39,11 @@ describe('Inventory & Listings Module (E2E Integration & Tenant Isolation Tests)
   let createdListingSlug: string;
 
   beforeAll(async () => {
+    process.env.R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || 'test-r2-key';
+    process.env.R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || 'test-r2-secret-1234567890';
+    process.env.R2_ENDPOINT = process.env.R2_ENDPOINT || 'https://test-account.r2.cloudflarestorage.com';
+    process.env.R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'automotive-os-media-staging';
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -260,7 +265,7 @@ describe('Inventory & Listings Module (E2E Integration & Tenant Isolation Tests)
 
       expect(response.body.mediaId).toBeDefined();
       expect(response.body.objectKey).toContain(`tenants/${tenantAId}/vehicles/${createdVehicleId}`);
-      expect(response.body.uploadUrl).toContain('signed-upload-token');
+      expect(response.body.uploadUrl).toMatch(/X-Amz-Algorithm|signed-upload-token/);
       expect(response.body.isPublic).toBe(true);
 
       createdMediaId = response.body.mediaId;

@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://marketplace.staging.automotive-os.ae",
+          "https://dealer.staging.automotive-os.ae"
+        ],
+        "methods": [
+          "GET",
+          "HEAD"
+        ],
+        "headers": [
+          "Content-Type",
+          "Range"
+        ]
+      },
+      "exposed": {
+        "headers": [
+          "ETag",
+          "Content-Length",
+          "Content-Range"
+        ]
+      },
+      "maxAgeSeconds": 86400
+    }
+  ]
+}
