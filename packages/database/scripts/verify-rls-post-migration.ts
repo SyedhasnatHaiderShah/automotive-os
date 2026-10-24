@@ -18,6 +18,9 @@ const EXPECTED_RLS_TABLES = [
   'outbox_events',
   'makes',
   'car_models',
+  'tenants',
+  'users',
+  'subscription_plans',
 ];
 
 const REQUIRED_POLICIES = [
@@ -40,12 +43,16 @@ const REQUIRED_POLICIES = [
   { table: 'saved_searches', policy: 'buyer_isolation' },
   { table: 'makes', policy: 'public_catalog_makes' },
   { table: 'car_models', policy: 'public_catalog_models' },
+  { table: 'tenants', policy: 'tenant_self_isolation' },
+  { table: 'tenants', policy: 'public_active_dealers' },
+  { table: 'users', policy: 'users_self_isolation' },
+  { table: 'subscription_plans', policy: 'public_plans_read' },
   { table: 'audit_events', policy: 'audit_events_tenant_isolation' },
   { table: 'outbox_events', policy: 'outbox_events_tenant_isolation' },
 ];
 
 async function verifyRlsPostMigration() {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL || process.env.DIRECT_URL || (process.env.NODE_ENV === 'test' ? 'postgresql://postgres:postgres@localhost:5432/automotive_os?schema=public' : undefined);
 
   console.log('========================================================================');
   console.log('Automotive OS — Post-Migration Row-Level Security (RLS) Verification Gate');
@@ -84,7 +91,7 @@ async function verifyRlsPostMigration() {
       }
     }
 
-    // 2. Verify Row-Level Security is ENABLED and FORCED on all sensitive tables
+    // 2. Verify Row-Level Security is ENABLED and FORCED on all protected tables
     console.log('\n2. Verifying RLS enablement (relrowsecurity & relforcerowsecurity)...');
     const tableSecurityResult: any = await prisma.$queryRawUnsafe(`
       SELECT 
@@ -112,10 +119,13 @@ async function verifyRlsPostMigration() {
         console.error(`   ❌ Table public.${table} not found in database!`);
         failures++;
       } else if (!sec.rls_enabled) {
-        console.error(`   ❌ Table public.${table} DOES NOT have Row Level Security enabled!`);
+        console.error(`   ❌ Table public.${table} DOES NOT have Row Level Security enabled (relrowsecurity=false)!`);
+        failures++;
+      } else if (!sec.rls_forced) {
+        console.error(`   ❌ Table public.${table} DOES NOT have FORCE ROW LEVEL SECURITY enabled (relforcerowsecurity=false)!`);
         failures++;
       } else {
-        console.log(`   ✅ Table public.${table}: RLS ENABLED (forced: ${sec.rls_forced})`);
+        console.log(`   ✅ Table public.${table}: RLS ENABLED & FORCED (relrowsecurity=true, relforcerowsecurity=true)`);
       }
     }
 
@@ -149,42 +159,29 @@ async function verifyRlsPostMigration() {
       }
     }
 
-    // 4. Verify runtime DB role does not have BYPASSRLS
+    // 4. Verify runtime application DB role exists and strictly lacks SUPERUSER and BYPASSRLS
     console.log('\n4. Verifying non-bypass role attribute for application safety...');
-    const roleResult: any = await prisma.$queryRawUnsafe(`
-      SELECT rolname, rolsuper, rolbypassrls 
-      FROM pg_roles 
-      WHERE rolname = CURRENT_USER;
-    `);
-
-    if (roleResult.length > 0) {
-      const currentRole = roleResult[0];
-      console.log(`   Current connection role: ${currentRole.rolname}`);
-      console.log(`   Superuser: ${currentRole.rolsuper}`);
-      console.log(`   Bypass RLS: ${currentRole.rolbypassrls}`);
-
-      if (currentRole.rolbypassrls) {
-        console.warn(`   ⚠️ WARNING: Current connection role '${currentRole.rolname}' has rolbypassrls=true.`);
-        console.warn(`   Ensure the application connection pool user (e.g. automotive_app_user) has rolbypassrls=false!`);
-      } else {
-        console.log(`   ✅ Role '${currentRole.rolname}' enforces Row-Level Security (rolbypassrls=false).`);
-      }
-    }
-
-    // Check application user role if exists
     const appRoleResult: any = await prisma.$queryRawUnsafe(`
       SELECT rolname, rolsuper, rolbypassrls 
       FROM pg_roles 
       WHERE rolname = 'automotive_app_user';
     `);
 
-    if (appRoleResult.length > 0) {
+    if (appRoleResult.length === 0) {
+      console.error(`   ❌ FATAL SECURITY VIOLATION: Required application role 'automotive_app_user' does NOT exist!`);
+      failures++;
+    } else {
       const appRole = appRoleResult[0];
+      if (appRole.rolsuper) {
+        console.error(`   ❌ FATAL SECURITY VIOLATION: Application role 'automotive_app_user' has rolsuper=true!`);
+        failures++;
+      }
       if (appRole.rolbypassrls) {
         console.error(`   ❌ FATAL SECURITY VIOLATION: Application role 'automotive_app_user' has rolbypassrls=true!`);
         failures++;
-      } else {
-        console.log(`   ✅ Application role 'automotive_app_user' strictly lacks rolbypassrls.`);
+      }
+      if (!appRole.rolsuper && !appRole.rolbypassrls) {
+        console.log(`   ✅ Application role 'automotive_app_user' strictly lacks SUPERUSER and BYPASSRLS.`);
       }
     }
 

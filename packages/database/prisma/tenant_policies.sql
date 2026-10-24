@@ -29,6 +29,25 @@ LANGUAGE sql STABLE AS $$
   SELECT COALESCE(NULLIF(current_setting('app.is_admin', true), '')::boolean, false);
 $$;
 
+-- Ensure non-bypass runtime application role exists
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'automotive_app_user') THEN
+    CREATE ROLE automotive_app_user WITH LOGIN PASSWORD 'app_secure_dev_password' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS;
+  ELSE
+    ALTER ROLE automotive_app_user NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS;
+  END IF;
+END $$;
+
+GRANT USAGE ON SCHEMA public TO automotive_app_user;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO automotive_app_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO automotive_app_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO automotive_app_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO automotive_app_user;
+
+GRANT USAGE ON SCHEMA app TO automotive_app_user;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA app TO automotive_app_user;
+
 -- ------------------------------------------------------------------------------
 -- 1. Dealer Operational Tables (Strict Tenant Boundary Isolation)
 -- ------------------------------------------------------------------------------
@@ -101,7 +120,34 @@ CREATE POLICY buyer_appointment_access ON public.appointments
   USING (buyer_user_id = app.current_user_uuid());
 
 -- ------------------------------------------------------------------------------
--- 3. Public Marketplace Projection Policies (Read-Only)
+-- 3. Identity and Tenant Root Tables (Users & Tenants)
+-- ------------------------------------------------------------------------------
+
+ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tenants FORCE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS tenant_self_isolation ON public.tenants;
+CREATE POLICY tenant_self_isolation ON public.tenants
+  FOR ALL
+  USING (id = app.current_tenant_uuid() OR app.is_platform_admin())
+  WITH CHECK (id = app.current_tenant_uuid() OR app.is_platform_admin());
+
+DROP POLICY IF EXISTS public_active_dealers ON public.tenants;
+CREATE POLICY public_active_dealers ON public.tenants
+  FOR SELECT
+  USING (status = 'ACTIVE');
+
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.users FORCE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS users_self_isolation ON public.users;
+CREATE POLICY users_self_isolation ON public.users
+  FOR ALL
+  USING (id = app.current_user_uuid() OR app.is_platform_admin())
+  WITH CHECK (id = app.current_user_uuid() OR app.is_platform_admin());
+
+-- ------------------------------------------------------------------------------
+-- 4. Public Marketplace Projection Policies (Read-Only)
 -- ------------------------------------------------------------------------------
 
 -- Allow public read access strictly to APPROVED & PUBLISHED listings
@@ -116,9 +162,15 @@ CREATE POLICY public_vehicle_media_read ON public.vehicle_media
   FOR SELECT
   USING (is_public = true);
 
--- Catalog Taxonomy (Makes & Models): Globally accessible for reading
+-- Catalog Taxonomy (Makes, Models, Subscription Plans): Globally accessible for reading
 ALTER TABLE public.makes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.makes FORCE ROW LEVEL SECURITY;
+
 ALTER TABLE public.car_models ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.car_models FORCE ROW LEVEL SECURITY;
+
+ALTER TABLE public.subscription_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.subscription_plans FORCE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS public_catalog_makes ON public.makes;
 CREATE POLICY public_catalog_makes ON public.makes FOR SELECT USING (true);
@@ -126,8 +178,11 @@ CREATE POLICY public_catalog_makes ON public.makes FOR SELECT USING (true);
 DROP POLICY IF EXISTS public_catalog_models ON public.car_models;
 CREATE POLICY public_catalog_models ON public.car_models FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS public_plans_read ON public.subscription_plans;
+CREATE POLICY public_plans_read ON public.subscription_plans FOR SELECT USING (true);
+
 -- ------------------------------------------------------------------------------
--- 4. Audit & Outbox Events Security
+-- 5. Audit & Outbox Events Security
 -- ------------------------------------------------------------------------------
 
 ALTER TABLE public.audit_events ENABLE ROW LEVEL SECURITY;

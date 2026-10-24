@@ -16,8 +16,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4000
-      - DATABASE_URL=postgresql://${DB_USER:-automotive_user}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:-automotive_os_production}?schema=public
-      - DIRECT_URL=postgresql://${DB_USER:-automotive_user}:${DB_PASSWORD:?DB_PASSWORD must be set}@postgres:5432/${DB_NAME:-automotive_os_production}?schema=public
+      # Defense-in-depth: Runtime connects strictly as non-bypass application user
+      - DATABASE_URL=postgresql://${APP_DB_USER:-automotive_app_user}:${APP_DB_PASSWORD:?APP_DB_PASSWORD must be set}@postgres:5432/${DB_NAME:-automotive_os_production}?schema=public
+      - DIRECT_URL=postgresql://${APP_DB_USER:-automotive_app_user}:${APP_DB_PASSWORD:?APP_DB_PASSWORD must be set}@postgres:5432/${DB_NAME:-automotive_os_production}?schema=public
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set}
       - CORS_ORIGINS=https://marketplace.automotive-os.ae,https://dealer.automotive-os.ae,https://admin.automotive-os.ae
@@ -55,16 +56,18 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=${DB_USER:-automotive_user}
+      - POSTGRES_USER=${DB_USER:-automotive_admin}
       - POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD must be set}
       - POSTGRES_DB=${DB_NAME:-automotive_os_production}
+      - APP_DB_PASSWORD=${APP_DB_PASSWORD:?APP_DB_PASSWORD must be set}
       - POSTGRES_INITDB_ARGS=--encoding=UTF8 --lc-collate=C --lc-ctype=C
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ../initdb:/docker-entrypoint-initdb.d:ro
     networks:
       - internal-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-automotive_user} -d ${DB_NAME:-automotive_os_production}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-automotive_admin} -d ${DB_NAME:-automotive_os_production}"]
       interval: 10s
       timeout: 5s
       retries: 5

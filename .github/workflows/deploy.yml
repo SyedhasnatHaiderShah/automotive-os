@@ -108,12 +108,55 @@ jobs:
         run: pnpm run build
 
   # =========================================================================
+  # Gate 1b: Formal GitHub Environment Approval & Branch Protection
+  # Genuinely triggers GitHub Environment Protection Rules (Required Reviewers)
+  # and enforces branch protection independently of typed confirmation.
+  # =========================================================================
+  environment-approval-staging:
+    name: Staging Governance & Environmental Approval Gate
+    needs: verify-gate
+    if: "${{ github.event.inputs.environment == 'staging' }}"
+    environment: staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm Authorized Staging Environment Ingress
+        run: |
+          echo "✅ Staging environment gate approved via GitHub Environment protection."
+          echo "Target Environment: staging"
+          echo "Release Reference:  ${{ github.event.inputs.release_tag }} (${{ github.sha }})"
+
+  environment-approval-production:
+    name: Production Governance & Environmental Approval Gate
+    needs: verify-gate
+    if: "${{ github.event.inputs.environment == 'production' }}"
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce Production Protected Branch Policy
+        shell: bash
+        run: |
+          CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
+          if [ "$CURRENT_BRANCH" != "main" ] && [ "$CURRENT_BRANCH" != "master" ]; then
+            echo "❌ PRODUCTION DEPLOYMENT BLOCKED: Production releases are strictly permitted only from 'main'."
+            echo "Attempted deployment from branch: '$CURRENT_BRANCH'"
+            exit 1
+          fi
+          echo "✅ Production branch policy verified: release originates from '$CURRENT_BRANCH'."
+
+      - name: Confirm Authorized Production Environment Ingress
+        run: |
+          echo "✅ Production environment gate approved by designated release architects."
+          echo "Target Environment: production"
+          echo "Release Reference:  ${{ github.event.inputs.release_tag }} (${{ github.sha }})"
+
+  # =========================================================================
   # Gate 2: Build & Publish Container for NestJS API Origin
   # Frontends (marketplace, dealer, admin) are deployed to Cloudflare Workers!
   # =========================================================================
   build-api-container:
     name: Build & Publish API Container Image
-    needs: verify-gate
+    needs: [verify-gate, environment-approval-staging, environment-approval-production]
+    if: "always() && needs.verify-gate.result == 'success' && (needs.environment-approval-staging.result == 'success' || needs.environment-approval-production.result == 'success')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -163,12 +206,12 @@ jobs:
           cache-to: type=gha,mode=max
 
   # =========================================================================
-  # Gate 3: Database Migration with Machine-Verifiable Backup Prerequisites
+  # Gate 3: Database Migration with Provider-Backed Backup Verification
   # =========================================================================
   database-migrations:
     name: Apply Database Migrations & RLS
-    needs: verify-gate
-    if: "${{ github.event.inputs.run_database_migrations == 'true' || github.event.inputs.run_database_migrations == true }}"
+    needs: [verify-gate, environment-approval-staging, environment-approval-production]
+    if: "always() && needs.verify-gate.result == 'success' && (needs.environment-approval-staging.result == 'success' || needs.environment-approval-production.result == 'success') && (${{ github.event.inputs.run_database_migrations == 'true' || github.event.inputs.run_database_migrations == true }})"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -207,7 +250,7 @@ jobs:
           fi
           echo "✅ Database connection string credential detected for '$TARGET_ENV'."
 
-      - name: Machine-Verifiable Backup & Migration Safety Verification
+      - name: Provider-Backed Backup & Migration Safety Verification
         shell: bash
         env:
           TARGET_ENV: ${{ github.event.inputs.environment }}
@@ -215,6 +258,9 @@ jobs:
           PROD_CONFIRM: ${{ github.event.inputs.confirm_production_migration }}
           STAGING_URL: ${{ secrets.STAGING_DATABASE_URL }}
           PROD_URL: ${{ secrets.PROD_DATABASE_URL }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'me-central-1' }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           set +x
           if [ "$TARGET_ENV" = "production" ]; then
@@ -228,7 +274,7 @@ jobs:
             DATABASE_URL="$STAGING_URL"
           fi
 
-          echo "Verifying machine-verifiable backup snapshot / PITR readiness..."
+          echo "Verifying independent provider backup / PITR evidence via provider adapter..."
           DATABASE_URL="$DATABASE_URL" TARGET_ENV="$TARGET_ENV" BACKUP_TOKEN="$BACKUP_TOKEN" \
             pnpm --filter @automotive-os/database run verify:backup
 
@@ -257,8 +303,7 @@ jobs:
           DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run prisma:deploy
           
           echo "Applying defense-in-depth tenant RLS policies with fail-closed error handling..."
-          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
-          psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -f packages/database/prisma/tenant_policies.sql
+          DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database exec tsx scripts/apply-tenant-policies.ts
 
           echo "Executing post-migration RLS policy and non-bypass role verification..."
           DATABASE_URL="$DATABASE_URL" pnpm --filter @automotive-os/database run verify:rls

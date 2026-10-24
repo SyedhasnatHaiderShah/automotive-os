@@ -1,91 +1,42 @@
 import { PrismaClient } from '@prisma/client';
+import { getBackupProviderAdapter } from '../src/backup';
 
-interface BackupSnapshotManifest {
-  provider: 'aws-rds' | 'postgresql-pitr' | 'gcp-cloudsql' | 'azure-postgres' | 'manual-verified';
-  snapshotId: string;
-  status: 'available' | 'completed' | 'in-progress' | 'failed';
-  targetDatabase: string;
-  createdAt: string; // ISO 8601
-  recoverable: boolean;
-  region?: string;
-}
+function parseTokenComponents(token: string): { identifier: string; region?: string; isPitr: boolean } {
+  const trimmed = token.trim();
 
-function parseBackupToken(token: string, targetDatabase: string): BackupSnapshotManifest {
-  // 1. Try parsing JSON format
-  if (token.startsWith('{') && token.endsWith('}')) {
-    try {
-      const parsed = JSON.parse(token);
-      return {
-        provider: parsed.provider || 'manual-verified',
-        snapshotId: parsed.snapshotId || parsed.id || 'unknown',
-        status: parsed.status || 'available',
-        targetDatabase: parsed.targetDatabase || targetDatabase,
-        createdAt: parsed.createdAt || new Date().toISOString(),
-        recoverable: parsed.recoverable !== false,
-        region: parsed.region,
-      };
-    } catch {
-      // Fall through to string parser
-    }
+  // PITR syntax: pitr:2026-10-23T18:00:00Z
+  if (trimmed.startsWith('pitr:')) {
+    return {
+      identifier: trimmed.substring(5),
+      isPitr: true,
+    };
   }
 
-  // 2. Try parsing AWS RDS Snapshot ARN
-  // arn:aws:rds:me-central-1:123456789012:snapshot:rds-automotive-os-prod-2026-10-23
+  // AWS RDS Snapshot ARN: arn:aws:rds:me-central-1:123456789012:snapshot:snapshot-name
   const rdsArnRegex = /^arn:aws:rds:([a-z0-9-]+):\d{12}:snapshot:(.+)$/;
-  const rdsMatch = token.match(rdsArnRegex);
+  const rdsMatch = trimmed.match(rdsArnRegex);
   if (rdsMatch) {
     return {
-      provider: 'aws-rds',
-      snapshotId: rdsMatch[2],
-      status: 'available',
-      targetDatabase,
-      createdAt: new Date().toISOString(), // Assumed recent unless verified against AWS API
-      recoverable: true,
+      identifier: rdsMatch[2],
       region: rdsMatch[1],
+      isPitr: false,
     };
   }
 
-  // 3. Try parsing PITR format: pitr:YYYY-MM-DDTHH:mm:ssZ
-  const pitrRegex = /^pitr:(.+)$/;
-  const pitrMatch = token.match(pitrRegex);
-  if (pitrMatch) {
-    const ts = new Date(pitrMatch[1]);
-    if (isNaN(ts.getTime())) {
-      throw new Error(`Invalid PITR timestamp format: ${pitrMatch[1]}`);
-    }
-    return {
-      provider: 'postgresql-pitr',
-      snapshotId: `pitr-${pitrMatch[1]}`,
-      status: 'available',
-      targetDatabase,
-      createdAt: ts.toISOString(),
-      recoverable: true,
-    };
-  }
-
-  // 4. Standard verified identifier token (e.g. backup-staging-20261023-180000)
-  const standardTokenRegex = /^[a-zA-Z0-9_-]{8,128}$/;
-  if (standardTokenRegex.test(token)) {
-    return {
-      provider: 'manual-verified',
-      snapshotId: token,
-      status: 'available',
-      targetDatabase,
-      createdAt: new Date().toISOString(),
-      recoverable: true,
-    };
-  }
-
-  throw new Error(`Unrecognized backup token format. Expected RDS Snapshot ARN, PITR token ('pitr:ISO_DATE'), or verified snapshot manifest.`);
+  // Standard identifier (e.g. rds-automotive-os-prod-2026-10-23)
+  return {
+    identifier: trimmed,
+    isPitr: false,
+  };
 }
 
 async function verifyBackupSnapshot() {
   const targetEnv = (process.env.TARGET_ENV || 'staging').toLowerCase();
   const rawToken = process.env.BACKUP_TOKEN?.trim() || '';
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_URL || process.env.DIRECT_URL;
 
   console.log('========================================================================');
-  console.log('Automotive OS — Machine-Verifiable Database Backup & PITR Verifier');
+  console.log('Automotive OS — Provider-Backed Database Backup & PITR Verification Gate');
   console.log(`Target Environment: ${targetEnv}`);
   console.log('========================================================================\n');
 
@@ -101,7 +52,7 @@ async function verifyBackupSnapshot() {
   });
 
   try {
-    // 1. Probe active database connection & identity
+    // 1. Probe active target database connection & identity
     console.log('1. Connecting to target database to verify identity...');
     const identityResult: any = await prisma.$queryRawUnsafe(`
       SELECT 
@@ -111,12 +62,17 @@ async function verifyBackupSnapshot() {
         version() as pg_version;
     `);
 
+    if (!identityResult || identityResult.length === 0) {
+      throw new Error('Failed to query database identity.');
+    }
+
     const dbIdentity = identityResult[0];
     console.log(`   Connected Database: ${dbIdentity.db_name}`);
     console.log(`   Connected User:     ${dbIdentity.db_user}`);
     console.log(`   PostgreSQL Version: ${dbIdentity.pg_version.split(',')[0]}`);
 
-    // Environment sanity check: Ensure production DB is not accidentally targeted in staging or vice versa
+    // Environment Sanity Isolation Gate:
+    // Prevent accidental cross-targeting of production/staging databases
     if (targetEnv === 'production') {
       if (dbIdentity.db_name.includes('staging') || dbIdentity.db_name.includes('test')) {
         console.error(`❌ FATAL MISMATCH: Target environment is 'production' but connected database is '${dbIdentity.db_name}'.`);
@@ -129,66 +85,82 @@ async function verifyBackupSnapshot() {
       }
     }
 
-    // 2. Machine-verifiable snapshot verification
-    console.log('\n2. Verifying backup snapshot and Point-In-Time-Recovery (PITR) status...');
+    // 2. Enforce backup presence (fail-closed in staging and production)
+    console.log('\n2. Verifying independent provider backup / PITR evidence...');
     if (!rawToken) {
-      if (targetEnv === 'production') {
-        console.error('❌ REJECTED: Production migrations require a valid, verified BACKUP_TOKEN.');
-        console.error('   Please supply an AWS RDS snapshot ARN, PITR token, or snapshot manifest JSON.');
+      if (targetEnv === 'production' || targetEnv === 'staging') {
+        console.error(`❌ REJECTED: Environment '${targetEnv}' migrations require verified independent provider backup evidence.`);
+        console.error(`   Please provide a valid AWS RDS snapshot ARN or PITR token via BACKUP_TOKEN.`);
         process.exit(1);
       } else {
-        console.warn('⚠️ WARNING: Staging migration running without explicit BACKUP_TOKEN.');
-        console.log('   Checking database transaction-scoped rollback readiness...');
-        
-        // Check if database supports savepoints & clean transactions
-        await prisma.$executeRawUnsafe(`SELECT 1;`);
-        console.log('   ✅ Staging database is online and accepting transactions.');
-        console.log('   ✅ Pre-migration safety checks passed for staging.');
+        console.warn(`⚠️ WARNING: Running without explicit BACKUP_TOKEN in development.`);
         process.exit(0);
       }
     }
 
-    const manifest = parseBackupToken(rawToken, dbIdentity.db_name);
-    console.log(`   Provider:         ${manifest.provider}`);
-    console.log(`   Snapshot ID:      ${manifest.snapshotId}`);
-    console.log(`   Snapshot Status:  ${manifest.status}`);
-    console.log(`   Target Database:  ${manifest.targetDatabase}`);
-    console.log(`   Created At:       ${manifest.createdAt}`);
-    console.log(`   Recoverable:      ${manifest.recoverable}`);
+    // 3. Obtain appropriate provider adapter
+    const adapter = getBackupProviderAdapter(targetEnv);
+    console.log(`   Provider Adapter:  ${adapter.providerName}`);
 
-    // Validation 1: Status must be available / completed
-    if (manifest.status !== 'available' && manifest.status !== 'completed') {
-      console.error(`❌ BACKUP VERIFICATION FAILED: Snapshot status is '${manifest.status}', expected 'available'.`);
-      process.exit(1);
+    const { identifier, region, isPitr } = parseTokenComponents(rawToken);
+    const expectedRegion = region || process.env.AWS_REGION || 'me-central-1';
+
+    if (isPitr) {
+      // Verify Point-in-Time-Recovery (PITR)
+      const targetTime = new Date(identifier);
+      if (isNaN(targetTime.getTime())) {
+        throw new Error(`Invalid PITR restore timestamp format: '${identifier}'. Expected ISO 8601.`);
+      }
+
+      console.log(`   Verifying PITR target time: ${targetTime.toISOString()}...`);
+      const pitrResult = await adapter.describePitr(targetTime, {
+        targetDatabase: dbIdentity.db_name,
+        expectedRegion,
+      });
+
+      console.log(`   ✅ Provider Status:          ${pitrResult.status}`);
+      console.log(`   ✅ Restorable Window Start:  ${pitrResult.earliestRestorableTime.toISOString()}`);
+      console.log(`   ✅ Restorable Window End:    ${pitrResult.latestRestorableTime.toISOString()}`);
+      console.log(`   ✅ Region:                   ${pitrResult.region}`);
+      console.log(`   ✅ Restore Eligibility:      ${pitrResult.restoreEligible}`);
+    } else {
+      // Verify Snapshot with provider
+      console.log(`   Querying provider for snapshot '${identifier}' in region '${expectedRegion}'...`);
+      const snapshot = await adapter.describeSnapshot(identifier, {
+        targetDatabase: dbIdentity.db_name,
+        expectedRegion,
+        maxAgeHours: 24.0,
+      });
+
+      console.log(`   ✅ Provider Status:          ${snapshot.status}`);
+      console.log(`   ✅ Provider Created At:      ${snapshot.snapshotCreateTime.toISOString()}`);
+      console.log(`   ✅ Snapshot Freshness:       ${snapshot.ageHours.toFixed(2)} hours (safety limit: 24h)`);
+      console.log(`   ✅ Target Instance:          ${snapshot.dbInstanceIdentifier}`);
+      console.log(`   ✅ Engine Version:           ${snapshot.engine} ${snapshot.engineVersion}`);
+      console.log(`   ✅ Region:                   ${snapshot.region}`);
+      console.log(`   ✅ Encrypted:                ${snapshot.encrypted}`);
+      console.log(`   ✅ Restore Eligibility:      ${snapshot.restoreEligible}`);
     }
 
-    // Validation 2: Target database identity match
-    if (manifest.targetDatabase !== dbIdentity.db_name && !manifest.snapshotId.includes(dbIdentity.db_name)) {
-      console.error(`❌ BACKUP VERIFICATION FAILED: Snapshot target database '${manifest.targetDatabase}' does not match connected database '${dbIdentity.db_name}'.`);
-      process.exit(1);
+    // 4. Optional Isolated Restore Verification
+    const restoreTestUrl = process.env.RESTORE_TEST_DATABASE_URL;
+    if (restoreTestUrl) {
+      console.log('\n3. Verifying restoration in isolated test database...');
+      const restorePrisma = new PrismaClient({ datasources: { db: { url: restoreTestUrl } } });
+      try {
+        await restorePrisma.$queryRawUnsafe(`SELECT 1;`);
+        console.log('   ✅ Isolated test restore database connectivity verified.');
+      } finally {
+        await restorePrisma.$disconnect();
+      }
     }
 
-    // Validation 3: Snapshot age verification (< 24 hours)
-    const snapshotTime = new Date(manifest.createdAt).getTime();
-    const now = Date.now();
-    const ageHours = (now - snapshotTime) / (1000 * 60 * 60);
-
-    if (ageHours > 24) {
-      console.error(`❌ BACKUP VERIFICATION FAILED: Snapshot age (${ageHours.toFixed(1)} hours) exceeds maximum allowed age of 24.0 hours.`);
-      process.exit(1);
-    }
-    console.log(`   Snapshot Age:     ${ageHours.toFixed(2)} hours (within 24h safety limit)`);
-
-    // Validation 4: Recoverability flag
-    if (!manifest.recoverable) {
-      console.error(`❌ BACKUP VERIFICATION FAILED: Snapshot manifests recoverable=false. Cannot proceed with migration.`);
-      process.exit(1);
-    }
-
-    console.log('\n✅ BACKUP VERIFICATION SUCCESSFUL: Machine-verifiable snapshot confirmed valid, recent, and recoverable.');
+    console.log('\n========================================================================');
+    console.log('✅ PROVIDER-BACKED BACKUP VERIFICATION CONFIRMED: PASS');
+    console.log('========================================================================');
     process.exit(0);
   } catch (err: any) {
-    console.error(`❌ FATAL BACKUP VERIFICATION ERROR: ${err?.message || err}`);
+    console.error(`\n❌ FATAL BACKUP VERIFICATION ERROR: ${err?.message || err}`);
     process.exit(1);
   } finally {
     await prisma.$disconnect();
