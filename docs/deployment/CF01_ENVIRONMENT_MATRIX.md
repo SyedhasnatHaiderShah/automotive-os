@@ -26,11 +26,11 @@ Deployed as Cloudflare Workers (`marketplace`, `dealer`, `admin`).
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `NEXT_PRIVATE_MINIMAL_MODE` | RESTRICTED | `1` | `1` | `1` | Enforces serverless isolate mode for NextNodeServer |
 | `NEXT_PUBLIC_APP_ENV` | PUBLIC | `development` | `staging` | `production` | Active environment identifier |
-| `NEXT_PUBLIC_API_URL` | PUBLIC | `http://localhost:4000` | `https://api.staging.automotive-os.ae` | `https://api.automotive-os.ae` | NestJS backend ingress URL |
-| `NEXT_PUBLIC_STORAGE_URL` | PUBLIC | `http://localhost:9000/media` | `https://media.staging.automotive-os.ae` | `https://media.automotive-os.ae` | Cloudflare R2 public vehicle media CDN |
-| `NEXT_PUBLIC_MARKETPLACE_URL` | PUBLIC | `http://localhost:3000` | `https://marketplace.staging.automotive-os.ae` | `https://automotive-os.ae` | Canonical marketplace URL |
-| `NEXT_PUBLIC_DEALER_URL` | PUBLIC | `http://localhost:3001` | `https://dealer.staging.automotive-os.ae` | `https://dealer.automotive-os.ae` | Dealer cockpit portal URL |
-| `NEXT_PUBLIC_ADMIN_URL` | PUBLIC | `http://localhost:3002` | `https://admin.staging.automotive-os.ae` | `https://admin.automotive-os.ae` | Platform ops portal URL |
+| `NEXT_PUBLIC_API_URL` | PUBLIC | `http://localhost:4000` | `https://api-staging.syedhasnat.com` | `https://api.automotive-os.ae` | NestJS backend ingress URL |
+| `NEXT_PUBLIC_STORAGE_URL` | PUBLIC | `http://localhost:9000/media` | `https://media-staging.syedhasnat.com` | `https://media.automotive-os.ae` | Cloudflare R2 public vehicle media CDN |
+| `NEXT_PUBLIC_MARKETPLACE_URL` | PUBLIC | `http://localhost:3000` | `https://cars-staging.syedhasnat.com` | `https://automotive-os.ae` | Canonical marketplace URL |
+| `NEXT_PUBLIC_DEALER_URL` | PUBLIC | `http://localhost:3001` | `https://dealer-staging.syedhasnat.com` | `https://dealer.automotive-os.ae` | Dealer cockpit portal URL |
+| `NEXT_PUBLIC_ADMIN_URL` | PUBLIC | `http://localhost:3002` | `https://admin-staging.syedhasnat.com` | `https://admin.automotive-os.ae` | Platform ops portal URL |
 | `NEXT_PUBLIC_DEFAULT_LOCALE` | PUBLIC | `en` | `en` | `en` | Default UI language |
 | `NEXT_PUBLIC_SUPPORTED_LOCALES`| PUBLIC | `en,ar` | `en,ar` | `en,ar` | Supported locales for UAE marketplace |
 | `NEXT_PUBLIC_DEFAULT_CURRENCY` | PUBLIC | `AED` | `AED` | `AED` | Sovereign currency standard |

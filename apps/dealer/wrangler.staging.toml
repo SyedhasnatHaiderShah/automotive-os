@@ -1,7 +1,7 @@
 # ==============================================================================
 # Cloudflare Workers Staging Manifest — Dealer Cockpit (DMS)
 # Application: apps/dealer
-# Target: https://dealer.staging.automotive-os.ae
+# Target: https://dealer-staging.syedhasnat.com
 # ==============================================================================
 
 name = "automotive-os-dealer-staging"
@@ -16,9 +16,9 @@ binding = "ASSETS"
 [vars]
 NEXT_PRIVATE_MINIMAL_MODE = "1"
 NEXT_PUBLIC_APP_ENV = "staging"
-NEXT_PUBLIC_API_URL = "https://api.staging.automotive-os.ae"
-NEXT_PUBLIC_STORAGE_URL = "https://media.staging.automotive-os.ae"
-NEXT_PUBLIC_DEALER_URL = "https://dealer.staging.automotive-os.ae"
+NEXT_PUBLIC_API_URL = "https://api-staging.syedhasnat.com"
+NEXT_PUBLIC_STORAGE_URL = "https://media-staging.syedhasnat.com"
+NEXT_PUBLIC_DEALER_URL = "https://dealer-staging.syedhasnat.com"
 NEXT_PUBLIC_DEFAULT_LOCALE = "en"
 NEXT_PUBLIC_SUPPORTED_LOCALES = "en,ar"
 NEXT_PUBLIC_DEFAULT_CURRENCY = "AED"

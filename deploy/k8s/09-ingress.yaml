@@ -11,13 +11,13 @@ metadata:
 spec:
   tls:
     - hosts:
-        - marketplace.staging.automotive-os.ae
-        - dealer.staging.automotive-os.ae
-        - admin.staging.automotive-os.ae
-        - api.staging.automotive-os.ae
+        - cars-staging.syedhasnat.com
+        - dealer-staging.syedhasnat.com
+        - admin-staging.syedhasnat.com
+        - api-staging.syedhasnat.com
       secretName: automotive-os-staging-tls
   rules:
-    - host: marketplace.staging.automotive-os.ae
+    - host: cars-staging.syedhasnat.com
       http:
         paths:
           - path: /
@@ -27,7 +27,7 @@ spec:
                 name: marketplace-service
                 port:
                   number: 3000
-    - host: dealer.staging.automotive-os.ae
+    - host: dealer-staging.syedhasnat.com
       http:
         paths:
           - path: /
@@ -37,7 +37,7 @@ spec:
                 name: dealer-service
                 port:
                   number: 3001
-    - host: admin.staging.automotive-os.ae
+    - host: admin-staging.syedhasnat.com
       http:
         paths:
           - path: /
@@ -47,7 +47,7 @@ spec:
                 name: admin-service
                 port:
                   number: 3002
-    - host: api.staging.automotive-os.ae
+    - host: api-staging.syedhasnat.com
       http:
         paths:
           - path: /

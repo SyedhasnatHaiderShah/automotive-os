@@ -1,7 +1,7 @@
 # ==============================================================================
 # Cloudflare Workers Staging Manifest — Platform Operations Command
 # Application: apps/admin
-# Target: https://admin.staging.automotive-os.ae
+# Target: https://admin-staging.syedhasnat.com
 # Security: Gated behind Cloudflare Zero Trust (Access) Application
 # ==============================================================================
 
@@ -17,8 +17,8 @@ binding = "ASSETS"
 [vars]
 NEXT_PRIVATE_MINIMAL_MODE = "1"
 NEXT_PUBLIC_APP_ENV = "staging"
-NEXT_PUBLIC_API_URL = "https://api.staging.automotive-os.ae"
-NEXT_PUBLIC_ADMIN_URL = "https://admin.staging.automotive-os.ae"
+NEXT_PUBLIC_API_URL = "https://api-staging.syedhasnat.com"
+NEXT_PUBLIC_ADMIN_URL = "https://admin-staging.syedhasnat.com"
 NEXT_PUBLIC_DEFAULT_LOCALE = "en"
 NEXT_PUBLIC_SUPPORTED_LOCALES = "en,ar"
 NEXT_PUBLIC_DEFAULT_CURRENCY = "AED"

@@ -1,77 +1,87 @@
 {
   "$schema": "https://developers.cloudflare.com/dns/manage-dns-records/how-to/create-dns-records/",
-  "version": "2026-10-23",
-  "zone_name": "automotive-os.ae",
-  "records": [
-    {
-      "type": "CNAME",
-      "name": "api.staging",
-      "content": "${TUNNEL_ID_STAGING}.cfargotunnel.com",
-      "proxied": true,
-      "comment": "Cloudflare Tunnel Ingress to Staging UAE Origin Node 22 API"
-    },
-    {
-      "type": "CNAME",
-      "name": "marketplace.staging",
-      "content": "automotive-os-marketplace-staging.syedhasnathaidershah.workers.dev",
-      "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Staging Buyer Marketplace"
-    },
-    {
-      "type": "CNAME",
-      "name": "dealer.staging",
-      "content": "automotive-os-dealer-staging.syedhasnathaidershah.workers.dev",
-      "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Staging Dealer DMS Cockpit"
-    },
-    {
-      "type": "CNAME",
-      "name": "admin.staging",
-      "content": "automotive-os-admin-staging.syedhasnathaidershah.workers.dev",
-      "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Staging Platform Admin (Zero Trust Access Gated)"
-    },
-    {
-      "type": "CNAME",
-      "name": "media.staging",
-      "content": "public.r2.dev",
-      "proxied": true,
-      "comment": "Cloudflare R2 Custom Domain for Staging Public Vehicle Media"
-    },
-    {
-      "type": "CNAME",
-      "name": "api",
-      "content": "${TUNNEL_ID_PROD}.cfargotunnel.com",
-      "proxied": true,
-      "comment": "Cloudflare Tunnel Ingress to Production Sovereign UAE Origin Node 22 API"
-    },
-    {
-      "type": "CNAME",
-      "name": "marketplace",
-      "content": "automotive-os-marketplace-production.syedhasnathaidershah.workers.dev",
-      "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Production Buyer Marketplace"
-    },
-    {
-      "type": "CNAME",
-      "name": "dealer",
-      "content": "automotive-os-dealer-production.syedhasnathaidershah.workers.dev",
-      "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Production Dealer DMS Cockpit"
-    },
-    {
-      "type": "CNAME",
-      "name": "admin",
-      "content": "automotive-os-admin-production.syedhasnathaidershah.workers.dev",
-      "proxied": true,
-      "comment": "Cloudflare Worker Custom Domain for Production Platform Admin (Zero Trust Access Gated)"
-    },
-    {
-      "type": "CNAME",
-      "name": "media",
-      "content": "public.r2.dev",
-      "proxied": true,
-      "comment": "Cloudflare R2 Custom Domain for Production Public Vehicle Media"
-    }
-  ]
+  "version": "2026-10-24",
+  "staging_zone": {
+    "zone_name": "syedhasnat.com",
+    "zone_id": "a66068517320394243578be16bae68fc",
+    "preservation_notice": "Existing authoritative records for personal portfolio (syedhasnat.com, www.syedhasnat.com) and existing railway services (api.syedhasnat.com, app.syedhasnat.com) MUST BE PRESERVED. Do not delete or overwrite.",
+    "records": [
+      {
+        "type": "CNAME",
+        "name": "cars-staging",
+        "content": "automotive-os-marketplace-staging.syedhasnathaidershah.workers.dev",
+        "proxied": true,
+        "comment": "Cloudflare Worker Custom Domain for Staging Buyer Marketplace (cars-staging.syedhasnat.com)"
+      },
+      {
+        "type": "CNAME",
+        "name": "dealer-staging",
+        "content": "automotive-os-dealer-staging.syedhasnathaidershah.workers.dev",
+        "proxied": true,
+        "comment": "Cloudflare Worker Custom Domain for Staging Dealer DMS Cockpit (dealer-staging.syedhasnat.com)"
+      },
+      {
+        "type": "CNAME",
+        "name": "admin-staging",
+        "content": "automotive-os-admin-staging.syedhasnathaidershah.workers.dev",
+        "proxied": true,
+        "comment": "Cloudflare Worker Custom Domain for Staging Platform Admin Zero Trust (admin-staging.syedhasnat.com)"
+      },
+      {
+        "type": "CNAME",
+        "name": "api-staging",
+        "content": "${TUNNEL_ID_STAGING}.cfargotunnel.com",
+        "proxied": true,
+        "comment": "Cloudflare Tunnel Ingress to Staging UAE Origin Node 22 API (api-staging.syedhasnat.com)"
+      },
+      {
+        "type": "CNAME",
+        "name": "media-staging",
+        "content": "public.r2.dev",
+        "proxied": true,
+        "comment": "Cloudflare R2 Custom Domain for Staging Public Vehicle Media (media-staging.syedhasnat.com)"
+      }
+    ]
+  },
+  "production_zone_provisional": {
+    "zone_name": "automotive-os.ae",
+    "status": "PROVISIONAL_PENDING_SEPARATE_PRODUCTION_DOMAIN_DECISION",
+    "records": [
+      {
+        "type": "CNAME",
+        "name": "api",
+        "content": "${TUNNEL_ID_PROD}.cfargotunnel.com",
+        "proxied": true,
+        "comment": "Cloudflare Tunnel Ingress to Production Sovereign UAE Origin Node 22 API"
+      },
+      {
+        "type": "CNAME",
+        "name": "marketplace",
+        "content": "automotive-os-marketplace-production.syedhasnathaidershah.workers.dev",
+        "proxied": true,
+        "comment": "Cloudflare Worker Custom Domain for Production Buyer Marketplace"
+      },
+      {
+        "type": "CNAME",
+        "name": "dealer",
+        "content": "automotive-os-dealer-production.syedhasnathaidershah.workers.dev",
+        "proxied": true,
+        "comment": "Cloudflare Worker Custom Domain for Production Dealer DMS Cockpit"
+      },
+      {
+        "type": "CNAME",
+        "name": "admin",
+        "content": "automotive-os-admin-production.syedhasnathaidershah.workers.dev",
+        "proxied": true,
+        "comment": "Cloudflare Worker Custom Domain for Production Platform Admin (Zero Trust Access Gated)"
+      },
+      {
+        "type": "CNAME",
+        "name": "media",
+        "content": "public.r2.dev",
+        "proxied": true,
+        "comment": "Cloudflare R2 Custom Domain for Production Public Vehicle Media"
+      }
+    ]
+  }
 }

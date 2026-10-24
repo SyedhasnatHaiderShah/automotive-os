@@ -72,7 +72,7 @@
       "name": "automotive-os-admin-probe-token",
       "purpose": "Zero Trust Access Service Token for automated synthetic health checks",
       "type": "ACCESS_SERVICE_TOKEN",
-      "application": "admin.staging.automotive-os.ae",
+      "application": "admin-staging.syedhasnat.com",
       "headers": {
         "id_header": "CF-Access-Client-Id",
         "secret_header": "CF-Access-Client-Secret"

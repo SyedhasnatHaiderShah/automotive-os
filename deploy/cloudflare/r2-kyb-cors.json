@@ -3,8 +3,8 @@
     {
       "allowed": {
         "origins": [
-          "https://dealer.staging.automotive-os.ae",
-          "https://admin.staging.automotive-os.ae"
+          "https://dealer-staging.syedhasnat.com",
+          "https://admin-staging.syedhasnat.com"
         ],
         "methods": [
           "PUT",
