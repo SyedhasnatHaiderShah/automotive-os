@@ -6,7 +6,7 @@ export interface BackupVerifyOptions {
 }
 
 export interface VerifiedBackupSnapshot {
-  provider: 'aws-rds' | 'postgresql-pitr' | 'gcp-cloudsql' | 'azure-postgres' | 'mock';
+  provider: 'aws-rds' | 'postgresql-pitr' | 'self-hosted-postgres' | 'gcp-cloudsql' | 'azure-postgres' | 'mock';
   snapshotIdentifier: string;
   dbInstanceIdentifier: string;
   status: string; // must be 'available'
@@ -22,7 +22,7 @@ export interface VerifiedBackupSnapshot {
 }
 
 export interface VerifiedPitr {
-  provider: 'aws-rds' | 'postgresql-pitr' | 'mock';
+  provider: 'aws-rds' | 'postgresql-pitr' | 'self-hosted-postgres' | 'mock';
   dbInstanceIdentifier: string;
   status: string; // 'available'
   earliestRestorableTime: Date;
