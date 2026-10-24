@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from '@automotive-os/database';
+import { PrismaClient, Prisma } from '@automotive-os/database';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 export interface DatabaseContext {
@@ -13,6 +13,8 @@ export const dbContextStorage = new AsyncLocalStorage<DatabaseContext>();
 export function runWithDbContext<T>(context: DatabaseContext, fn: () => Promise<T>): Promise<T> {
   return dbContextStorage.run(context, fn);
 }
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
@@ -51,13 +53,17 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
             if (ctx?.tenantId || ctx?.isAdmin || ctx?.userId) {
               return base.$transaction(async (tx) => {
                 if (ctx.tenantId) {
-                  await tx.$executeRawUnsafe(`SELECT set_config('app.tenant_id', '${ctx.tenantId}', true)`);
+                  // Defense-in-depth: Validate tenant UUID strictly before parameterization
+                  if (!UUID_REGEX.test(ctx.tenantId)) {
+                    throw new Error(`[SECURITY] Invalid tenantId format in database context: ${ctx.tenantId}`);
+                  }
+                  await tx.$executeRaw(Prisma.sql`SELECT set_config('app.tenant_id', ${ctx.tenantId}, true)`);
                 }
                 if (ctx.userId) {
-                  await tx.$executeRawUnsafe(`SELECT set_config('app.user_id', '${ctx.userId}', true)`);
+                  await tx.$executeRaw(Prisma.sql`SELECT set_config('app.user_id', ${ctx.userId}, true)`);
                 }
                 if (ctx.isAdmin) {
-                  await tx.$executeRawUnsafe(`SELECT set_config('app.is_admin', 'true', true)`);
+                  await tx.$executeRaw(Prisma.sql`SELECT set_config('app.is_admin', 'true', true)`);
                 }
                 return (tx as any)[model][operation](args);
               });
