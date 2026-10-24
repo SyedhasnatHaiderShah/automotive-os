@@ -40,6 +40,8 @@
     },
     {
       "name": "automotive-os-kyb-staging",
+      "status": "DEFERRED",
+      "deferral_reason": "Cloudflare R2 does not currently document sovereign UAE in-country data residency guarantees required under UAE PDPL (Federal Decree-Law No. 45 of 2021) for confidential KYC/KYB trade licenses and Emirates ID documents. Staging utilizes synthetic fixture documents until an approved sovereign storage backend is certified.",
       "purpose": "Confidential dealer trade licenses, commercial registry documents, Emirates ID photocopies, dispute evidence",
       "access": "STRICT_PRIVATE",
       "custom_domain": null,

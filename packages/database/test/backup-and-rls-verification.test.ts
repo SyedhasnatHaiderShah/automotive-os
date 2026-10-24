@@ -215,8 +215,36 @@ async function runTestSuite() {
     assert(!test12.stderr.includes('DATABASE_URL environment variable is not defined'));
     console.log('  [PASS] Subprocess reliably inherits DATABASE_URL configuration.');
 
+    // -------------------------------------------------------------------------
+    // TEST 13: Positive verification with Self-Hosted Containerized Backup Adapter
+    // -------------------------------------------------------------------------
+    console.log('\n13. Testing Self-Hosted Containerized PostgreSQL Backup Adapter...');
+    const currentIso = new Date().toISOString();
+    const test13 = runBackupVerification({
+      TARGET_ENV: 'staging',
+      BACKUP_PROVIDER_ADAPTER: 'self-hosted',
+      BACKUP_TOKEN: `selfhosted-automotive_os_staging-${currentIso}`,
+    });
+    assert.strictEqual(test13.code, 0, `Expected 0, got ${test13.code}: ${test13.stderr || test13.stdout}`);
+    assert(test13.stdout.includes('PROVIDER-BACKED BACKUP VERIFICATION CONFIRMED: PASS'));
+    console.log('  [PASS] Self-hosted containerized PostgreSQL backup verification confirmed.');
+
+    // -------------------------------------------------------------------------
+    // TEST 14: Negative Test: Stale Self-Hosted backup rejected
+    // -------------------------------------------------------------------------
+    console.log('\n14. Negative Test: Stale Self-Hosted backup (>24h) rejected...');
+    const staleIso = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    const test14 = runBackupVerification({
+      TARGET_ENV: 'staging',
+      BACKUP_PROVIDER_ADAPTER: 'self-hosted',
+      BACKUP_TOKEN: `selfhosted-automotive_os_staging-${staleIso}`,
+    });
+    assert.notStrictEqual(test14.code, 0, 'Stale self-hosted backup must be rejected');
+    assert(test14.stderr.includes('is stale') || test14.stdout.includes('is stale'));
+    console.log('  [PASS] Stale self-hosted backup safely rejected (age > 24h).');
+
     console.log('\n========================================================================');
-    console.log('✅ ALL 12 DATABASE BACKUP & RLS VERIFICATION TESTS PASSED.');
+    console.log('✅ ALL 14 DATABASE BACKUP & RLS VERIFICATION TESTS PASSED.');
     console.log('========================================================================');
     process.exit(0);
   } catch (err: any) {
