@@ -28,6 +28,7 @@ ENV NODE_ENV=staging
 ENV PORT=4000
 ENV NODE_PATH=/app/node_modules:/app/apps/api/node_modules
 RUN apk add --no-cache curl openssl libc6-compat
+RUN npm install -g pnpm@9.15.9
 
 # Security: Non-root user
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nestjs
@@ -37,6 +38,8 @@ COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api ./apps/api
 COPY --from=builder --chown=nestjs:nodejs /app/packages ./packages
 COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nestjs:nodejs /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder --chown=nestjs:nodejs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 EXPOSE 4000
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
