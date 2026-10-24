@@ -1,7 +1,7 @@
 # ==============================================================================
 # Cloudflare Workers Staging Manifest — Buyer Marketplace
 # Application: apps/marketplace
-# Target: https://marketplace.staging.automotive-os.ae
+# Target: https://cars-staging.syedhasnat.com
 # ==============================================================================
 
 name = "automotive-os-marketplace-staging"
@@ -16,9 +16,9 @@ binding = "ASSETS"
 [vars]
 NEXT_PRIVATE_MINIMAL_MODE = "1"
 NEXT_PUBLIC_APP_ENV = "staging"
-NEXT_PUBLIC_API_URL = "https://api.staging.automotive-os.ae"
-NEXT_PUBLIC_STORAGE_URL = "https://media.staging.automotive-os.ae"
-NEXT_PUBLIC_MARKETPLACE_URL = "https://marketplace.staging.automotive-os.ae"
+NEXT_PUBLIC_API_URL = "https://api-staging.syedhasnat.com"
+NEXT_PUBLIC_STORAGE_URL = "https://media-staging.syedhasnat.com"
+NEXT_PUBLIC_MARKETPLACE_URL = "https://cars-staging.syedhasnat.com"
 NEXT_PUBLIC_DEFAULT_LOCALE = "en"
 NEXT_PUBLIC_SUPPORTED_LOCALES = "en,ar"
 NEXT_PUBLIC_DEFAULT_CURRENCY = "AED"

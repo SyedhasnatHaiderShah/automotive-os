@@ -21,13 +21,13 @@ services:
       - DIRECT_URL=postgresql://${APP_DB_USER:-automotive_app_user}:${APP_DB_PASSWORD:?APP_DB_PASSWORD must be set}@postgres:5432/${DB_NAME:-automotive_os_staging}?schema=public
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET must be set}
-      - CORS_ORIGINS=https://marketplace.staging.automotive-os.ae,https://dealer.staging.automotive-os.ae,https://admin.staging.automotive-os.ae
+      - CORS_ORIGINS=https://cars-staging.syedhasnat.com,https://dealer-staging.syedhasnat.com,https://admin-staging.syedhasnat.com
       - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID:?R2_ACCESS_KEY_ID must be set}
       - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY:?R2_SECRET_ACCESS_KEY must be set}
       - R2_BUCKET_NAME=${R2_BUCKET_NAME:-automotive-os-media-staging}
       - R2_KYB_BUCKET_NAME=${R2_KYB_BUCKET_NAME:-automotive-os-kyb-staging}
       - R2_ENDPOINT=${R2_ENDPOINT:-https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com}
-      - R2_PUBLIC_URL=https://media.staging.automotive-os.ae
+      - R2_PUBLIC_URL=https://media-staging.syedhasnat.com
       - RATE_LIMIT_TTL=60
       - RATE_LIMIT_MAX=100
       # Sovereign UAE compliance & integration guards: Live financial/gov calls disabled

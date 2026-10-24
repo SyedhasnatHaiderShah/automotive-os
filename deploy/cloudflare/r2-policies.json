@@ -7,12 +7,12 @@
       "name": "automotive-os-media-staging",
       "purpose": "Public vehicle inventory photos, studio glass inspection images, dealer showroom branding",
       "access": "PUBLIC_READ",
-      "custom_domain": "media.staging.automotive-os.ae",
+      "custom_domain": "media-staging.syedhasnat.com",
       "cors": [
         {
           "AllowedOrigins": [
-            "https://marketplace.staging.automotive-os.ae",
-            "https://dealer.staging.automotive-os.ae"
+            "https://cars-staging.syedhasnat.com",
+            "https://dealer-staging.syedhasnat.com"
           ],
           "AllowedMethods": [
             "GET",
@@ -52,8 +52,8 @@
       "cors": [
         {
           "AllowedOrigins": [
-            "https://dealer.staging.automotive-os.ae",
-            "https://admin.staging.automotive-os.ae"
+            "https://dealer-staging.syedhasnat.com",
+            "https://admin-staging.syedhasnat.com"
           ],
           "AllowedMethods": [
             "PUT"

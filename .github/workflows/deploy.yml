@@ -527,11 +527,17 @@ jobs:
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
-          DOMAIN_PREFIX=$([ "$TARGET_ENV" = "production" ] && echo "" || echo "staging.")
-          API_URL="${STAGING_API_URL:-https://api.${DOMAIN_PREFIX}automotive-os.ae}"
-          MARKETPLACE_URL="https://marketplace.${DOMAIN_PREFIX}automotive-os.ae"
-          DEALER_URL="https://dealer.${DOMAIN_PREFIX}automotive-os.ae"
-          ADMIN_URL="https://admin.${DOMAIN_PREFIX}automotive-os.ae"
+          if [ "$TARGET_ENV" = "production" ]; then
+            API_URL="${PROD_API_URL:-https://api.automotive-os.ae}"
+            MARKETPLACE_URL="https://marketplace.automotive-os.ae"
+            DEALER_URL="https://dealer.automotive-os.ae"
+            ADMIN_URL="https://admin.automotive-os.ae"
+          else
+            API_URL="${STAGING_API_URL:-https://api-staging.syedhasnat.com}"
+            MARKETPLACE_URL="https://cars-staging.syedhasnat.com"
+            DEALER_URL="https://dealer-staging.syedhasnat.com"
+            ADMIN_URL="https://admin-staging.syedhasnat.com"
+          fi
 
           echo "1. Probing backend API at: $API_URL/health"
           API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health" --max-time 15 || true)
@@ -602,7 +608,17 @@ jobs:
         shell: bash
         run: |
           ENV="${{ github.event.inputs.environment }}"
-          DOMAIN_PREFIX=$([ "$ENV" = "production" ] && echo "" || echo "staging.")
+          if [ "$ENV" = "production" ]; then
+            MK_ROUTE="https://marketplace.automotive-os.ae"
+            DLR_ROUTE="https://dealer.automotive-os.ae"
+            ADM_ROUTE="https://admin.automotive-os.ae"
+            API_ROUTE="https://api.automotive-os.ae/health"
+          else
+            MK_ROUTE="https://cars-staging.syedhasnat.com"
+            DLR_ROUTE="https://dealer-staging.syedhasnat.com"
+            ADM_ROUTE="https://admin-staging.syedhasnat.com"
+            API_ROUTE="https://api-staging.syedhasnat.com/health"
+          fi
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           
           cat << EOF >> $GITHUB_STEP_SUMMARY
@@ -623,10 +639,10 @@ jobs:
           - **Admin Ops Worker:** \`automotive-os-admin-${ENV}\` (Cloudflare Access Zero Trust)
 
           ### 🌐 Ingress Routes
-          - **Buyer Marketplace:** https://marketplace.${DOMAIN_PREFIX}automotive-os.ae
-          - **Dealer Cockpit (DMS):** https://dealer.${DOMAIN_PREFIX}automotive-os.ae
-          - **Platform Admin (Access Gated):** https://admin.${DOMAIN_PREFIX}automotive-os.ae
-          - **NestJS API (Cloudflare Tunnel):** https://api.${DOMAIN_PREFIX}automotive-os.ae/health
+          - **Buyer Marketplace:** ${MK_ROUTE}
+          - **Dealer Cockpit (DMS):** ${DLR_ROUTE}
+          - **Platform Admin (Access Gated):** ${ADM_ROUTE}
+          - **NestJS API (Cloudflare Tunnel):** ${API_ROUTE}
 
           ### 🔒 Sovereign Security & Release Governance
           - Defense-in-depth PostgreSQL Row-Level Security (RLS) active and machine-verified.

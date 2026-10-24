@@ -49,13 +49,13 @@ services:
     environment:
       NODE_ENV: staging
       API_PORT: 4000
-      API_HOST: https://api.staging.automotive-os.ae
+      API_HOST: https://api-staging.syedhasnat.com
       DATABASE_URL: postgresql://automotive_app:${APP_DB_PASSWORD:-app_staging_pass}@postgres:5432/automotive_os?schema=public
       DIRECT_URL: postgresql://postgres:${POSTGRES_PASSWORD:-staging_secure_postgres_pass}@postgres:5432/automotive_os?schema=public
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-staging-jwt-secret-min-32-chars-strictly-secure}
       JWT_EXPIRATION: "24h"
-      CORS_ORIGINS: "https://marketplace.staging.automotive-os.ae,https://dealer.staging.automotive-os.ae,https://admin.staging.automotive-os.ae"
+      CORS_ORIGINS: "https://cars-staging.syedhasnat.com,https://dealer-staging.syedhasnat.com,https://admin-staging.syedhasnat.com"
       FEATURE_FLAG_UAE_PASS_LIVE: "false"
       FEATURE_FLAG_DED_LIVE: "false"
       FEATURE_FLAG_RTA_TASJEEL_LIVE: "false"
@@ -82,8 +82,8 @@ services:
     environment:
       NODE_ENV: staging
       PORT: 3000
-      NEXT_PUBLIC_API_URL: https://api.staging.automotive-os.ae
-      NEXT_PUBLIC_MARKETPLACE_URL: https://marketplace.staging.automotive-os.ae
+      NEXT_PUBLIC_API_URL: https://api-staging.syedhasnat.com
+      NEXT_PUBLIC_MARKETPLACE_URL: https://cars-staging.syedhasnat.com
       NEXT_PUBLIC_DEFAULT_LOCALE: en
       NEXT_PUBLIC_DEFAULT_CURRENCY: AED
     ports:
@@ -102,8 +102,8 @@ services:
     environment:
       NODE_ENV: staging
       PORT: 3001
-      NEXT_PUBLIC_API_URL: https://api.staging.automotive-os.ae
-      NEXT_PUBLIC_DEALER_URL: https://dealer.staging.automotive-os.ae
+      NEXT_PUBLIC_API_URL: https://api-staging.syedhasnat.com
+      NEXT_PUBLIC_DEALER_URL: https://dealer-staging.syedhasnat.com
       NEXT_PUBLIC_DEFAULT_CURRENCY: AED
     ports:
       - "3001:3001"
@@ -121,8 +121,8 @@ services:
     environment:
       NODE_ENV: staging
       PORT: 3002
-      NEXT_PUBLIC_API_URL: https://api.staging.automotive-os.ae
-      NEXT_PUBLIC_ADMIN_URL: https://admin.staging.automotive-os.ae
+      NEXT_PUBLIC_API_URL: https://api-staging.syedhasnat.com
+      NEXT_PUBLIC_ADMIN_URL: https://admin-staging.syedhasnat.com
     ports:
       - "3002:3002"
     networks:

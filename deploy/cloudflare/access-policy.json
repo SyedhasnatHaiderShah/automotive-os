@@ -3,7 +3,7 @@
   "version": "2026-10-23",
   "application": {
     "name": "Automotive OS — Platform Admin",
-    "domain": "admin.staging.automotive-os.ae",
+    "domain": "admin-staging.syedhasnat.com",
     "type": "self_hosted",
     "session_duration": "12h",
     "auto_redirect_to_identity": true,
@@ -16,6 +16,11 @@
       "name": "Enforce Platform Staff MFA & UAE Geo-fencing",
       "decision": "allow",
       "include": [
+        {
+          "email_domain": {
+            "domain": "syedhasnat.com"
+          }
+        },
         {
           "email_domain": {
             "domain": "automotive-os.ae"
