@@ -1,14 +1,63 @@
 'use client';
-import { useEffect } from 'react';
-export default function ErrorBoundary({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => { console.error('Automotive OS route failure', error); }, [error]);
+
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+import { Button } from '@automotive-os/ui';
+
+export default function MarketplaceError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error('Marketplace route runtime error:', error);
+  }, [error]);
+
   return (
-    <main role="alert" className="flex min-h-screen items-center justify-center bg-background p-5 text-on-surface">
-      <section className="w-full max-w-lg rounded-lg border border-outline-variant/50 bg-surface-container p-6 sm:p-8">
-        <h1 className="font-display text-2xl font-semibold">Unable to load this page</h1>
-        <p className="mt-3 text-on-surface-variant">Please check your connection or try again.</p>
-        <button type="button" onClick={reset} className="mt-6 min-h-11 rounded-lg bg-primary px-5 font-semibold text-on-primary">Retry</button>
-      </section>
-    </main>
+    <div className="flex-1 min-h-[70vh] flex items-center justify-center p-6 bg-background">
+      <div className="max-w-lg w-full bg-surface-container border border-outline-variant/40 rounded-2xl p-8 text-center shadow-2xl relative overflow-hidden">
+        {/* Subtle top gold accent line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+
+        <div className="w-16 h-16 rounded-full bg-error-container/20 border border-error/30 flex items-center justify-center text-error mx-auto mb-6">
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+
+        <h2 className="font-headline-md text-2xl font-bold text-on-surface mb-2">
+          Unable to Load Marketplace Exchange
+        </h2>
+        <p className="font-arabic text-sm text-outline mb-2" dir="rtl">
+          تعذر تحميل بيانات المنصة — حدث خطأ غير متوقع
+        </p>
+        <p className="text-sm text-outline mb-8">
+          A secure connection interruption occurred while fetching verified inventory data.
+          {error.digest && (
+            <span className="block text-xs font-mono text-outline/60 mt-2">
+              Reference Code: {error.digest}
+            </span>
+          )}
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button variant="primary" size="md" onClick={() => reset()}>
+            Try Again / إعادة المحاولة
+          </Button>
+          <Link href="/">
+            <Button variant="outline" size="md">
+              Return to Showcase
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

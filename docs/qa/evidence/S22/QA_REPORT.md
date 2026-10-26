@@ -2,7 +2,7 @@
 
 **Screen:** S22 (`apps/dealer/app/accounting/page.tsx`)  
 **Stitch Screen ID:** `481e7a7007f64c8c8c76e7e7ad5ec63d`  
-**Timestamp:** 2026-10-23T09:12:11.107Z  
+**Timestamp:** 2026-10-26T06:12:51.504Z  
 **Result:** VERIFIED_PASS (18/18 checks passed)
 
 ## Visual Parity & Evidence

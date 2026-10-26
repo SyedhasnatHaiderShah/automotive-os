@@ -1,13 +1,40 @@
+import React from 'react';
 import Link from 'next/link';
-export default function NotFound() {
+import { Button } from '@automotive-os/ui';
+
+export default function MarketplaceNotFound() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-5 text-on-surface">
-      <section className="w-full max-w-lg rounded-lg border border-outline-variant/50 bg-surface-container p-6 sm:p-8">
-        <p className="font-mono text-primary">404</p>
-        <h1 className="mt-3 font-display text-2xl font-semibold">Page not found</h1>
-        <p className="mt-3 text-on-surface-variant">This route or record is not available.</p>
-        <Link className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-primary px-5 font-semibold text-on-primary" href="/">Go to home</Link>
-      </section>
-    </main>
+    <div className="flex-1 min-h-[70vh] flex items-center justify-center p-6 bg-background">
+      <div className="max-w-lg w-full bg-surface-container border border-outline-variant/40 rounded-2xl p-8 text-center shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary-container to-transparent" />
+
+        <div className="w-16 h-16 rounded-full bg-surface-container-high border border-outline-variant/50 flex items-center justify-center text-primary mx-auto mb-6">
+          <span className="font-mono text-xl font-bold">404</span>
+        </div>
+
+        <h2 className="font-headline-md text-2xl font-bold text-on-surface mb-2">
+          Vehicle Dossier Not Found
+        </h2>
+        <p className="font-arabic text-sm text-outline mb-2" dir="rtl">
+          لم يتم العثور على ملف السيارة أو الصفحة المطلوبة
+        </p>
+        <p className="text-sm text-outline mb-8">
+          The requested listing or exchange resource may have been acquired, unlisted, or relocated.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/cars">
+            <Button variant="primary" size="md">
+              Browse Available Cars
+            </Button>
+          </Link>
+          <Link href="/">
+            <Button variant="outline" size="md">
+              Home Showcase
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

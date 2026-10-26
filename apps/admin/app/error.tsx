@@ -1,14 +1,57 @@
 'use client';
-import { useEffect } from 'react';
-export default function ErrorBoundary({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => { console.error('Automotive OS route failure', error); }, [error]);
+
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+
+export default function AdminError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error('Platform Admin runtime error:', error);
+  }, [error]);
+
   return (
-    <main role="alert" className="flex min-h-screen items-center justify-center bg-background p-5 text-on-surface">
-      <section className="w-full max-w-lg rounded-lg border border-outline-variant/50 bg-surface-container p-6 sm:p-8">
-        <h1 className="font-display text-2xl font-semibold">Unable to load this page</h1>
-        <p className="mt-3 text-on-surface-variant">Please check your connection or try again.</p>
-        <button type="button" onClick={reset} className="mt-6 min-h-11 rounded-lg bg-primary px-5 font-semibold text-on-primary">Retry</button>
-      </section>
-    </main>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-on-surface">
+      <div className="bg-surface-container border border-error/40 rounded-2xl p-8 max-w-lg w-full text-center flex flex-col items-center gap-4 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-error to-transparent" />
+
+        <div className="w-14 h-14 rounded-full bg-error-container/20 border border-error/30 flex items-center justify-center text-error">
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+
+        <h2 className="text-xl font-bold font-headline text-on-surface">
+          Governance Command Hub Error
+        </h2>
+        <p className="text-sm text-outline font-body-md">
+          {error.message || 'An error occurred during platform administration or moderation queue rendering.'}
+        </p>
+        {error.digest && (
+          <span className="text-xs font-mono text-outline/60">
+            Audit Digest: {error.digest}
+          </span>
+        )}
+
+        <div className="flex gap-3 mt-4">
+          <button
+            onClick={() => reset()}
+            className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-semibold hover:opacity-90 transition-opacity"
+          >
+            Retry Governance View
+          </button>
+          <Link
+            href="/"
+            className="px-5 py-2.5 rounded-xl bg-surface-container-high border border-outline-variant/40 text-on-surface font-semibold hover:bg-surface-container-highest transition-colors"
+          >
+            Command Cockpit
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }

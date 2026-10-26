@@ -1,13 +1,24 @@
+import React from 'react';
 import Link from 'next/link';
-export default function NotFound() {
+
+export default function DealerNotFound() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-5 text-on-surface">
-      <section className="w-full max-w-lg rounded-lg border border-outline-variant/50 bg-surface-container p-6 sm:p-8">
-        <p className="font-mono text-primary">404</p>
-        <h1 className="mt-3 font-display text-2xl font-semibold">Page not found</h1>
-        <p className="mt-3 text-on-surface-variant">This route or record is not available.</p>
-        <Link className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-primary px-5 font-semibold text-on-primary" href="/">Go to home</Link>
-      </section>
-    </main>
+    <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-6 text-on-surface">
+      <div className="bg-surface-container-high border border-outline-variant/40 rounded-2xl p-8 max-w-lg w-full text-center flex flex-col items-center gap-4 shadow-2xl">
+        <span className="font-mono text-3xl font-bold text-primary">404</span>
+        <h2 className="text-xl font-bold font-headline text-on-surface">
+          DMS Module or Record Not Found
+        </h2>
+        <p className="text-sm text-on-surface-variant font-body-md">
+          The requested dealership management module, vehicle inventory record, or order does not exist in this tenant partition.
+        </p>
+        <Link
+          href="/dashboard"
+          className="mt-4 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-semibold hover:opacity-90 transition-opacity"
+        >
+          Return to Operations Cockpit
+        </Link>
+      </div>
+    </div>
   );
 }
