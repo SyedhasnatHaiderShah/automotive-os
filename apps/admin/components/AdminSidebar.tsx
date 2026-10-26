@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -10,6 +10,7 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
   const pathname = usePathname();
+  useEffect(() => { document.body.classList.remove('admin-mobile-nav-open'); }, [pathname]);
 
   const isListingActive = pathname?.includes('/moderation') ?? false;
   const isKybActive = pathname?.includes('/verifications') ?? false;
@@ -18,11 +19,12 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
 
   return (
     <aside
-      className={`fixed ${
+      className={`admin-app-sidebar fixed ${
         isRtl ? 'right-0' : 'left-0'
       } top-0 h-full w-60 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-50 flex flex-col justify-between`}
     >
       <div className="flex flex-col flex-1 overflow-y-auto">
+        <button type="button" className="lg:hidden absolute top-3 right-3 rounded-lg p-2 text-on-surface" aria-label="Close admin navigation" onClick={() => document.body.classList.remove("admin-mobile-nav-open")}>✕</button>
         {/* Brand Header */}
         <div className="h-16 px-space-md flex items-center gap-space-sm bg-surface-container-lowest">
           <div className="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center">
@@ -130,9 +132,10 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
             </span>
             <nav className="flex flex-col gap-space-xs">
               <a
-                href="#tariffs"
-                onClick={(e) => e.preventDefault()}
-                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
+                aria-disabled="true"
+                title="Not available on staging: server-side integration required"
+                tabIndex={-1}
+                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant transition-colors cursor-not-allowed opacity-50"
               >
                 <span className="material-symbols-outlined text-[18px]">receipt_long</span>
                 <span className="font-body-sm text-body-sm">
@@ -141,8 +144,9 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
               </a>
 
               <a
-                href="#audit"
-                onClick={(e) => e.preventDefault()}
+                aria-disabled="true"
+                title="Not available on staging: server-side integration required"
+                tabIndex={-1}
                 className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">lock_clock</span>
@@ -152,8 +156,9 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
               </a>
 
               <a
-                href="#gateways"
-                onClick={(e) => e.preventDefault()}
+                aria-disabled="true"
+                title="Not available on staging: server-side integration required"
+                tabIndex={-1}
                 className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">hub</span>
@@ -163,8 +168,9 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
               </a>
 
               <a
-                href="#rbac"
-                onClick={(e) => e.preventDefault()}
+                aria-disabled="true"
+                title="Not available on staging: server-side integration required"
+                tabIndex={-1}
                 className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">key</span>
@@ -194,6 +200,8 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
           </span>
         </div>
         <button
+          disabled
+          title="Emergency freeze is not available in staging"
           className="w-full h-8 px-space-sm rounded bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-body-sm text-body-sm flex items-center justify-center gap-space-xs transition-colors"
           type="button"
           onClick={() => {
@@ -202,7 +210,7 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                 'EMERGENCY FREEZE PROTOCOL:\nAre you sure you want to trigger emergency freeze across all broker nodes?'
               )
             ) {
-              alert('Emergency security lockout initiated. Audit outbox event dispatched.');
+              alert('Emergency freeze is not connected in staging. No action was performed.');
             }
           }}
         >

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface DealerHeaderProps {
   currentRole: 'PRINCIPAL' | 'SALES_REP';
@@ -16,12 +16,15 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
   onLocaleToggle,
 }) => {
   const isArabic = locale === 'ar';
+  const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => () => { document.body.classList.remove('dealer-mobile-nav-open'); }, []);
 
   return (
-    <header className="fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-6 flex items-center justify-between border-b border-white/[0.06]">
+    <header className="dealer-app-header fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-6 flex items-center justify-between border-b border-white/[0.06]">
       {/* Left: Hub Selector & Real-Time RTA Status */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest cursor-pointer text-on-surface transition-colors border border-white/[0.05]">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg p-2 text-on-surface hover:bg-surface-container-high" aria-label="Toggle dealer navigation" aria-expanded={mobileOpen} onClick={() => { const next = !mobileOpen; setMobileOpen(next); document.body.classList.toggle("dealer-mobile-nav-open", next); }}><span className="material-symbols-outlined">menu</span></button>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface transition-colors border border-white/[0.05]">
           <span className="material-symbols-outlined text-[18px] text-primary">storefront</span>
           <span className="font-body-sm text-xs sm:text-sm font-semibold">
             SilberArrows • Al Quoz 1 Hub
@@ -33,8 +36,8 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
 
         <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface border border-white/[0.04]">
           <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
-          <span className="font-body-sm text-xs font-medium">RTA API Connected</span>
-          <span className="font-data-mono-num text-xs text-on-surface-variant font-bold">14ms</span>
+          <span className="font-body-sm text-xs font-medium">RTA integration disabled</span>
+          
         </div>
       </div>
 
@@ -72,7 +75,9 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
         <button
           type="button"
           className="relative p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
-          aria-label="View notifications"
+          aria-label="Notifications unavailable in staging"
+          title="Staging inbox is not connected"
+          disabled
         >
           <span className="material-symbols-outlined text-[20px]">notifications</span>
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
@@ -82,10 +87,10 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
         <div className="flex items-center gap-2.5 pl-1">
           <div className="text-right hidden sm:block">
             <div className="font-body-sm text-xs font-semibold text-on-surface leading-tight">
-              {currentRole === 'PRINCIPAL' ? 'Marc Ackermann' : 'Tariq Mansoor'}
+              Staging dealer
             </div>
             <div className="font-label-caps text-[10px] text-on-surface-variant uppercase font-medium">
-              {currentRole === 'PRINCIPAL' ? 'General Manager' : 'Sales Executive'}
+              Synthetic role preview
             </div>
           </div>
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary text-xs shadow-md">

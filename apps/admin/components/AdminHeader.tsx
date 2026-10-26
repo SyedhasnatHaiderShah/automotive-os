@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface AdminHeaderProps {
   isRtl?: boolean;
@@ -8,13 +8,16 @@ interface AdminHeaderProps {
 }
 
 export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => () => { document.body.classList.remove('admin-mobile-nav-open'); }, []);
   return (
     <header
-      className={`fixed top-0 ${
+      className={`admin-app-header fixed top-0 ${
         isRtl ? 'right-60 left-0' : 'left-60 right-0'
       } h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-40 px-gutter border-b border-surface-container-high/40`}
     >
       <div className="h-16 w-full flex items-center justify-between gap-space-md">
+        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg text-on-surface hover:bg-surface-container-high" aria-label="Toggle admin navigation" aria-expanded={mobileOpen} onClick={() => { const next = !mobileOpen; setMobileOpen(next); document.body.classList.toggle("admin-mobile-nav-open", next); }}><span className="material-symbols-outlined">menu</span></button>
         {/* Left Info & Clearance Badge */}
         <div className="flex items-center gap-space-md min-w-0 flex-1">
           <div className="flex flex-col min-w-0">
@@ -23,13 +26,13 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
                 {isRtl ? 'حوكمة المنصة وعمليات الثقة' : 'Platform Governance & Trust Ops'}
               </span>
               <span className="px-1.5 py-0.5 rounded bg-surface-container-high font-data-mono-num text-body-sm text-on-surface-variant">
-                Tier-0 Clearance
+                Staging
               </span>
             </div>
             <div className="flex items-center gap-space-xs text-outline text-body-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
               <span className="font-data-mono-num text-body-sm">
-                DIFC Vault Node 01 • RTA Gateway 9ms
+                Synthetic staging • external gateways disconnected
               </span>
             </div>
           </div>
@@ -62,7 +65,7 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
           <div className="hidden lg:flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-surface-container">
             <span className="w-2 h-2 rounded-full bg-tertiary" />
             <span className="font-body-sm text-body-sm text-on-surface-variant">
-              {isRtl ? 'شرطة دبي • دائرة الاقتصاد نشطة' : 'Dubai Police • DED Active'}
+              {isRtl ? 'شرطة دبي • دائرة الاقتصاد نشطة' : 'External integrations disabled'}
             </span>
           </div>
 
@@ -98,7 +101,8 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
           <button
             className="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
             type="button"
-            title="Notifications & Regulatory Alerts"
+            title="Notifications unavailable in staging"
+            disabled
           >
             <span className="material-symbols-outlined text-[20px]">notifications</span>
             <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error text-on-error font-data-mono-num text-body-sm rounded-full flex items-center justify-center text-[10px]">
