@@ -84,12 +84,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // In local test/browser environments on localhost, allow direct access unless explicitly enforced
+  // An upstream reverse proxy can surface localhost as request.nextUrl.hostname
+  // even when the original request originated publicly. Only *development*
+  // may use the local preview bypass. Staging/production must always enforce
+  // authentication even if a proxy rewrites the hostname to localhost.
   const isLocalhost =
     request.nextUrl.hostname === 'localhost' ||
     request.nextUrl.hostname === '127.0.0.1' ||
     request.nextUrl.hostname === '::1';
-  if (isLocalhost && process.env.ADMIN_AUTH_ENFORCED !== 'true') {
+  if (
+    process.env.NODE_ENV === 'development' &&
+    isLocalhost &&
+    process.env.ADMIN_AUTH_ENFORCED !== 'true'
+  ) {
     return NextResponse.next();
   }
 

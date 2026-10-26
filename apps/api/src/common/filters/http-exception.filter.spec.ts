@@ -64,14 +64,14 @@ describe("HttpExceptionFilter", () => {
     });
   });
 
-  it("should generate cryptographically valid UUID when correlation header is missing", () => {
+  it("should generate a cryptographically random corr-prefixed UUID when correlation header is missing", () => {
     const exception = new HttpException("Forbidden", HttpStatus.FORBIDDEN);
 
     filter.catch(exception, mockArgumentsHost);
 
     const jsonArg = mockResponse.json.mock.calls[0][0];
     const uuidRegex =
-      /^(corr-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      /^corr-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     expect(jsonArg.error.correlationId).toMatch(uuidRegex);
   });
 
