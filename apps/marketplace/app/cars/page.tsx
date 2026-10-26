@@ -131,6 +131,17 @@ export default function SearchResultsPage() {
     setPage(1);
   };
 
+  const goToPage = (next: number) => {
+    const validPage = Math.max(1, Math.min(totalPages, next));
+    const params = new URLSearchParams(window.location.search);
+    if (validPage === 1) params.delete('page');
+    else params.set('page', String(validPage));
+    const suffix = params.toString();
+    window.history.pushState(null, '', window.location.pathname + (suffix ? '?' + suffix : ''));
+    setPage(validPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const filteredVehicles = vehicles;
 
   const makesList = ['ALL', 'Porsche', 'Toyota', 'Mercedes-AMG', 'Land Rover', 'Ferrari'];
@@ -422,9 +433,9 @@ export default function SearchResultsPage() {
                 <nav aria-label="Pagination" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-outline-variant/30 bg-surface-container p-3 text-sm">
                   <span className="text-on-surface-variant">Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}</span>
                   <div className="flex items-center gap-2">
-                    <button type="button" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 text-on-surface disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+                    <button type="button" disabled={page <= 1} onClick={() => goToPage(page - 1)} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 text-on-surface disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
                     <span className="font-data-mono-num text-on-surface">Page {page} / {totalPages}</span>
-                    <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 text-on-surface disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+                    <button type="button" disabled={page >= totalPages} onClick={() => goToPage(page + 1)} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 text-on-surface disabled:cursor-not-allowed disabled:opacity-40">Next</button>
                   </div>
                 </nav>
               )}
