@@ -261,6 +261,56 @@ export class ListingsService {
   }
 
   /**
+   * Tenant-authorized unpublish. Status mutation, projection outbox and audit
+   * must be persisted before the UI announces success.
+   */
+  async unpublishListing(
+    tenantId: string,
+    listingId: string,
+    actorUserId?: string,
+  ): Promise<ListingResponseDto> {
+    const listing = await this.prisma.listing.findUnique({
+      where: { tenantId_id: { tenantId, id: listingId } },
+    });
+    if (!listing) throw new NotFoundException('Listing not found in this dealership');
+    if (listing.status !== ListingStatus.PUBLISHED) {
+      throw new BadRequestException('Only published listings may be unpublished');
+    }
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.listing.update({
+        where: { tenantId_id: { tenantId, id: listingId } },
+        data: { status: ListingStatus.PAUSED },
+      });
+      await tx.outboxEvent.create({
+        data: {
+          tenantId,
+          aggregateType: 'listing',
+          aggregateId: listingId,
+          eventType: 'listing.unpublished',
+          payload: {
+            tenantId,
+            listingId,
+            vehicleId: listing.vehicleId,
+            previousStatus: ListingStatus.PUBLISHED,
+            newStatus: ListingStatus.PAUSED,
+            reason: 'Dealer requested unpublish',
+          },
+        },
+      });
+      return result;
+    });
+    await this.auditService.logAction({
+      tenantId,
+      actorUserId: actorUserId || null,
+      action: 'LISTING_UNPUBLISHED',
+      targetType: 'listing',
+      targetId: listingId,
+      metadata: { vehicleId: listing.vehicleId, source: 'dealer' },
+    });
+    return this.mapListingResponse(updated);
+  }
+
+  /**
    * Platform Admin reviews listing (Approve or Reject with reason).
    * Appends transactional outbox event and audit record.
    */

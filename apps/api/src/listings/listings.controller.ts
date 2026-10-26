@@ -59,6 +59,24 @@ export class ListingsController {
     );
   }
 
+  @Post('listings/:id/unpublish')
+  @HttpCode(HttpStatus.OK)
+  @RequireRoles(
+    MembershipRole.OWNER,
+    MembershipRole.ADMIN,
+    MembershipRole.INVENTORY_MANAGER,
+    MembershipRole.SALES_MANAGER
+  )
+  @ApiOperation({ summary: 'Remove published vehicle listing from the public marketplace' })
+  @ApiResponse({ status: 200, type: ListingResponseDto })
+  async unpublishListing(
+    @CurrentTenant() tenant: TenantContext,
+    @Param('id') listingId: string,
+    @CurrentUser('id') actorUserId: string
+  ): Promise<ListingResponseDto> {
+    return this.listingsService.unpublishListing(tenant.tenantId, listingId, actorUserId);
+  }
+
   @Post('listings/:id/submit')
   @HttpCode(HttpStatus.OK)
   @RequireRoles(

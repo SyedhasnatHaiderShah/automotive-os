@@ -25,10 +25,88 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
 
   const [activeFilter, setActiveFilter] = useState<'all' | 'published' | 'review' | 'escrow' | 'draft'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set([vehicles[0]?.id || '']));
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [revealedVins, setRevealedVins] = useState<Set<string>>(new Set());
   const [isIntakeOpen, setIsIntakeOpen] = useState(false);
   const [rtaSyncStatus, setRtaSyncStatus] = useState<string | null>(null);
+  const [pendingVehicleId, setPendingVehicleId] = useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+
+  const exportVisibleCsv = () => {
+    const cells = [
+      ['Stock Number', 'Make', 'Model', 'Year', 'Ask Price AED', 'Listing Status'],
+      ...filteredVehicles.map((item) => [
+        item.stockNumber,
+        item.makeName,
+        item.modelName,
+        String(item.modelYear),
+        String(Math.round(Number(item.askingPriceFils) / 100)),
+        item.listingStatus || 'DRAFT',
+      ]),
+    ];
+    const escapeCsv = (value: string) => '"' + value.replaceAll('"', '""') + '"';
+    const csv = cells.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
+    const fileUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = 'automotive-staging-inventory.csv';
+    link.click();
+    URL.revokeObjectURL(fileUrl);
+    setActionFeedback('Downloaded currently visible inventory. This is not a regulatory export.');
+  };
+
+  const changeListingStatus = async (vehicle: DealerVehicleItem, action: 'submit' | 'unpublish') => {
+    setActionFeedback(null);
+    // Until a dealer sign-in workflow is live, never assume a privileged token.
+    const token = typeof window !== 'undefined'
+      ? window.sessionStorage.getItem('automotive_dealer_access_token')
+      : null;
+    if (!token) {
+      setActionFeedback('Dealer sign-in is required. Listing was NOT changed.');
+      return;
+    }
+    if (!vehicle.tenantId || vehicle.isFixture) {
+      setActionFeedback('This is not an authorized, persisted dealer record. No change was made.');
+      return;
+    }
+    setPendingVehicleId(vehicle.id);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!baseUrl) throw new Error('Dealer API endpoint is not configured');
+      const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+      let listingId = vehicle.listingId;
+      if (action === 'submit' && !listingId) {
+        const draft = await fetch(`${baseUrl}/api/v1/tenants/${vehicle.tenantId}/vehicles/${vehicle.id}/listing`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ askingPriceFils: Number(vehicle.askingPriceFils) }),
+          cache: 'no-store',
+        });
+        if (!draft.ok) throw new Error(`Create listing failed (HTTP ${draft.status})`);
+        const created = await draft.json();
+        listingId = created.id;
+      }
+      if (!listingId) throw new Error('Listing ID is missing');
+      const endpoint = action === 'submit' ? 'submit' : 'unpublish';
+      const res = await fetch(`${baseUrl}/api/v1/tenants/${vehicle.tenantId}/listings/${listingId}/${endpoint}`, {
+        method: 'POST',
+        headers,
+        cache: 'no-store',
+      });
+      if (!res.ok) throw new Error(`Listing status change rejected (HTTP ${res.status})`);
+      const persisted = await res.json();
+      const nextStatus: DealerVehicleItem['listingStatus'] =
+        persisted.status === 'PAUSED' ? 'UNPUBLISHED' : persisted.status;
+      setVehicles((items) => items.map((item) => item.id === vehicle.id
+        ? { ...item, listingId, listingStatus: nextStatus }
+        : item));
+      setActionFeedback('Listing status saved by the API. Refresh to confirm the persisted status.');
+    } catch (err) {
+      setActionFeedback(err instanceof Error ? err.message : 'Listing was NOT updated.');
+    } finally {
+      setPendingVehicleId(null);
+    }
+  };
 
   const toggleSelectAll = () => {
     if (selectedIds.size === filteredVehicles.length) {
@@ -127,6 +205,8 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
 
         {/* Main Content Workspace */}
         <main className="w-full pt-16 bg-surface px-6 pb-12 flex-1">
+          {actionFeedback && <div role="status" className="my-4 rounded-lg border border-primary/30 bg-surface-container p-4 text-sm text-on-surface">{actionFeedback}</div>}
+          {pendingVehicleId && <p className="text-sm text-on-surface-variant" aria-live="polite">Saving listing status…</p>}
           {/* Sub-Canvas Studio Ambient Layer */}
           <div className="relative w-full overflow-hidden rounded-2xl bg-surface-container-lowest p-6 mb-6 shadow-xl border border-white/[0.05] mt-4">
             <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
@@ -485,7 +565,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert('Exporting full canonical inventory CSV...')}
+                  onClick={exportVisibleCsv}
                   className="h-8 px-3 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-xs flex items-center gap-1.5 transition-colors border border-white/[0.05]"
                 >
                   <span className="material-symbols-outlined text-[15px]">file_download</span>
@@ -519,7 +599,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => alert('Adjusting prices for ' + selectedIds.size + ' units')}
+                  disabled title="Requires an authenticated API-backed workflow; unavailable in staging"
                   className="px-3 py-1.5 rounded-lg bg-surface-container-highest hover:bg-surface-bright text-on-surface font-body-sm text-xs font-medium flex items-center gap-1.5 transition-all border border-white/[0.06]"
                 >
                   <span className="material-symbols-outlined text-[15px] text-primary">percent</span>
@@ -527,7 +607,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert('Exporting official RTA compliance dossier for selected vehicles...')}
+                  disabled title="Requires an authenticated API-backed workflow; unavailable in staging"
                   className="px-3 py-1.5 rounded-lg bg-surface-container-highest hover:bg-surface-bright text-on-surface font-body-sm text-xs font-medium flex items-center gap-1.5 transition-all border border-white/[0.06]"
                 >
                   <span className="material-symbols-outlined text-[15px] text-tertiary">verified</span>
@@ -535,7 +615,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => alert('Batch publishing ' + selectedIds.size + ' listings to portal outbox')}
+                  disabled title="Requires an authenticated API-backed workflow; unavailable in staging"
                   className="px-3 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-fixed-dim font-body-sm text-xs font-bold flex items-center gap-1.5 transition-all shadow-md"
                 >
                   <span className="material-symbols-outlined text-[15px]">rocket_launch</span>
@@ -543,16 +623,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setVehicles((prev) =>
-                      prev.map((v) =>
-                        selectedIds.has(v.id)
-                          ? { ...v, stockStatus: 'SOLD', listingStatus: 'UNPUBLISHED' }
-                          : v
-                      )
-                    );
-                    setSelectedIds(new Set());
-                  }}
+                  disabled title="Mark sold requires an authenticated stock-status API workflow"
                   className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-error-container hover:text-on-error-container text-on-surface-variant font-body-sm text-xs transition-all flex items-center gap-1 border border-white/[0.05]"
                 >
                   <span className="material-symbols-outlined text-[15px]">archive</span>
@@ -807,13 +878,8 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                             {vehicle.listingStatus === 'PUBLISHED' ? (
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setVehicles((prev) =>
-                                    prev.map((v) =>
-                                      v.id === vehicle.id ? { ...v, listingStatus: 'UNPUBLISHED' } : v
-                                    )
-                                  );
-                                }}
+                                onClick={() => { void changeListingStatus(vehicle, 'unpublish'); }}
+                                disabled={pendingVehicleId === vehicle.id}
                                 className="px-2 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-[11px] font-medium"
                                 title="Unpublish from live marketplace"
                               >
@@ -822,13 +888,8 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                             ) : (
                               <button
                                 type="button"
-                                onClick={() => {
-                                  setVehicles((prev) =>
-                                    prev.map((v) =>
-                                      v.id === vehicle.id ? { ...v, listingStatus: 'PENDING_REVIEW' } : v
-                                    )
-                                  );
-                                }}
+                                onClick={() => { void changeListingStatus(vehicle, 'submit'); }}
+                                disabled={pendingVehicleId === vehicle.id}
                                 className="px-2 py-1 rounded bg-primary text-on-primary text-[11px] font-bold shadow-sm"
                                 title="Submit to admin moderation"
                               >
