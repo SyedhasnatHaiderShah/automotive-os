@@ -36,7 +36,7 @@ describe('Codex PR #12 regressions: atomic unpublish audit and public keyword se
         findMany: jest.fn().mockResolvedValue([]),
         count: jest.fn().mockResolvedValue(0),
       },
-      $transaction: jest.fn((callback: (tx: typeof tx) => Promise<unknown>) => callback(tx)),
+      $transaction: jest.fn(async (callback: (trx: any) => Promise<unknown>) => callback(tx)),
     };
     const audit = { logAction: jest.fn() };
     const service = new ListingsService(
