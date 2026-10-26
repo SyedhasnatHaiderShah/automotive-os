@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DealerSidebar } from './dealer-sidebar';
 import { DealerHeader } from './dealer-header';
 import { VehicleIntakeModal } from './vehicle-intake-modal';
@@ -159,26 +159,29 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
     }));
   };
 
-  // Filter criteria
-  const filteredVehicles = vehicles.filter((v) => {
-    // Tab filter
-    if (activeFilter === 'published' && v.listingStatus !== 'PUBLISHED') return false;
-    if (activeFilter === 'review' && v.listingStatus !== 'PENDING_REVIEW') return false;
-    if (activeFilter === 'escrow' && v.stockStatus !== 'RESERVED') return false;
-    if (activeFilter === 'draft' && (v.listingStatus && v.listingStatus !== 'DRAFT')) return false;
+  // Optimization (⚡ Bolt): Memoize filteredVehicles to prevent redundant filtering and string matching
+  // on every component re-render (e.g. selection toggle, VIN reveal, page change, action feedback).
+  const filteredVehicles = useMemo(() => {
+    return vehicles.filter((v) => {
+      // Tab filter
+      if (activeFilter === 'published' && v.listingStatus !== 'PUBLISHED') return false;
+      if (activeFilter === 'review' && v.listingStatus !== 'PENDING_REVIEW') return false;
+      if (activeFilter === 'escrow' && v.stockStatus !== 'RESERVED') return false;
+      if (activeFilter === 'draft' && (v.listingStatus && v.listingStatus !== 'DRAFT')) return false;
 
-    // Search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      const matchMake = v.makeName.toLowerCase().includes(query);
-      const matchModel = v.modelName.toLowerCase().includes(query);
-      const matchVin = v.vin.toLowerCase().includes(query);
-      const matchStock = v.stockNumber.toLowerCase().includes(query);
-      if (!matchMake && !matchModel && !matchVin && !matchStock) return false;
-    }
+      // Search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchMake = v.makeName.toLowerCase().includes(query);
+        const matchModel = v.modelName.toLowerCase().includes(query);
+        const matchVin = v.vin.toLowerCase().includes(query);
+        const matchStock = v.stockNumber.toLowerCase().includes(query);
+        if (!matchMake && !matchModel && !matchVin && !matchStock) return false;
+      }
 
-    return true;
-  });
+      return true;
+    });
+  }, [vehicles, activeFilter, searchQuery]);
 
   const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / PAGE_SIZE));
   const pageVehicles = filteredVehicles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
