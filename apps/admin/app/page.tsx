@@ -73,13 +73,6 @@ export default function AdminOverviewPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleCircuitBreakerClick = () => {
-    showToast('Emergency regulatory controls are not connected in staging. No action was performed.');
-  };
-
-  const handleTriageAction = (_id: string, _actionName: string) => {
-    showToast('This action is a read-only Stitch prototype. No regulatory action or audit entry was created.');
-  };
 
   return (
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
