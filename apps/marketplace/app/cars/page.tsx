@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MarketplaceHeader,
   MarketplaceFooter,
@@ -26,44 +26,98 @@ export default function SearchResultsPage() {
   const [vehicles, setVehicles] = useState<PublicListingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [urlReady, setUrlReady] = useState(false);
+  const PAGE_SIZE = 12;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const isArabic = locale === 'ar';
 
+  // URL is the source of truth for deep links and browser Back/Forward.
   useEffect(() => {
-    // Read initial URL params if present
-    if (typeof window !== 'undefined') {
+    const restoreUrl = () => {
       const params = new URLSearchParams(window.location.search);
-      const q = params.get('q');
-      const em = params.get('emirate');
-      const cond = params.get('condition');
-      const make = params.get('make');
-      if (q) setSearchQuery(q);
-      if (em) setSelectedEmirate(em);
-      if (cond) setSelectedCondition(cond);
-      if (make) setSelectedMake(make);
-    }
+      setSearchQuery(params.get('q') || '');
+      setSelectedEmirate(params.get('emirate') || 'All Emirates');
+      setSelectedCondition(params.get('condition') || 'ALL');
+      setSelectedMake(params.get('make') || 'ALL');
+      setGccOnly(params.get('gcc') !== 'false');
+      setMaxPriceAed(Number(params.get('maxPrice')) > 0 ? Number(params.get('maxPrice')) : 2000000);
+      const sort = params.get('sort');
+      setSortBy(sort === 'price-asc' || sort === 'price-desc' ? sort : 'recent');
+      setPage(Math.max(1, Number(params.get('page')) || 1));
+      setUrlReady(true);
+    };
+    restoreUrl();
+    window.addEventListener('popstate', restoreUrl);
+    return () => window.removeEventListener('popstate', restoreUrl);
   }, []);
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      const res = await fetchPublicListings({
-        emirate: selectedEmirate !== 'All Emirates' ? selectedEmirate : undefined,
-        make: selectedMake !== 'ALL' ? selectedMake : undefined,
-        condition: selectedCondition !== 'ALL' ? selectedCondition : undefined,
-        gccSpec: gccOnly ? true : undefined,
-        maxPriceFils: maxPriceAed * 100,
-      });
-      setVehicles(res.items);
-      setLoading(false);
-    }
-    loadData();
-  }, [selectedEmirate, selectedMake, selectedCondition, gccOnly, maxPriceAed]);
+    if (!urlReady) return;
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set('q', searchQuery.trim());
+    if (selectedEmirate !== 'All Emirates') params.set('emirate', selectedEmirate);
+    if (selectedCondition !== 'ALL') params.set('condition', selectedCondition);
+    if (selectedMake !== 'ALL') params.set('make', selectedMake);
+    if (!gccOnly) params.set('gcc', 'false');
+    if (maxPriceAed !== 2000000) params.set('maxPrice', String(maxPriceAed));
+    if (sortBy !== 'recent') params.set('sort', sortBy);
+    if (page > 1) params.set('page', String(page));
+    const query = params.toString();
+    const nextUrl = window.location.pathname + (query ? '?' + query : '');
+    window.history.replaceState(null, '', nextUrl);
+  }, [urlReady, searchQuery, selectedEmirate, selectedCondition, selectedMake, gccOnly, maxPriceAed, sortBy, page]);
 
+  useEffect(() => {
+    if (!urlReady) return;
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    fetchPublicListings({
+      q: searchQuery.trim() || undefined,
+      emirate: selectedEmirate !== 'All Emirates' ? selectedEmirate : undefined,
+      make: selectedMake !== 'ALL' ? selectedMake : undefined,
+      condition: selectedCondition !== 'ALL' ? selectedCondition : undefined,
+      gccSpec: gccOnly ? true : undefined,
+      maxPriceFils: maxPriceAed * 100,
+      sort: sortBy,
+      page,
+      limit: PAGE_SIZE,
+    }).then((result) => {
+      if (!active) return;
+      setVehicles(result.items);
+      setTotal(result.total);
+    }).catch((err) => {
+      if (!active) return;
+      setVehicles([]);
+      setTotal(0);
+      setLoadError(err instanceof Error ? err.message : 'Unable to load vehicle inventory');
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => { active = false; };
+  }, [urlReady, selectedEmirate, selectedMake, selectedCondition, gccOnly, maxPriceAed, sortBy, searchQuery, page]);
+
+  useEffect(() => {
+    if (!mobileFiltersOpen) return;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileFiltersOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = oldOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [mobileFiltersOpen]);
+
+  // Favorites remain session-only until buyer authentication is available.
   const toggleFavorite = (id: string) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setFavorites((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
   };
 
   const handleResetFilters = () => {
@@ -73,30 +127,22 @@ export default function SearchResultsPage() {
     setSelectedCondition('ALL');
     setGccOnly(true);
     setMaxPriceAed(2000000);
+    setSortBy('recent');
+    setPage(1);
   };
 
-  // Filter & sort list in-memory
-  const filteredVehicles = useMemo(() => {
-    let list = [...vehicles];
+  const goToPage = (next: number) => {
+    const validPage = Math.max(1, Math.min(totalPages, next));
+    const params = new URLSearchParams(window.location.search);
+    if (validPage === 1) params.delete('page');
+    else params.set('page', String(validPage));
+    const suffix = params.toString();
+    window.history.pushState(null, '', window.location.pathname + (suffix ? '?' + suffix : ''));
+    setPage(validPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (v) =>
-          v.title.toLowerCase().includes(q) ||
-          v.seller.displayName.toLowerCase().includes(q) ||
-          v.emirate.toLowerCase().includes(q)
-      );
-    }
-
-    if (sortBy === 'price-asc') {
-      list.sort((a, b) => Number(a.price.amountFils) - Number(b.price.amountFils));
-    } else if (sortBy === 'price-desc') {
-      list.sort((a, b) => Number(b.price.amountFils) - Number(a.price.amountFils));
-    }
-
-    return list;
-  }, [vehicles, searchQuery, sortBy]);
+  const filteredVehicles = vehicles;
 
   const makesList = ['ALL', 'Porsche', 'Toyota', 'Mercedes-AMG', 'Land Rover', 'Ferrari'];
   const emiratesList = ['All Emirates', 'Dubai', 'Abu Dhabi', 'Sharjah'];
@@ -109,7 +155,7 @@ export default function SearchResultsPage() {
       <MarketplaceHeader
         activePath="/cars"
         selectedEmirate={selectedEmirate}
-        onEmirateChange={setSelectedEmirate}
+        onEmirateChange={(v) => { setSelectedEmirate(v); setPage(1); }}
         favoritesCount={favorites.length}
         locale={locale}
         onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
@@ -129,7 +175,7 @@ export default function SearchResultsPage() {
               </div>
               <h1 className="font-headline-lg text-2xl lg:text-3xl font-bold text-on-surface">
                 {isArabic
-                  ? `سيارات الوكلاء المعتمدة في الإمارات (${filteredVehicles.length})`
+                  ? `سيارات الوكلاء المعتمدة في الإمارات (${total})`
                   : `Verified Showroom Stock (${filteredVehicles.length})`}
               </h1>
             </div>
@@ -153,7 +199,7 @@ export default function SearchResultsPage() {
                 </span>
                 <select
                   value={sortBy}
-                  onChange={(e: any) => setSortBy(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setSortBy(e.target.value as 'recent' | 'price-asc' | 'price-desc'); setPage(1); }}
                   className="h-10 px-3 rounded-lg bg-surface-container border border-outline-variant/30 text-xs text-on-surface focus:outline-none focus:border-primary cursor-pointer"
                 >
                   <option value="recent">
@@ -196,7 +242,7 @@ export default function SearchResultsPage() {
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
                     placeholder={isArabic ? 'مثال: GT3, VXR...' : 'e.g. GT3, GR-Sport...'}
                     className="w-full h-9 px-3 rounded bg-surface-container-low border border-outline-variant/30 text-xs text-on-surface focus:outline-none focus:border-primary"
                   />
@@ -212,7 +258,7 @@ export default function SearchResultsPage() {
                       <button
                         key={m}
                         type="button"
-                        onClick={() => setSelectedMake(m)}
+                        onClick={() => { setSelectedMake(m); setPage(1); }}
                         className={`px-2.5 py-1 rounded text-xs transition-colors ${
                           selectedMake === m
                             ? 'bg-primary text-on-primary font-bold'
@@ -232,7 +278,7 @@ export default function SearchResultsPage() {
                   </label>
                   <select
                     value={selectedEmirate}
-                    onChange={(e) => setSelectedEmirate(e.target.value)}
+                    onChange={(e) => { setSelectedEmirate(e.target.value); setPage(1); }}
                     className="w-full h-9 px-3 rounded bg-surface-container-low border border-outline-variant/30 text-xs text-on-surface focus:outline-none focus:border-primary cursor-pointer"
                   >
                     {emiratesList.map((em) => (
@@ -257,7 +303,7 @@ export default function SearchResultsPage() {
                       <button
                         key={cond.key}
                         type="button"
-                        onClick={() => setSelectedCondition(cond.key)}
+                        onClick={() => { setSelectedCondition(cond.key); setPage(1); }}
                         className={`flex-1 py-1 rounded text-xs text-center transition-colors ${
                           selectedCondition === cond.key
                             ? 'bg-primary text-on-primary font-bold'
@@ -283,7 +329,7 @@ export default function SearchResultsPage() {
                   <input
                     type="checkbox"
                     checked={gccOnly}
-                    onChange={(e) => setGccOnly(e.target.checked)}
+                    onChange={(e) => { setGccOnly(e.target.checked); setPage(1); }}
                     className="w-4 h-4 rounded text-primary focus:ring-primary focus:ring-offset-surface cursor-pointer"
                   />
                 </div>
@@ -304,7 +350,7 @@ export default function SearchResultsPage() {
                     max={3000000}
                     step={50000}
                     value={maxPriceAed}
-                    onChange={(e) => setMaxPriceAed(Number(e.target.value))}
+                    onChange={(e) => { setMaxPriceAed(Number(e.target.value)); setPage(1); }}
                     className="w-full accent-primary cursor-pointer"
                   />
                 </div>
@@ -316,19 +362,19 @@ export default function SearchResultsPage() {
               {/* Active Filter Chips */}
               <div className="flex flex-wrap items-center gap-2">
                 {selectedEmirate !== 'All Emirates' && (
-                  <Badge variant="outline" className="gap-1 cursor-pointer" onClick={() => setSelectedEmirate('All Emirates')}>
+                  <Badge variant="outline" className="gap-1 cursor-pointer" onClick={() => { setSelectedEmirate('All Emirates'); setPage(1); }}>
                     <span>{selectedEmirate}</span>
                     <span className="text-outline">×</span>
                   </Badge>
                 )}
                 {selectedMake !== 'ALL' && (
-                  <Badge variant="gold" className="gap-1 cursor-pointer" onClick={() => setSelectedMake('ALL')}>
+                  <Badge variant="gold" className="gap-1 cursor-pointer" onClick={() => { setSelectedMake('ALL'); setPage(1); }}>
                     <span>{selectedMake}</span>
                     <span className="text-on-primary">×</span>
                   </Badge>
                 )}
                 {selectedCondition !== 'ALL' && (
-                  <Badge variant="condition" className="gap-1 cursor-pointer" onClick={() => setSelectedCondition('ALL')}>
+                  <Badge variant="condition" className="gap-1 cursor-pointer" onClick={() => { setSelectedCondition('ALL'); setPage(1); }}>
                     <span>{selectedCondition}</span>
                     <span className="text-outline">×</span>
                   </Badge>
@@ -341,7 +387,13 @@ export default function SearchResultsPage() {
               </div>
 
               {/* Grid or Empty State */}
-              {loading ? (
+              {loadError && !loading ? (
+                <section role="alert" className="rounded-lg border border-error/40 bg-error-container/10 p-6">
+                  <h2 className="font-headline-sm text-lg text-on-surface">Couldn't load vehicle results</h2>
+                  <p className="mt-2 text-sm text-on-surface-variant">{loadError}</p>
+                  <button type="button" onClick={() => { setUrlReady(false); window.location.reload(); }} className="mt-4 min-h-11 rounded-lg bg-primary px-5 font-semibold text-on-primary">Retry loading</button>
+                </section>
+              ) : loading ? (
                 <VehicleGridSkeleton count={6} />
               ) : filteredVehicles.length === 0 ? (
                 <EmptyState
@@ -377,6 +429,16 @@ export default function SearchResultsPage() {
                   ))}
                 </div>
               )}
+              {!loading && !loadError && total > 0 && (
+                <nav aria-label="Pagination" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-outline-variant/30 bg-surface-container p-3 text-sm">
+                  <span className="text-on-surface-variant">Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}</span>
+                  <div className="flex items-center gap-2">
+                    <button type="button" disabled={page <= 1} onClick={() => goToPage(page - 1)} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 text-on-surface disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+                    <span className="font-data-mono-num text-on-surface">Page {page} / {totalPages}</span>
+                    <button type="button" disabled={page >= totalPages} onClick={() => goToPage(page + 1)} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 text-on-surface disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+                  </div>
+                </nav>
+              )}
             </div>
           </div>
         </div>
@@ -407,7 +469,7 @@ export default function SearchResultsPage() {
                   </label>
                   <select
                     value={selectedMake}
-                    onChange={(e) => setSelectedMake(e.target.value)}
+                    onChange={(e) => { setSelectedMake(e.target.value); setPage(1); }}
                     className="w-full h-10 px-3 rounded bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface"
                   >
                     {makesList.map((m) => (
@@ -425,7 +487,7 @@ export default function SearchResultsPage() {
                   </label>
                   <select
                     value={selectedEmirate}
-                    onChange={(e) => setSelectedEmirate(e.target.value)}
+                    onChange={(e) => { setSelectedEmirate(e.target.value); setPage(1); }}
                     className="w-full h-10 px-3 rounded bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface"
                   >
                     {emiratesList.map((em) => (
@@ -448,7 +510,7 @@ export default function SearchResultsPage() {
                     max={3000000}
                     step={50000}
                     value={maxPriceAed}
-                    onChange={(e) => setMaxPriceAed(Number(e.target.value))}
+                    onChange={(e) => { setMaxPriceAed(Number(e.target.value)); setPage(1); }}
                     className="w-full accent-primary"
                   />
                 </div>

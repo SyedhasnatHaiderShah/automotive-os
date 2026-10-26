@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -14,6 +14,13 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
   locale = 'en',
 }) => {
   const pathname = usePathname();
+  useEffect(() => {
+    const close = () => { document.body.classList.remove('dealer-mobile-nav-open'); window.dispatchEvent(new Event('dealer-nav-closed')); };
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') close(); };
+    close();
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [pathname]);
   const isArabic = locale === 'ar';
 
   const navItems = [
@@ -31,7 +38,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
     },
     {
       label: isArabic ? 'إدخال مركبة' : 'Add Vehicle',
-      href: '#',
+      href: '/inventory',
       icon: 'add_circle',
       onClick: onIntakeClick,
     },
@@ -43,27 +50,31 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
     },
     {
       label: isArabic ? 'تجارب القيادة' : 'Test Drives',
-      href: '#',
+      href: '/appointments',
       path: '/appointments',
+      disabled: true,
       icon: 'speed',
     },
     {
       label: isArabic ? 'الامتثال والتسجيل RTA' : 'RTA & Compliance',
-      href: '#',
+      href: '/compliance',
       path: '/compliance',
+      disabled: true,
       icon: 'verified',
     },
     {
       label: isArabic ? 'إعدادات الوكالة' : 'Dealership Settings',
-      href: '#',
+      href: '/settings',
       path: '/settings',
+      disabled: true,
       icon: 'tune',
     },
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)] border-r border-white/[0.06]">
+    <aside aria-label="Dealer navigation" className="dealer-app-sidebar fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)] border-r border-white/[0.06]">
       <div className="flex flex-col">
+        <button type="button" className="lg:hidden absolute top-3 right-3 rounded-lg p-2 text-on-surface" aria-label="Close dealer navigation" onClick={() => { document.body.classList.remove("dealer-mobile-nav-open"); window.dispatchEvent(new Event("dealer-nav-closed")); }}>✕</button>
         {/* Dealership Suite Branding */}
         <div className="h-16 px-4 flex items-center justify-between bg-surface-container/60 border-b border-white/[0.05]">
           <div className="flex items-center gap-3">
@@ -102,6 +113,9 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
                 ? pathname === '/' || pathname === '/dashboard'
                 : pathname?.startsWith(item.path));
 
+            if (item.disabled) {
+              return <span key={item.label} aria-disabled="true" title="Staging feature not available: real API workflow required" className="flex gap-3 items-center px-3.5 py-2 rounded-lg text-on-surface-variant/60 cursor-not-allowed"><span className="material-symbols-outlined text-[20px]">{item.icon}</span><span className="text-xs">{item.label} · Soon</span></span>;
+            }
             if (item.onClick) {
               return (
                 <button
@@ -253,7 +267,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
           <div className="flex items-center justify-between pt-1">
             <span className="font-body-sm text-[11px] text-on-surface-variant flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-tertiary inline-block animate-pulse" />
-              All changes saved
+              Synthetic staging only
             </span>
             <span className="font-label-caps text-[10px] text-on-surface-variant font-bold">
               Tier-1

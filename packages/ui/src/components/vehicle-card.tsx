@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { Badge } from './badge';
 import { Card } from './card';
 
@@ -58,8 +59,8 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
       ? 'جديدة كلياً'
       : 'Brand New';
 
-  const defaultImage =
-    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80';
+  const [imageFailed, setImageFailed] = useState(!mediaUrl);
+  useEffect(() => { setImageFailed(!mediaUrl); }, [mediaUrl]);
 
   const linkHref = href || `/cars/${slug}`;
 
@@ -71,12 +72,22 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
       {/* Image Container with Badge Overlays */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-container-low">
         <a href={linkHref} className="block w-full h-full focus:outline-none">
-          <img
-            src={mediaUrl || defaultImage}
-            alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+          {imageFailed ? (
+            <div role="img" aria-label={`Image unavailable for ${title}`} className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-surface-container-high to-surface-container-lowest text-on-surface-variant">
+              <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">
+                <path d="M5 17h14l-1.5-5h-11L5 17Z" /><path d="M8 12l2-4h4l2 4M7 17v2m10-2v2M8 15h.01M16 15h.01" />
+              </svg>
+              <span className="text-xs">Vehicle image not available</span>
+            </div>
+          ) : (
+            <img
+              src={mediaUrl || ''}
+              onError={() => setImageFailed(true)}
+              alt={title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          )}
         </a>
 
         {/* Top Floating Badges */}
@@ -102,7 +113,8 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
                 e.stopPropagation();
                 onFavoriteToggle(id);
               }}
-              aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-label={isFavorite ? 'Remove session favorite' : 'Save for this session'}
+              title="Favorites are saved for this browser session until buyer sign-in is connected"
               className="pointer-events-auto w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant/30 flex items-center justify-center text-on-surface hover:text-primary transition-colors focus-visible:ring-2 focus-visible:ring-primary"
             >
               <svg

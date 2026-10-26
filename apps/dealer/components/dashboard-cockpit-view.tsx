@@ -71,6 +71,7 @@ export const DashboardCockpitView: React.FC<DashboardCockpitViewProps> = ({
 
         {/* Main Content Workspace */}
         <main className="w-full pt-16 bg-surface px-space-lg pb-space-xl flex-1">
+          <div role="status" className="mb-4 rounded-lg border border-primary/40 bg-primary/10 p-3 text-sm text-on-surface">STAGING UI PREVIEW — RTA, Tasjeel, financial and escrow panels below contain synthetic design data. They are not live external integrations.</div>
           {/* Notification Toast */}
           {feedbackToast && (
             <div className="my-space-md p-space-md rounded-xl bg-primary/10 border border-primary/30 text-on-surface flex items-center justify-between gap-space-md animate-fadeIn">
@@ -144,7 +145,7 @@ export const DashboardCockpitView: React.FC<DashboardCockpitViewProps> = ({
                 type="button"
                 id="exportReportBtn"
                 onClick={() =>
-                  showToast('Generating official RTA Title Registry & DIFC Escrow Report (PDF/Excel)... Dispatch queued.')
+                  showToast('This regulated integration is disabled in staging. No external action was performed.')
                 }
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm transition-all shadow-sm"
               >
@@ -201,7 +202,7 @@ export const DashboardCockpitView: React.FC<DashboardCockpitViewProps> = ({
               </div>
               <button
                 type="button"
-                onClick={() => showToast('Accessing RTA Electronic Title Seal and Smart Contract escrow lock...')}
+                onClick={() => showToast('This regulated integration is disabled in staging. No external action was performed.')}
                 className="shrink-0 self-center px-3 py-1.5 rounded-md bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface text-body-sm font-medium transition-all shadow-sm"
               >
                 Review RTA Seal
@@ -233,7 +234,7 @@ export const DashboardCockpitView: React.FC<DashboardCockpitViewProps> = ({
               </div>
               <button
                 type="button"
-                onClick={() => showToast('Opening Live Tasjeel Hoist Telemetry video feed...')}
+                onClick={() => showToast('This regulated integration is disabled in staging. No external action was performed.')}
                 className="shrink-0 self-center px-3 py-1.5 rounded-md bg-surface-container-high hover:bg-secondary hover:text-on-secondary text-on-surface text-body-sm font-medium transition-all shadow-sm"
               >
                 Live Bay Telemetry
@@ -993,7 +994,7 @@ export const DashboardCockpitView: React.FC<DashboardCockpitViewProps> = ({
                 type="button"
                 onClick={() => {
                   setIsLeadModalOpen(false);
-                  showToast('VIP Lead created with verified UAE PASS handshake & outbox event.');
+                  showToast('This is a UI preview only. No UAE PASS handshake or persisted lead was created.');
                 }}
                 className="flex-1 py-2.5 rounded-lg bg-primary text-on-primary font-headline-sm text-headline-sm font-semibold hover:opacity-95 transition-opacity"
               >
