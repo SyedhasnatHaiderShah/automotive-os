@@ -183,6 +183,25 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
             </span>
           </div>
         </div>
+
+        {/* Card Footer Action */}
+        <div className="pt-2">
+          <a
+            href={linkHref}
+            className="w-full py-2 px-3 rounded bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-sm group/btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <span>{isArabic ? 'عرض الملف ورقم الهيكل' : 'View Dossier & VIN'}</span>
+            <svg
+              className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
+        </div>
       </div>
     </Card>
   );

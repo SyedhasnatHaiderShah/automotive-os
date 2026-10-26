@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-10-26T09:37:51.503Z",
+  "screensTested": [
+    {
+      "id": "S01",
+      "name": "Marketplace Home",
+      "url": "http://localhost:3002",
+      "status": 200,
+      "audit": {
+        "heroTabs": [
+          "Showroom Inventory",
+          "Off-Market Allocations",
+          "Direct Consignment"
+        ],
+        "hasVerifiedDealersSection": true,
+        "dealerHeadings": [
+          "Al Quoz Showroom 4",
+          "Yas Marina Luxury Motors",
+          "Sheikh Zayed Rd Gallery",
+          "Sharjah Auto Oasis Hub"
+        ],
+        "dossierButtons": 6,
+        "inertLinks": [],
+        "anonymousButtons": 0,
+        "overflow": 0
+      }
+    },
+    {
+      "id": "S02",
+      "name": "Search Results & Filters",
+      "url": "http://localhost:3002/cars",
+      "status": 200,
+      "audit": {
+        "mainHeading": "Search Results: 6 Verified Vehicles",
+        "sortOptions": [
+          "All Emirates",
+          "Dubai",
+          "Abu Dhabi",
+          "Sharjah",
+          "Recently Listed (Live UAE)",
+          "Price: High to Low (Institutional)",
+          "Price: Low to High",
+          "All Emirates",
+          "Dubai",
+          "Abu Dhabi",
+          "Sharjah"
+        ],
+        "dossierButtons": 6,
+        "inertLinks": [],
+        "anonymousButtons": 0,
+        "overflow": 0
+      }
+    },
+    {
+      "id": "DEALERS_DIR",
+      "name": "Verified Dealership Directory",
+      "url": "http://localhost:3002/dealers",
+      "status": 200,
+      "audit": {
+        "heading": "Verified UAE Dealerships",
+        "showroomCards": [
+          "SilberArrows Luxury & Classic Cars",
+          "Al Quoz Showroom 4",
+          "Yas Marina Luxury Motors",
+          "Sheikh Zayed Rd Gallery",
+          "Sharjah Auto Oasis Hub",
+          "Al Futtaim Prestige Motors"
+        ],
+        "inertLinks": [],
+        "overflow": 0
+      }
+    },
+    {
+      "id": "S06",
+      "name": "Verified Dealer Storefront (Al Quoz)",
+      "url": "http://localhost:3002/dealers/al-quoz",
+      "status": 200,
+      "audit": {
+        "title": "Al Quoz Showroom 4",
+        "address": "Tier-1 Institutional Partner | Al Quoz Industrial 3 Flagship",
+        "overflow": 0
+      }
+    }
+  ],
+  "findings": []
+}

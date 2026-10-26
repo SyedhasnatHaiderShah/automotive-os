@@ -174,10 +174,18 @@ export default function SearchResultsPage() {
                 </span>
               </div>
               <h1 className="font-headline-lg text-2xl lg:text-3xl font-bold text-on-surface">
-                {isArabic
-                  ? `سيارات الوكلاء المعتمدة في الإمارات (${total})`
-                  : `Verified Showroom Stock (${filteredVehicles.length})`}
+                {isArabic ? (
+                  `نتائج البحث: ${filteredVehicles.length} سيارة معتمدة`
+                ) : (
+                  <>
+                    Search Results: <span className="font-data-mono-num font-semibold text-primary">{filteredVehicles.length}</span> Verified Vehicles
+                  </>
+                )}
               </h1>
+              <div className="flex items-center gap-1.5 font-data-mono-num text-xs text-outline mt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
+                <span>{isArabic ? 'تزامن فوري مع سجلات RTA و TAMM' : 'RTA & TAMM Registry Sync: Real-Time'}</span>
+              </div>
             </div>
 
             {/* Sorting & Mobile Filter Toggle */}
@@ -203,13 +211,13 @@ export default function SearchResultsPage() {
                   className="h-10 px-3 rounded-lg bg-surface-container border border-outline-variant/30 text-xs text-on-surface focus:outline-none focus:border-primary cursor-pointer"
                 >
                   <option value="recent">
-                    {isArabic ? 'أحدث المعروض أولاً' : 'Recently Published'}
+                    {isArabic ? 'أحدث المعروض (مباشر الإمارات)' : 'Recently Listed (Live UAE)'}
+                  </option>
+                  <option value="price-desc">
+                    {isArabic ? 'السعر: من الأعلى للأقل (مؤسسي)' : 'Price: High to Low (Institutional)'}
                   </option>
                   <option value="price-asc">
                     {isArabic ? 'السعر: من الأقل للأعلى' : 'Price: Low to High'}
-                  </option>
-                  <option value="price-desc">
-                    {isArabic ? 'السعر: من الأعلى للأقل' : 'Price: High to Low'}
                   </option>
                 </select>
               </div>

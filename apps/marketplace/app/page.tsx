@@ -153,9 +153,9 @@ export default function MarketplaceHomePage() {
                   {/* Condition Selector Tabs */}
                   <div className="flex items-center gap-2 pb-3 border-b border-outline-variant/20">
                     {[
-                      { key: 'ALL', label: isArabic ? 'كافة المعروض' : 'All Stock' },
-                      { key: 'NEW', label: isArabic ? 'جديدة بالكامل' : 'Brand New' },
-                      { key: 'USED', label: isArabic ? 'مستعملة معتمدة' : 'Certified Used' },
+                      { key: 'ALL', label: isArabic ? 'معروض صالات العرض' : 'Showroom Inventory' },
+                      { key: 'NEW', label: isArabic ? 'تخصيصات خاصة' : 'Off-Market Allocations' },
+                      { key: 'USED', label: isArabic ? 'إيداع مباشر' : 'Direct Consignment' },
                     ].map((tab) => (
                       <button
                         key={tab.key}
@@ -273,6 +273,163 @@ export default function MarketplaceHomePage() {
 
                 </a>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ==========================================
+            FEATURED VERIFIED UAE DEALERS SHOWCASE
+            ========================================== */}
+        <section className="w-full py-12 lg:py-16 bg-surface-container-lowest border-b border-outline-variant/30">
+          <div className="max-w-[1440px] mx-auto px-4 md:px-8">
+            {/* Section Header */}
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-label-caps text-xs text-primary uppercase tracking-widest font-semibold">
+                    {isArabic ? 'حوكمة صالات العرض' : 'Showroom Governance'}
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="font-label-caps text-xs text-outline uppercase tracking-wider">
+                    {isArabic ? 'شركاء مؤسسيون فئة أولى' : 'Tier-1 Institutional Partners'}
+                  </span>
+                </div>
+                <h2 className="font-headline-xl text-2xl lg:text-3xl font-bold text-on-surface tracking-tight">
+                  {isArabic ? 'صالات عرض الإمارات المعتمدة' : 'Verified UAE Dealerships'}
+                </h2>
+              </div>
+              <a
+                className="inline-flex items-center gap-2 text-primary hover:text-primary-container transition-colors font-body-md text-sm font-semibold"
+                href="/dealers"
+              >
+                <span>{isArabic ? 'عرض كافة الصالات المعتمدة (64)' : 'View All 64 Accredited Showrooms'}</span>
+                <svg className="w-4 h-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+
+            {/* Dealer Bento Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Dealer Card 1 */}
+              <div className="bg-surface-container p-5 rounded-xl border border-outline-variant/30 shadow-md hover:border-primary/50 transition-all group flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center p-2 text-primary shadow-inner">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] uppercase font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> Active License
+                    </span>
+                  </div>
+                  <a href="/dealers/al-quoz" className="block group-hover:text-primary transition-colors">
+                    <h3 className="font-headline-sm text-base font-bold text-on-surface">Al Quoz Showroom 4</h3>
+                  </a>
+                  <p className="font-body-sm text-xs text-outline mt-0.5">Al Quoz Industrial 3, Dubai • DED #894102</p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-primary">
+                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="font-data-mono-num text-xs font-bold text-on-surface">4.96</span>
+                    <span className="font-body-sm text-xs text-outline">(128)</span>
+                  </div>
+                  <span className="font-data-mono-num text-xs font-semibold text-secondary">42 Active Cars</span>
+                </div>
+              </div>
+
+              {/* Dealer Card 2 */}
+              <div className="bg-surface-container p-5 rounded-xl border border-outline-variant/30 shadow-md hover:border-primary/50 transition-all group flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center p-2 text-primary shadow-inner">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] uppercase font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> Active License
+                    </span>
+                  </div>
+                  <a href="/dealers/yas-marina" className="block group-hover:text-primary transition-colors">
+                    <h3 className="font-headline-sm text-base font-bold text-on-surface">Yas Marina Luxury Motors</h3>
+                  </a>
+                  <p className="font-body-sm text-xs text-outline mt-0.5">Yas Marina Circuit, Abu Dhabi • AD-DED #44109</p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-primary">
+                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="font-data-mono-num text-xs font-bold text-on-surface">4.98</span>
+                    <span className="font-body-sm text-xs text-outline">(94)</span>
+                  </div>
+                  <span className="font-data-mono-num text-xs font-semibold text-secondary">31 Active Cars</span>
+                </div>
+              </div>
+
+              {/* Dealer Card 3 */}
+              <div className="bg-surface-container p-5 rounded-xl border border-outline-variant/30 shadow-md hover:border-primary/50 transition-all group flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center p-2 text-primary shadow-inner">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] uppercase font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> Active License
+                    </span>
+                  </div>
+                  <a href="/dealers/sheikh-zayed" className="block group-hover:text-primary transition-colors">
+                    <h3 className="font-headline-sm text-base font-bold text-on-surface">Sheikh Zayed Rd Gallery</h3>
+                  </a>
+                  <p className="font-body-sm text-xs text-outline mt-0.5">Between 3rd & 4th Interchange • DED #772910</p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-primary">
+                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="font-data-mono-num text-xs font-bold text-on-surface">4.92</span>
+                    <span className="font-body-sm text-xs text-outline">(210)</span>
+                  </div>
+                  <span className="font-data-mono-num text-xs font-semibold text-secondary">68 Active Cars</span>
+                </div>
+              </div>
+
+              {/* Dealer Card 4 */}
+              <div className="bg-surface-container p-5 rounded-xl border border-outline-variant/30 shadow-md hover:border-primary/50 transition-all group flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center p-2 text-primary shadow-inner">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] uppercase font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary" /> Active License
+                    </span>
+                  </div>
+                  <a href="/dealers/sharjah-oasis" className="block group-hover:text-primary transition-colors">
+                    <h3 className="font-headline-sm text-base font-bold text-on-surface">Sharjah Auto Oasis Hub</h3>
+                  </a>
+                  <p className="font-body-sm text-xs text-outline mt-0.5">Al Souq Al Haraj, Sector 1 • SHJ-LIC #30198</p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-primary">
+                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="font-data-mono-num text-xs font-bold text-on-surface">4.89</span>
+                    <span className="font-body-sm text-xs text-outline">(88)</span>
+                  </div>
+                  <span className="font-data-mono-num text-xs font-semibold text-secondary">26 Active Cars</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>

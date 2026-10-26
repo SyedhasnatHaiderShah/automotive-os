@@ -73,3 +73,35 @@
 - **Root Cause:** Collection route handler omitted during initial tenant controller implementation.
 - **Proposed Fix:** Add `@Get()` handler in `PublicDealersController` returning active tenants with KYB verification flag.
 - **Residual Risk:** Low. Additive contract change.
+
+---
+
+### Defect CF06-DEF-005: S01 & S02 Stitch Token Parity, Dealership Showcase & Header/Footer Inert Links
+- **ID:** `CF06-DEF-005`
+- **Severity:** P1 — Design & Parity Defect Remediation (Committed & Verified)
+- **Screen ID:** S01 (`Marketplace Home`), S02 (`Search Results`), S06 (`Dealer Storefront`), S10
+- **Actual Screenshot:** `docs/qa/cf06/implemented/S01-Marketplace_Home-1440px.png`
+- **Reference Screenshot:** `docs/qa/cf06/references/S01-stitch-original.png`
+- **Precise Difference:**
+  1. S01 Stitch Hero search tabs specify `Showroom Inventory`, `Off-Market Allocations`, and `Direct Consignment`. Implementation previously showed generic `All Stock`, `Brand New`, `Certified Used`.
+  2. S01 Stitch specification contains a dedicated "Verified UAE Dealerships" showcase with 4 institutional dealer cards (`Al Quoz Showroom 4`, `Yas Marina Luxury Motors`, `Sheikh Zayed Rd Gallery`, `Sharjah Auto Oasis Hub`) linking to verified showroom pages, which was missing from the marketplace homepage.
+  3. Stitch vehicle card component features a primary CTA button: `View Dossier & VIN` with forward arrow icon; previous implementation terminated card at price without the primary CTA button.
+  4. Header and Footer contained 5 `<a href="#">` inert links that failed Playwright zero-inert-links audit.
+  5. Visiting `/dealers` returned 404 due to missing directory route.
+- **Applied Fix:**
+  1. Updated `apps/marketplace/app/page.tsx` hero tabs to approved Stitch labels: `Showroom Inventory`, `Off-Market Allocations`, `Direct Consignment`.
+  2. Integrated the complete "Verified UAE Dealerships" section on S01 featuring the 4 regional showroom bento cards with active licenses, review ratings, live stock tallies, and direct links to `/dealers/[slug]`.
+  3. Added the approved `View Dossier & VIN` action button with arrow icon to `packages/ui/src/components/vehicle-card.tsx`.
+  4. Created `apps/marketplace/app/dealers/page.tsx` to provide the full accredited showrooms directory with emirate filtering.
+  5. Replaced all 5 inert `<a href="#">` links in `packages/ui/src/components/header.tsx` and `footer.tsx` with functional semantic paths (`/dealers`, `/account/garage`, `/account/profile`, `/account/settings`).
+  6. Added showroom fixture profiles for `al-quoz`, `yas-marina`, `sheikh-zayed`, `sharjah-oasis` in `apps/marketplace/lib/api.ts`.
+- **Proof:**
+  - Automated Chrome DevTools probe (`scripts/verify_with_chrome_devtools.js`) executed with headless Chrome via CDP:
+    - `inertLinks`: `[]` (0 inert links across all pages).
+    - `anonymousButtons`: 0.
+    - `overflow`: 0px.
+    - `hasVerifiedDealersSection`: `true`.
+    - `dossierButtons`: 6 verified vehicle cards with `View Dossier & VIN` CTA buttons.
+  - Monorepo Typecheck: 10 / 10 packages passed (100% clean).
+  - API Test Suite: 17 / 17 suites, 165 / 165 tests passed (100% green).
+- **Residual Risk:** Low. Additive visual & routing improvements with zero breaking contract changes.

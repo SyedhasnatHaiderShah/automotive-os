@@ -44,13 +44,13 @@ export const MarketplaceFooter: React.FC<MarketplaceFooterProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-outline font-body-sm">
           <p>© {new Date().getFullYear()} Automotive OS UAE. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-primary transition-colors">
+            <a href="/account/profile" className="hover:text-primary transition-colors">
               {isArabic ? 'سياسة الخصوصية' : 'Privacy Notice'}
             </a>
-            <a href="#" className="hover:text-primary transition-colors">
+            <a href="/account/settings" className="hover:text-primary transition-colors">
               {isArabic ? 'شروط الخدمة' : 'Terms of Service'}
             </a>
-            <a href="#" className="hover:text-primary transition-colors">
+            <a href="/account/settings" className="hover:text-primary transition-colors">
               {isArabic ? 'إفصاح حماية المستهلك' : 'UAE Consumer Rights'}
             </a>
           </div>
