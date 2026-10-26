@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsIn,
   IsEnum,
   IsInt,
   IsOptional,
@@ -60,6 +61,16 @@ export class PublicListingQueryDto {
   @IsOptional()
   @Type(() => Number)
   maxPriceFils?: number;
+
+  @ApiProperty({ description: 'Search listing headline or vehicle title', required: false })
+  @IsOptional()
+  @IsString()
+  q?: string;
+
+  @ApiProperty({ enum: ['recent', 'price-asc', 'price-desc'], required: false })
+  @IsOptional()
+  @IsIn(['recent', 'price-asc', 'price-desc'])
+  sort?: 'recent' | 'price-asc' | 'price-desc';
 
   @ApiProperty({ description: 'Page number (starts at 1)', default: 1, required: false })
   @IsInt()

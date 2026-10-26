@@ -491,6 +491,10 @@ export class ListingsService {
       },
     };
 
+    if (query.q?.trim()) {
+      where.title = { contains: query.q.trim(), mode: 'insensitive' };
+    }
+
     if (query.dealerSlug) {
       where.tenant.slug = {
         equals: query.dealerSlug,
@@ -573,7 +577,11 @@ export class ListingsService {
               },
             },
           },
-          orderBy: { publishedAt: "desc" },
+          orderBy: query.sort === "price-asc"
+            ? [{ askingPriceFils: "asc" }, { publishedAt: "desc" }]
+            : query.sort === "price-desc"
+              ? [{ askingPriceFils: "desc" }, { publishedAt: "desc" }]
+              : [{ publishedAt: "desc" }],
           skip,
           take: limit,
         }),
