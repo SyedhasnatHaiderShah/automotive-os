@@ -46,24 +46,41 @@ The source-of-truth app configs are committed **in each Next.js app**:
 | automotive-dealer | `/apps/dealer/railway.json` | 3001 | `/api/health` |
 | automotive-admin | `/apps/admin/railway.json` | 3002 | `/api/health` |
 
-In Railway > each service > Settings > **Config File Path**, use the exact
-absolute repository paths above. Set **Root Directory** to `/` for all three
-so the pnpm workspace packages and root lockfile remain available. Config File
-Path is **not** the same as Root Directory.
+**Railway API limitation (verified 2026-10-26):** Railway rejects setting
+`railwayConfigFile` for legacy JSON config with
+`Config as Code is deprecated. Use Infrastructure as Code`. The three JSON
+files therefore serve as independently checked-in **per-app build/start/health
+configuration templates and CI contracts**, not as actively selected Railway
+Config File Paths. Do not claim that the live services are reading these files.
 
-Each file explicitly uses `RAILPACK` (no Dockerfile), the app-specific
-pnpm build and start commands, and its own healthcheck. Railway's config-as-code
-settings override dashboard settings; therefore **pointing the three services
-at these paths is mandatory**. Merely committing the files does not change
-which config Railway reads. Retain the existing explicit DOCKERFILE setting
-on `automotive-api`; it continues to use `docker/Dockerfile.api` and `/health`.
+The working staging implementation is:
+1. Root `railway.json` has only `$schema`, with no `build` or `deploy`
+   override. This removes the erroneous global NestJS Docker build.
+2. Existing **per-service Railway settings** explicitly select `RAILPACK`,
+   pnpm workspace build/start commands and `/api/health` for all three
+   frontends. These settings were independently verified via Railway API.
+3. **Root Directory remains `/`** for each service so all workspace packages
+   and `pnpm-lock.yaml` are available. Do not set Root Directory to an
+   individual `/apps/<app>` folder just to locate its config: that can
+   remove the monorepo workspace from the build context.
+4. Keep the existing explicit `DOCKERFILE` builder and `/health`
+   endpoint for `automotive-api`.
+
+For durable code-managed Railway settings, migrate with Railway's replacement
+`.railway/railway.ts` Infrastructure-as-Code system. Railway requires one
+project-level authoring file for a monorepo. Review a **non-destructive plan**
+against the existing project, including Postgres and buckets, before enabling
+IaC or applying any changes. Do not attempt an unsupported Config File Path
+update or claim these JSON files are applied automatically.
 
 ### Staging release procedure
 
 1. Ensure GitHub CI has passed `node scripts/verify-railway-staging-config.mjs`
    (plus the existing typecheck, API/RLS tests, monorepo build).
-2. Stage only the frontend three services' `railwayConfigFile` settings
-   to their per-app config paths and a common verified Git SHA.
+2. Verify each of the **three existing Railway frontend service
+   settings** matches its per-app JSON contract (RAILPACK, build command,
+   start command, `/api/health`) and stage only their source commit
+   updates to the common verified Git SHA. No config-path updates.
 3. Inspect `get_staged_changes`: no Postgres/volume, bucket, API, secrets,
    nameservers or production changes.
 4. Deploy the staged frontend revision after user authorization; check each
