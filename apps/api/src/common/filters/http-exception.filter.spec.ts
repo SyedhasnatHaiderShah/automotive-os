@@ -71,7 +71,7 @@ describe("HttpExceptionFilter", () => {
 
     const jsonArg = mockResponse.json.mock.calls[0][0];
     const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      /^(corr-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     expect(jsonArg.error.correlationId).toMatch(uuidRegex);
   });
 

@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"outline":"#99907c","inverse-on-surface":"#2d3136","on-secondary":"#00354a","outline-variant":"#4d4635","tertiary-fixed":"#6ffbbe","surface":"#101419","on-surface":"#e0e2ea","surface-container-highest":"#31353b","on-tertiary-fixed-variant":"#005236","primary-fixed":"#ffe088","surface-dim":"#101419","on-background":"#e0e2ea","tertiary-container":"#33ca90","primary-fixed-dim":"#e9c349","on-primary-fixed-variant":"#574500","on-primary-fixed":"#241a00","on-primary":"#3c2f00","inverse-surface":"#e0e2ea","on-error":"#690005","background":"#101419","inverse-primary":"#735c00","surface-container-high":"#262a30","surface-container":"#1c2025","surface-variant":"#31353b","surface-bright":"#36393f","surface-container-lowest":"#0a0e13","on-tertiary-container":"#005035","secondary-fixed-dim":"#7bd0ff","on-tertiary":"#003824","on-tertiary-fixed":"#002113","on-primary-container":"#554300","on-secondary-container":"#00374d","tertiary":"#58e7aa","on-error-container":"#ffdad6","primary":"#f2ca50","secondary-fixed":"#c4e7ff","error":"#ffb4ab","error-container":"#93000a","secondary":"#7bd0ff","tertiary-fixed-dim":"#4edea3","surface-container-low":"#181c21","on-surface-variant":"#d0c5af","secondary-container":"#00a6e0","on-secondary-fixed":"#001e2c","surface-tint":"#e9c349","on-secondary-fixed-variant":"#004c69","primary-container":"#d4af37"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-lg":"1.5rem","margin":"2rem","gutter":"1.5rem","gutter-mobile":"0.75rem","gutter-desktop-wide":"2rem","space-sm":"0.5rem","space-3xl":"4rem","space-xl":"2rem","margin-mobile":"1rem","space-2xl":"3rem","space-xs":"0.25rem","margin-desktop-wide":"3rem","space-md":"1rem"},fontFamily:{"headline-xl":["Outfit"],"headline-xl-mobile":["Outfit"],"headline-md":["Outfit"],"label-caps":["Inter"],"body-lg":["Inter"],"body-sm":["Inter"],"headline-lg":["Outfit"],"headline-sm":["Outfit"],"display-hero":["Outfit"],"data-mono-num":["JetBrains Mono"],"data-currency-lg":["Outfit"],"body-md":["Inter"],"display-hero-mobile":["Outfit"]},fontSize:{"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"500"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"500"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"data-mono-num":["13px",{"lineHeight":"18px","letterSpacing":"-0.01em","fontWeight":"500"}],"data-currency-lg":["32px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)]"><div class="flex flex-col flex-1 min-h-0"><div class="h-16 px-space-md flex items-center justify-between bg-surface-container/60 shrink-0"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center"><span class="material-symbols-outlined text-on-primary-container text-[20px]">directions_car</span></div><div><div class="font-headline-sm text-headline-sm font-semibold text-on-surface tracking-tight leading-none">Automotive OS</div><div class="font-label-caps text-label-caps uppercase text-primary mt-0.5 tracking-wider">Dealership Suite</div></div></div><span class="material-symbols-outlined text-on-surface-variant text-[18px] cursor-pointer hover:text-on-surface">unfold_more</span></div><div class="overflow-y-auto flex-1 py-space-xs"><div class="px-space-md py-space-xs"><div class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">Operational Core</div></div><nav class="flex flex-col gap-1 px-space-sm mb-space-sm" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dealer-executive-overview-dashboard" href="#">Dashboard</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="vehicle-inventory-management-grid" href="#">Inventory</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="add-vehicle" href="#">Add Vehicle</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="crm-pipeline" href="#">CRM Pipeline</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="test-drives" href="#">Test Drives</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="rta-compliance" href="#">RTA &amp; Compliance</a></nav><div class="px-space-md pt-space-xs pb-space-xs flex items-center justify-between"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">[P1 ROADMAP / DMS]</span><span class="px-1.5 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-secondary/15 text-secondary tracking-widest">Future</span></div><nav class="flex flex-col gap-1 px-space-sm pb-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="sales-orders-and-quotes" href="#">Sales Orders &amp; Quotes</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="workshop-and-bays" href="#">Workshop &amp; Bays</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="parts-and-procurement" href="#">Parts &amp; Procurement</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="finance-and-insurance-f-and-i" href="#">Finance &amp; Insurance (F&amp;I)</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="invoices-and-accounting" href="#">Invoices &amp; Accounting</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="fleet-and-consignment" href="#">Fleet &amp; Consignment</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dms-analytics" href="#">DMS Analytics</a></nav></div></div><div class="p-space-sm bg-surface-container-lowest/80 flex flex-col gap-space-xs shrink-0"><div class="bg-surface-container-high/90 p-space-sm rounded-lg flex flex-col gap-1.5"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-on-surface font-semibold">Vault Allocations</span><span class="font-data-mono-num text-data-mono-num text-primary font-semibold">42 / 50</span></div><div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 84%"></div></div><div class="flex items-center justify-between pt-1"><span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary inline-block"></span>All changes saved</span><span class="font-label-caps text-label-caps text-on-surface-variant">Tier-1</span></div></div><div class="p-space-xs bg-surface-container/60 rounded-lg flex flex-col gap-0.5"><div class="font-body-sm text-body-sm font-semibold text-on-surface truncate">SilberArrows Luxury FZCO</div><div class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-tertiary">verified</span>DED #612048 • GCC Spec</div></div></div></aside><div class="pl-64 min-h-screen flex flex-col"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 px-space-sm py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest cursor-pointer text-on-surface transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-body-sm text-body-sm font-semibold">SilberArrows • Al Quoz 1 Hub</span><span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span></div><div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-body-sm text-body-sm font-medium">RTA API Connected</span><span class="font-data-mono-num text-data-mono-num text-on-surface-variant">14ms</span></div><div class="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container border border-outline-variant/40"><span class="material-symbols-outlined text-[15px] text-secondary">architecture</span><span class="font-label-caps text-label-caps uppercase text-secondary font-semibold tracking-wider">[FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]</span></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors"><span class="font-semibold text-primary">EN</span><span class="text-on-surface-variant">/</span><span class="text-on-surface-variant hover:text-on-surface">عربي</span></button><button class="relative p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary"></span></button><div class="flex items-center gap-3 pl-space-xs"><div class="text-right"><div class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Marc Ackermann</div><div class="font-label-caps text-label-caps text-on-surface-variant">General Manager</div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface px-space-lg pb-space-xl flex-1"><div class="flex flex-col w-full">
+<!-- P1 ROADMAP CONCEPT BANNER -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-high p-space-md mb-space-lg shadow-md">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-sm relative z-10">
+<div class="flex items-start sm:items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[24px]">account_balance</span>
+</div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps font-bold uppercase tracking-widest bg-primary text-on-primary">
+              [FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]
+            </span>
+<span class="font-data-mono-num text-[11px] text-tertiary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+              CBUAE SANDBOX REGULATORY MOCKUP
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-4xl">
+            CONCEPT TEMPLATE ONLY: Phase 1 Dealership Management System Roadmap. Specification mockups for UAE Central Bank lending syndication, LTV capping, auto-insurance underwriting, and dealer reserve commission reconciliation. No live banking write-backs occur from this mockup.
+          </p>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0 self-end lg:self-auto">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">API Target:</span>
+<span class="px-2 py-1 rounded bg-surface-container-lowest font-data-mono-num text-body-sm text-secondary">
+          v1.4-cbuae-openfinance
+        </span>
+</div>
+</div>
+</div>
+<!-- TITLE BAR & ACTIONS -->
+<div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-md mb-space-lg">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-primary">Financial Services &amp; Underwriting Core</span>
+<span class="text-on-surface-variant text-[12px]">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Sovereign &amp; Private Desk</span>
+</div>
+<div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+<h1 class="font-headline-lg text-headline-lg font-semibold text-on-surface tracking-tight">
+          F&amp;I Referral &amp; Lending Status Desk
+        </h1>
+<span class="font-headline-md text-headline-md text-on-surface-variant/70 font-light" dir="rtl">
+          إدارة التمويل والتأمين المصرفي
+        </span>
+</div>
+</div>
+<!-- ACTION BUTTON GROUP -->
+<div class="flex flex-wrap items-center gap-2">
+<button class="px-3.5 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm font-medium flex items-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">tune</span>
+<span>Simulate Financing Terms</span>
+</button>
+<button class="px-3.5 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm font-medium flex items-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">table_chart</span>
+<span>Rate Sheet Matrix (Q4)</span>
+</button>
+<button class="px-3.5 py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm font-medium flex items-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">download</span>
+<span>Export Compliance Log</span>
+</button>
+<button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm font-semibold flex items-center gap-2 shadow-md hover:brightness-105 transition-all">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Submit Bank Dossier</span>
+</button>
+</div>
+</div>
+<!-- KPI SUMMARY BAR -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-lg">
+<!-- KPI 1 -->
+<div class="p-space-md rounded-xl bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Financed Pipeline (QTD)</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">account_balance_wallet</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="font-label-caps text-[12px] font-bold text-primary">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface font-bold tracking-tight">28,450,000</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm mt-1">
+<span class="text-on-surface-variant">18 In-Flight Files</span>
+<span class="text-tertiary font-data-mono-num flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>+12.4% MoM
+          </span>
+</div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="p-space-md rounded-xl bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Avg Approval SLA</span>
+<span class="material-symbols-outlined text-primary text-[20px]">timer</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface font-bold tracking-tight">4.8</span>
+<span class="font-headline-sm text-headline-sm text-on-surface-variant font-medium">Hours</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm mt-1">
+<span class="text-on-surface-variant">Benchmark: 24.0h</span>
+<span class="text-tertiary font-data-mono-num">79% Faster than Avg</span>
+</div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="p-space-md rounded-xl bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Projected Dealer F&amp;I Yield</span>
+<span class="material-symbols-outlined text-tertiary text-[20px]">monetization_on</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="font-label-caps text-[12px] font-bold text-primary">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface font-bold tracking-tight">842,600</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm mt-1">
+<span class="text-on-surface-variant">Front + Back-end</span>
+<span class="text-secondary font-data-mono-num">2.96% Overall Yield</span>
+</div>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="p-space-md rounded-xl bg-surface-container-low shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-caps text-label-caps uppercase tracking-wider">CBUAE LTV Compliance</span>
+<span class="material-symbols-outlined text-tertiary text-[20px]">verified_user</span>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="font-data-currency-lg text-data-currency-lg text-tertiary font-bold tracking-tight">100.0%</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Capped ≤ 80%</span>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm mt-1">
+<span class="text-on-surface-variant">20% Min Equity Met</span>
+<span class="text-tertiary font-data-mono-num">0 Breaches</span>
+</div>
+</div>
+</div>
+</div>
+<!-- MAIN 2-COLUMN OPERATIONAL LAYOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg mb-space-lg">
+<!-- LEFT COLUMN (Wider ~65% -> 8 of 12 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-space-lg">
+<!-- 1. ACTIVE DOSSIER SPOTLIGHT -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-md">
+<div class="flex items-center gap-3">
+<span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary font-data-mono-num text-body-sm font-semibold">
+              CASE #FNI-2025-0418
+            </span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-caps text-label-caps uppercase flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+              Live Underwriting Active
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span> Opened 2h 14m ago
+          </span>
+</div>
+<!-- Vehicle & Applicant Header Bento -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md p-space-md rounded-xl bg-surface-container mb-space-md">
+<div class="md:col-span-4 relative rounded-lg overflow-hidden h-40 md:h-full min-h-[140px] bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="High contrast studio photograph of a 2024 Porsche 911 GT3 RS Weissach Package in Arctic Grey with lightweight carbon fiber aero elements and satin pyro red magnesium wheels on dark asphalt floor with subtle golden rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXxoytAedWl5H6HrmG4QhUVDNmym26K4t5YTM_3Sa6zp-BRUJq2FI5Krko9ZIyEeZJWQs4FG_u27-NYxR-Gzpyg18ryk9BeJa74RVyjbYVXjXZNvCULQA9YWdcuiLvWHOQlRx0Q2-XGOT2q7S09rT7_2zo0CsM5JPsR5FDyVujBmJMz85Xx7j1vtIWP-wBM7T8jVCY3MisGNj4dAzwqeTfdA1qpuGQPmloTMQY7RYU4GF8ee5SeZU5"/>
+<div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-data-mono-num text-[11px] text-on-surface">
+              #DXB-911-RS
+            </div>
+</div>
+<div class="md:col-span-8 flex flex-col justify-between gap-space-sm">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-secondary">Pre-Approved Prime Tier</span>
+<span class="font-data-mono-num text-body-sm text-on-surface-variant">VIN: WP0AF2A97RS194022</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">
+                2024 Porsche 911 GT3 RS Weissach
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                GCC Spec • 4.0L Naturally Aspirated Boxer-6 • 518 BHP • PDK 7-Speed • 1,240 km
+              </p>
+</div>
+<!-- Applicant Snapshot Row -->
+<div class="p-space-sm rounded-lg bg-surface-container-high/80 grid grid-cols-1 sm:grid-cols-3 gap-space-sm">
+<div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Applicant Profile</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface truncate block">Dr. Tariq Al-Hashimi</span>
+<span class="font-body-sm text-[11px] text-tertiary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">verified</span> UAE PASS Verified
+                </span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Affiliation</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate block">Al Maktoum Family Office</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Principal Executive</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">AECB Credit Score</span>
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-num text-headline-sm text-primary font-bold">842</span>
+<span class="px-1.5 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-caps text-[10px] uppercase font-semibold">Very Low Risk</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Commercial Figures Strip -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm p-space-md rounded-xl bg-surface-container-high">
+<div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Vehicle Invoice Price</span>
+<span class="font-data-mono-num text-headline-sm text-on-surface font-bold">AED 1,420,000</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Client Down Payment</span>
+<div class="flex items-baseline gap-1">
+<span class="font-data-mono-num text-headline-sm text-tertiary font-bold">AED 284,000</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant font-medium">(20.0%)</span>
+</div>
+</div>
+<div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Net Financed Principal</span>
+<span class="font-data-mono-num text-headline-sm text-secondary font-bold">AED 1,136,000</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Selected Tenor</span>
+<span class="font-data-mono-num text-headline-sm text-on-surface font-bold">48 Months</span>
+</div>
+</div>
+</div>
+<!-- 2. BANK SYNDICATION & REAL-TIME APPROVAL MATRIX -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-md">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">
+              Bank Syndication &amp; Approval Matrix
+            </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Multi-lender automated loan syndication engine connected via UAE Open Banking Gateway
+            </p>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">4 Lenders Polled</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-label-caps text-label-caps uppercase">
+<th class="py-2.5 px-space-md rounded-l-lg">Lending Institution</th>
+<th class="py-2.5 px-space-md">Status &amp; Decision SLA</th>
+<th class="py-2.5 px-space-md text-right">Profit / Interest Rate</th>
+<th class="py-2.5 px-space-md text-right">Dealer Reserve Yield</th>
+<th class="py-2.5 px-space-md">Special Conditions</th>
+<th class="py-2.5 px-space-md rounded-r-lg text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Bank 1: ENBD -->
+<tr class="bg-surface-container/30 hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-surface-container-high flex items-center justify-center font-bold text-primary text-[12px]">
+                      ENBD
+                    </div>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Emirates NBD</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Private Banking Auto Desk</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-body-sm text-[12px] font-medium inline-flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                    Conditionally Approved (Offer Ready)
+                  </span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant mt-0.5">Sanctioned in 1.4h</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-semibold text-primary">2.49% Flat</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">4.65% Reducing</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-bold text-tertiary">AED 13,064</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">1.15% Margin Share</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-tertiary">check_circle</span>
+                    Processing fee waived (VIP)
+                  </span>
+</td>
+<td class="py-3 px-space-md text-center">
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary font-body-sm text-[12px] font-semibold hover:brightness-105 transition-all shadow-sm">
+                    Select Offer
+                  </button>
+</td>
+</tr>
+<!-- Bank 2: FAB -->
+<tr class="bg-surface-container/50 hover:bg-surface-container/80 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-surface-container-high flex items-center justify-center font-bold text-secondary text-[12px]">
+                      FAB
+                    </div>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">First Abu Dhabi Bank</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">FAB Elite Auto Lending</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-body-sm text-[12px] font-medium inline-flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Credit Committee (L3 Gate)
+                  </span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant mt-0.5">Est. Decision: 45 min</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-semibold text-secondary">2.39% Flat</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">4.48% Reducing</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-bold text-tertiary">AED 14,200</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">1.25% Margin Share</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-secondary">info</span>
+                    Requires salary certificate attestation
+                  </span>
+</td>
+<td class="py-3 px-space-md text-center">
+<button class="px-2.5 py-1 rounded bg-surface-container-highest text-on-surface font-body-sm text-[12px] font-medium hover:bg-surface-bright transition-all">
+                    View Gate
+                  </button>
+</td>
+</tr>
+<!-- Bank 3: DIB -->
+<tr class="bg-surface-container/30 hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-surface-container-high flex items-center justify-center font-bold text-tertiary text-[12px]">
+                      DIB
+                    </div>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Dubai Islamic Bank</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Al Islami Auto Murabaha</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-primary/15 text-primary font-body-sm text-[12px] font-medium inline-flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Sharia Shurah Board Pre-cleared
+                  </span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant mt-0.5">Asset Sale Agreement Ready</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-semibold text-on-surface">2.55% Flat</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">4.78% Profit Rate</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-bold text-on-surface">AED 11,360</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">1.00% Murabaha Fee</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">verified</span>
+                    Takaful Bundling mandatory
+                  </span>
+</td>
+<td class="py-3 px-space-md text-center">
+<button class="px-2.5 py-1 rounded bg-surface-container-highest text-on-surface font-body-sm text-[12px] font-medium hover:bg-surface-bright transition-all">
+                    Murabaha Docs
+                  </button>
+</td>
+</tr>
+<!-- Bank 4: ADCB -->
+<tr class="bg-surface-container/50 hover:bg-surface-container/80 transition-colors">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-surface-container-high flex items-center justify-center font-bold text-on-surface-variant text-[12px]">
+                      ADCB
+                    </div>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">ADCB Private</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Millionaire Auto Program</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-body-sm text-[12px] font-medium inline-flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                    Backup Offer Registered
+                  </span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant mt-0.5">Standby syndicate node</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-semibold text-on-surface-variant">2.60% Flat</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">4.89% Reducing</div>
+</td>
+<td class="py-3 px-space-md text-right">
+<span class="font-data-mono-num text-body-md font-semibold text-on-surface-variant">AED 10,224</span>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">0.90% Margin Share</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Standard auto underwriting</span>
+</td>
+<td class="py-3 px-space-md text-center">
+<button class="px-2.5 py-1 rounded bg-surface-container-high text-on-surface-variant font-body-sm text-[12px] hover:text-on-surface transition-all">
+                    Details
+                  </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 3. INSURANCE UNDERWRITING & RIDER MATRIX -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-md">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps uppercase text-primary">Pre-Bind Underwriting</span>
+<span class="px-1.5 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-caps text-[10px] font-semibold">Sanction Locked</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">
+              Insurance Underwriting &amp; Supercar Rider Matrix
+            </h3>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Carrier &amp; Policy</span>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Oman Insurance (Sukoon) • Agreed Value</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md mb-space-md">
+<!-- Policy Pricing Breakdown -->
+<div class="md:col-span-5 p-space-md rounded-xl bg-surface-container flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Agreed Valuation</span>
+<span class="font-data-mono-num text-body-sm text-on-surface font-semibold">AED 1,420,000</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Rate Factor</span>
+<span class="font-data-mono-num text-body-sm text-secondary font-semibold">3.00% Premium Ratio</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-high mb-3">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Total Annual Premium</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-label-caps text-label-caps font-bold text-primary">AED</span>
+<span class="font-data-currency-lg text-headline-lg font-bold text-on-surface">42,600</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">/ annum</span>
+</div>
+</div>
+</div>
+<!-- Brokerage Commission Payout -->
+<div class="p-space-sm rounded-lg bg-tertiary/10 flex items-center justify-between">
+<div>
+<span class="font-label-caps text-label-caps uppercase text-tertiary font-semibold block">Dealership Brokerage Share</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">15.0% Direct Inward Commission</span>
+</div>
+<span class="font-data-mono-num text-headline-sm text-tertiary font-bold">+AED 6,390</span>
+</div>
+</div>
+<!-- Endorsements & Supercar Riders List -->
+<div class="md:col-span-7 flex flex-col gap-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Included High-Net-Worth Endorsements</span>
+<div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">GCC Agency Repair Guarantee</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Authorized Al Nabooda Porsche Center exclusively</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps uppercase font-bold bg-tertiary/15 text-tertiary">Active</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]">sports_score</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Dubai Autodrome Track Day Cover</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">FIA Non-competitive sanctioned track events</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps uppercase font-bold bg-tertiary/15 text-tertiary">Active</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]">shield</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Zero Depreciation on Carbon Aero &amp; PCCB</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Full replacement value guaranteed for 24 months</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps uppercase font-bold bg-tertiary/15 text-tertiary">Active</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]">local_shipping</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">24/7 Enclosed Flatbed Recovery</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Covering all UAE Emirates &amp; GCC cross-border transit</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps uppercase font-bold bg-tertiary/15 text-tertiary">Active</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (~35% -> 4 of 12 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-space-lg">
+<!-- 1. CBUAE REGULATORY GUARDRAILS CARD -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm">
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">gavel</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">CBUAE Guardrails</h3>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps font-bold uppercase bg-tertiary/15 text-tertiary">Compliant</span>
+</div>
+<div class="space-y-space-md">
+<!-- DBR Indicator -->
+<div class="p-space-md rounded-xl bg-surface-container">
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Debt Burden Ratio (DBR)</span>
+<span class="font-data-mono-num text-headline-sm text-tertiary font-bold">18.4%</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden mb-1.5">
+<div class="h-full bg-tertiary rounded-full" style="width: 36.8%"></div>
+</div>
+<div class="flex items-center justify-between font-label-caps text-label-caps text-on-surface-variant">
+<span>Current Commitment</span>
+<span>CBUAE Statutory Max: 50.0%</span>
+</div>
+</div>
+<!-- LTV & Tenor Checks -->
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="p-space-sm rounded-lg bg-surface-container">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Loan-To-Value</span>
+<span class="font-data-mono-num text-headline-sm text-primary font-bold">80.0%</span>
+<span class="font-body-sm text-[11px] text-tertiary block mt-0.5">Statutory Cap Met</span>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block">Tenor Window</span>
+<span class="font-data-mono-num text-headline-sm text-on-surface font-bold">48 / 60m</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant block mt-0.5">12m Buffer Left</span>
+</div>
+</div>
+<!-- Proof of Income Source -->
+<div class="p-space-sm rounded-lg bg-surface-container flex items-start gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[20px] shrink-0 mt-0.5">verified_user</span>
+<div>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface block">Central Bank Open Finance Attestation</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant block">
+                Direct salary feed &amp; dividend distribution attested via CBUAE gateway 38m ago. No physical payslips required.
+              </span>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. INTERACTIVE LOAN CALCULATOR & COMMISSION YIELD SLIDER -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm">
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[22px]">calculate</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Yield &amp; Payment Simulator</h3>
+</div>
+<span class="font-data-mono-num text-body-sm text-on-surface-variant">Live Model</span>
+</div>
+<div class="space-y-space-md">
+<!-- Tenor Selector -->
+<div>
+<div class="flex items-center justify-between text-body-sm mb-1.5">
+<span class="text-on-surface-variant">Financing Tenor</span>
+<span class="font-data-mono-num text-on-surface font-semibold" id="tenor-display">48 Months</span>
+</div>
+<div class="grid grid-cols-4 gap-1.5 bg-surface-container p-1 rounded-lg">
+<button class="py-1 rounded text-body-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">24m</button>
+<button class="py-1 rounded text-body-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">36m</button>
+<button class="py-1 rounded text-body-sm font-bold bg-primary text-on-primary shadow-sm">48m</button>
+<button class="py-1 rounded text-body-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">60m</button>
+</div>
+</div>
+<!-- Down payment Slider Simulation -->
+<div>
+<div class="flex items-center justify-between text-body-sm mb-1.5">
+<span class="text-on-surface-variant">Down Payment Equity</span>
+<span class="font-data-mono-num text-primary font-semibold">20% (AED 284,000)</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest relative">
+<div class="h-full bg-primary rounded-full" style="width: 25%"></div>
+<div class="absolute top-1/2 left-[25%] -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-on-surface shadow"></div>
+</div>
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mt-1">
+<span>20% (Min)</span>
+<span>50%</span>
+<span>80% (Max)</span>
+</div>
+</div>
+<!-- Estimated Monthly Installment Hero -->
+<div class="p-space-md rounded-xl bg-surface-container text-center">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block mb-1">Estimated Client Monthly Installment</span>
+<div class="flex items-baseline justify-center gap-1.5">
+<span class="font-label-caps text-headline-sm font-bold text-primary">AED</span>
+<span class="font-data-currency-lg text-display-hero-mobile font-bold text-on-surface">26,018</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">/ mo</span>
+</div>
+<span class="font-body-sm text-[11px] text-on-surface-variant block mt-1">Includes 2.49% Flat Profit + Standard Fees</span>
+</div>
+<!-- Dealership Yield Breakdown -->
+<div class="p-space-md rounded-xl bg-primary/10">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps uppercase text-on-primary-container font-bold">Total Dealership Back-End Yield</span>
+<span class="font-data-mono-num text-headline-sm text-primary font-bold">AED 19,454</span>
+</div>
+<div class="space-y-1 text-body-sm font-body-sm">
+<div class="flex items-center justify-between text-on-surface">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span> ENBD Bank Reserve (1.15%)
+                </span>
+<span class="font-data-mono-num font-medium">AED 13,064</span>
+</div>
+<div class="flex items-center justify-between text-on-surface">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Sukoon Insurance Kickback (15%)
+                </span>
+<span class="font-data-mono-num font-medium">AED 6,390</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. DIRECT ACTION BUTTONS -->
+<div class="mt-space-md space-y-2">
+<button class="w-full py-3 px-space-md rounded-lg bg-primary hover:brightness-105 text-on-primary font-body-sm text-body-sm font-bold flex items-center justify-center gap-2 shadow-md transition-all">
+<span class="material-symbols-outlined text-[20px]">fingerprint</span>
+<span>Transmit Sanction Letter (UAE PASS)</span>
+</button>
+<div class="grid grid-cols-2 gap-2">
+<button class="py-2 px-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-[12px] font-medium text-center transition-colors">
+              Counter-Offer Margin
+            </button>
+<button class="py-2 px-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-[12px] font-medium text-center transition-colors">
+              Request Bank Waiver
+            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM SECTION: PIPELINE TABLE OF RECENT F&I FILES -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-sm mb-space-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-md">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">
+          Active Dealer F&amp;I Loan &amp; Insurance Pipeline
+        </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          In-flight customer financing files across Dubai, Abu Dhabi, and Northern Emirates locations
+        </p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">Filter By:</span>
+<select class="bg-surface-container text-on-surface font-body-sm text-body-sm rounded-lg px-2.5 py-1.5 outline-none cursor-pointer">
+<option>All Bank Files (18)</option>
+<option>Approved / Sanction Ready (8)</option>
+<option>Committee Review (6)</option>
+<option>Settled / Funded (4)</option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-label-caps text-label-caps uppercase">
+<th class="py-2.5 px-space-md rounded-l-lg">File Ref &amp; Vehicle</th>
+<th class="py-2.5 px-space-md">Customer / Sponsor</th>
+<th class="py-2.5 px-space-md text-right">Invoice Value</th>
+<th class="py-2.5 px-space-md text-right">Financed Amt</th>
+<th class="py-2.5 px-space-md">Lender &amp; Product</th>
+<th class="py-2.5 px-space-md">Underwriting Status</th>
+<th class="py-2.5 px-space-md text-right">Dealer Reserve</th>
+<th class="py-2.5 px-space-md rounded-r-lg text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 font-body-sm text-body-sm">
+<!-- Row 1 -->
+<tr class="bg-surface-container/30 hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-data-mono-num text-[11px] text-primary font-semibold">#FNI-2025-0414</div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Ferrari 296 GTB Assetto Fiorano</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">2023 • Rosso Corsa • 3,100 km</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">H.E. Sheikh Majid Al Qasimi</div>
+<div class="font-body-sm text-[11px] text-tertiary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">verified</span> AECB 860 (Tier-1)
+              </div>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-medium text-on-surface">
+              AED 1,650,000
+            </td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-secondary">
+              AED 1,320,000
+            </td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">FAB Elite Auto</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">2.35% Flat • 36 Months</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-body-sm text-[12px] font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                FAB Sanctioned
+              </span>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-bold text-tertiary">
+              AED 16,500
+            </td>
+<td class="py-3 px-space-md text-center">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-container/50 hover:bg-surface-container/80 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-data-mono-num text-[11px] text-primary font-semibold">#FNI-2025-0409</div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Mercedes-AMG G63 4x4²</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">2024 • Obsidian Black • 850 km</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">Khalfan Saeed Real Estate LLC</div>
+<div class="font-body-sm text-[11px] text-tertiary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">domain</span> Corporate Facility
+              </div>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-medium text-on-surface">
+              AED 1,890,000
+            </td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-secondary">
+              AED 1,400,000
+            </td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">Emirates NBD Commercial</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">2.45% Flat • 48 Months</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-body-sm text-[12px] font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Funds Disbursed
+              </span>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-bold text-tertiary">
+              AED 17,500
+            </td>
+<td class="py-3 px-space-md text-center">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-surface-container/30 hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-data-mono-num text-[11px] text-primary font-semibold">#FNI-2025-0402</div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Aston Martin Valkyrie Spider</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">2024 • British Racing Green • 120 km</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">Private Collector (Jumeirah Islands)</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Sovereign Direct Client</div>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-medium text-on-surface">
+              AED 14,200,000
+            </td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-on-surface-variant">
+              AED 0 (Cash Wire)
+            </td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">Self-Financed Wire</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">Insurance Brokerage Only</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-primary/15 text-primary font-body-sm text-[12px] font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Cash Settle / Insurance Bound
+              </span>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-bold text-tertiary">
+              AED 63,900
+            </td>
+<td class="py-3 px-space-md text-center">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-surface-container/50 hover:bg-surface-container/80 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-data-mono-num text-[11px] text-primary font-semibold">#FNI-2025-0398</div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Rolls-Royce Cullinan Series II</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">2025 • Arctic White • Delivery Mileage</div>
+</td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">Bader Sultan Al Nuaimi</div>
+<div class="font-body-sm text-[11px] text-tertiary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">verified</span> AECB 795 (Tier-1)
+              </div>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-medium text-on-surface">
+              AED 2,750,000
+            </td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-secondary">
+              AED 2,200,000
+            </td>
+<td class="py-3 px-space-md">
+<div class="font-body-sm text-body-sm font-medium text-on-surface">Dubai Islamic Bank (DIB)</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">2.50% Murabaha • 60 Months</div>
+</td>
+<td class="py-3 px-space-md">
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-body-sm text-[12px] font-semibold inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Pending Murabaha Asset Sale
+              </span>
+</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-bold text-tertiary">
+              AED 22,000
+            </td>
+<td class="py-3 px-space-md text-center">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- BOTTOM STATE DEMONSTRATOR DOCK -->
+<div class="rounded-xl bg-surface-container-high p-space-md shadow-md flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px]">preview</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps uppercase text-primary font-bold">Interactive State Demonstrator</span>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+          Simulate prototype states for stakeholder presentation and UAE Central Bank regulatory review:
+        </div>
+</div>
+</div>
+<!-- State Buttons Pill Strip -->
+<div class="flex flex-wrap items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-body-sm text-[12px] font-semibold shadow-sm flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-on-primary"></span>
+        Approved Syndication (GT3 RS)
+      </button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-body-sm text-[12px] font-medium transition-colors">
+        High DBR / Subprime Warning
+      </button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-body-sm text-[12px] font-medium transition-colors">
+        Islamic Murabaha Contract State
+      </button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-body-sm text-[12px] font-medium transition-colors">
+        Insurance Claim Exception
+      </button>
+</div>
+</div>
+</div></main></div></body></html>

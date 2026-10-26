@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"outline":"#99907c","inverse-on-surface":"#2d3136","on-secondary":"#00354a","outline-variant":"#4d4635","tertiary-fixed":"#6ffbbe","surface":"#101419","on-surface":"#e0e2ea","surface-container-highest":"#31353b","on-tertiary-fixed-variant":"#005236","primary-fixed":"#ffe088","surface-dim":"#101419","on-background":"#e0e2ea","tertiary-container":"#33ca90","primary-fixed-dim":"#e9c349","on-primary-fixed-variant":"#574500","on-primary-fixed":"#241a00","on-primary":"#3c2f00","inverse-surface":"#e0e2ea","on-error":"#690005","background":"#101419","inverse-primary":"#735c00","surface-container-high":"#262a30","surface-container":"#1c2025","surface-variant":"#31353b","surface-bright":"#36393f","surface-container-lowest":"#0a0e13","on-tertiary-container":"#005035","secondary-fixed-dim":"#7bd0ff","on-tertiary":"#003824","on-tertiary-fixed":"#002113","on-primary-container":"#554300","on-secondary-container":"#00374d","tertiary":"#58e7aa","on-error-container":"#ffdad6","primary":"#f2ca50","secondary-fixed":"#c4e7ff","error":"#ffb4ab","error-container":"#93000a","secondary":"#7bd0ff","tertiary-fixed-dim":"#4edea3","surface-container-low":"#181c21","on-surface-variant":"#d0c5af","secondary-container":"#00a6e0","on-secondary-fixed":"#001e2c","surface-tint":"#e9c349","on-secondary-fixed-variant":"#004c69","primary-container":"#d4af37"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-lg":"1.5rem","margin":"2rem","gutter":"1.5rem","gutter-mobile":"0.75rem","gutter-desktop-wide":"2rem","space-sm":"0.5rem","space-3xl":"4rem","space-xl":"2rem","margin-mobile":"1rem","space-2xl":"3rem","space-xs":"0.25rem","margin-desktop-wide":"3rem","space-md":"1rem"},fontFamily:{"headline-xl":["Outfit"],"headline-xl-mobile":["Outfit"],"headline-md":["Outfit"],"label-caps":["Inter"],"body-lg":["Inter"],"body-sm":["Inter"],"headline-lg":["Outfit"],"headline-sm":["Outfit"],"display-hero":["Outfit"],"data-mono-num":["JetBrains Mono"],"data-currency-lg":["Outfit"],"body-md":["Inter"],"display-hero-mobile":["Outfit"]},fontSize:{"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"500"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"500"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"data-mono-num":["13px",{"lineHeight":"18px","letterSpacing":"-0.01em","fontWeight":"500"}],"data-currency-lg":["32px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)]"><div class="flex flex-col flex-1 min-h-0"><div class="h-16 px-space-md flex items-center justify-between bg-surface-container/60 shrink-0"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center"><span class="material-symbols-outlined text-on-primary-container text-[20px]">directions_car</span></div><div><div class="font-headline-sm text-headline-sm font-semibold text-on-surface tracking-tight leading-none">Automotive OS</div><div class="font-label-caps text-label-caps uppercase text-primary mt-0.5 tracking-wider">Dealership Suite</div></div></div><span class="material-symbols-outlined text-on-surface-variant text-[18px] cursor-pointer hover:text-on-surface">unfold_more</span></div><div class="overflow-y-auto flex-1 py-space-xs"><div class="px-space-md py-space-xs"><div class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">Operational Core</div></div><nav class="flex flex-col gap-1 px-space-sm mb-space-sm" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dealer-executive-overview-dashboard" href="#">Dashboard</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="vehicle-inventory-management-grid" href="#">Inventory</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="add-vehicle" href="#">Add Vehicle</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="crm-pipeline" href="#">CRM Pipeline</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="test-drives" href="#">Test Drives</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="rta-compliance" href="#">RTA &amp; Compliance</a></nav><div class="px-space-md pt-space-xs pb-space-xs flex items-center justify-between"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">[P1 ROADMAP / DMS]</span><span class="px-1.5 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-secondary/15 text-secondary tracking-widest">Future</span></div><nav class="flex flex-col gap-1 px-space-sm pb-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a aria-current="page" class="px-space-md py-2 transition-all block bg-primary-container text-on-primary-container font-semibold rounded-lg" data-path="sales-orders-and-quotes" href="#">Sales Orders &amp; Quotes</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="workshop-and-bays" href="#">Workshop &amp; Bays</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="parts-and-procurement" href="#">Parts &amp; Procurement</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="finance-and-insurance" href="#">Finance &amp; Insurance</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="invoices-and-accounting" href="#">Invoices &amp; Accounting</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="fleet-accounts" href="#">Fleet Accounts</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dms-analytics" href="#">DMS Analytics</a></nav></div></div><div class="p-space-sm bg-surface-container-lowest/80 flex flex-col gap-space-xs shrink-0"><div class="bg-surface-container-high/90 p-space-sm rounded-lg flex flex-col gap-1.5"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-on-surface font-semibold">Vault Allocations</span><span class="font-data-mono-num text-data-mono-num text-primary font-semibold">42 / 50</span></div><div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 84%"></div></div><div class="flex items-center justify-between pt-1"><span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary inline-block"></span>All changes saved</span><span class="font-label-caps text-label-caps text-on-surface-variant">Tier-1</span></div></div><div class="p-space-xs bg-surface-container/60 rounded-lg flex flex-col gap-0.5"><div class="font-body-sm text-body-sm font-semibold text-on-surface truncate">SilberArrows Luxury FZCO</div><div class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-tertiary">verified</span>DED #612048 • GCC Spec</div></div></div></aside><div class="pl-64 min-h-screen flex flex-col"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 px-space-sm py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest cursor-pointer text-on-surface transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-body-sm text-body-sm font-semibold">SilberArrows • Al Quoz 1 Hub</span><span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span></div><div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-body-sm text-body-sm font-medium">RTA API Connected</span><span class="font-data-mono-num text-data-mono-num text-on-surface-variant">14ms</span></div><div class="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container border border-outline-variant/40"><span class="material-symbols-outlined text-[15px] text-secondary">architecture</span><span class="font-label-caps text-label-caps uppercase text-secondary font-semibold tracking-wider">[FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]</span></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors"><span class="font-semibold text-primary">EN</span><span class="text-on-surface-variant">/</span><span class="text-on-surface-variant hover:text-on-surface">عربي</span></button><button class="relative p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary"></span></button><div class="flex items-center gap-3 pl-space-xs"><div class="text-right"><div class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Marc Ackermann</div><div class="font-label-caps text-label-caps text-on-surface-variant">General Manager</div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface px-space-lg pb-space-xl flex-1"><div class="flex flex-col w-full">
+<!-- P1 Specification & Concept Roadmap Hero Banner -->
+<div class="relative overflow-hidden bg-surface-container-low rounded-xl p-space-md shadow-xl mb-space-lg">
+<div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+<div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-secondary/10 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col gap-space-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<span class="hover:text-on-surface transition-colors cursor-pointer">Dealership Suite</span>
+<span class="text-outline">/</span>
+<span class="text-secondary font-semibold">Future DMS Roadmap (P1)</span>
+<span class="text-outline">/</span>
+<span class="text-on-surface font-semibold">Sales Orders &amp; Quotations Studio</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/15 text-secondary font-label-caps text-label-caps uppercase tracking-widest font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
+            [FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]
+          </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary font-label-caps text-label-caps uppercase">
+<span class="material-symbols-outlined text-[13px]">verified</span>
+            DED #612048 • FZCO
+          </span>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pt-space-xs">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 text-primary">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h1 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">Sales Orders &amp; Quotations Studio</h1>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-surface-container-highest text-on-surface-variant">v1.4 Spec Mockup</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 max-w-3xl">
+              CONCEPT TEMPLATE ONLY: Phase 1 Dealership Management System Roadmap. Specification mockups for commercial sales workflows, biometric e-signature handshakes, and automated FTA UAE VAT compliance pipelines.
+            </p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-2 shrink-0">
+<button class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest transition-all shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-secondary">tune</span>
+<span>Template Settings</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest transition-all shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-tertiary">file_download</span>
+<span>Export FTA Tax Schema</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest transition-all shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-primary">post_add</span>
+<span>New Pro-Forma Order</span>
+</button>
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary-container text-on-primary-container font-body-sm text-body-sm font-semibold hover:brightness-110 transition-all shadow-md">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Create Quotation [Draft]</span>
+</button>
+</div>
+</div>
+<!-- Live Pipeline State Filters -->
+<div class="flex flex-wrap items-center gap-2 pt-space-xs">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-highest text-on-surface font-body-sm text-body-sm font-medium flex items-center gap-2 shadow-sm">
+<span>All Orders</span>
+<span class="px-1.5 py-0.2 rounded bg-surface text-[11px] font-data-mono-num font-semibold text-primary">18</span>
+</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-body-sm text-body-sm flex items-center gap-2 transition-colors">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>Quotation Draft</span>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">5</span>
+</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-body-sm text-body-sm flex items-center gap-2 transition-colors">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>In Escrow Review</span>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">4</span>
+</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-body-sm text-body-sm flex items-center gap-2 transition-colors">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span>Trade-in Valuation</span>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">3</span>
+</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-body-sm text-body-sm flex items-center gap-2 transition-colors">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>Delivery Scheduled</span>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">6</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dual-Column Studio Workspace -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg mb-space-lg">
+<!-- LEFT COLUMN: Order Builder & Vehicle Financials (8 cols) -->
+<div class="xl:col-span-8 flex flex-col gap-space-lg min-w-0">
+<!-- Active Order Dossier Header -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div class="flex items-center gap-2.5">
+<span class="font-data-mono-num text-headline-sm font-bold text-primary">SO-2025-0891</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-label-caps font-label-caps uppercase font-semibold">Pro-Forma Order</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant text-label-caps font-label-caps uppercase">GCC Spec • Dubai, UAE</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Currency Mode:</span>
+<span class="font-data-mono-num text-body-sm font-semibold text-on-surface bg-surface-container px-2 py-0.5 rounded">AED (Dirhams)</span>
+<span class="text-outline-variant font-label-caps text-label-caps">| د.إ</span>
+</div>
+</div>
+<!-- Buyer Identity Bar -->
+<div class="bg-surface-container rounded-lg p-space-sm flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline-sm font-bold">
+              AM
+            </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Al Maktoum Family Office</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-tertiary/15 text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">fingerprint</span>
+                  UAE PASS Gold Biometric Verified
+                </span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2 mt-0.5">
+<span>Principal Rep: Tariq Al-Hashimi</span>
+<span>•</span>
+<span class="font-data-mono-num text-on-surface">tariq@familyoffice.ae</span>
+<span>•</span>
+<span class="font-data-mono-num text-on-surface">+971 50 882 1904</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-auto">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">badge</span>
+<span>CRM Card</span>
+</button>
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span>Audit Log</span>
+</button>
+</div>
+</div>
+<!-- Selected Vehicle Dossier Card -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md bg-surface-container-lowest p-space-md rounded-lg">
+<div class="md:col-span-5 relative rounded-lg overflow-hidden h-48 bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="High-contrast studio editorial photograph of a 2024 Porsche 911 GT3 RS in GT Silver Metallic with exposed carbon fiber Weissach Package aerodynamics, gold magnesium forged center-lock wheels, dark obsidian studio backdrop, architectural reflections, ultra-sharp detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq_u5IllIoIZ_yj1hZLqlksaNvQEyJjlYNaRqBxqMU8-hJaXlF9i04aONqjqTfvX1F83Mc9TBPBiR36PoRKlpuSqICGnv0tTd8T29vUJFKGGj5p5fY22gZ1g19wqXxQ7KWP8es32HyJG7ym6FuW5gP4USfZMStHXoNr__Cq8jcRWcq1zMThVnxnoWYqyerhO45iS5Ocs9oxdztbK7P1eBBUy7kN4_54RXG_9im__Z2AYy_M8ltg0_L"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-transparent to-transparent"></div>
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+<span class="px-2 py-0.5 rounded text-[10px] font-label-caps font-bold bg-primary text-on-primary uppercase">In Stock (Grounded)</span>
+<span class="font-data-mono-num text-body-sm font-semibold text-on-surface bg-surface-container-lowest/80 px-2 py-0.5 rounded">#DXB-911-RS</span>
+</div>
+</div>
+<div class="md:col-span-7 flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between gap-2">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-primary font-semibold tracking-wider">SilberArrows Prime Vault Allocation</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface leading-tight mt-0.5">2024 Porsche 911 GT3 RS Weissach</h3>
+</div>
+<span class="px-2 py-1 rounded bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase">GCC Spec</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Al Nabooda Motors Dubai Delivery • Clubsport Spec • Carbon Ceramic PCCB • Front Axle Lift</p>
+</div>
+<!-- Spec Grid Micro-Strip -->
+<div class="grid grid-cols-3 gap-2 py-2 my-2 bg-surface-container-high/60 px-3 rounded-lg">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">VIN Identifier</div>
+<div class="font-data-mono-num text-body-sm text-on-surface font-semibold truncate hover:text-primary cursor-pointer flex items-center gap-1" title="WP0AF2A97RS289012">
+<span>WP0AF2A...9012</span>
+<span class="material-symbols-outlined text-[13px] text-outline">content_copy</span>
+</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">Odometer</div>
+<div class="font-data-mono-num text-body-sm text-on-surface font-semibold">1,850 KM</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">Original Warranty</div>
+<div class="font-body-sm text-body-sm text-tertiary font-medium">Valid Thru 2027</div>
+</div>
+</div>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+                Tasjeel 160-Point Comprehensive Pass
+              </span>
+<a class="text-primary hover:underline font-label-caps text-label-caps uppercase font-semibold" href="#">Inspect Spec Sheet →</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Dynamic Line-Item Costing Table -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-xs pb-space-xs">
+<div>
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Vehicle Line-Item Commercial Costing</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Itemized schedule subject to UAE Federal Tax Authority (FTA) 5% VAT governance.</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">add</span>
+<span>Add Custom Line</span>
+</button>
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">percent</span>
+<span>Special Discount</span>
+</button>
+</div>
+</div>
+<!-- Telemetry Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-2.5 px-space-md rounded-l-lg">Item Code &amp; Description</th>
+<th class="py-2.5 px-space-sm text-center">Tax Status</th>
+<th class="py-2.5 px-space-sm text-right">Qty</th>
+<th class="py-2.5 px-space-sm text-right">Unit Price (AED)</th>
+<th class="py-2.5 px-space-md text-right rounded-r-lg">Net Line Total (AED)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high text-body-sm font-body-sm">
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-semibold text-on-surface">Base Showroom Asking Price</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">2024 Porsche 911 GT3 RS Weissach Package (DXB Grounded Unit)</div>
+</td>
+<td class="py-3 px-space-sm text-center">
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps font-semibold uppercase bg-tertiary/15 text-tertiary">Standard 5%</span>
+</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface">1</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface">1,420,000.00</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-on-surface">1,420,000.00</td>
+</tr>
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-semibold text-on-surface">Bespoke Commission &amp; Staging Package</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Stek DynoShield Full Body PPF Self-Healing + Akrapovic Titanium Exhaust Stage-1 Calibration</div>
+</td>
+<td class="py-3 px-space-sm text-center">
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps font-semibold uppercase bg-tertiary/15 text-tertiary">Standard 5%</span>
+</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface">1</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface">48,500.00</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-on-surface">48,500.00</td>
+</tr>
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-semibold text-on-surface">Pre-Delivery Inspection &amp; Tasjeel Passing Fee</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">RTA Vehicle Registration Service, VIP Expedited Lane, RFID Fitment</div>
+</td>
+<td class="py-3 px-space-sm text-center">
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps font-semibold uppercase bg-tertiary/15 text-tertiary">Standard 5%</span>
+</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface">1</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface">2,200.00</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-on-surface">2,200.00</td>
+</tr>
+<tr class="hover:bg-surface-container-high/40 transition-colors">
+<td class="py-3 px-space-md">
+<div class="font-semibold text-on-surface">GCC Transit / KSA Customs Bond Surcharge</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Cross-Border Customs Manifest &amp; Clearance Guarantee</div>
+</td>
+<td class="py-3 px-space-sm text-center">
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps font-semibold uppercase bg-surface-container-highest text-on-surface-variant">Exempt (0%)</span>
+</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface">1</td>
+<td class="py-3 px-space-sm text-right font-data-mono-num text-on-surface-variant">0.00</td>
+<td class="py-3 px-space-md text-right font-data-mono-num font-semibold text-on-surface-variant">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Subtotals & Tax Matrix Breakdown -->
+<div class="bg-surface-container rounded-lg p-space-md flex flex-col md:flex-row justify-between gap-space-md">
+<div class="flex flex-col justify-between max-w-sm">
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps uppercase text-secondary font-semibold">FTA Tax Compliance Stamp</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                Registered TRN: 100293847500003. All amounts in United Arab Emirates Dirhams (AED). This quotation conforms to FTA Executive Regulations Article 59.
+              </p>
+</div>
+<div class="pt-2 flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Digital Cryptographic Stamp Active</span>
+</div>
+</div>
+<div class="w-full md:w-80 flex flex-col gap-2">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">Subtotal (Taxable Supplies)</span>
+<span class="font-data-mono-num text-on-surface font-semibold">AED 1,470,700.00</span>
+</div>
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">UAE VAT (5.00% FTA Rate)</span>
+<span class="font-data-mono-num text-on-surface font-semibold">AED 73,535.00</span>
+</div>
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">GCC Customs / Regional Surcharges</span>
+<span class="font-data-mono-num text-on-surface-variant">AED 0.00</span>
+</div>
+<div class="h-0.5 bg-surface-container-highest my-1"></div>
+<div class="flex justify-between items-center">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Gross Sale Total</span>
+<span class="font-data-mono-num text-headline-sm font-bold text-primary">AED 1,544,235.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Trade-In Acquisition Offset Dossier -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">swap_horizontal_circle</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Trade-In Acquisition Offset (Appraisal Approved)</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tasjeel certified physical appraisal linked with bank settlement authorization.</p>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded bg-secondary/15 text-secondary font-label-caps text-label-caps uppercase font-semibold">
+            Credit Offset Applied
+          </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md bg-surface-container p-space-md rounded-lg">
+<div class="md:col-span-4 relative rounded-lg overflow-hidden h-36 bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="High-end automotive photography of a 2022 Mercedes-AMG G63 in Obsidian Black metallic parked in a luxury Dubai showroom, distinctive vertical grille, LED headlights, dark sleek ambiance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABCOCjUk9lheK2fVahLXmq7oFso4QmgGSUjBCslUd9wAGbuYuK_XUFltbl6Rl2yxRsZWsheX9B1E-rSIvSaGNaqWu38jlsXmbtFj5Jo0vxlFfAxn7SA6QpaoxRe3DvjP0QRxPYnb1yHLsFaMaP2OcPR8RH8et9qJGNCB62BD7kRp7Q8VbeZS7KlGJ3IoLdyMFLwI9Cr1YRLcx10CZ6UUDcP9KIsIY0rob5y6087q1Nwnarg3UoKG-Z"/>
+<div class="absolute bottom-1.5 left-2 px-1.5 py-0.5 rounded bg-surface-container-lowest/80 text-[10px] font-data-mono-num text-on-surface">
+              VIN: W1N4632761...
+            </div>
+</div>
+<div class="md:col-span-8 flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<div>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface">2022 Mercedes-AMG G 63 V8 BiTurbo</h4>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">GCC Spec • G Manufaktur Interior • 18,400 KM • Single HNWI Owner</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary text-label-caps font-label-caps uppercase font-semibold">Tier-1 Grade A</span>
+</div>
+<!-- Trade-In Equity Ledger -->
+<div class="grid grid-cols-3 gap-2 pt-space-xs">
+<div class="bg-surface-container-high p-2 rounded">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">Agreed Valuation</div>
+<div class="font-data-mono-num text-body-lg font-bold text-tertiary mt-0.5">AED 610,000</div>
+</div>
+<div class="bg-surface-container-high p-2 rounded">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">Lien Settle (Emirates NBD)</div>
+<div class="font-data-mono-num text-body-lg font-bold text-error mt-0.5">-AED 120,000</div>
+</div>
+<div class="bg-surface-container-high p-2 rounded">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">Net Trade-In Equity</div>
+<div class="font-data-mono-num text-body-lg font-bold text-primary mt-0.5">AED 490,000</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Net Payable Calculation Bar -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md w-full md:w-auto">
+<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[28px]">payments</span>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-primary font-semibold tracking-wider">Final Deal Settlement Position</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Net Payable = Gross Order Total (AED 1,544,235) minus Trade-In Equity (AED 490,000)</div>
+</div>
+</div>
+<div class="text-right w-full md:w-auto flex md:flex-col justify-between items-end">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">Net Customer Cash Outlay</div>
+<div class="font-data-currency-lg text-data-currency-lg font-bold text-primary">AED 1,054,235.00</div>
+<div class="font-body-sm text-body-sm text-secondary font-medium">Req. 20% Sovereign Escrow Deposit: <span class="font-data-mono-num font-semibold text-on-surface">AED 210,847.00</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Deal Orchestration & Milestone Sign-Off Gates (4 cols) -->
+<div class="xl:col-span-4 flex flex-col gap-space-lg min-w-0">
+<!-- Multi-Party Cryptographic Sign-Off Gates -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Sign-Off Gates &amp; Escrow</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Sequential legal authorization pipeline</p>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-label-caps font-semibold uppercase bg-primary/15 text-primary">Gate 2 of 5</span>
+</div>
+<!-- Stepper Checklist -->
+<div class="flex flex-col gap-space-md relative">
+<!-- Connector line -->
+<div class="absolute left-4 top-4 bottom-4 w-0.5 bg-surface-container-highest"></div>
+<!-- Step 1: Sales Consultant Quotation -->
+<div class="relative flex items-start gap-3 z-10">
+<div class="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">done</span>
+</div>
+<div class="flex-1 bg-surface-container p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Step 1: Consultant Quotation Issue</span>
+<span class="font-data-mono-num text-[11px] text-tertiary">14:10 GST</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Signed by Marc Ackermann (GM / Principal)</p>
+<div class="flex items-center gap-1.5 mt-1 text-[11px] font-data-mono-num text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-tertiary">lock</span>
+<span>Hash: #SHA256-8A91C0...</span>
+</div>
+</div>
+</div>
+<!-- Step 2: UAE PASS Biometric -->
+<div class="relative flex items-start gap-3 z-10">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shrink-0 shadow-sm animate-pulse">
+<span class="material-symbols-outlined text-[18px]">fingerprint</span>
+</div>
+<div class="flex-1 bg-surface-container p-space-sm rounded-lg ring-1 ring-primary/40">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-primary">Step 2: Customer UAE PASS Signature</span>
+<span class="px-1.5 py-0.5 rounded bg-primary/20 text-[10px] font-label-caps font-semibold text-primary uppercase">Active Step</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Awaiting Tariq Al-Hashimi OTP biometric handshake via UAE PASS app.</p>
+<div class="pt-2 flex items-center gap-2">
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary font-body-sm text-body-sm font-semibold hover:brightness-110 transition-all">
+                  Resend Prompt
+                </button>
+<button class="px-2.5 py-1 rounded bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest">
+                  Manual Override
+                </button>
+</div>
+</div>
+</div>
+<!-- Step 3: Dealer Margin Override Approval -->
+<div class="relative flex items-start gap-3 z-10">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-tertiary shrink-0">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div class="flex-1 bg-surface-container p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Step 3: Commercial Margin Sign-Off</span>
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Pre-Approved</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">&gt;12% Margin Threshold cleared (Projected: 14.8%). Pre-authorized by Marc Ackermann.</p>
+</div>
+</div>
+<!-- Step 4: FAB Sovereign Escrow Lock -->
+<div class="relative flex items-start gap-3 z-10">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-outline shrink-0">
+<span class="material-symbols-outlined text-[18px]">account_balance</span>
+</div>
+<div class="flex-1 bg-surface-container p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface-variant">Step 4: FAB Escrow Account Lock</span>
+<span class="font-label-caps text-label-caps text-outline uppercase">Pending #2</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">First Abu Dhabi Bank (FAB) Vault Escrow. Deposit AED 210,847.00 allocated IBAN.</p>
+</div>
+</div>
+<!-- Step 5: Dubai RTA Electronic Ownership Transfer -->
+<div class="relative flex items-start gap-3 z-10">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-outline shrink-0">
+<span class="material-symbols-outlined text-[18px]">assignment_turned_in</span>
+</div>
+<div class="flex-1 bg-surface-container p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface-variant">Step 5: RTA Electronic Ownership</span>
+<span class="font-label-caps text-label-caps text-outline uppercase">Queue</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Mulkiya issuance &amp; plate assignment at Al Quoz Tasjeel hub.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Commercial Margin & Telemetry Widget -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">Deal Profitability Telemetry</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-tertiary/15 text-tertiary">Exceeds Targets</span>
+</div>
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<div class="bg-surface-container p-space-sm rounded-lg">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">Front-End Margin</div>
+<div class="font-data-mono-num text-headline-sm font-bold text-tertiary mt-1">14.8%</div>
+<div class="font-body-sm text-body-sm text-on-surface font-semibold mt-0.5">AED 210,500.00</div>
+</div>
+<div class="bg-surface-container p-space-sm rounded-lg">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant">F&amp;I Commission Proj.</div>
+<div class="font-data-mono-num text-headline-sm font-bold text-secondary mt-1">AED 28,400</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Oman Insurance RSA</div>
+</div>
+</div>
+<!-- Telemetry Progress Bar -->
+<div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">Target Handover Window</span>
+<span class="font-data-mono-num text-on-surface font-semibold">48 Hours post-escrow</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary via-tertiary to-secondary rounded-full" style="width: 72%"></div>
+</div>
+<div class="flex justify-between items-center text-[11px] font-label-caps text-on-surface-variant pt-0.5">
+<span>PDI Cleared</span>
+<span>RTA Bond Staged</span>
+<span>Silk Bay Booked</span>
+</div>
+</div>
+</div>
+<!-- Customer Handover & Logistics Specifications -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Handover &amp; Logistics Protocol</h3>
+<div class="flex flex-col gap-2 pt-space-xs text-body-sm">
+<div class="flex items-start gap-2.5 p-2 rounded bg-surface-container">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0 mt-0.5">location_on</span>
+<div>
+<div class="font-semibold text-on-surface">SilberArrows Al Quoz Private Bay</div>
+<div class="text-on-surface-variant text-body-sm">Includes VIP Silk Reveal ceremony &amp; professional delivery photographer.</div>
+</div>
+</div>
+<div class="flex items-start gap-2.5 p-2 rounded bg-surface-container">
+<span class="material-symbols-outlined text-[18px] text-secondary shrink-0 mt-0.5">shield</span>
+<div>
+<div class="font-semibold text-on-surface">Included Care Package</div>
+<div class="text-on-surface-variant text-body-sm">2-Year SilberArrows Concierge Extended Warranty + First 10,000 KM major service included.</div>
+</div>
+</div>
+<div class="flex items-start gap-2.5 p-2 rounded bg-surface-container">
+<span class="material-symbols-outlined text-[18px] text-tertiary shrink-0 mt-0.5">description</span>
+<div>
+<div class="font-semibold text-on-surface">Registration Documentation</div>
+<div class="text-on-surface-variant text-body-sm">Dubai Private Mulkiya Plate (No export manifest required). Transfer completed in-house.</div>
+</div>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<button class="w-full py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm font-semibold transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+<span>Schedule Silk Handover Slot</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- SECONDARY SECTION: Recent Sales Order Pipeline Table -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-md mb-space-lg">
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Recent Sales Order Pipeline (Phase 1 Active Mockup)</h2>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-surface-container-highest text-secondary">Telemetry Sync Live</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Active contracts, commercial quotations, and escrow transfers in the Al Quoz Hub queue.</p>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-on-surface-variant">search</span>
+<input class="h-9 pl-9 pr-3 rounded-lg bg-surface-container text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary w-64" placeholder="Search VIN, Order ID, Client..." type="text"/>
+</div>
+<button class="h-9 px-3 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-1.5 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+<span>Filters</span>
+</button>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-2.5 px-space-md rounded-l-lg">Order ID</th>
+<th class="py-2.5 px-space-sm">Client / Entity</th>
+<th class="py-2.5 px-space-sm">Vehicle Dossier</th>
+<th class="py-2.5 px-space-sm text-right">Net Total (AED)</th>
+<th class="py-2.5 px-space-sm">Settlement Mechanism</th>
+<th class="py-2.5 px-space-sm text-center">Lifecycle Stage</th>
+<th class="py-2.5 px-space-md text-right rounded-r-lg">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high text-body-sm font-body-sm">
+<!-- Row 1: Active order -->
+<tr class="bg-surface-container-high/40 hover:bg-surface-container-high transition-colors">
+<td class="py-3.5 px-space-md">
+<span class="font-data-mono-num font-bold text-primary">SO-2025-0891</span>
+<div class="font-label-caps text-[10px] text-on-surface-variant mt-0.5">TODAY • 14:10 GST</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">Al Maktoum Family Office</div>
+<div class="text-on-surface-variant text-body-sm">Tariq Al-Hashimi (Gold PASS)</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">2024 Porsche 911 GT3 RS</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">WP0AF2A97RS289012</div>
+</td>
+<td class="py-3.5 px-space-sm text-right font-data-mono-num font-bold text-on-surface">
+              1,054,235.00
+            </td>
+<td class="py-3.5 px-space-sm">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">account_balance</span>
+<span>Sovereign Escrow (FAB)</span>
+</div>
+</td>
+<td class="py-3.5 px-space-sm text-center">
+<span class="px-2.5 py-1 rounded-full text-[11px] font-label-caps font-semibold uppercase bg-primary/20 text-primary">
+                Customer Signature
+              </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button class="px-3 py-1.5 rounded bg-primary text-on-primary font-body-sm text-body-sm font-semibold hover:brightness-110 shadow-sm transition-all">
+                Sign Handshake
+              </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-high/50 transition-colors">
+<td class="py-3.5 px-space-md">
+<span class="font-data-mono-num font-bold text-on-surface">SO-2025-0888</span>
+<div class="font-label-caps text-[10px] text-on-surface-variant mt-0.5">YESTERDAY • 18:45 GST</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">Khamis Bin Dahi Holdings</div>
+<div class="text-on-surface-variant text-body-sm">Corporate Vault Account</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">2023 Ferrari 296 GTB Assetto</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">ZFF92NHA7P029311</div>
+</td>
+<td class="py-3.5 px-space-sm text-right font-data-mono-num font-bold text-on-surface">
+              1,380,000.00
+            </td>
+<td class="py-3.5 px-space-sm">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-tertiary">swap_horiz</span>
+<span>Trade-in Heavy + Wire</span>
+</div>
+</td>
+<td class="py-3.5 px-space-sm text-center">
+<span class="px-2.5 py-1 rounded-full text-[11px] font-label-caps font-semibold uppercase bg-secondary/20 text-secondary">
+                Escrow Locked
+              </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button class="px-3 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm transition-colors">
+                View Dossier
+              </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-high/50 transition-colors">
+<td class="py-3.5 px-space-md">
+<span class="font-data-mono-num font-bold text-on-surface">SO-2025-0882</span>
+<div class="font-label-caps text-[10px] text-on-surface-variant mt-0.5">24 OCT • 11:20 GST</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">Alexander Vance</div>
+<div class="text-on-surface-variant text-body-sm">Private Collector (UK Expat)</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">2022 Aston Martin DBS Superleggera</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">SCFRMFAW3NG819200</div>
+</td>
+<td class="py-3.5 px-space-sm text-right font-data-mono-num font-bold text-on-surface">
+              945,000.00
+            </td>
+<td class="py-3.5 px-space-sm">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-primary">credit_card</span>
+<span>Direct Wire TT (CBD)</span>
+</div>
+</td>
+<td class="py-3.5 px-space-sm text-center">
+<span class="px-2.5 py-1 rounded-full text-[11px] font-label-caps font-semibold uppercase bg-tertiary/20 text-tertiary">
+                Ready for Handover
+              </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button class="px-3 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm transition-colors">
+                Print Mulkiya
+              </button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-high/50 transition-colors">
+<td class="py-3.5 px-space-md">
+<span class="font-data-mono-num font-bold text-on-surface">SO-2025-0879</span>
+<div class="font-label-caps text-[10px] text-on-surface-variant mt-0.5">22 OCT • 16:05 GST</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">Al Qasimi Investment Trust</div>
+<div class="text-on-surface-variant text-body-sm">Sharjah Royal Office</div>
+</td>
+<td class="py-3.5 px-space-sm">
+<div class="font-semibold text-on-surface">2024 Rolls-Royce Spectre</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">SCA664S05PU192837</div>
+</td>
+<td class="py-3.5 px-space-sm text-right font-data-mono-num font-bold text-on-surface">
+              2,150,000.00
+            </td>
+<td class="py-3.5 px-space-sm">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">account_balance</span>
+<span>Bank Guarantee / Letter of Credit</span>
+</div>
+</td>
+<td class="py-3.5 px-space-sm text-center">
+<span class="px-2.5 py-1 rounded-full text-[11px] font-label-caps font-semibold uppercase bg-outline/20 text-on-surface-variant">
+                Quotation Draft
+              </span>
+</td>
+<td class="py-3.5 px-space-md text-right">
+<button class="px-3 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm transition-colors">
+                Edit Draft
+              </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Interactive Template View Switcher Dock (Fixed/Floating at Bottom) -->
+<div class="sticky bottom-4 z-30 self-center max-w-4xl w-full">
+<div class="bg-surface-container-highest/95 backdrop-blur-xl p-2 rounded-xl shadow-2xl flex flex-wrap items-center justify-between gap-2 ring-1 ring-white/10">
+<div class="flex items-center gap-2 px-2">
+<span class="material-symbols-outlined text-[18px] text-primary">view_carousel</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">Interactive Roadmap Presets:</span>
+</div>
+<div class="flex flex-wrap items-center gap-1.5">
+<button class="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container font-body-sm text-body-sm font-semibold shadow-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px]">done</span>
+<span>Populated Quotation (GT3 RS)</span>
+</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-body-sm text-body-sm transition-colors">
+<span>Trade-In Heavy Order (Ferrari 296)</span>
+</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-body-sm text-body-sm transition-colors">
+<span>Blank Quotation Builder State</span>
+</button>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-body-sm text-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary">verified</span>
+<span>Compliance &amp; FTA Export</span>
+</button>
+</div>
+<div class="px-2 hidden md:block">
+<span class="font-data-mono-num text-[11px] text-outline">P1.SPEC.2025.Q3</span>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {"darkMode":"class","theme":{"extend":{"colors":{"inverse-surface":"#e0e2ea","on-error":"#690005","inverse-on-surface":"#2d3136","error":"#ffb4ab","surface":"#101419","outline-variant":"#4d4635","background":"#101419","primary":"#f2ca50","on-error-container":"#ffdad6","on-primary-fixed":"#241a00","tertiary-fixed-dim":"#4edea3","primary-fixed":"#ffe088","surface-container-high":"#262a30","tertiary-container":"#33ca90","on-surface":"#e0e2ea","on-surface-variant":"#d0c5af","surface-tint":"#e9c349","surface-container-low":"#181c21","inverse-primary":"#735c00","surface-container":"#1c2025","on-tertiary-fixed-variant":"#005236","surface-variant":"#31353b","tertiary-fixed":"#6ffbbe","on-tertiary-container":"#005035","on-primary":"#3c2f00","tertiary":"#58e7aa","on-primary-fixed-variant":"#574500","on-tertiary-fixed":"#002113","secondary-fixed-dim":"#7bd0ff","on-secondary":"#00354a","surface-dim":"#101419","surface-container-highest":"#31353b","on-primary-container":"#554300","secondary-fixed":"#c4e7ff","on-secondary-container":"#00374d","on-background":"#e0e2ea","on-secondary-fixed-variant":"#004c69","surface-bright":"#36393f","error-container":"#93000a","primary-container":"#d4af37","on-tertiary":"#003824","secondary":"#7bd0ff","secondary-container":"#00a6e0","outline":"#99907c","primary-fixed-dim":"#e9c349","on-secondary-fixed":"#001e2c","surface-container-lowest":"#0a0e13"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-mobile":"1rem","gutter-mobile":"0.75rem","space-sm":"0.5rem","space-xs":"0.25rem","margin":"2rem","space-2xl":"3rem","gutter-desktop-wide":"2rem","margin-desktop-wide":"3rem","space-lg":"1.5rem","space-3xl":"4rem","space-xl":"2rem","gutter":"1.5rem","space-md":"1rem"},"fontFamily":{"headline-xl":["Outfit"],"headline-xl-mobile":["Outfit"],"data-mono-num":["JetBrains Mono"],"headline-md":["Outfit"],"body-lg":["Inter"],"label-caps":["Inter"],"headline-sm":["Outfit"],"headline-lg":["Outfit"],"body-md":["Inter"],"display-hero":["Outfit"],"display-hero-mobile":["Outfit"],"data-currency-lg":["Outfit"],"body-sm":["Inter"]},"fontSize":{"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"data-mono-num":["13px",{"lineHeight":"18px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"500"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"500"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}],"data-currency-lg":["32px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col justify-between"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.40)]"><div class="h-20 max-w-[1440px] mx-auto px-space-md lg:px-space-xl flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm group" data-path="browse-stock" href="#"><div class="w-9 h-9 rounded bg-surface-container-high flex items-center justify-center shadow-inner"><span class="material-symbols-outlined text-primary text-[22px]">token</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface group-hover:text-primary transition-colors uppercase">Automotive<span class="text-primary font-bold">OS</span></span><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">UAE Collector Exchange</span></div></a><div class="hidden xl:flex items-center"><div class="h-6 w-px bg-surface-container-highest mx-space-xs"></div><button class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high transition-colors text-on-surface"><span class="material-symbols-outlined text-primary text-[18px]">location_on</span><span class="font-body-sm text-body-sm text-on-surface font-medium">Dubai</span><span class="font-label-caps text-label-caps text-on-surface-variant">DXB</span><span class="material-symbols-outlined text-on-surface-variant text-[16px]">expand_more</span></button></div></div><nav class="hidden lg:flex items-center gap-space-xs p-1 bg-surface-container-lowest/80 rounded-xl" data-active-classes="bg-primary-container text-on-primary font-medium rounded-lg shadow-sm"><a class="px-space-md py-2 font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all rounded-lg" data-path="browse-stock" href="#">Browse Stock</a><a class="px-space-md py-2 font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all rounded-lg" data-path="verified-dealers" href="#">Verified Dealers</a><a class="px-space-md py-2 font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all rounded-lg" data-path="vip-services" href="#">VIP Services</a><a class="px-space-md py-2 font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all rounded-lg" data-path="compare-vehicles" href="#">Compare Vehicles</a></nav><div class="flex items-center gap-space-sm"><div class="flex items-center p-1 bg-surface-container-lowest rounded-lg"><button class="px-space-xs py-1 rounded font-label-caps text-label-caps text-primary font-semibold">EN</button><span class="text-outline-variant font-label-caps text-label-caps">|</span><button class="px-space-xs py-1 rounded font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors font-medium">العربية</button></div><a class="relative p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center" data-path="saved-garage" href="#" title="Saved Inventory"><span class="material-symbols-outlined text-[20px]">bookmark</span><span class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary text-on-primary font-data-mono-num text-[10px] font-bold flex items-center justify-center leading-none">4</span></a><a class="relative p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center" data-path="notifications" href="#" title="Advisories &amp; Alerts"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-tertiary ring-2 ring-surface"></span></a><a class="flex items-center gap-space-sm pl-space-sm pr-space-md py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container-high transition-colors group" data-path="buyer-portal" href="#"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="hidden md:flex flex-col text-left"><span class="font-body-sm text-body-sm text-on-surface font-semibold group-hover:text-primary transition-colors">Rashid Al Nuaimi</span><span class="font-label-caps text-label-caps text-primary uppercase">VIP Collector</span></div></a></div></div></header><main class="w-full pt-20 bg-surface flex-1"><div class="flex flex-col w-full">
+<!-- Interactive State Tabs Banner -->
+<div class="w-full bg-surface-container-lowest py-space-sm px-space-md lg:px-space-xl flex flex-wrap items-center justify-between gap-space-sm shadow-sm">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-caps text-label-caps tracking-wider uppercase">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span>Simulated Dossier Context:</span>
+</div>
+<div class="flex items-center gap-space-xs overflow-x-auto p-1 bg-surface-container-low rounded-lg">
+<button class="state-tab-btn px-space-sm py-1 rounded text-body-sm font-medium transition-all bg-primary-container text-on-primary" id="tab-active" onclick="setDossierState('active')">
+        Active Progress
+      </button>
+<button class="state-tab-btn px-space-sm py-1 rounded text-body-sm font-medium transition-all text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" id="tab-empty" onclick="setDossierState('empty')">
+        Onboarding / Empty
+      </button>
+<button class="state-tab-btn px-space-sm py-1 rounded text-body-sm font-medium transition-all text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" id="tab-cancelled" onclick="setDossierState('cancelled')">
+        Data Revoked State
+      </button>
+<button class="state-tab-btn px-space-sm py-1 rounded text-body-sm font-medium transition-all text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" id="tab-complete" onclick="setDossierState('complete')">
+        RTA Title Transferred
+      </button>
+</div>
+</div>
+<!-- Main Container -->
+<div class="max-w-[1440px] mx-auto w-full px-space-md lg:px-space-xl py-space-lg lg:py-space-2xl flex flex-col gap-space-xl">
+<!-- Top Breadcrumb & Metadata Strip -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<nav class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Buyer Portal</a>
+<span class="text-outline-variant font-label-caps text-label-caps">/</span>
+<a class="hover:text-primary transition-colors" href="#">Transactions &amp; Allocations</a>
+<span class="text-outline-variant font-label-caps text-label-caps">/</span>
+<span class="text-on-surface font-medium">Enquiry Status Timeline</span>
+</nav>
+<div class="flex items-center gap-space-sm self-start md:self-auto">
+<div class="flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-high shadow-sm">
+<span class="material-symbols-outlined text-tertiary text-[16px]">shield</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface">FAB ESCROW #ESC-89214</span>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-high shadow-sm">
+<span class="material-symbols-outlined text-primary text-[16px]">fingerprint</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface">UAE PASS VERIFIED</span>
+</div>
+</div>
+</div>
+<!-- Editorial Header with RTL Alignment Mirror -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs max-w-3xl">
+<div class="flex items-center gap-space-xs text-primary font-label-caps text-label-caps uppercase tracking-widest">
+<span class="material-symbols-outlined text-[16px]">encrypted</span>
+<span>Sovereign Protocol • Allocation Escrow Registry</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">
+          Institutional Enquiry Timeline &amp; Allocation Tracking
+        </h1>
+<p class="font-headline-md text-headline-md text-primary/90 font-light" dir="rtl">
+          مسار وتتبع طلبات الشراء والضمان البنكي المعتمد
+        </p>
+<p class="font-body-md text-body-md text-on-surface-variant pt-space-xs leading-relaxed">
+          Monitor live dealership responses, Tasjeel inspection booking milestones, escrow deposits, and immutable RTA title release records with shielded buyer privacy.
+        </p>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="px-space-md py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-all flex items-center gap-space-xs font-body-sm text-body-sm font-medium shadow-sm" onclick="window.print()">
+<span class="material-symbols-outlined text-[18px]">print</span>
+<span>Export Legal Dossier</span>
+</button>
+<a class="px-space-md py-2.5 rounded-lg bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-all flex items-center gap-space-xs shadow-md" href="#communications-channel">
+<span class="material-symbols-outlined text-[18px]">forum</span>
+<span>VIP Concierge Chat</span>
+</a>
+</div>
+</div>
+<!-- STATE WRAPPER: ACTIVE STATE (DEFAULT) -->
+<div class="flex flex-col gap-space-xl" id="view-active-state">
+<!-- Active Allocation Card (Hero) -->
+<div class="relative w-full rounded-xl bg-surface-container p-space-md lg:p-space-xl shadow-xl overflow-hidden">
+<!-- Background Ambient Accent Glow -->
+<div class="absolute -right-24 -top-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+<div class="absolute -left-24 -bottom-24 w-96 h-96 rounded-full bg-tertiary/10 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row gap-space-xl items-start justify-between">
+<!-- Vehicle Visual & Telemetry Snapshot -->
+<div class="w-full lg:w-5/12 flex flex-col gap-space-md">
+<div class="relative rounded-lg overflow-hidden bg-surface-container-low aspect-[16/10] shadow-md group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Obsidian metallic 2024 Porsche 911 GT3 RS with carbon aero elements parked inside a sterile ultra-luxury Dubai private architectural hangar with ambient gold and moody cool spotlights, cinematic 8k collector photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU8hULJzJeVd2NCmr_A5lVWV0uXClXqc2Aj4wMwPYIqO-tAP7F0rmANYUb0E4HfliluXiWBc9blbdM73MVbSrNbdrymjgBuxH_pqi1fchwIYOed26EfFRRWZ1MhPiVV8h75jTgYrv-7_H8JNV2CFK8lDbYdXpYS_q81i8BGbHTb-ZOeH5PsXm_InIT9EDa7NEEHd2xUF1vshFaJNk07p9tivMvAwGlVwlL5jVtPiAXW7H26Jge-PK2"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-black/30"></div>
+<div class="absolute top-space-md left-space-md flex items-center gap-space-xs">
+<span class="px-space-sm py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-tertiary font-body-sm text-body-sm font-semibold flex items-center gap-1 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                  ALLOCATED CUSTODY
+                </span>
+<span class="px-space-sm py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface font-data-mono-num text-data-mono-num shadow-sm">
+                  DXB-911-RS
+                </span>
+</div>
+<div class="absolute bottom-space-md left-space-md right-space-md flex items-end justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider block">Agreed Transaction Price</span>
+<div class="flex items-baseline gap-space-xs text-primary font-data-currency-lg text-data-currency-lg">
+<span class="text-headline-sm">AED</span>
+<span>1,420,000</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-tertiary uppercase tracking-wider block">Down Payment Locked</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface font-semibold">20% (AED 284,000)</span>
+</div>
+</div>
+</div>
+<!-- Vehicle Micro-Specs Strip -->
+<div class="grid grid-cols-3 gap-space-xs p-space-sm rounded-lg bg-surface-container-low text-center shadow-inner">
+<div class="flex flex-col py-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Powerhouse</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">518 HP • 4.0L</span>
+</div>
+<div class="flex flex-col py-1 bg-surface-container-high/40 rounded">
+<span class="font-label-caps text-label-caps text-on-surface-variant">0-100 km/h</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">3.2 Seconds</span>
+</div>
+<div class="flex flex-col py-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Origin / Spec</span>
+<span class="font-body-md text-body-md font-semibold text-primary">GCC Al Nabooda</span>
+</div>
+</div>
+</div>
+<!-- Allocation Details & Escrow Dossier -->
+<div class="w-full lg:w-7/12 flex flex-col justify-between gap-space-lg">
+<div class="flex flex-col gap-space-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Active Verified Allocation</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">
+                    2024 Porsche 911 GT3 RS Clubsport
+                  </h2>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-highest shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Stage 3 of 6 In Progress</span>
+</div>
+</div>
+<!-- Dealership & Custodian Bar -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm mt-space-xs">
+<div class="flex items-start gap-space-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-primary text-[28px]">storefront</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Apex GT Motors</span>
+<span class="material-symbols-outlined text-tertiary text-[18px]" title="RTA &amp; DED Verified Dealer">verified</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">DED License #984210 • Dubai Autodrome Paddock 3</span>
+<span class="font-body-sm text-body-sm text-primary font-medium mt-1">Rep: Tariq Mansoor (VIP Client Executive)</span>
+</div>
+</div>
+<div class="flex items-start gap-space-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-secondary text-[28px]">account_balance</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">FAB Sovereign Vault</span>
+<span class="material-symbols-outlined text-primary text-[18px]">lock</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Central Bank of UAE Regulated Escrow</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface font-medium mt-1">IBAN: AE94 0300 0000 8921 4010 9</span>
+</div>
+</div>
+</div>
+<!-- Shielded Buyer Privacy Card (Strict Protocol) -->
+<div class="p-space-md rounded-xl bg-surface-container-lowest/90 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[22px]">security</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Data Shielding Protocol Active (UAE PDPL Compliant)</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">
+                      Apex GT Motors received <strong class="text-on-surface">ONLY</strong>: Full Legal Name &amp; Verified UAE Mobile (+971 50 ••••). Emirates ID, financial telemetry, and home address remain shielded under Sovereign Escrow.
+                    </p>
+</div>
+</div>
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-caps text-label-caps uppercase transition-colors shrink-0" onclick="toggleDataShieldAudit()">
+                  Inspect Access Token
+                </button>
+</div>
+</div>
+<!-- Action Quick Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-md pt-space-xs">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-tertiary text-[18px]">schedule</span>
+<span>Active Status SLA: Dealership bound to respond within 45 mins</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="px-space-md py-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-body-sm text-body-sm font-medium transition-colors" onclick="openInspectMilestone()">
+                  Telemetry Checklist
+                </button>
+<button class="px-space-md py-2 rounded-lg bg-error-container/40 hover:bg-error-container text-error font-body-sm text-body-sm font-medium transition-colors flex items-center gap-1.5" onclick="confirmWithdrawModal()">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+<span>Withdraw Allocation</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 1: DETAILED INTERACTIVE MULTI-STEP TIMELINE -->
+<div class="flex flex-col gap-space-md bg-surface-container p-space-md lg:p-space-xl rounded-xl shadow-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Sovereign Milestones</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Allocation Progression &amp; Audit Log</h3>
+</div>
+<div class="flex items-center gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span> Completed</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span> Active Stage</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest"></span> Upcoming</span>
+</div>
+</div>
+<!-- Horizontal Stepper Bar (Visual Progress for Desktop) -->
+<div class="hidden lg:grid grid-cols-6 gap-space-sm py-space-md">
+<!-- Step 1 Indicator -->
+<div class="flex flex-col gap-space-xs">
+<div class="h-2 w-full rounded-full bg-tertiary shadow-sm"></div>
+<span class="font-label-caps text-label-caps text-tertiary uppercase">01. Pass Validation</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">UAE PASS Verified</span>
+</div>
+<!-- Step 2 Indicator -->
+<div class="flex flex-col gap-space-xs">
+<div class="h-2 w-full rounded-full bg-tertiary shadow-sm"></div>
+<span class="font-label-caps text-label-caps text-tertiary uppercase">02. Dealer Ack</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Slot Reserved</span>
+</div>
+<!-- Step 3 Indicator -->
+<div class="flex flex-col gap-space-xs">
+<div class="h-2 w-full rounded-full bg-primary shadow-[0_0_12px_rgba(242,202,80,0.5)]"></div>
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold">03. Tasjeel Shamil</span>
+<span class="font-body-sm text-body-sm text-primary font-semibold truncate">Vault Inspection</span>
+</div>
+<!-- Step 4 Indicator -->
+<div class="flex flex-col gap-space-xs">
+<div class="h-2 w-full rounded-full bg-surface-container-highest"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">04. Viewing</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Autodrome Track Test</span>
+</div>
+<!-- Step 5 Indicator -->
+<div class="flex flex-col gap-space-xs">
+<div class="h-2 w-full rounded-full bg-surface-container-highest"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">05. Escrow</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">FAB Deposit Release</span>
+</div>
+<!-- Step 6 Indicator -->
+<div class="flex flex-col gap-space-xs">
+<div class="h-2 w-full rounded-full bg-surface-container-highest"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">06. RTA Title</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Digital Ownership Handover</span>
+</div>
+</div>
+<!-- Vertical Detailed Timeline Node Sequence -->
+<div class="flex flex-col gap-space-md pt-space-xs">
+<!-- STEP 1: COMPLETED -->
+<div class="flex flex-col md:flex-row items-start gap-space-md p-space-md rounded-xl bg-surface-container-low transition-all">
+<div class="flex items-center gap-space-md md:w-64 shrink-0">
+<div class="w-10 h-10 rounded-full bg-tertiary/20 text-tertiary flex items-center justify-center font-bold shadow-sm">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Stage 01 • Passed</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">VIP Transmitted</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface">
+                Encrypted purchase interest dispatched through UAE PASS cryptographic auth key <code class="font-data-mono-num text-primary">#KEY-99420-UAEP</code>. Dealership accepted escrow terms under DIFC standard conditions.
+              </p>
+<div class="flex flex-wrap items-center gap-space-sm text-on-surface-variant font-data-mono-num text-body-sm">
+<span>Timestamp: May 18, 2024 - 10:14:22 GST</span>
+<span>•</span>
+<span class="text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">verified_user</span> RTA Verified Buyer ID
+                </span>
+</div>
+</div>
+<div class="shrink-0 self-end md:self-center">
+<span class="px-space-sm py-1 rounded bg-surface-container-high text-tertiary font-label-caps text-label-caps uppercase">100% Immutable</span>
+</div>
+</div>
+<!-- STEP 2: COMPLETED -->
+<div class="flex flex-col md:flex-row items-start gap-space-md p-space-md rounded-xl bg-surface-container-low transition-all">
+<div class="flex items-center gap-space-md md:w-64 shrink-0">
+<div class="w-10 h-10 rounded-full bg-tertiary/20 text-tertiary flex items-center justify-center font-bold shadow-sm">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Stage 02 • Passed</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Slot Confirmed</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface">
+                Apex GT Motors VIP desk locked vehicle DXB-911-RS exclusively to Buyer Rashid Al Nuaimi for 48 hours. Showroom general manager counter-signed the pre-sale freeze guarantee.
+              </p>
+<div class="flex flex-wrap items-center gap-space-sm text-on-surface-variant font-data-mono-num text-body-sm">
+<span>Timestamp: May 18, 2024 - 11:30:05 GST</span>
+<span>•</span>
+<span>Counter-signed: Tariq Mansoor (Apex GT)</span>
+</div>
+</div>
+<div class="shrink-0 self-end md:self-center">
+<span class="px-space-sm py-1 rounded bg-surface-container-high text-tertiary font-label-caps text-label-caps uppercase">Slot Secured</span>
+</div>
+</div>
+<!-- STEP 3: ACTIVE / IN PROGRESS -->
+<div class="flex flex-col md:flex-row items-start gap-space-md p-space-lg rounded-xl bg-surface-container-high shadow-md relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="flex items-center gap-space-md md:w-64 shrink-0">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-md animate-pulse">
+<span class="material-symbols-outlined text-[22px]">car_repair</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold tracking-wider">Stage 03 • Current</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Tasjeel Shamil Audit</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-space-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<span class="font-body-md text-body-md text-on-surface font-semibold">
+                  Al Quoz 4 Precision Vault • 150-Point Structural &amp; Telemetry Inspection
+                </span>
+<span class="px-space-sm py-0.5 rounded-full bg-primary/20 text-primary font-data-mono-num text-body-sm">
+                  Est. Completion: Today 03:00 PM GST (~2h remaining)
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Master technicians are conducting microscopic paint gauge mapping, engine ECU over-rev stage logging (Range 1-6 analysis), and Dubai Police chassis VIN laser matching.
+              </p>
+<!-- Live Inspection Progress Bar -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex items-center justify-between text-body-sm font-data-mono-num">
+<span class="text-on-surface">Audit Checklist Complete</span>
+<span class="text-primary font-bold">114 / 150 Checks (76%)</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-lowest overflow-hidden">
+<div class="h-full bg-primary transition-all duration-1000" style="width: 76%;"></div>
+</div>
+</div>
+<!-- Quick Action Inside Active Stage -->
+<div class="flex flex-wrap items-center gap-space-sm pt-space-xs">
+<button class="px-space-md py-1.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-body-sm text-body-sm font-semibold transition-colors flex items-center gap-1 shadow-sm" onclick="toggleInspectionDetails()">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>View Live Diagnostic Stream</span>
+</button>
+<a class="text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm underline transition-colors" href="#booking-support">
+                  Contact Tasjeel Lead Inspector (Ahmed Al Blooshi)
+                </a>
+</div>
+</div>
+<div class="shrink-0 self-end md:self-center">
+<span class="px-space-sm py-1 rounded bg-primary text-on-primary font-label-caps text-label-caps uppercase font-bold">In Inspection</span>
+</div>
+</div>
+<!-- STEP 4: UPCOMING -->
+<div class="flex flex-col md:flex-row items-start gap-space-md p-space-md rounded-xl bg-surface-container-low/70 opacity-90 transition-all">
+<div class="flex items-center gap-space-md md:w-64 shrink-0">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[20px]">sports_score</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Stage 04 • Scheduled</span>
+<span class="font-headline-sm text-headline-sm text-on-surface-variant">Private Track Viewing</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Scheduled for <strong class="text-on-surface">May 19, 2024 at 06:00 PM GST</strong> at Dubai Autodrome Club Circuit. Chaperoned by factory-certified Porsche instructor with dynamic track warm-up.
+              </p>
+<div class="flex items-center gap-space-sm text-on-surface-variant font-data-mono-num text-body-sm">
+<span>Access Pass: Autodrome VIP Paddock Suite #14</span>
+<span>•</span>
+<span>Private Chauffeur Transfer Reserved</span>
+</div>
+</div>
+<div class="shrink-0 self-end md:self-center">
+<span class="px-space-sm py-1 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps uppercase">Queued</span>
+</div>
+</div>
+<!-- STEP 5: UPCOMING -->
+<div class="flex flex-col md:flex-row items-start gap-space-md p-space-md rounded-xl bg-surface-container-low/60 opacity-80 transition-all">
+<div class="flex items-center gap-space-md md:w-64 shrink-0">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Stage 05 • Escrow</span>
+<span class="font-headline-sm text-headline-sm text-on-surface-variant">Mutual Settlement</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Final down payment authorization (AED 284,000 / 20%) via FAB Escrow Vault. Funds remain locked until RTA title transfer token is digitally validated by the buyer.
+              </p>
+<span class="text-on-surface-variant font-data-mono-num text-body-sm">Settlement protocol: Smart Escrow Contract v3.2</span>
+</div>
+<div class="shrink-0 self-end md:self-center">
+<span class="px-space-sm py-1 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps uppercase">Pending Viewing</span>
+</div>
+</div>
+<!-- STEP 6: UPCOMING -->
+<div class="flex flex-col md:flex-row items-start gap-space-md p-space-md rounded-xl bg-surface-container-low/50 opacity-70 transition-all">
+<div class="flex items-center gap-space-md md:w-64 shrink-0">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[20px]">local_shipping</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Stage 06 • Final Handover</span>
+<span class="font-headline-sm text-headline-sm text-on-surface-variant">RTA Title Transfer</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Instant electronic ownership certificate issuance via Dubai Drive / RTA API followed by enclosed hydraulic flatbed transport directly to your private estate residence.
+              </p>
+<span class="text-on-surface-variant font-data-mono-num text-body-sm">Destination: Emirates Hills, Villa Sector E</span>
+</div>
+<div class="shrink-0 self-end md:self-center">
+<span class="px-space-sm py-1 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps uppercase">Locked</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Live Inspection Checklist Expandable Drawer (Modal/Drawer) -->
+<div class="hidden flex-col gap-space-md p-space-md lg:p-space-xl rounded-xl bg-surface-container-high shadow-2xl transition-all" id="inspection-drawer">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">fact_check</span>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Live Tasjeel Shamil Telemetry Stream</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Chassis VIN: DXB-911-RS • Station: Al Quoz 4 Vault Bay #02</p>
+</div>
+</div>
+<button class="p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-highest text-on-surface transition-colors" onclick="toggleInspectionDetails()">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-tertiary">Chassis &amp; Frame</span>
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">0.00mm Distortion</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Factory laser tolerance: 100% compliant</span>
+</div>
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-tertiary">ECU Over-Rev Log</span>
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Zero Range 4-6</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Engine operating strictly within track spec</span>
+</div>
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-primary">Paint Film Gauge</span>
+<span class="material-symbols-outlined text-primary text-[18px] animate-spin">sync</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Scanning Front Lip...</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">OEM Weissach Carbon package verification</span>
+</div>
+</div>
+</div>
+<!-- LOWER SPLIT GRID: SECONDARY ENQUIRIES & COMMUNICATIONS DOSSIER -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- Left: Secondary Enquiries Queue (5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Secondary Pipeline</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Concurrent Vehicle Requests</h3>
+</div>
+<span class="px-space-xs py-1 rounded-full bg-surface-container-high text-on-surface-variant font-data-mono-num text-body-sm font-semibold">2 Enquiries</span>
+</div>
+<!-- Secondary Card 1 -->
+<div class="p-space-md rounded-xl bg-surface-container flex flex-col gap-space-sm shadow-md transition-all" id="secondary-enquiry-card-2">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex gap-space-sm">
+<div class="w-16 h-16 rounded-lg bg-surface-container-low overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Matte emerald green 2023 Mercedes AMG G 63 parked in front of futuristic glass skyscraper in DIFC Dubai, moody luxury automotive photography with gold reflective light accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbRRTsTjxNk_dkHkImw-GPgz0jivHJoyne9jxCD_Jmad2hzWR9Av7YjuC-Pc7KtZHkdsuqJTxtN4FNFCSB6dTVEItfTF1CT8SwMfBq3d--oowYgL0dM83MWe5t2lc15MRCgAHUW6Aig_Tq7OZHkKSIwrpfQxx7pfDiBqAYSrEPdOY24XyBsufyy8tkuM1KQhk_Vyj-j0oCO4Fb1rtcuo138ozNd-tUHSw1wZy3FgUyzJwLPQcIyutY"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">2023 Mercedes-AMG G 63</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">SilberArrows Motors • Dubai</span>
+<span class="font-data-mono-num text-data-mono-num text-primary font-bold mt-1">AED 890,000</span>
+</div>
+</div>
+<span class="px-space-xs py-1 rounded-full bg-secondary/15 text-secondary font-label-caps text-label-caps uppercase shrink-0">
+                Awaiting Dealer SLA
+              </span>
+</div>
+<div class="flex items-center justify-between pt-space-xs text-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1 font-data-mono-num">
+<span class="material-symbols-outlined text-secondary text-[16px]">timer</span> SLA response &lt; 2 hrs
+              </span>
+<button class="text-error hover:text-on-error-container font-body-sm text-body-sm font-medium transition-colors" onclick="cancelSecondaryEnquiry('secondary-enquiry-card-2', 'Mercedes-AMG G 63')">
+                Cancel Enquiry
+              </button>
+</div>
+</div>
+<!-- Secondary Card 2: Cancelled & Data Wiped -->
+<div class="p-space-md rounded-xl bg-surface-container/60 flex flex-col gap-space-sm shadow-sm opacity-80">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex gap-space-sm">
+<div class="w-16 h-16 rounded-lg bg-surface-container-low overflow-hidden shrink-0 grayscale">
+<img class="w-full h-full object-cover" data-alt="Gloss black 2024 Land Rover Defender 110 V8 in desert dune setting near Abu Dhabi with dramatic golden hour twilight sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5UBor0cvIiy0BDsAjwY2LY6WQUpT-m8hmy4uzkjD5IJzFmbKLhSmjnZvENpPyESvWi156oOZAdofz7mM0NH9mLbaGcKoWE_Hs36Zq8SFFruxtulxBuMpM6Qnv0mpEYVZ4_3Ha8I_nCK1pfZUUrXLDT1y3Mzqfr6igdRT9tMrOmsIKSBhXfc6_h_b5wvbgyYHL5Ax2CwrB4ytESoyyBXBdCzP4czK_OGOyJWHyNe8Cojx34K1ZDTdh"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface-variant line-through font-medium">2024 Defender 110 V8</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Premier Motors Abu Dhabi</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface-variant mt-1">AED 620,000</span>
+</div>
+</div>
+<span class="px-space-xs py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps uppercase shrink-0">
+                Data Wiped
+              </span>
+</div>
+<div class="p-space-xs rounded bg-surface-container-low text-body-sm text-on-surface-variant flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-[16px]">verified</span>
+<span>Cancelled by Buyer • Identity Purged from Premier Motors CRM</span>
+</div>
+</div>
+<!-- Escrow Guarantee Notice Box -->
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs shadow-sm">
+<div class="flex items-center gap-space-xs text-primary font-label-caps text-label-caps uppercase font-bold">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span>Zero-Obligation Escrow Guarantee</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Every prospective vehicle allocation is backed by sovereign non-custodial protection. In the event of vehicle failure at Tasjeel or buyer withdrawal before final escrow agreement, your deposit is released within 60 seconds with zero dealer retention fees.
+            </p>
+</div>
+</div>
+<!-- Right: Official Dealer Communication Dossier & Chat Log (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md bg-surface-container p-space-md lg:p-space-xl rounded-xl shadow-lg" id="communications-channel">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-headline-sm">
+                TM
+              </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Tariq Mansoor</span>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Online</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Apex GT Motors VIP Allocation Desk • Dubai</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors" onclick="triggerCallRequest()" title="Encrypted Voice Call">
+<span class="material-symbols-outlined text-[20px]">call</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors" onclick="triggerDocUpload()" title="Attach Bank / Inspection Document">
+<span class="material-symbols-outlined text-[20px]">attach_file</span>
+</button>
+</div>
+</div>
+<!-- Chat Conversation Log -->
+<div class="flex flex-col gap-space-md p-space-md rounded-xl bg-surface-container-low max-h-[360px] overflow-y-auto">
+<!-- System Milestone Notice -->
+<div class="self-center px-space-md py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-data-mono-num text-body-sm text-center">
+              May 18, 10:14 AM — Smart Contract Allocation Initialized under DIFC Rules
+            </div>
+<!-- Dealer Message 1 -->
+<div class="flex items-start gap-space-sm max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-on-surface font-data-mono-num text-[11px] shrink-0">
+                TM
+              </div>
+<div class="flex flex-col gap-1">
+<div class="p-space-sm rounded-xl rounded-tl-none bg-surface-container-high text-on-surface font-body-md text-body-md shadow-sm">
+                  Salam Rashid. It is an honor. The GT3 RS (Chassis #DXB-911-RS) is officially earmarked for you. We just delivered the vehicle to Tasjeel Shamil Al Quoz for your scheduled 150-point technical audit.
+                </div>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">10:28 AM GST • Tariq Mansoor</span>
+</div>
+</div>
+<!-- Buyer Response -->
+<div class="flex items-start gap-space-sm max-w-[85%] self-end flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-data-mono-num text-[11px] font-bold shrink-0">
+                RN
+              </div>
+<div class="flex flex-col gap-1 items-end">
+<div class="p-space-sm rounded-xl rounded-tr-none bg-primary text-on-primary font-body-md text-body-md shadow-sm font-medium">
+                  Thank you Tariq. Please ensure the paint thickness measurement log is uploaded directly to my portal before our Autodrome session tomorrow.
+                </div>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">10:45 AM GST • Delivered (Encrypted)</span>
+</div>
+</div>
+<!-- Dealer Message 2 (with Attached Card) -->
+<div class="flex items-start gap-space-sm max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-on-surface font-data-mono-num text-[11px] shrink-0">
+                TM
+              </div>
+<div class="flex flex-col gap-1">
+<div class="p-space-sm rounded-xl rounded-tl-none bg-surface-container-high text-on-surface font-body-md text-body-md shadow-sm flex flex-col gap-space-xs">
+<span>Understood completely. Ahmed at Tasjeel has already verified zero structural alerts. Here is the preliminary pass seal:</span>
+<div class="p-space-xs rounded bg-surface-container-lowest flex items-center gap-space-sm shadow-inner">
+<span class="material-symbols-outlined text-tertiary text-[24px]">verified</span>
+<div class="flex flex-col">
+<span class="font-data-mono-num text-body-sm font-semibold text-on-surface">TASJEEL-DXB-PREPASS-911.PDF</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Signed by Eng. Ahmed Al Blooshi (Lead Auditor)</span>
+</div>
+</div>
+</div>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">11:12 AM GST • Tariq Mansoor</span>
+</div>
+</div>
+</div>
+<!-- Message Input Bar -->
+<form class="flex items-center gap-space-xs p-1 bg-surface-container-low rounded-xl" onsubmit="handleSendMessage(event)">
+<input class="flex-1 bg-transparent px-space-md py-2 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none" id="chat-input-field" placeholder="Type a message to Tariq Mansoor (Apex GT Motors)..." type="text"/>
+<button class="px-space-md py-2 rounded-lg bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-colors flex items-center gap-1 shadow-sm" type="submit">
+<span>Send</span>
+<span class="material-symbols-outlined text-[16px]">send</span>
+</button>
+</form>
+</div>
+</div>
+<!-- SECTION 2: CANCELLATION & WITHDRAWAL CONTROLS -->
+<div class="p-space-md lg:p-space-xl rounded-xl bg-surface-container-low flex flex-col md:flex-row items-center justify-between gap-space-lg shadow-md">
+<div class="flex items-start gap-space-md max-w-3xl">
+<div class="w-12 h-12 rounded-lg bg-error-container/30 text-error flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[26px]">lock_reset</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">
+              Withdraw Allocation &amp; Revoke Contact Authorization
+            </h4>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              Zero Obligation Sovereign Guarantee: Withdrawing immediately wipes your shared phone number and profile record from the Apex GT Motors dealership terminal, revokes API data access, and instantly returns any pending reserve balance to your FAB vault.
+            </p>
+</div>
+</div>
+<button class="px-space-lg py-3 rounded-lg bg-error text-on-error hover:bg-error/90 font-body-md text-body-md font-semibold transition-all shadow-md shrink-0 flex items-center gap-2" onclick="confirmWithdrawModal()">
+<span class="material-symbols-outlined text-[20px]">person_remove</span>
+<span>Revoke &amp; Erase Dossier</span>
+</button>
+</div>
+</div>
+<!-- END: VIEW-ACTIVE-STATE -->
+<!-- STATE 2: ONBOARDING / EMPTY STATE (HIDDEN BY DEFAULT) -->
+<div class="hidden flex-col items-center justify-center text-center py-space-3xl px-space-md bg-surface-container rounded-xl shadow-lg" id="view-empty-state">
+<div class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center text-primary mb-space-md shadow-inner">
+<span class="material-symbols-outlined text-[40px]">garage</span>
+</div>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest mb-1">Dossier Clean • No Active Reserves</span>
+<h2 class="font-headline-xl text-headline-xl text-on-surface max-w-lg mb-space-xs">
+        No Active Vehicle Allocations Under Escrow
+      </h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mb-space-xl">
+        Explore the verified UAE Collector Exchange to place high-touch allocations with RTA telemetry guarantees and FAB custodial escrow.
+      </p>
+<div class="flex flex-wrap items-center justify-center gap-space-md">
+<button class="px-space-xl py-3 rounded-lg bg-primary text-on-primary font-body-md text-body-md font-semibold hover:bg-primary/90 transition-all shadow-md" onclick="setDossierState('active')">
+          Browse Collector Showroom
+        </button>
+<button class="px-space-xl py-3 rounded-lg bg-surface-container-high text-on-surface font-body-md text-body-md font-medium hover:bg-surface-container-highest transition-all" onclick="setDossierState('active')">
+          Restore Active Simulation
+        </button>
+</div>
+</div>
+<!-- STATE 3: CANCELLED & DATA WIPED STATE (HIDDEN BY DEFAULT) -->
+<div class="hidden flex-col gap-space-lg p-space-xl bg-surface-container rounded-xl shadow-xl" id="view-cancelled-state">
+<div class="flex items-center gap-space-md p-space-md rounded-xl bg-error-container/20 text-on-surface">
+<span class="material-symbols-outlined text-error text-[36px]">shield_person</span>
+<div class="flex flex-col">
+<h3 class="font-headline-md text-headline-md text-on-surface font-semibold">Contact Record Successfully Wiped from Dealership CRM</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Transaction #ESC-89214 terminated. Mutual escrow held by First Abu Dhabi Bank was liquidated with zero penalty fees.</p>
+</div>
+</div>
+<div class="p-space-lg rounded-xl bg-surface-container-low flex flex-col gap-space-md">
+<span class="font-label-caps text-label-caps text-primary uppercase">Cryptographic Audit Certificate</span>
+<div class="font-data-mono-num text-body-sm text-on-surface-variant bg-surface-container-lowest p-space-md rounded-lg flex flex-col gap-1">
+<div>[INFO] 12:44:02 GST: Buyer revocations issued via UAE PASS private signature.</div>
+<div>[INFO] 12:44:03 GST: Apex GT Motors token #TK-984210 invalidated across all terminals.</div>
+<div>[INFO] 12:44:04 GST: Buyer mobile and email strings shredded with SHA-256 confirmation.</div>
+<div class="text-tertiary">[SUCCESS] 12:44:05 GST: Zero dealer record persistence verified under UAE Federal Decree Law No. 45.</div>
+</div>
+</div>
+<div class="flex justify-end gap-space-sm">
+<button class="px-space-md py-2.5 rounded-lg bg-primary-container text-on-primary font-body-sm text-body-sm font-semibold hover:bg-primary transition-all" onclick="setDossierState('active')">
+          Return to Active Pipeline
+        </button>
+</div>
+</div>
+<!-- STATE 4: RTA TITLE COMPLETED STATE (HIDDEN BY DEFAULT) -->
+<div class="hidden flex-col gap-space-lg p-space-xl bg-surface-container rounded-xl shadow-xl" id="view-complete-state">
+<div class="flex items-center gap-space-md p-space-md rounded-xl bg-tertiary-container/30 text-on-surface">
+<span class="material-symbols-outlined text-tertiary text-[42px]">verified</span>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h3 class="font-headline-lg text-headline-lg text-on-surface font-semibold">RTA Electronic Title Transferred</h3>
+<span class="px-space-xs py-0.5 rounded bg-tertiary text-on-tertiary font-label-caps text-label-caps font-bold uppercase">Official Owner</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Congratulations Rashid Al Nuaimi. You are the registered custodian of 2024 Porsche 911 GT3 RS (Chassis #DXB-911-RS).</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<span class="font-label-caps text-label-caps text-primary uppercase">Digital Possession Deed</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Dubai Drive Certificate #RTA-2024-9981</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Plate Allocation: Dubai Code R - 911 (Pre-cleared)</span>
+</div>
+<div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<span class="font-label-caps text-label-caps text-tertiary uppercase">White-Glove Flatbed Tracking</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">En route to Emirates Hills, Sector E</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Diplomatic covered carrier arriving at 07:15 PM GST</span>
+</div>
+</div>
+<div class="flex justify-end gap-space-sm">
+<button class="px-space-md py-2.5 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm font-semibold hover:bg-surface-container-highest transition-all" onclick="setDossierState('active')">
+          Review Previous Stages
+        </button>
+</div>
+</div>
+</div>
+<!-- INTERACTIVE MODAL: WITHDRAWAL CONFIRMATION -->
+<div class="fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-md hidden items-center justify-center p-space-md" id="withdraw-modal">
+<div class="w-full max-w-md rounded-xl bg-surface-container p-space-xl shadow-2xl flex flex-col gap-space-md relative">
+<div class="w-12 h-12 rounded-full bg-error/20 text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">warning</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-md text-headline-md text-on-surface font-semibold">Confirm Allocation Revocation</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Are you certain you wish to withdraw your enquiry for the <strong class="text-on-surface">2024 Porsche 911 GT3 RS</strong>?
+        </p>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-1 text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-1.5 text-on-surface font-medium">
+<span class="material-symbols-outlined text-primary text-[16px]">check_circle</span>
+<span>Zero Escrow Penalty</span>
+</div>
+<div>Your FAB escrow hold of AED 284,000 will be instantly unreserved. Contact telemetry will be completely expunged from Apex GT Motors.</div>
+</div>
+<div class="flex items-center justify-end gap-space-sm pt-space-xs">
+<button class="px-space-md py-2 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest font-body-sm text-body-sm font-medium transition-colors" onclick="closeWithdrawModal()">
+          Dismiss
+        </button>
+<button class="px-space-md py-2 rounded-lg bg-error text-on-error hover:bg-error/90 font-body-sm text-body-sm font-semibold transition-colors" onclick="executeWithdrawal()">
+          Confirm Revocation
+        </button>
+</div>
+</div>
+</div>
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div class="fixed bottom-6 right-6 z-50 hidden p-space-md rounded-xl bg-surface-container-high text-on-surface shadow-2xl items-center gap-space-sm max-w-sm transition-all" id="toast-notification">
+<span class="material-symbols-outlined text-primary text-[24px]" id="toast-icon">info</span>
+<span class="font-body-sm text-body-sm" id="toast-msg">Operation completed.</span>
+</div>
+</div>
+<script>
+  function setDossierState(state) {
+    const states = ['active', 'empty', 'cancelled', 'complete'];
+    states.forEach(s => {
+      const el = document.getElementById('view-' + s + '-state');
+      const tab = document.getElementById('tab-' + s);
+      if (el) el.classList.add('hidden');
+      if (tab) {
+        tab.classList.remove('bg-primary-container', 'text-on-primary');
+        tab.classList.add('text-on-surface-variant');
+      }
+    });
+
+    const activeEl = document.getElementById('view-' + state + '-state');
+    const activeTab = document.getElementById('tab-' + state);
+    if (activeEl) activeEl.classList.remove('hidden');
+    if (activeTab) {
+      activeTab.classList.add('bg-primary-container', 'text-on-primary');
+      activeTab.classList.remove('text-on-surface-variant');
+    }
+  }
+
+  function toggleInspectionDetails() {
+    const drawer = document.getElementById('inspection-drawer');
+    if (drawer) {
+      drawer.classList.toggle('hidden');
+      if (!drawer.classList.contains('hidden')) {
+        drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }
+
+  function openInspectMilestone() {
+    const drawer = document.getElementById('inspection-drawer');
+    if (drawer && drawer.classList.contains('hidden')) {
+      drawer.classList.remove('hidden');
+      drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function toggleDataShieldAudit() {
+    showToast('Privacy Token #AUD-912: All identity fields except Legal Name & Contact are masked with SHA-256 hash.', 'security');
+  }
+
+  function confirmWithdrawModal() {
+    const modal = document.getElementById('withdraw-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeWithdrawModal() {
+    const modal = document.getElementById('withdraw-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function executeWithdrawal() {
+    closeWithdrawModal();
+    setDossierState('cancelled');
+    showToast('Allocation withdrawn and contact data wiped successfully.', 'verified');
+  }
+
+  function cancelSecondaryEnquiry(cardId, carTitle) {
+    const card = document.getElementById(cardId);
+    if (card) {
+      card.classList.add('opacity-40');
+      setTimeout(() => {
+        card.innerHTML = `
+          <div class="p-space-sm rounded bg-surface-container-low text-body-sm text-on-surface-variant flex items-center justify-between">
+            <span class="text-error font-medium">Enquiry for ` + carTitle + ` Cancelled</span>
+            <span class="text-tertiary font-data-mono-num text-[11px]">CRM Record Purged</span>
+          </div>
+        `;
+        showToast('Enquiry for ' + carTitle + ' cancelled. Contact info shredded from CRM.', 'delete');
+      }, 300);
+    }
+  }
+
+  function handleSendMessage(e) {
+    e.preventDefault();
+    const input = document.getElementById('chat-input-field');
+    if (!input || !input.value.trim()) return;
+    const msg = input.value.trim();
+    input.value = '';
+    showToast('Message encrypted and dispatched to Tariq Mansoor.', 'send');
+  }
+
+  function triggerCallRequest() {
+    showToast('Initiating encrypted VIP VoIP bridge to Apex GT Motors Desk...', 'phone_in_talk');
+  }
+
+  function triggerDocUpload() {
+    showToast('Opening secure document custody upload bridge...', 'upload_file');
+  }
+
+  function showToast(message, iconName) {
+    const toast = document.getElementById('toast-notification');
+    const msg = document.getElementById('toast-msg');
+    const icon = document.getElementById('toast-icon');
+    if (toast && msg && icon) {
+      msg.textContent = message;
+      icon.textContent = iconName || 'info';
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 4000);
+    }
+  }
+</script></main><footer class="w-full bg-surface-container-lowest mt-space-3xl"><div class="max-w-[1440px] mx-auto px-space-md lg:px-space-xl py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl mb-space-2xl"><div class="lg:col-span-2 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[20px]">token</span></div><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface uppercase">Automotive<span class="text-primary font-bold">OS</span></span></div><p class="font-body-md text-body-md text-on-surface-variant max-w-md">The ultra-luxury automotive transactional standard for the GCC. Direct custody, verified RTA telemetry, escrow settlement, and diplomatic transport across the Emirates.</p><div class="flex flex-wrap items-center gap-space-sm pt-space-xs"><div class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-low"><span class="material-symbols-outlined text-tertiary text-[18px]">verified</span><span class="font-body-sm text-body-sm text-on-surface font-medium">RTA Certified Dealer Portal</span></div><div class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-low"><span class="material-symbols-outlined text-primary text-[18px]">policy</span><span class="font-body-sm text-body-sm text-on-surface font-medium">DED License #984210</span></div></div></div><div class="flex flex-col gap-space-sm"><span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Collector Inventory</span><nav class="flex flex-col gap-space-xs"><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="browse-stock" href="#">Hypercars &amp; Exotics</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="browse-stock" href="#">Pristine Heritage &amp; Classic</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="browse-stock" href="#">Armored Presidential Fleet</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="compare-vehicles" href="#">Telemetry Comparator</a></nav></div><div class="flex flex-col gap-space-sm"><span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Emirates Hubs</span><nav class="flex flex-col gap-space-xs"><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="verified-dealers" href="#">Dubai International Financial Centre</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="verified-dealers" href="#">Abu Dhabi Yas Marina Terminal</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="verified-dealers" href="#">Sharjah Classic Auto Zone</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="verified-dealers" href="#">Ras Al Khaimah Concours Logistics</a></nav></div><div class="flex flex-col gap-space-sm"><span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Compliance &amp; Advisory</span><nav class="flex flex-col gap-space-xs"><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="vip-services" href="#">GCC Customs Clearance</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="vip-services" href="#">Escrow Vault Settlement</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="vip-services" href="#">TASJEEL Pre-Purchase Audit</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="vip-services" href="#">Concierge Air Freight (DXB/AUH)</a></nav></div></div><div class="pt-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md text-on-surface-variant"><div class="flex items-center gap-space-md font-body-sm text-body-sm"><span>© 2025 Automotive OS FZ-LLC. All rights reserved.</span><span>UAE Federal Law No. 15 Compliant</span></div><div class="flex items-center gap-space-lg font-body-sm text-body-sm"><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a><a class="hover:text-primary transition-colors" href="#">Terms of Exchange</a><a class="hover:text-primary transition-colors" href="#">AML Policy</a></div></div></div></footer></body></html>

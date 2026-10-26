@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"outline":"#99907c","inverse-on-surface":"#2d3136","on-secondary":"#00354a","outline-variant":"#4d4635","tertiary-fixed":"#6ffbbe","surface":"#101419","on-surface":"#e0e2ea","surface-container-highest":"#31353b","on-tertiary-fixed-variant":"#005236","primary-fixed":"#ffe088","surface-dim":"#101419","on-background":"#e0e2ea","tertiary-container":"#33ca90","primary-fixed-dim":"#e9c349","on-primary-fixed-variant":"#574500","on-primary-fixed":"#241a00","on-primary":"#3c2f00","inverse-surface":"#e0e2ea","on-error":"#690005","background":"#101419","inverse-primary":"#735c00","surface-container-high":"#262a30","surface-container":"#1c2025","surface-variant":"#31353b","surface-bright":"#36393f","surface-container-lowest":"#0a0e13","on-tertiary-container":"#005035","secondary-fixed-dim":"#7bd0ff","on-tertiary":"#003824","on-tertiary-fixed":"#002113","on-primary-container":"#554300","on-secondary-container":"#00374d","tertiary":"#58e7aa","on-error-container":"#ffdad6","primary":"#f2ca50","secondary-fixed":"#c4e7ff","error":"#ffb4ab","error-container":"#93000a","secondary":"#7bd0ff","tertiary-fixed-dim":"#4edea3","surface-container-low":"#181c21","on-surface-variant":"#d0c5af","secondary-container":"#00a6e0","on-secondary-fixed":"#001e2c","surface-tint":"#e9c349","on-secondary-fixed-variant":"#004c69","primary-container":"#d4af37"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-lg":"1.5rem","margin":"2rem","gutter":"1.5rem","gutter-mobile":"0.75rem","gutter-desktop-wide":"2rem","space-sm":"0.5rem","space-3xl":"4rem","space-xl":"2rem","margin-mobile":"1rem","space-2xl":"3rem","space-xs":"0.25rem","margin-desktop-wide":"3rem","space-md":"1rem"},fontFamily:{"headline-xl":["Outfit"],"headline-xl-mobile":["Outfit"],"headline-md":["Outfit"],"label-caps":["Inter"],"body-lg":["Inter"],"body-sm":["Inter"],"headline-lg":["Outfit"],"headline-sm":["Outfit"],"display-hero":["Outfit"],"data-mono-num":["JetBrains Mono"],"data-currency-lg":["Outfit"],"body-md":["Inter"],"display-hero-mobile":["Outfit"]},fontSize:{"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"500"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"500"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"data-mono-num":["13px",{"lineHeight":"18px","letterSpacing":"-0.01em","fontWeight":"500"}],"data-currency-lg":["32px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)]"><div class="flex flex-col flex-1 min-h-0"><div class="h-16 px-space-md flex items-center justify-between bg-surface-container/60 shrink-0"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center"><span class="material-symbols-outlined text-on-primary-container text-[20px]">directions_car</span></div><div><div class="font-headline-sm text-headline-sm font-semibold text-on-surface tracking-tight leading-none">Automotive OS</div><div class="font-label-caps text-label-caps uppercase text-primary mt-0.5 tracking-wider">Dealership Suite</div></div></div><span class="material-symbols-outlined text-on-surface-variant text-[18px] cursor-pointer hover:text-on-surface">unfold_more</span></div><div class="overflow-y-auto flex-1 py-space-xs"><div class="px-space-md py-space-xs"><div class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">Operational Core</div></div><nav class="flex flex-col gap-1 px-space-sm mb-space-sm" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dealer-executive-overview-dashboard" href="#">Dashboard</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="vehicle-inventory-management-grid" href="#">Inventory</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="add-vehicle" href="#">Add Vehicle</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="crm-pipeline" href="#">CRM Pipeline</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="test-drives" href="#">Test Drives</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="rta-compliance" href="#">RTA &amp; Compliance</a></nav><div class="px-space-md pt-space-xs pb-space-xs flex items-center justify-between"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase px-space-xs tracking-wider">[P1 ROADMAP / DMS]</span><span class="px-1.5 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-secondary/15 text-secondary tracking-widest">Future</span></div><nav class="flex flex-col gap-1 px-space-sm pb-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg"><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="sales-orders-and-quotes" href="#">Sales Orders &amp; Quotes</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="workshop-and-bays" href="#">Workshop &amp; Bays</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="parts-and-procurement" href="#">Parts &amp; Procurement</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="finance-and-insurance-f-and-i" href="#">Finance &amp; Insurance (F&amp;I)</a><a aria-current="page" class="px-space-md py-2 transition-all block bg-primary-container text-on-primary-container font-semibold rounded-lg" data-path="invoices-and-accounting" href="#">Invoices &amp; Accounting</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="fleet-and-consignment" href="#">Fleet &amp; Consignment</a><a class="px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-md text-body-md block" data-path="dms-analytics" href="#">DMS Analytics</a></nav></div></div><div class="p-space-sm bg-surface-container-lowest/80 flex flex-col gap-space-xs shrink-0"><div class="bg-surface-container-high/90 p-space-sm rounded-lg flex flex-col gap-1.5"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-on-surface font-semibold">Vault Allocations</span><span class="font-data-mono-num text-data-mono-num text-primary font-semibold">42 / 50</span></div><div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 84%"></div></div><div class="flex items-center justify-between pt-1"><span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary inline-block"></span>All changes saved</span><span class="font-label-caps text-label-caps text-on-surface-variant">Tier-1</span></div></div><div class="p-space-xs bg-surface-container/60 rounded-lg flex flex-col gap-0.5"><div class="font-body-sm text-body-sm font-semibold text-on-surface truncate">SilberArrows Luxury FZCO</div><div class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-tertiary">verified</span>DED #612048 • GCC Spec</div></div></div></aside><div class="pl-64 min-h-screen flex flex-col"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-space-lg flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-2 px-space-sm py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest cursor-pointer text-on-surface transition-colors"><span class="material-symbols-outlined text-[18px] text-primary">storefront</span><span class="font-body-sm text-body-sm font-semibold">SilberArrows • Al Quoz 1 Hub</span><span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span></div><div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span class="font-body-sm text-body-sm font-medium">RTA API Connected</span><span class="font-data-mono-num text-data-mono-num text-on-surface-variant">14ms</span></div><div class="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container border border-outline-variant/40"><span class="material-symbols-outlined text-[15px] text-secondary">architecture</span><span class="font-label-caps text-label-caps uppercase text-secondary font-semibold tracking-wider">[FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]</span></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-surface-container-highest transition-colors"><span class="font-semibold text-primary">EN</span><span class="text-on-surface-variant">/</span><span class="text-on-surface-variant hover:text-on-surface">عربي</span></button><button class="relative p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary"></span></button><div class="flex items-center gap-3 pl-space-xs"><div class="text-right"><div class="font-body-sm text-body-sm font-semibold text-on-surface leading-tight">Marc Ackermann</div><div class="font-label-caps text-label-caps text-on-surface-variant">General Manager</div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface px-space-lg pb-space-xl flex-1"><div class="flex flex-col w-full">
+<!-- P1 Specification Concept Notice & Roadmap Context Banner -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-high/90 p-space-md shadow-xl mb-space-lg">
+<div class="absolute -right-16 -top-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-1.5 max-w-4xl">
+<div class="flex flex-wrap items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary/15 text-primary font-label-caps text-label-caps uppercase tracking-wider font-semibold">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+            [FUTURE ROADMAP • P1 SPECIFICATION — CONCEPT TEMPLATE]
+          </span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps tracking-widest uppercase">
+            Federal Decree-Law No. (8) of 2017 &amp; (47) of 2022
+          </span>
+<span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-caps text-label-caps uppercase">
+            Peppol BIS 3.0 / UAE E-Invoice Schema
+          </span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1 flex flex-wrap items-baseline gap-3">
+<span>Tax Invoices &amp; Corporate Escrow Accounting</span>
+<span class="font-body-md text-body-md text-primary font-medium" dir="rtl">الفواتير الضريبية وتسوية حساب الضمان المصرفي</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          CONCEPT TEMPLATE ONLY: Phase 1 Dealership Management System Roadmap. Specification mockups for UAE Federal Tax Authority (FTA) e-invoicing schema, bilingual Arabic/English tax invoices, corporate tax ledger reconciliation, and DIFC/CBUAE escrow disbursement matching.
+        </p>
+</div>
+<!-- Action Cluster -->
+<div class="flex flex-wrap items-center gap-2.5 shrink-0">
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container-highest text-on-surface hover:bg-surface-bright transition-colors font-body-sm text-body-sm font-medium">
+<span class="material-symbols-outlined text-[18px] text-secondary">file_download</span>
+          Export FAF (XML)
+        </button>
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container-highest text-on-surface hover:bg-surface-bright transition-colors font-body-sm text-body-sm font-medium">
+<span class="material-symbols-outlined text-[18px] text-primary">account_balance</span>
+          Reconcile Escrow
+        </button>
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm font-semibold shadow-lg hover:brightness-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          Generate FTA Tax Invoice
+        </button>
+</div>
+</div>
+</div>
+<!-- KPI Operational Telemetry Bar -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md mb-space-lg">
+<!-- Total Cleared Revenue -->
+<div class="rounded-xl bg-surface-container-low p-space-md shadow-md flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Cleared Revenue (MTD)</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">14 Closed Realized Sales Deeds</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+</div>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface tracking-tight">34,890,000</span>
+</div>
+<div class="mt-2 flex items-center gap-2 font-body-sm text-body-sm text-tertiary">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+18.4% vs last tax quarter (Q4)</span>
+</div>
+</div>
+<!-- Escrow Disbursement Status -->
+<div class="rounded-xl bg-surface-container-low p-space-md shadow-md flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Pending Escrow Release</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">FAB / CBUAE Sovereign Escrow</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-secondary/15 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+</div>
+</div>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-label-caps text-label-caps text-secondary uppercase font-bold">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface tracking-tight">9,450,000</span>
+</div>
+<div class="mt-2 flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface">3 disbursements awaiting RTA title clearance</span>
+</div>
+</div>
+<!-- Input / Output VAT Position -->
+<div class="rounded-xl bg-surface-container-low p-space-md shadow-md flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Net VAT Payable (5%)</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">FTA Form 201 Return Provision</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-tertiary/15 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]">percent</span>
+</div>
+</div>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-label-caps text-label-caps text-tertiary uppercase font-bold">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg text-on-surface tracking-tight">1,744,500</span>
+</div>
+<div class="mt-2 flex items-center justify-between font-body-sm text-body-sm">
+<span class="text-on-surface-variant">Filing Deadline:</span>
+<span class="font-data-mono-num text-data-mono-num text-primary font-semibold">28 Apr 2025 (T-14)</span>
+</div>
+</div>
+<!-- E-Invoicing Cryptographic Compliance -->
+<div class="rounded-xl bg-surface-container-low p-space-md shadow-md flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">FTA E-Invoicing Integrity</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Peppol BIS XML + SHA-256 Signatures</div>
+</div>
+<div class="w-9 h-9 rounded-lg bg-tertiary/15 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+</div>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-data-currency-lg text-data-currency-lg text-tertiary tracking-tight font-bold">100.0%</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase font-medium">Valid</span>
+</div>
+<div class="mt-2 flex items-center gap-1.5 font-body-sm text-body-sm text-tertiary">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+<span>Hardware Security Module (HSM) Signed</span>
+</div>
+</div>
+</div>
+<!-- Primary 2-Column High-Density Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg mb-space-lg">
+<!-- LEFT COLUMN: ~65% (Cols 1 to 8) -->
+<div class="lg:col-span-8 flex flex-col gap-space-lg">
+<!-- 1. Interactive FTA Compliant Tax Invoice Preview -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-xl relative overflow-hidden">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-tertiary to-secondary"></div>
+<!-- Invoice Control / Top Metadata Header -->
+<div class="flex flex-wrap items-center justify-between gap-3 pb-space-md mb-space-md bg-surface-container/40 -mx-space-lg -mt-space-lg px-space-lg pt-space-md">
+<div class="flex items-center gap-3">
+<span class="px-2.5 py-1 rounded bg-primary/20 text-primary font-data-mono-num text-data-mono-num font-bold">
+              INV-2025-0142
+            </span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary text-body-sm font-medium flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+              Cryptographically Cleared by FTA API
+            </span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-medium flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px]">print</span>
+              PDF Print
+            </button>
+<button class="px-3 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-body-sm font-medium flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-secondary">code</span>
+              Inspect UBL 2.1 XML
+            </button>
+<button class="p-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+</div>
+<!-- Bilingual Tax Invoice Body Presentation -->
+<div class="bg-surface-container-lowest/90 rounded-lg p-space-md text-on-surface flex flex-col gap-space-md shadow-inner">
+<!-- Bilingual Header Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pb-space-sm">
+<!-- Left: Dealership Details (English) -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">TAX INVOICE</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold tracking-wider">STANDARD RATED</span>
+</div>
+<div class="font-body-md text-body-md font-semibold text-on-surface">SilberArrows Luxury Motor Cars FZCO</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                Vault Hub 04, Sheikh Zayed Road, Al Quoz Industrial 1<br/>
+                Dubai, United Arab Emirates • P.O. Box 49102
+              </div>
+<div class="mt-1 flex items-center gap-1.5 font-data-mono-num text-data-mono-num text-primary">
+<span class="text-on-surface-variant text-[11px] font-sans">TRN:</span>
+<span class="font-bold tracking-wider">100293847500003</span>
+<span class="material-symbols-outlined text-[14px] text-tertiary" title="Verified active with FTA Tax Registry">verified</span>
+</div>
+</div>
+<!-- Right: Arabic Mirror & Meta (RTL Bilateral) -->
+<div class="flex flex-col gap-1 md:text-right" dir="rtl">
+<div class="flex items-center md:justify-start justify-end gap-2">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">فاتورة ضريبية</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold tracking-wider">خاضعة للنسبة الأساسية</span>
+</div>
+<div class="font-body-md text-body-md font-semibold text-on-surface">سيلبر آروز لتجارة السيارات الفاخرة ش.م.ح</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                صالة العرض ٠٤، شارع الشيخ زايد، القوز الصناعية الأولى<br/>
+                دبي، الإمارات العربية المتحدة
+              </div>
+<div class="mt-1 flex items-center md:justify-start justify-end gap-1.5 font-data-mono-num text-data-mono-num text-primary">
+<span class="text-on-surface-variant text-[11px] font-sans">رقم التسجيل الضريبي:</span>
+<span class="font-bold tracking-wider" dir="ltr">100293847500003</span>
+</div>
+</div>
+</div>
+<!-- Customer Tax Profile Bar -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 rounded-lg bg-surface-container-high/60">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase">Customer / العميل</div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface mt-0.5">Al Maktoum Family Office LLC</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Gate Precinct 4, Level 5, DIFC, Dubai</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase">Buyer TRN / رقم تسجيل المشتري</div>
+<div class="font-data-mono-num text-data-mono-num font-semibold text-secondary mt-0.5">100481928300003</div>
+<div class="font-body-sm text-body-sm text-tertiary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[13px]">check_circle</span>
+                DIFC Non-Designated Mainland Tax Entity
+              </div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase">Tax Point &amp; Issue Date / تاريخ التوريد</div>
+<div class="font-data-mono-num text-data-mono-num text-on-surface mt-0.5">14 Apr 2025 • 11:42 GST</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Payment Deed Ref: <span class="text-primary font-mono">DMS-SL-8841</span></div>
+</div>
+</div>
+<!-- Line Items Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead>
+<tr class="bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-2.5 px-3">Item Description / البيان</th>
+<th class="py-2.5 px-2 text-center">Tax Category</th>
+<th class="py-2.5 px-3 text-right">Unit Price (AED)</th>
+<th class="py-2.5 px-2 text-right">Rate</th>
+<th class="py-2.5 px-3 text-right">VAT (AED)</th>
+<th class="py-2.5 px-3 text-right">Total Payable (AED)</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Row 1: The Vehicle -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">2024 Porsche 911 GT3 RS Weissach Package</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant flex items-center gap-2 mt-0.5">
+<span>VIN: WP0AF2A97RS289012</span>
+<span class="text-secondary">Engine: 4.0L NA 518hp</span>
+<span class="text-tertiary">Odo: 840 km</span>
+</div>
+</td>
+<td class="py-3 px-2 text-center">
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-label-caps text-[10px] font-semibold uppercase">5% Standard</span>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface">1,420,000.00</td>
+<td class="py-3 px-2 text-right font-data-mono-num text-data-mono-num text-on-surface-variant">5.0%</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-primary font-medium">71,000.00</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface font-semibold">1,491,000.00</td>
+</tr>
+<!-- Row 2: PPF & Bespoke detailing -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-2.5 px-3">
+<div class="font-medium text-on-surface">Bespoke Full-Body STEK DynoShield Paint Protection Film (PPF)</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Self-healing ceramic topcoat &amp; 10-year sovereign warranty transfer</div>
+</td>
+<td class="py-2.5 px-2 text-center">
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-label-caps text-[10px] font-semibold uppercase">5% Standard</span>
+</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface">48,500.00</td>
+<td class="py-2.5 px-2 text-right font-data-mono-num text-data-mono-num text-on-surface-variant">5.0%</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-primary font-medium">2,425.00</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface font-semibold">50,925.00</td>
+</tr>
+<!-- Row 3: Tasjeel Testing & PDI -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-2.5 px-3">
+<div class="font-medium text-on-surface">Pre-Delivery Inspection (PDI) &amp; Tasjeel Passing Certification</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Official Dubai Police &amp; RTA mechanical emission audit</div>
+</td>
+<td class="py-2.5 px-2 text-center">
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-label-caps text-[10px] font-semibold uppercase">5% Standard</span>
+</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface">2,200.00</td>
+<td class="py-2.5 px-2 text-right font-data-mono-num text-data-mono-num text-on-surface-variant">5.0%</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-primary font-medium">110.00</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface font-semibold">2,310.00</td>
+</tr>
+<!-- Row 4: GCC Transit & Customs Bond Handling (Exempt / 0%) -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-2.5 px-3">
+<div class="font-medium text-on-surface">GCC Customs Transit &amp; Bond Custody Clearance</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Customs Declaration #DXB-B-99812-25 • Direct Out-of-Scope Transit</div>
+</td>
+<td class="py-2.5 px-2 text-center">
+<span class="px-2 py-0.5 rounded bg-secondary/15 text-secondary font-label-caps text-[10px] font-semibold uppercase">Zero-Rated (0%)</span>
+</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface">0.00</td>
+<td class="py-2.5 px-2 text-right font-data-mono-num text-data-mono-num text-on-surface-variant">0.0%</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface-variant font-medium">0.00</td>
+<td class="py-2.5 px-3 text-right font-data-mono-num text-data-mono-num text-on-surface font-semibold">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Bottom Totals & FTA Encoded Cryptographic Stamp -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md pt-space-sm bg-surface-container/40 p-space-md rounded-lg">
+<!-- Cryptographic TLV Stamp Section (Cols 1-6) -->
+<div class="md:col-span-6 flex flex-col justify-between gap-3">
+<div class="flex items-start gap-3">
+<!-- High-Fidelity SVG TLV QR Code Representation -->
+<div class="w-24 h-24 bg-white p-1 rounded shrink-0 flex items-center justify-center shadow">
+<svg class="w-full h-full text-black" viewbox="0 0 100 100">
+<!-- Distinctive QR Finder Corners -->
+<rect fill="currentColor" height="28" width="28" x="5" y="5"></rect>
+<rect fill="white" height="20" width="20" x="9" y="9"></rect>
+<rect fill="currentColor" height="12" width="12" x="13" y="13"></rect>
+<rect fill="currentColor" height="28" width="28" x="67" y="5"></rect>
+<rect fill="white" height="20" width="20" x="71" y="9"></rect>
+<rect fill="currentColor" height="12" width="12" x="75" y="13"></rect>
+<rect fill="currentColor" height="28" width="28" x="5" y="67"></rect>
+<rect fill="white" height="20" width="20" x="9" y="71"></rect>
+<rect fill="currentColor" height="12" width="12" x="13" y="75"></rect>
+<!-- Synthesized Data Grid Matrix -->
+<rect fill="currentColor" height="6" width="6" x="38" y="10"></rect>
+<rect fill="currentColor" height="6" width="6" x="48" y="6"></rect>
+<rect fill="currentColor" height="6" width="6" x="58" y="14"></rect>
+<rect fill="currentColor" height="6" width="6" x="38" y="24"></rect>
+<rect fill="currentColor" height="6" width="6" x="48" y="20"></rect>
+<rect fill="currentColor" height="6" width="6" x="10" y="38"></rect>
+<rect fill="currentColor" height="6" width="6" x="20" y="44"></rect>
+<rect fill="currentColor" height="6" width="6" x="28" y="38"></rect>
+<rect fill="currentColor" height="6" width="6" x="14" y="52"></rect>
+<rect fill="currentColor" height="20" width="20" x="40" y="40"></rect>
+<rect fill="white" height="12" width="12" x="44" y="44"></rect>
+<rect fill="currentColor" height="4" width="4" x="48" y="48"></rect>
+<rect fill="currentColor" height="6" width="8" x="66" y="38"></rect>
+<rect fill="currentColor" height="6" width="6" x="80" y="44"></rect>
+<rect fill="currentColor" height="6" width="6" x="72" y="52"></rect>
+<rect fill="currentColor" height="6" width="6" x="86" y="54"></rect>
+<rect fill="currentColor" height="8" width="6" x="38" y="68"></rect>
+<rect fill="currentColor" height="6" width="6" x="50" y="72"></rect>
+<rect fill="currentColor" height="6" width="6" x="42" y="84"></rect>
+<rect fill="currentColor" height="6" width="8" x="54" y="82"></rect>
+<rect fill="currentColor" height="6" width="8" x="68" y="68"></rect>
+<rect fill="currentColor" height="8" width="6" x="82" y="72"></rect>
+<rect fill="currentColor" height="6" width="6" x="74" y="84"></rect>
+<rect fill="currentColor" height="8" width="6" x="86" y="82"></rect>
+</svg>
+</div>
+<div class="flex flex-col gap-1 min-w-0">
+<div class="font-label-caps text-label-caps text-tertiary uppercase flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px]">qr_code_scanner</span>
+                    FTA TLV Encoded Cryptographic Stamp
+                  </div>
+<div class="font-body-sm text-[11px] text-on-surface-variant leading-tight">
+                    Compliant with UAE E-Invoicing Phase 1 Mandate. Contains UTF-8 Tag-Length-Value fields: Seller, TRN, ISO Timestamp, Total, and VAT.
+                  </div>
+<div class="font-data-mono-num text-[10px] text-on-surface-variant truncate bg-surface-container-highest px-2 py-1 rounded mt-1 select-all" title="SHA-256 Digital Signature">
+                    SHA-256: 8f9a2b5e0c34a17932d8471e8bb529e7104b6dc9aa4618e5229db972c3886f41
+                  </div>
+</div>
+</div>
+<!-- Settlement Verification Stamp -->
+<div class="p-2.5 rounded bg-tertiary/10 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">CBUAE Settlement Cleared</span>
+</div>
+<span class="font-data-mono-num text-[11px] text-tertiary font-medium">Batch #FAB-ESCR-00984</span>
+</div>
+</div>
+<!-- Financial Reconciliation Ledger Breakdown (Cols 7-12) -->
+<div class="md:col-span-6 flex flex-col gap-2 font-body-sm text-body-sm pl-0 md:pl-2">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Total Excluding Tax / الإجمالي غير شامل الضريبة</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface">1,470,700.00 AED</span>
+</div>
+<div class="flex justify-between items-center text-primary font-medium">
+<span>Total UAE VAT (5.00%) / إجمالي ضريبة القيمة المضافة</span>
+<span class="font-data-mono-num text-data-mono-num font-bold">73,535.00 AED</span>
+</div>
+<div class="flex justify-between items-center text-on-surface font-semibold pt-1">
+<span>Gross Total Payable / إجمالي المبلغ المستحق</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface font-bold text-headline-sm">1,544,235.00 AED</span>
+</div>
+<!-- Trade-in Deduction Line -->
+<div class="flex justify-between items-center p-2 rounded bg-surface-container-high text-on-surface">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary text-[16px]">swap_horiz</span>
+<span>Trade-in Offset: 2022 Mercedes-AMG G63 Equity</span>
+</div>
+<span class="font-data-mono-num text-data-mono-num text-tertiary font-bold">-490,000.00 AED</span>
+</div>
+<!-- Net Disbursement through Escrow -->
+<div class="flex justify-between items-center p-2.5 rounded bg-primary/10 text-on-surface mt-1">
+<div>
+<div class="font-label-caps text-label-caps text-primary uppercase font-bold">Net Disbursed via Sovereign Escrow</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">First Abu Dhabi Bank (FAB) Vault Account</div>
+</div>
+<span class="font-data-currency-lg text-headline-md text-primary font-bold font-data-mono-num">
+                  1,054,235.00 <span class="text-xs font-sans">AED</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. Dual-Ledger Escrow Disbursement Matcher -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-xl">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-space-md">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-secondary/15 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">balance</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-semibold">Dual-Ledger Escrow Settlement Matcher</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Live cross-comparison: FAB Escrow Trust Account vs Dealership ERP General Ledger (GL)</div>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-tertiary/10 text-tertiary font-data-mono-num text-data-mono-num font-semibold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+            Variance: 0.00 AED (Balanced)
+          </span>
+</div>
+<!-- Split Ledger Comparison Card Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Ledger A: FAB Escrow Sovereign View -->
+<div class="rounded-lg bg-surface-container p-space-md flex flex-col gap-3">
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">account_balance</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Platform Escrow Ledger</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">First Abu Dhabi Bank (IBAN: AE020300...)</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-secondary text-body-sm font-data-mono-num">Inflow Verified</span>
+</div>
+<div class="space-y-2 text-body-sm">
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-high/60">
+<span class="text-on-surface-variant">Initial Security Deposit (Wire):</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface font-medium">AED 210,847.00</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-high/60">
+<span class="text-on-surface-variant">ADCB Auto Finance Proceeds:</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface font-medium">AED 843,388.00</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-high/60">
+<span class="text-on-surface-variant">CBUAE Mandatory Escrow Holdback:</span>
+<span class="font-data-mono-num text-data-mono-num text-error font-medium">-AED 0.00</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container-highest font-semibold text-on-surface">
+<span>Total Liquid Escrow Balance:</span>
+<span class="font-data-mono-num text-data-mono-num text-secondary">AED 1,054,235.00</span>
+</div>
+</div>
+</div>
+<!-- Ledger B: Dealership ERP General Ledger -->
+<div class="rounded-lg bg-surface-container p-space-md flex flex-col gap-3">
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">dataset</span>
+<div>
+<div class="font-body-sm text-body-sm font-semibold text-on-surface">Dealership General Ledger</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">ERP Sub-Account: 1040-02 (Vehicles Receivable)</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary text-body-sm font-data-mono-num">GL Matched</span>
+</div>
+<div class="space-y-2 text-body-sm">
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-high/60">
+<span class="text-on-surface-variant">Gross Vehicle Invoice Total:</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface font-medium">AED 1,544,235.00</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-high/60">
+<span class="text-on-surface-variant">Trade-In G63 Equity Realization:</span>
+<span class="font-data-mono-num text-data-mono-num text-tertiary font-medium">-AED 490,000.00</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container-high/60">
+<span class="text-on-surface-variant">Tasjeel Internal Passed Absorption:</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface-variant font-medium">AED 0.00 (Zero variance)</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container-highest font-semibold text-on-surface">
+<span>Net Accounts Receivable Target:</span>
+<span class="font-data-mono-num text-data-mono-num text-primary">AED 1,054,235.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Settlement Authorization Callout -->
+<div class="mt-space-md p-space-sm rounded-lg bg-tertiary/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[20px]">sync_saved_locally</span>
+<div>
+<div class="font-body-sm text-body-sm text-on-surface font-semibold">T+0 Settlement Ready for Release</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Tasjeel title deed transfer #DXB-PASS-2881 confirmed on Dubai RTA registry.</div>
+</div>
+</div>
+<button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm font-semibold hover:brightness-105 active:scale-95 transition-all shrink-0">
+            Authorize Escrow Disbursement
+          </button>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: ~35% (Cols 9 to 12) -->
+<div class="lg:col-span-4 flex flex-col gap-space-lg">
+<!-- 1. UAE Corporate Tax & VAT Compliance Engine -->
+<div class="rounded-xl bg-surface-container-low p-space-md shadow-xl flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">gavel</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Corporate Tax (9%) Engine</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-primary/15 text-primary font-label-caps text-label-caps uppercase font-bold">FY2025</span>
+</div>
+<div class="bg-surface-container p-3 rounded-lg flex flex-col gap-2">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">Statutory Threshold:</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface">AED 375,000</span>
+</div>
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">Applicable Tax Rate:</span>
+<span class="font-data-mono-num text-data-mono-num text-primary font-bold">9.0% on excess</span>
+</div>
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">YTD Taxable Net Income:</span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface font-medium">AED 4,820,400</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden my-1">
+<div class="h-full bg-primary rounded-full" style="width: 78%"></div>
+</div>
+<div class="flex justify-between items-center font-body-sm text-body-sm pt-1">
+<span class="text-on-surface font-medium">Accrued CT Provision:</span>
+<span class="font-data-mono-num text-data-mono-num text-primary font-bold">AED 399,861</span>
+</div>
+</div>
+<!-- Free Zone Qualified Status Check -->
+<div class="p-3 rounded-lg bg-surface-container-high/60 flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-tertiary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+              QFZP Status Active
+            </span>
+<span class="font-data-mono-num text-data-mono-num text-tertiary">0% Qualifying</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant leading-relaxed">
+            Eligible for 0% Corporate Tax rate on designated bonded warehouse wholesale re-export transactions outside the UAE mainland customs boundary.
+          </p>
+</div>
+<!-- Mainland vs Bonded Freezone Split Visualizer -->
+<div class="bg-surface-container p-3 rounded-lg flex flex-col gap-2">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">Jurisdiction Supply Split (MTD)</div>
+<div class="flex items-center gap-2">
+<div class="h-3 rounded-l-full bg-primary" style="width: 72%" title="72% Mainland Sales"></div>
+<div class="h-3 rounded-r-full bg-secondary" style="width: 28%" title="28% Bonded Free Zone Transit"></div>
+</div>
+<div class="flex items-center justify-between font-body-sm text-body-sm text-on-surface-variant pt-1">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded bg-primary inline-block"></span>
+<span>72% Mainland UAE (5% VAT)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded bg-secondary inline-block"></span>
+<span>28% GCC Bonded (0% Export)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. Automated FTA Audit File (FAF) Generator -->
+<div class="rounded-xl bg-surface-container-low p-space-md shadow-xl flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">assignment_turned_in</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">FTA Audit File (FAF)</span>
+</div>
+<span class="font-data-mono-num text-data-mono-num text-secondary font-semibold">XML Schema 1.0</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          Standardized accounting data extract compliant with UAE Federal Decree-Law No. (8) on Value Added Tax. Ready for automated upload into EmaraTax portal.
+        </p>
+<!-- Bayan Declaration Matching Status -->
+<div class="p-3 rounded-lg bg-surface-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Dubai Customs Bayan Reconciled</span>
+<span class="font-data-mono-num text-data-mono-num text-tertiary font-bold">14 / 14 Passed</span>
+</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">
+            All GCC cross-border consignments matched with verified Dubai Customs import/export declaration certificates.
+          </div>
+<div class="flex items-center gap-2 text-tertiary font-body-sm text-[12px] mt-1">
+<span class="material-symbols-outlined text-[14px]">format_image_left</span>
+<span>Zero open audit flags across all VIN records</span>
+</div>
+</div>
+<button class="w-full py-2.5 px-3 rounded-lg bg-surface-container-highest hover:bg-surface-bright text-on-surface font-body-sm text-body-sm font-medium flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px] text-secondary">download</span>
+          Export Full FAF Tax Ledger (.xml / .csv)
+        </button>
+</div>
+<!-- 3. Quick Accounting & Settlement Actions -->
+<div class="rounded-xl bg-surface-container-low p-space-md shadow-xl flex flex-col gap-2.5">
+<div class="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold tracking-wider mb-1">
+          Escrow &amp; Tax Operations
+        </div>
+<button class="w-full flex items-center justify-between p-3 rounded-lg bg-primary-container text-on-primary-container font-body-sm text-body-sm font-semibold hover:brightness-105 active:scale-95 transition-all">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">account_balance</span>
+            Release Escrow to Dealership Account
+          </span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-medium transition-colors">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">note_add</span>
+            Issue Credit Note / Debit Note
+          </span>
+<span class="font-data-mono-num text-[11px] text-on-surface-variant">Art. 61 FTA</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm font-medium transition-colors">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">domain</span>
+            Batch VAT Return Form 201 Schedule
+          </span>
+<span class="font-data-mono-num text-[11px] text-tertiary">Live Sync</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Recent Invoices & Accounting Ledger -->
+<div class="rounded-xl bg-surface-container-low p-space-lg shadow-xl mb-space-lg">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-space-md">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-[22px]">table_chart_view</span>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-semibold">Recent Invoices &amp; Fiscal Settlement Journal</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Live audit ledger of high-value transactions cleared through DIFC/CBUAE escrow channels</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">filter_list</span>
+<span>Showing Last 5 Sales</span>
+</div>
+</div>
+</div>
+<!-- Telemetry Density Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead>
+<tr class="bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-2.5 px-3">Tax Invoice #</th>
+<th class="py-2.5 px-3">Buyer &amp; Entity TRN</th>
+<th class="py-2.5 px-3">Vehicle / Asset Unit</th>
+<th class="py-2.5 px-3 text-right">Gross Amount</th>
+<th class="py-2.5 px-3 text-right">VAT (5%)</th>
+<th class="py-2.5 px-3 text-center">Settlement Channel</th>
+<th class="py-2.5 px-3 text-center">FTA Status</th>
+<th class="py-2.5 px-3 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Row 1: INV-0142 (Active preview vehicle) -->
+<tr class="hover:bg-surface-container/60 transition-colors bg-surface-container/20">
+<td class="py-3 px-3">
+<div class="font-data-mono-num text-data-mono-num font-bold text-primary">INV-2025-0142</div>
+<div class="text-[11px] text-on-surface-variant">Today • 11:42 GST</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Al Maktoum Family Office LLC</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">TRN: 100481928300003</div>
+</td>
+<td class="py-3 px-3">
+<div class="text-on-surface font-medium">2024 Porsche 911 GT3 RS</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">VIN: WP0AF2A97RS289012</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num font-semibold text-on-surface">AED 1,544,235.00</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-primary font-medium">AED 73,535.00</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[11px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                FAB Escrow
+              </span>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                XML Filed &amp; Cleared
+              </span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="p-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: INV-0141 -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-data-mono-num text-data-mono-num font-bold text-on-surface">INV-2025-0141</div>
+<div class="text-[11px] text-on-surface-variant">12 Apr 2025</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Emaar Hospitality Assets Ltd</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">TRN: 100238491800003</div>
+</td>
+<td class="py-3 px-3">
+<div class="text-on-surface font-medium">2023 Rolls-Royce Phantom VIII EWB</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">VIN: SCA668S52PU198421</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num font-semibold text-on-surface">AED 2,890,000.00</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-primary font-medium">AED 137,619.05</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary/15 text-tertiary text-[11px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                Direct Wire Transfer
+              </span>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                Reconciled
+              </span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="p-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: INV-0140 (GCC Zero-Rated) -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-data-mono-num text-data-mono-num font-bold text-on-surface">INV-2025-0140</div>
+<div class="text-[11px] text-on-surface-variant">10 Apr 2025</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Al-Rajhi Prestige Fleet (Riyadh, KSA)</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">VAT Reg (KSA): 300184918200003</div>
+</td>
+<td class="py-3 px-3">
+<div class="text-on-surface font-medium">2024 Ferrari SF90 XX Stradale</div>
+<div class="font-data-mono-num text-[11px] text-secondary">Export Bayan #SA-981240-DXB</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num font-semibold text-on-surface">AED 4,200,000.00</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-secondary font-medium">AED 0.00 (0%)</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[11px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Bank Guarantee (LC)
+              </span>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary font-label-caps text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Zero-Rated Export
+              </span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="p-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: INV-0139 -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-data-mono-num text-data-mono-num font-bold text-on-surface">INV-2025-0139</div>
+<div class="text-[11px] text-on-surface-variant">08 Apr 2025</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Sheikh Hamdan Investment Trust</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">TRN: 100918291000003</div>
+</td>
+<td class="py-3 px-3">
+<div class="text-on-surface font-medium">2023 Mercedes-AMG ONE Formula 1</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">VIN: W1N98492018894102</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num font-semibold text-on-surface">AED 13,500,000.00</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-primary font-medium">AED 642,857.14</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[11px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                FAB Escrow
+              </span>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                Reconciled
+              </span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="p-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: INV-0138 -->
+<tr class="hover:bg-surface-container/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-data-mono-num text-data-mono-num font-bold text-on-surface">INV-2025-0138</div>
+<div class="text-[11px] text-on-surface-variant">04 Apr 2025</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Dr. Tariq Bin Zayed Al Nahyan</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Private High-Net Collector (Retail)</div>
+</td>
+<td class="py-3 px-3">
+<div class="text-on-surface font-medium">2023 Aston Martin Valkyrie AMR Pro</div>
+<div class="font-data-mono-num text-[11px] text-on-surface-variant">VIN: SCFA3847291084201</div>
+</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num font-semibold text-on-surface">AED 11,200,000.00</td>
+<td class="py-3 px-3 text-right font-data-mono-num text-data-mono-num text-primary font-medium">AED 533,333.33</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[11px] font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                FAB Escrow
+              </span>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] font-semibold uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                Reconciled
+              </span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="p-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Bottom State Demonstrator Dock (Roadmap Interactive States) -->
+<div class="rounded-xl bg-surface-container-high p-space-md shadow-2xl flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">developer_board</span>
+</div>
+<div>
+<div class="font-body-sm text-body-sm text-on-surface font-semibold">Interactive Prototype State Switcher</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Switch template scenario to validate alternate fiscal compliance conditions</div>
+</div>
+</div>
+<!-- State Switcher Chips -->
+<div class="flex flex-wrap items-center gap-2">
+<button class="px-3 py-1.5 rounded-full bg-primary text-on-primary font-body-sm text-body-sm font-semibold shadow transition-all">
+        Standard Tax Invoice (GT3 RS)
+      </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-on-surface hover:bg-surface-bright font-body-sm text-body-sm font-medium transition-colors">
+        Trade-in Offset &amp; Credit Note
+      </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-on-surface hover:bg-surface-bright font-body-sm text-body-sm font-medium transition-colors">
+        GCC Cross-Border (0% Zero-Rated)
+      </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-highest text-error hover:bg-surface-bright font-body-sm text-body-sm font-medium transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+        FTA Audit Discrepancy Flag
+      </button>
+</div>
+</div>
+</div></main></div></body></html>

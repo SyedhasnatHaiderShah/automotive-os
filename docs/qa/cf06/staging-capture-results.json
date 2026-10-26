@@ -1,0 +1,1618 @@
+[
+  {
+    "screen_id": "S10",
+    "app": "marketplace",
+    "raw_path": "/account/saved",
+    "target_url": "https://automotive-marketplace-staging.up.railway.app/account/saved",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S10-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 1,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 33,
+          "anonButtonsCount": 0,
+          "linksCount": 28,
+          "hashLinksCount": 0,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 7
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S10-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 33,
+          "anonButtonsCount": 0,
+          "linksCount": 28,
+          "hashLinksCount": 0,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 7
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S10-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 33,
+          "anonButtonsCount": 0,
+          "linksCount": 28,
+          "hashLinksCount": 0,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 7
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S10-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 33,
+      "buttons_anonymous": 0,
+      "links_total": 28,
+      "inert_hash_links": 0,
+      "inputs_total": 1
+    }
+  },
+  {
+    "screen_id": "S11",
+    "app": "marketplace",
+    "raw_path": "/account/profile",
+    "target_url": "https://automotive-marketplace-staging.up.railway.app/account/profile",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S11-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 1,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 17,
+          "anonButtonsCount": 0,
+          "linksCount": 29,
+          "hashLinksCount": 0,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 2
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S11-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 1,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 17,
+          "anonButtonsCount": 0,
+          "linksCount": 29,
+          "hashLinksCount": 0,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 2
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S11-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 17,
+          "anonButtonsCount": 0,
+          "linksCount": 29,
+          "hashLinksCount": 0,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 2
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S11-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 17,
+      "buttons_anonymous": 0,
+      "links_total": 29,
+      "inert_hash_links": 0,
+      "inputs_total": 1
+    }
+  },
+  {
+    "screen_id": "S12",
+    "app": "dealer",
+    "raw_path": "/",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S12-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 0,
+          "anonButtonsCount": 0,
+          "linksCount": 1,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 1,
+            "h3": 0
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S12-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 0,
+          "anonButtonsCount": 0,
+          "linksCount": 1,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 1,
+            "h3": 0
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S12-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 0,
+          "anonButtonsCount": 0,
+          "linksCount": 1,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 1,
+            "h3": 0
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S12-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 0,
+      "buttons_anonymous": 0,
+      "links_total": 1,
+      "inert_hash_links": 0,
+      "inputs_total": 0
+    }
+  },
+  {
+    "screen_id": "S13",
+    "app": "dealer",
+    "raw_path": "/inventory",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/inventory",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S13-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 0,
+          "anonButtonsCount": 0,
+          "linksCount": 1,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 1,
+            "h3": 0
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S13-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 0,
+          "anonButtonsCount": 0,
+          "linksCount": 1,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 1,
+            "h3": 0
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S13-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 0,
+          "anonButtonsCount": 0,
+          "linksCount": 1,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 1,
+            "h3": 0
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S13-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 0,
+      "buttons_anonymous": 0,
+      "links_total": 1,
+      "inert_hash_links": 0,
+      "inputs_total": 0
+    }
+  },
+  {
+    "screen_id": "S14",
+    "app": "admin",
+    "raw_path": "/",
+    "target_url": "https://admin-staging.syedhasnat.com/",
+    "viewports": {},
+    "status": "BLOCKED_ACCESS",
+    "errors": [],
+    "controls": {
+      "buttons_total": 0,
+      "buttons_anonymous": 0,
+      "links_total": 0,
+      "inert_hash_links": 0,
+      "inputs_total": 0
+    },
+    "blocker": "page.goto: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://admin-staging.syedhasnat.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "screen_id": "S15",
+    "app": "admin",
+    "raw_path": "/verifications/{KYB_ID}",
+    "target_url": "https://admin-staging.syedhasnat.com/verifications/kyb-req-001",
+    "viewports": {},
+    "status": "BLOCKED_ACCESS",
+    "errors": [],
+    "controls": {
+      "buttons_total": 0,
+      "buttons_anonymous": 0,
+      "links_total": 0,
+      "inert_hash_links": 0,
+      "inputs_total": 0
+    },
+    "blocker": "Cloudflare Zero Trust / HTTP Basic auth gate without provided credentials"
+  },
+  {
+    "screen_id": "S16",
+    "app": "admin",
+    "raw_path": "/moderation/listings/{MODERATION_ID}",
+    "target_url": "https://admin-staging.syedhasnat.com/moderation/listings/mod-lst-001",
+    "viewports": {},
+    "status": "BLOCKED_ACCESS",
+    "errors": [],
+    "controls": {
+      "buttons_total": 0,
+      "buttons_anonymous": 0,
+      "links_total": 0,
+      "inert_hash_links": 0,
+      "inputs_total": 0
+    },
+    "blocker": "Cloudflare Zero Trust / HTTP Basic auth gate without provided credentials"
+  },
+  {
+    "screen_id": "S17",
+    "app": "admin",
+    "raw_path": "/disputes",
+    "target_url": "https://admin-staging.syedhasnat.com/disputes",
+    "viewports": {},
+    "status": "BLOCKED_ACCESS",
+    "errors": [],
+    "controls": {
+      "buttons_total": 0,
+      "buttons_anonymous": 0,
+      "links_total": 0,
+      "inert_hash_links": 0,
+      "inputs_total": 0
+    },
+    "blocker": "Cloudflare Zero Trust / HTTP Basic auth gate without provided credentials"
+  },
+  {
+    "screen_id": "S18",
+    "app": "dealer",
+    "raw_path": "/sales",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/sales",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S18-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 3,
+            "h3": 3
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S18-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 3,
+            "h3": 3
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S18-mobile_390.png",
+        "overflow": 309,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 309,
+          "scrollWidth": 699,
+          "clientWidth": 390,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 1,
+          "headings": {
+            "h1": 1,
+            "h2": 3,
+            "h3": 3
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S18-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 23,
+      "buttons_anonymous": 0,
+      "links_total": 14,
+      "inert_hash_links": 4,
+      "inputs_total": 1
+    }
+  },
+  {
+    "screen_id": "S19",
+    "app": "dealer",
+    "raw_path": "/workshop",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/workshop",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S19-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 17,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 1
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S19-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 17,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 1
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S19-mobile_390.png",
+        "overflow": 109,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 109,
+          "scrollWidth": 499,
+          "clientWidth": 390,
+          "buttonsCount": 17,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 1
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S19-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 17,
+      "buttons_anonymous": 0,
+      "links_total": 13,
+      "inert_hash_links": 4,
+      "inputs_total": 0
+    }
+  },
+  {
+    "screen_id": "S20",
+    "app": "dealer",
+    "raw_path": "/parts",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/parts",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S20-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 43,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 2
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S20-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 43,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 2
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S20-mobile_390.png",
+        "overflow": 264,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 264,
+          "scrollWidth": 654,
+          "clientWidth": 390,
+          "buttonsCount": 43,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 2
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S20-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 43,
+      "buttons_anonymous": 0,
+      "links_total": 13,
+      "inert_hash_links": 4,
+      "inputs_total": 2
+    }
+  },
+  {
+    "screen_id": "S21",
+    "app": "dealer",
+    "raw_path": "/finance",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/finance",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S21-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 25,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 6
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S21-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 25,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 6
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S21-mobile_390.png",
+        "overflow": 250,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 250,
+          "scrollWidth": 640,
+          "clientWidth": 390,
+          "buttonsCount": 25,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 6
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S21-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 25,
+      "buttons_anonymous": 0,
+      "links_total": 13,
+      "inert_hash_links": 4,
+      "inputs_total": 2
+    }
+  },
+  {
+    "screen_id": "S22",
+    "app": "dealer",
+    "raw_path": "/accounting",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/accounting",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S22-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S22-tablet_1024.png",
+        "overflow": 11,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 11,
+          "scrollWidth": 1035,
+          "clientWidth": 1024,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S22-mobile_390.png",
+        "overflow": 157,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 157,
+          "scrollWidth": 547,
+          "clientWidth": 390,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 13,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S22-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 23,
+      "buttons_anonymous": 0,
+      "links_total": 13,
+      "inert_hash_links": 4,
+      "inputs_total": 0
+    }
+  },
+  {
+    "screen_id": "S23",
+    "app": "dealer",
+    "raw_path": "/fleet",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/fleet",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S23-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 30,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 6
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S23-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 30,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 6
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S23-mobile_390.png",
+        "overflow": 329,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 329,
+          "scrollWidth": 719,
+          "clientWidth": 390,
+          "buttonsCount": 30,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 2,
+          "headings": {
+            "h1": 1,
+            "h2": 2,
+            "h3": 6
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S23-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 30,
+      "buttons_anonymous": 0,
+      "links_total": 14,
+      "inert_hash_links": 4,
+      "inputs_total": 2
+    }
+  },
+  {
+    "screen_id": "S24",
+    "app": "dealer",
+    "raw_path": "/accounting/exception/export",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/accounting/exception/export",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S24-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 24,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S24-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 24,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S24-mobile_390.png",
+        "overflow": 150,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 150,
+          "scrollWidth": 540,
+          "clientWidth": 390,
+          "buttonsCount": 24,
+          "anonButtonsCount": 0,
+          "linksCount": 14,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 0,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S24-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 24,
+      "buttons_anonymous": 0,
+      "links_total": 14,
+      "inert_hash_links": 4,
+      "inputs_total": 0
+    }
+  },
+  {
+    "screen_id": "S25",
+    "app": "dealer",
+    "raw_path": "/finance/exception",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/finance/exception",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S25-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 28,
+          "anonButtonsCount": 0,
+          "linksCount": 16,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 6
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S25-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 28,
+          "anonButtonsCount": 0,
+          "linksCount": 16,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 6
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S25-mobile_390.png",
+        "overflow": 202,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 202,
+          "scrollWidth": 592,
+          "clientWidth": 390,
+          "buttonsCount": 28,
+          "anonButtonsCount": 0,
+          "linksCount": 16,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 6
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S25-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 28,
+      "buttons_anonymous": 0,
+      "links_total": 16,
+      "inert_hash_links": 4,
+      "inputs_total": 0
+    }
+  },
+  {
+    "screen_id": "S26",
+    "app": "dealer",
+    "raw_path": "/fleet/exception",
+    "target_url": "https://automotive-dealer-staging.up.railway.app/fleet/exception",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S26-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 16,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 5
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S26-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 16,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 5
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S26-mobile_390.png",
+        "overflow": 166,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 166,
+          "scrollWidth": 556,
+          "clientWidth": 390,
+          "buttonsCount": 23,
+          "anonButtonsCount": 0,
+          "linksCount": 16,
+          "hashLinksCount": 4,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 5
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S26-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 23,
+      "buttons_anonymous": 0,
+      "links_total": 16,
+      "inert_hash_links": 4,
+      "inputs_total": 0
+    }
+  },
+  {
+    "screen_id": "S27",
+    "app": "marketplace",
+    "raw_path": "/auth/login",
+    "target_url": "https://automotive-marketplace-staging.up.railway.app/auth/login",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S27-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 7,
+          "anonButtonsCount": 0,
+          "linksCount": 7,
+          "hashLinksCount": 0,
+          "inputsCount": 3,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S27-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 7,
+          "anonButtonsCount": 0,
+          "linksCount": 7,
+          "hashLinksCount": 0,
+          "inputsCount": 3,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S27-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 7,
+          "anonButtonsCount": 0,
+          "linksCount": 7,
+          "hashLinksCount": 0,
+          "inputsCount": 3,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 0
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S27-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 7,
+      "buttons_anonymous": 0,
+      "links_total": 7,
+      "inert_hash_links": 0,
+      "inputs_total": 3
+    }
+  },
+  {
+    "screen_id": "S28",
+    "app": "marketplace",
+    "raw_path": "/auth/register",
+    "target_url": "https://automotive-marketplace-staging.up.railway.app/auth/register",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S28-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 14,
+          "anonButtonsCount": 1,
+          "linksCount": 10,
+          "hashLinksCount": 0,
+          "inputsCount": 11,
+          "headings": {
+            "h1": 1,
+            "h2": 4,
+            "h3": 3
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S28-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 14,
+          "anonButtonsCount": 1,
+          "linksCount": 10,
+          "hashLinksCount": 0,
+          "inputsCount": 11,
+          "headings": {
+            "h1": 1,
+            "h2": 4,
+            "h3": 3
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S28-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 14,
+          "anonButtonsCount": 1,
+          "linksCount": 10,
+          "hashLinksCount": 0,
+          "inputsCount": 11,
+          "headings": {
+            "h1": 1,
+            "h2": 4,
+            "h3": 3
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S28-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 14,
+      "buttons_anonymous": 1,
+      "links_total": 10,
+      "inert_hash_links": 0,
+      "inputs_total": 11
+    }
+  },
+  {
+    "screen_id": "S29",
+    "app": "marketplace",
+    "raw_path": "/auth/forgot-password",
+    "target_url": "https://automotive-marketplace-staging.up.railway.app/auth/forgot-password",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S29-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 6,
+          "anonButtonsCount": 1,
+          "linksCount": 8,
+          "hashLinksCount": 0,
+          "inputsCount": 15,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 1
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S29-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 6,
+          "anonButtonsCount": 1,
+          "linksCount": 8,
+          "hashLinksCount": 0,
+          "inputsCount": 15,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 1
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S29-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 6,
+          "anonButtonsCount": 1,
+          "linksCount": 8,
+          "hashLinksCount": 0,
+          "inputsCount": 15,
+          "headings": {
+            "h1": 1,
+            "h2": 1,
+            "h3": 1
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S29-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 6,
+      "buttons_anonymous": 1,
+      "links_total": 8,
+      "inert_hash_links": 0,
+      "inputs_total": 15
+    }
+  },
+  {
+    "screen_id": "S30",
+    "app": "marketplace",
+    "raw_path": "/account/settings",
+    "target_url": "https://automotive-marketplace-staging.up.railway.app/account/settings",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S30-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 1,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 20,
+          "anonButtonsCount": 0,
+          "linksCount": 9,
+          "hashLinksCount": 0,
+          "inputsCount": 8,
+          "headings": {
+            "h1": 1,
+            "h2": 4,
+            "h3": 2
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S30-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 2,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 20,
+          "anonButtonsCount": 0,
+          "linksCount": 9,
+          "hashLinksCount": 0,
+          "inputsCount": 8,
+          "headings": {
+            "h1": 1,
+            "h2": 4,
+            "h3": 2
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S30-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 20,
+          "anonButtonsCount": 0,
+          "linksCount": 9,
+          "hashLinksCount": 0,
+          "inputsCount": 8,
+          "headings": {
+            "h1": 1,
+            "h2": 4,
+            "h3": 2
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S30-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 20,
+      "buttons_anonymous": 0,
+      "links_total": 9,
+      "inert_hash_links": 0,
+      "inputs_total": 8
+    }
+  },
+  {
+    "screen_id": "S31",
+    "app": "marketplace",
+    "raw_path": "/account/profile/dossier",
+    "target_url": "https://automotive-marketplace-staging.up.railway.app/account/profile/dossier",
+    "viewports": {
+      "desktop_1440": {
+        "httpStatus": 200,
+        "screenshot": "S31-desktop_1440.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 2,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1440,
+          "clientWidth": 1440,
+          "buttonsCount": 9,
+          "anonButtonsCount": 0,
+          "linksCount": 9,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 5
+          }
+        }
+      },
+      "tablet_1024": {
+        "httpStatus": 200,
+        "screenshot": "S31-tablet_1024.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 1024,
+          "clientWidth": 1024,
+          "buttonsCount": 9,
+          "anonButtonsCount": 0,
+          "linksCount": 9,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 5
+          }
+        }
+      },
+      "mobile_390": {
+        "httpStatus": 200,
+        "screenshot": "S31-mobile_390.png",
+        "overflow": 0,
+        "errors": [],
+        "failedRequests": 0,
+        "stats": {
+          "overflow": 0,
+          "scrollWidth": 390,
+          "clientWidth": 390,
+          "buttonsCount": 9,
+          "anonButtonsCount": 0,
+          "linksCount": 9,
+          "hashLinksCount": 0,
+          "inputsCount": 0,
+          "headings": {
+            "h1": 1,
+            "h2": 0,
+            "h3": 5
+          }
+        }
+      },
+      "arabic_rtl": {
+        "screenshot": "S31-arabic_rtl.png"
+      }
+    },
+    "status": "AUDITED",
+    "errors": [],
+    "controls": {
+      "buttons_total": 9,
+      "buttons_anonymous": 0,
+      "links_total": 9,
+      "inert_hash_links": 0,
+      "inputs_total": 0
+    }
+  }
+]
