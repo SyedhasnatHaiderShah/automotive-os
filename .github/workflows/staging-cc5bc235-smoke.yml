@@ -1,0 +1,33 @@
+name: Staging cc5bc235 Browser Smoke
+on:
+  push:
+    branches: ['qa/staging-cc5bc235-smoke']
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - name: Install workspace packages
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run browser smoke and safe admin auth denial
+        env:
+          STAGING_ADMIN_AUTH_USER: ${{ secrets.STAGING_ADMIN_AUTH_USER }}
+          STAGING_ADMIN_AUTH_PASSWORD: ${{ secrets.STAGING_ADMIN_AUTH_PASSWORD }}
+        run: node tests/staging-qa/smoke.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: staging-smoke-cc5bc235
+          path: staging-smoke-artifacts/
+          if-no-files-found: ignore
