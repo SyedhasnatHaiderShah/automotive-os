@@ -21,7 +21,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const correlationId =
       (request.headers["x-correlation-id"] as string) ||
       (request.headers["correlation-id"] as string) ||
-      randomUUID();
+      `corr-${randomUUID()}`;
 
     const status =
       exception instanceof HttpException
