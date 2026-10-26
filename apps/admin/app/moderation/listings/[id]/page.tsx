@@ -987,6 +987,9 @@ export default function ListingModerationPage() {
               />
             </div>
 
+            {submissionError && (
+              <p role="alert" className="rounded-lg border border-error/50 bg-error-container/20 p-3 text-sm text-error">{submissionError}</p>
+            )}
             <div className="flex items-center justify-end gap-space-sm pt-space-xs">
               <button
                 type="button"

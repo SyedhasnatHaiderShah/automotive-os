@@ -1057,11 +1057,13 @@ export default function KybVerificationDetailPage() {
               </div>
             </div>
 
+            {actionError && (
+              <p role="alert" className="rounded-lg border border-error/50 bg-error-container/20 p-3 text-sm text-error">{actionError}</p>
+            )}
             {/* Biometric scanner simulation box */}
             <div
               id="biometric-scanner-box"
-              onClick={handleExecuteBiometricSign}
-              className="h-28 rounded-lg bg-surface-container-lowest flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-surface-container transition-all group border border-surface-container-high/40"
+              className="h-28 rounded-lg bg-surface-container-lowest flex flex-col items-center justify-center gap-2 border border-surface-container-high/40"
             >
               <span
                 className={`material-symbols-outlined text-[36px] transition-transform ${
@@ -1069,7 +1071,7 @@ export default function KybVerificationDetailPage() {
                     ? 'text-primary animate-spin'
                     : broadcastingComplete
                     ? 'text-tertiary'
-                    : 'text-primary group-hover:scale-110'
+                    : 'text-primary'
                 }`}
               >
                 {broadcastingComplete ? 'verified' : isBroadcasting ? 'refresh' : 'fingerprint'}
@@ -1079,7 +1081,7 @@ export default function KybVerificationDetailPage() {
                   ? 'API request confirmed'
                   : isBroadcasting
                   ? 'Submitting to API...'
-                  : 'Request accreditation (no hardware 2FA)'}
+                  : 'Hardware 2FA is not connected in this staging UI'}
               </span>
             </div>
 
@@ -1100,7 +1102,7 @@ export default function KybVerificationDetailPage() {
                 className="px-5 py-2 rounded-lg bg-primary text-on-primary font-body-sm font-semibold hover:bg-primary-fixed-dim transition-colors flex items-center gap-1.5 shadow-md disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[18px]">lock_open</span>
-                <span>Execute Cryptographic Sign</span>
+                <span>Request accreditation via API</span>
               </button>
             </div>
           </div>
@@ -1160,6 +1162,9 @@ export default function KybVerificationDetailPage() {
               />
             </div>
 
+            {actionError && (
+              <p role="alert" className="rounded-lg border border-error/50 bg-error-container/20 p-3 text-sm text-error">{actionError}</p>
+            )}
             <div className="flex items-center justify-end gap-space-sm pt-space-xs">
               <button
                 type="button"
