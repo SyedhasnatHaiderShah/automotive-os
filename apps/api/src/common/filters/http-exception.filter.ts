@@ -4,15 +4,24 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import { Response, Request } from "express";
+import { randomUUID } from "node:crypto";
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+
+    const correlationId =
+      (request.headers["x-correlation-id"] as string) ||
+      (request.headers["correlation-id"] as string) ||
+      randomUUID();
 
     const status =
       exception instanceof HttpException
@@ -40,21 +49,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
         resp.details ||
         (Array.isArray(resp.message) ? resp.message : undefined);
     } else if (exception instanceof Error) {
-      // In production mode, sanitize unhandled 500 exceptions to prevent internal SQL/driver disclosure
-      if (
-        status === HttpStatus.INTERNAL_SERVER_ERROR &&
-        process.env.NODE_ENV === "production"
-      ) {
+      const isDevOrTest =
+        process.env.NODE_ENV === "development" ||
+        process.env.NODE_ENV === "test";
+
+      if (status === HttpStatus.INTERNAL_SERVER_ERROR && !isDevOrTest) {
         message = "An unexpected internal server error occurred";
       } else {
         message = exception.message;
       }
     }
 
-    const correlationId =
-      (request.headers["x-correlation-id"] as string) ||
-      (request.headers["correlation-id"] as string) ||
-      `corr-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+      this.logger.error(
+        `[${correlationId}] Internal Exception on ${request.method} ${request.url}: ${
+          exception instanceof Error ? exception.message : String(exception)
+        }`,
+        exception instanceof Error ? exception.stack : undefined
+      );
+    }
 
     response.status(status).json({
       error: {
