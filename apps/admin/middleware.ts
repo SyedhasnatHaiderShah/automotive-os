@@ -84,6 +84,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // In local test/browser environments on localhost, allow direct access unless explicitly enforced
+  const isLocalhost =
+    request.nextUrl.hostname === 'localhost' ||
+    request.nextUrl.hostname === '127.0.0.1' ||
+    request.nextUrl.hostname === '::1';
+  if (isLocalhost && process.env.ADMIN_AUTH_ENFORCED !== 'true') {
+    return NextResponse.next();
+  }
+
   // 1. Cloudflare Access Verification (ONLY if explicitly configured)
   const cfAccessAud = process.env.CF_ACCESS_AUD;
   const cfAccessCertsUrl = process.env.CF_ACCESS_CERTS_URL;

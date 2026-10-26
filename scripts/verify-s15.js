@@ -21,8 +21,8 @@ async function verifyS15() {
 
     console.log('Navigating to http://localhost:3002/verifications/kyb-2025-0842 ...');
     const response = await page.goto('http://localhost:3002/verifications/kyb-2025-0842', {
-      waitUntil: 'networkidle',
-      timeout: 30000
+      waitUntil: 'domcontentloaded',
+      timeout: 15000
     });
     const statusCode = response.status();
     results.push({
@@ -31,7 +31,7 @@ async function verifyS15() {
       detail: `Status code: ${statusCode}`
     });
 
-    // 2. Case Header & Breadcrumb
+    await page.waitForSelector('#btn-approve-dossier', { timeout: 10000 });
     const bodyText = await page.textContent('body');
     const hasCaseNo = bodyText.includes('Case #KYB-2025-0842') || bodyText.includes('KYB-2025-0842');
     const hasDedSync = bodyText.includes('DED-SYNC #994') && bodyText.includes('38ms');
