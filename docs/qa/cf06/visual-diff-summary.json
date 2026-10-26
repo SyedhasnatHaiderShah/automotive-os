@@ -1,0 +1,273 @@
+[
+  {
+    "id": "S01",
+    "name": "Marketplace Home & Car Search",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 75,
+    "diffPixels": 28273,
+    "diffRatio": "0.2476",
+    "diffImage": "S01-diff.png"
+  },
+  {
+    "id": "S02",
+    "name": "Search Results & Dealer Filters",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 78,
+    "diffPixels": 35199,
+    "diffRatio": "0.2155",
+    "diffImage": "S02-diff.png"
+  },
+  {
+    "id": "S03",
+    "name": "Mobile Filters Overlay Sheet",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 76,
+    "diffPixels": 13404,
+    "diffRatio": "0.2380",
+    "diffImage": "S03-diff.png"
+  },
+  {
+    "id": "S04",
+    "name": "Vehicle Comparison Matrix",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 83,
+    "diffPixels": 19243,
+    "diffRatio": "0.1732",
+    "diffImage": "S04-diff.png"
+  },
+  {
+    "id": "S05",
+    "name": "Vehicle Listing Detail Dossier",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 77,
+    "diffPixels": 24267,
+    "diffRatio": "0.2268",
+    "diffImage": "S05-diff.png"
+  },
+  {
+    "id": "S06",
+    "name": "Verified Dealership Storefront",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 82,
+    "diffPixels": 17064,
+    "diffRatio": "0.1831",
+    "diffImage": "S06-diff.png"
+  },
+  {
+    "id": "S07",
+    "name": "VIP Enquiry & Consent Flow",
+    "status": "HIGH_PARITY",
+    "parityScore": 86,
+    "diffPixels": 21877,
+    "diffRatio": "0.1374",
+    "diffImage": "S07-diff.png"
+  },
+  {
+    "id": "S08",
+    "name": "Buyer Enquiry Status Timeline",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 78,
+    "diffPixels": 23537,
+    "diffRatio": "0.2232",
+    "diffImage": "S08-diff.png"
+  },
+  {
+    "id": "S09",
+    "name": "Appointments, Test Drives & Virtual Garage",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 70,
+    "diffPixels": 38110,
+    "diffRatio": "0.2989",
+    "diffImage": "S09-diff.png"
+  },
+  {
+    "id": "S10",
+    "name": "Saved Searches & Favorites",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 75,
+    "diffPixels": 40404,
+    "diffRatio": "0.2489",
+    "diffImage": "S10-diff.png"
+  },
+  {
+    "id": "S11",
+    "name": "Buyer Profile & Privacy Permissions",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 79,
+    "diffPixels": 27821,
+    "diffRatio": "0.2082",
+    "diffImage": "S11-diff.png"
+  },
+  {
+    "id": "S12",
+    "name": "Dealer Executive Overview Dashboard",
+    "status": "HIGH_PARITY",
+    "parityScore": 89,
+    "diffPixels": 19306,
+    "diffRatio": "0.1084",
+    "diffImage": "S12-diff.png"
+  },
+  {
+    "id": "S13",
+    "name": "Vehicle Inventory Management Grid",
+    "status": "HIGH_PARITY",
+    "parityScore": 90,
+    "diffPixels": 22215,
+    "diffRatio": "0.1016",
+    "diffImage": "S13-diff.png"
+  },
+  {
+    "id": "S14",
+    "name": "Platform Operations & Governance Command",
+    "status": "BLOCKED_CAPTURE",
+    "parityScore": 0,
+    "notes": "Target was blocked by auth gate or deployment routing"
+  },
+  {
+    "id": "S15",
+    "name": "KYB Dealer Verification & Audit Dossier",
+    "status": "BLOCKED_CAPTURE",
+    "parityScore": 0,
+    "notes": "Target was blocked by auth gate or deployment routing"
+  },
+  {
+    "id": "S16",
+    "name": "Vehicle Listing Moderation & VIN Risk Review",
+    "status": "BLOCKED_CAPTURE",
+    "parityScore": 0,
+    "notes": "Target was blocked by auth gate or deployment routing"
+  },
+  {
+    "id": "S17",
+    "name": "Seller Sanctions & Escrow Dispute Review",
+    "status": "BLOCKED_CAPTURE",
+    "parityScore": 0,
+    "notes": "Target was blocked by auth gate or deployment routing"
+  },
+  {
+    "id": "S18",
+    "name": "Sales Orders & Quotations Studio",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 75,
+    "diffPixels": 28106,
+    "diffRatio": "0.2462",
+    "diffImage": "S18-diff.png"
+  },
+  {
+    "id": "S19",
+    "name": "Workshop Job Card & Bay Operations Calendar",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 79,
+    "diffPixels": 34760,
+    "diffRatio": "0.2135",
+    "diffImage": "S19-diff.png"
+  },
+  {
+    "id": "S20",
+    "name": "Parts Inventory & Automated Procurement",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 82,
+    "diffPixels": 31648,
+    "diffRatio": "0.1786",
+    "diffImage": "S20-diff.png"
+  },
+  {
+    "id": "S21",
+    "name": "Finance & Insurance Referral & Banking Desk",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 81,
+    "diffPixels": 19896,
+    "diffRatio": "0.1850",
+    "diffImage": "S21-diff.png"
+  },
+  {
+    "id": "S22",
+    "name": "FTA Tax Invoices & Accounting Settlement",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 79,
+    "diffPixels": 20860,
+    "diffRatio": "0.2133",
+    "diffImage": "S22-diff.png"
+  },
+  {
+    "id": "S23",
+    "name": "Corporate Fleet Accounts & VIP Consignment Portfolio",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 81,
+    "diffPixels": 20566,
+    "diffRatio": "0.1904",
+    "diffImage": "S23-diff.png"
+  },
+  {
+    "id": "S24",
+    "name": "Zero-Rated GCC Export & Customs Bond Discrepancy",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 78,
+    "diffPixels": 21152,
+    "diffRatio": "0.2233",
+    "diffImage": "S24-diff.png"
+  },
+  {
+    "id": "S25",
+    "name": "F&I Subprime DBR Exception & Underwriting Hard-Lock",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 81,
+    "diffPixels": 20790,
+    "diffRatio": "0.1934",
+    "diffImage": "S25-diff.png"
+  },
+  {
+    "id": "S26",
+    "name": "Consignment Custody Freeze & Judicial Injunction",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 79,
+    "diffPixels": 20950,
+    "diffRatio": "0.2109",
+    "diffImage": "S26-diff.png"
+  },
+  {
+    "id": "S27",
+    "name": "Sign In & UAE PASS Authentication",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 81,
+    "diffPixels": 45139,
+    "diffRatio": "0.1908",
+    "diffImage": "S27-diff.png"
+  },
+  {
+    "id": "S28",
+    "name": "VIP Registration & Account Creation",
+    "status": "HIGH_PARITY",
+    "parityScore": 85,
+    "diffPixels": 23956,
+    "diffRatio": "0.1481",
+    "diffImage": "S28-diff.png"
+  },
+  {
+    "id": "S29",
+    "name": "Forgot Password & Reset Sovereign PIN",
+    "status": "HIGH_PARITY",
+    "parityScore": 86,
+    "diffPixels": 24876,
+    "diffRatio": "0.1412",
+    "diffImage": "S29-diff.png"
+  },
+  {
+    "id": "S30",
+    "name": "Account Details, Security & Settings",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 83,
+    "diffPixels": 18355,
+    "diffRatio": "0.1749",
+    "diffImage": "S30-diff.png"
+  },
+  {
+    "id": "S31",
+    "name": "User Profile & Identity Dossier",
+    "status": "PARTIAL_PARITY",
+    "parityScore": 81,
+    "diffPixels": 34064,
+    "diffRatio": "0.1885",
+    "diffImage": "S31-diff.png"
+  }
+]

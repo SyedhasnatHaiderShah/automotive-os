@@ -23,7 +23,7 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
 
   const navItems = [
     { label: isArabic ? 'تصفح السيارات' : 'Browse Stock', href: '/cars', path: '/cars' },
-    { label: isArabic ? 'الوكلاء المعتمدون' : 'Verified Dealers', href: null, path: '/dealers' },
+    { label: isArabic ? 'الوكلاء المعتمدون' : 'Verified Dealers', href: '/dealers', path: '/dealers' },
     { label: isArabic ? 'بيع وتفويض' : 'Sell & Consign', href: null, path: '/sell' },
     { label: isArabic ? 'مقارنة السيارات' : 'Compare Vehicles', href: '/compare', path: '/compare' },
   ];

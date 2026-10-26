@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "error-container": "#93000a",
+          "on-background": "#e0e2ea",
+          "on-secondary": "#00354a",
+          "on-secondary-container": "#00374d",
+          "secondary": "#7bd0ff",
+          "surface-container-low": "#181c21",
+          "primary": "#f2ca50",
+          "surface-container-lowest": "#0a0e13",
+          "error": "#ffb4ab",
+          "surface": "#101419",
+          "background": "#101419",
+          "surface-variant": "#31353b",
+          "surface-container-highest": "#31353b",
+          "on-surface": "#e0e2ea",
+          "secondary-fixed": "#c4e7ff",
+          "surface-container": "#1c2025",
+          "on-primary-fixed-variant": "#574500",
+          "on-error": "#690005",
+          "on-secondary-fixed": "#001e2c",
+          "on-tertiary": "#003824",
+          "primary-fixed": "#ffe088",
+          "outline": "#99907c",
+          "outline-variant": "#4d4635",
+          "on-primary": "#3c2f00",
+          "on-tertiary-fixed-variant": "#005236",
+          "inverse-on-surface": "#2d3136",
+          "inverse-primary": "#735c00",
+          "on-secondary-fixed-variant": "#004c69",
+          "on-tertiary-fixed": "#002113",
+          "surface-bright": "#36393f",
+          "secondary-fixed-dim": "#7bd0ff",
+          "surface-dim": "#101419",
+          "on-primary-fixed": "#241a00",
+          "tertiary-fixed-dim": "#4edea3",
+          "on-tertiary-container": "#005035",
+          "surface-tint": "#e9c349",
+          "on-error-container": "#ffdad6",
+          "primary-fixed-dim": "#e9c349",
+          "on-surface-variant": "#d0c5af",
+          "tertiary-container": "#33ca90",
+          "secondary-container": "#00a6e0",
+          "inverse-surface": "#e0e2ea",
+          "primary-container": "#d4af37",
+          "surface-container-high": "#262a30",
+          "on-primary-container": "#554300",
+          "tertiary": "#58e7aa",
+          "tertiary-fixed": "#6ffbbe"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "gutter": "1.5rem",
+          "space-3xl": "4rem",
+          "margin": "2rem",
+          "space-sm": "0.5rem",
+          "space-2xl": "3rem",
+          "space-lg": "1.5rem",
+          "margin-desktop-wide": "3rem",
+          "space-md": "1rem",
+          "space-xl": "2rem",
+          "space-xs": "0.25rem",
+          "gutter-desktop-wide": "2rem",
+          "gutter-mobile": "0.75rem",
+          "margin-mobile": "1rem"
+        },
+        "fontFamily": {
+          "label-caps": ["Inter"],
+          "display-hero": ["Outfit"],
+          "data-mono-num": ["JetBrains Mono"],
+          "body-sm": ["Inter"],
+          "headline-lg": ["Outfit"],
+          "headline-sm": ["Outfit"],
+          "headline-xl-mobile": ["Outfit"],
+          "body-md": ["Inter"],
+          "data-currency-lg": ["Outfit"],
+          "display-hero-mobile": ["Outfit"],
+          "headline-xl": ["Outfit"],
+          "body-lg": ["Inter"],
+          "headline-md": ["Outfit"]
+        },
+        "fontSize": {
+          "label-caps": ["11px", {"lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "600"}],
+          "display-hero": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "data-mono-num": ["13px", {"lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+          "body-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+          "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+          "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500"}],
+          "headline-xl-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+          "data-currency-lg": ["32px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "display-hero-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+          "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.005em", "fontWeight": "500"}]
+        }
+      }
+    }
+  }</script></head><body class="bg-background font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.6)]"><div class="h-20 max-w-[1440px] mx-auto px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm group" data-path="browse-stock" href="#"><img alt="Automotive OS Emblem" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X8WVCGSQ9Qrp9fo-Qi0wRe7P7DO7xnzf3OkoW3G65JzR1GNJ_JF60MkJv0AOXH_p13I-uv77AdAReSNzwqTewUQa0GVyi1cUZRBcGguEZcpD1ItBQ0a-SsO8ZUIPnlyrrrvhMSjISz-2Lol1uCWl0G6n0YBNKNUx8tbb-mu7E0BT5dGORk90_2OOf4s3fPyUIQU2QKaj93_YNtIpIKoBoi07c6UHgqXB9DUvC2NIwD2i81vkg6faavTfw"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm uppercase tracking-wider text-on-surface">Automotive<span class="text-primary-container">.OS</span></span><span class="font-label-caps text-label-caps text-outline uppercase">UAE Collector Exchange</span></div></a><div class="h-6 w-px bg-surface-variant/40 hidden lg:block"></div><div class="hidden xl:flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-surface-container-low border border-white/[0.07] text-on-surface-variant hover:border-primary-container/40 transition-colors"><span class="material-symbols-outlined text-[16px] text-primary-container">location_on</span><select class="bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none cursor-pointer pr-space-xs"><option class="bg-surface-container-low text-on-surface" value="dubai">Dubai</option><option class="bg-surface-container-low text-on-surface" value="abu-dhabi">Abu Dhabi</option><option class="bg-surface-container-low text-on-surface" value="sharjah">Sharjah</option><option class="bg-surface-container-low text-on-surface" value="ras-al-khaimah">Ras Al Khaimah</option></select></div></div><nav class="hidden lg:flex items-center gap-space-lg" data-active-classes="text-primary font-semibold"><a aria-current="page" class="transition-colors py-2 text-primary font-semibold" data-path="browse-stock" href="#">Browse Stock</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-2" data-path="verified-dealers" href="#">Verified Dealers</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-2" data-path="sell-and-consign" href="#">Sell &amp; Consign</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-2" data-path="compare-vehicles" href="#">Compare Vehicles</a></nav><div class="flex items-center gap-space-md"><button class="flex items-center gap-1.5 px-space-sm py-1.5 rounded-lg bg-surface-container-low border border-white/[0.07] text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" type="button"><span class="font-label-caps text-label-caps uppercase">العربية</span><span class="text-[10px] text-outline">|</span><span class="font-label-caps text-label-caps text-primary uppercase">EN</span></button><a class="relative p-2 rounded-full border border-white/[0.07] bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all flex items-center justify-center" data-path="saved-vehicles" href="#" title="Saved Vehicles Tray"><span class="material-symbols-outlined text-[20px]">favorite</span><span class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-primary-container text-on-primary-container font-data-mono-num text-[10px] font-bold shadow-[0_2px_8px_rgba(212,175,55,0.4)]">3</span></a><div class="h-6 w-px bg-surface-variant/40 hidden sm:block"></div><a class="flex items-center gap-space-sm p-1 rounded-full border border-white/[0.07] hover:border-primary-container/40 bg-surface-container-low hover:bg-surface-container transition-all" data-path="client-portfolio" href="#" title="Institutional Collector Profile"><img alt="Collector Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-primary-container/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS4VX3Vo3I3KBIf59Zhlpww5VfHlm1ePpwWJwm9oiDvpLlu93IUePXNaDPvxuxKEzjZBa6vGsFiS26ZZe_58MRMEQYxuYCc0YowWwr0_FzOjlc93Jbli_OyMxQ-8FO99VEoMyBfxAy7koxOjlxCpQ9MdmOtctfbNeMcdWGt5XjNp34i5jjqbpLddTXtcPhXQNIcPHsg0TCgK9bGG5spybcS4fOrt3bu340F69RW7xMgHb1e9BVI0TJ"/><span class="material-symbols-outlined text-[18px] text-outline hidden sm:block pr-1">expand_more</span></a></div></div></header><main class="w-full pt-20 bg-background"><div class="flex flex-col w-full text-on-surface">
+<!-- Sub-Navigation & Breadcrumbs Bar -->
+<div class="w-full bg-surface-container-lowest/80 backdrop-blur-md">
+<div class="max-w-[1440px] mx-auto px-margin py-space-sm flex flex-wrap items-center justify-between gap-space-sm">
+<nav aria-label="Breadcrumb" class="flex items-center gap-space-xs text-body-sm font-body-sm text-outline">
+<a class="hover:text-primary transition-colors" href="#">Marketplace</a>
+<span class="text-outline-variant">/</span>
+<a class="hover:text-primary transition-colors" href="#">Dubai</a>
+<span class="text-outline-variant">/</span>
+<a class="hover:text-primary transition-colors" href="#">Porsche</a>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface">911 GT3 RS</span>
+<span class="text-outline-variant">/</span>
+<span class="font-data-mono-num text-body-sm text-primary-container">Stock #DXB-911-RS</span>
+</nav>
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-container/10 text-tertiary font-body-sm font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+          Vault Reserve • Live
+        </div>
+<button class="flex items-center gap-1 text-body-sm font-body-sm text-on-surface-variant hover:text-primary transition-colors" id="save-car-btn" onclick="toggleSave()">
+<span class="material-symbols-outlined text-[18px]" id="save-icon">favorite_border</span>
+<span id="save-label">Bookmark Spec</span>
+</button>
+<button class="flex items-center gap-1 text-body-sm font-body-sm text-on-surface-variant hover:text-primary transition-colors" onclick="copyShareLink()">
+<span class="material-symbols-outlined text-[18px]">share</span>
+          Share Dossier
+        </button>
+</div>
+</div>
+</div>
+<!-- Main Viewport Canvas -->
+<div class="max-w-[1440px] mx-auto px-margin py-space-md w-full">
+<!-- Top Hero Section: Title & Key Highlights Grid -->
+<div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-space-lg mb-space-lg">
+<div class="flex flex-col gap-space-xs max-w-3xl">
+<div class="flex flex-wrap items-center gap-space-xs mb-1">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary-container font-label-caps text-label-caps uppercase tracking-wider">Weissach Package</span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-tertiary font-label-caps text-label-caps uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">verified</span> GCC Official Spec
+          </span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase">Single Owner</span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-secondary font-label-caps text-label-caps uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">shield_with_heart</span> RTA Pass Validated
+          </span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">
+          2024 Porsche 911 GT3 RS <span class="text-outline font-normal text-headline-lg">(992.1)</span>
+</h1>
+<div class="flex flex-wrap items-center gap-x-space-md gap-y-1 font-body-md text-body-md text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-primary-container">location_on</span> Al Quoz Industrial 4, Showroom 12, Dubai</span>
+<span>•</span>
+<span class="flex items-center gap-1 font-data-mono-num"><span class="material-symbols-outlined text-[16px] text-outline">speed</span> 1,850 KM (Original)</span>
+<span>•</span>
+<span class="flex items-center gap-1 font-data-mono-num"><span class="material-symbols-outlined text-[16px] text-outline">calendar_month</span> Delivered Oct 2024</span>
+</div>
+</div>
+<!-- Live Pricing Anchor -->
+<div class="flex flex-col lg:items-end bg-surface-container-low/80 p-space-md rounded-xl backdrop-blur-md min-w-[280px]">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Cash Acquisition Price</span>
+<div class="flex items-baseline gap-1.5 text-primary-container">
+<span class="font-headline-sm text-headline-sm">AED</span>
+<span class="font-data-currency-lg text-data-currency-lg tracking-tight font-bold">1,420,000</span>
+</div>
+<div class="flex items-center gap-1.5 mt-1 font-data-mono-num text-body-sm text-on-surface-variant">
+<span>Est.</span>
+<span class="text-on-surface font-semibold text-primary">AED 24,150</span>
+<span>/ month</span>
+<span class="text-[10px] text-outline px-1.5 py-0.5 rounded bg-surface-container-high">20% Down • 60M</span>
+</div>
+</div>
+</div>
+<!-- Cinematic Media Deck -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md mb-space-xl">
+<!-- Primary Display Image -->
+<div class="lg:col-span-9 flex flex-col gap-space-sm">
+<div class="relative w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[16/9] rounded-xl overflow-hidden bg-surface-container-lowest group shadow-2xl">
+<img alt="2024 Porsche 911 GT3 RS Weissach Package Front Profile" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" data-alt="Obsidian studio darkroom wide 3/4 front angle of a 2024 Porsche 911 GT3 RS Weissach Package in Ice Grey Metallic with exposed carbon fiber aerodynamic hood, dual hood nostrils, dramatic roof strakes, and satin pyro red magnesium wheels on brushed dark asphalt floor. Cinematic moody lighting, rim highlights, raytracing hypercar reflections, UAE luxury showroom ambience." id="main-hero-display" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDllvhLjk7Z0QILDoRO3uk4PbJCzoFJ0Yiq3INeuiwPqPEK5JeArDG4OlfGnpIa09HzYtqY0hwzRdnJTlSD7vdeG6X2hOYGBZ7LGaqw2-E3sdChyzyuNhuanyc3ick3lFl84cMTbztSjp9At1Y_bAGaH_Fwugqm7-ivIdgFkLGY3Htjxb1Rzr6opS1vMz2FGUr8Jm_kHvpg5jW-BJ1VHm2LgSaXfLsl9VTjieHHFuarqj1h6vwKJo-f"/>
+<!-- Image Scrim & Overlays -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-transparent to-black/30 pointer-events-none"></div>
+<!-- Top Interactive Pill Controls -->
+<div class="absolute top-space-md left-space-md flex flex-wrap items-center gap-space-xs">
+<span class="px-space-sm py-1 rounded-full bg-surface-container-lowest/80 backdrop-blur-md text-on-surface font-data-mono-num text-body-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-primary-container">photo_camera</span>
+<span id="gallery-counter">1 / 28 High-Res Photos</span>
+</span>
+<span class="px-space-sm py-1 rounded-full bg-surface-container-lowest/80 backdrop-blur-md text-tertiary font-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lens</span> 4K Studio Capture
+            </span>
+</div>
+<!-- Bottom Control Strip -->
+<div class="absolute bottom-space-md left-space-md right-space-md flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs">
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-high/90 hover:bg-surface-bright text-on-surface font-body-sm font-medium backdrop-blur-md flex items-center gap-1.5 transition-all shadow-lg" onclick="openMediaModal('360')">
+<span class="material-symbols-outlined text-[16px] text-secondary">360</span>
+                Interactive 360° Walkaround
+              </button>
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-high/90 hover:bg-surface-bright text-on-surface font-body-sm font-medium backdrop-blur-md flex items-center gap-1.5 transition-all shadow-lg" id="engine-audio-btn" onclick="playEngineAudio()">
+<span class="material-symbols-outlined text-[16px] text-primary-container" id="audio-icon">volume_up</span>
+<span id="audio-text">Boxer-6 Cold Start (9,000 RPM)</span>
+</button>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-lg bg-surface-container-lowest/80 hover:bg-surface-container-high text-on-surface backdrop-blur-md transition-colors" onclick="prevGalleryImage()" title="Previous Image">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-lowest/80 hover:bg-surface-container-high text-on-surface backdrop-blur-md transition-colors" onclick="nextGalleryImage()" title="Next Image">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Thumbnail Filmstrip Strip -->
+<div class="grid grid-cols-6 gap-space-xs">
+<button class="thumb-btn aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-low transition-all ring-2 ring-primary-container opacity-100" onclick="selectGallery(0)">
+<img alt="Front 3/4" class="w-full h-full object-cover" data-alt="Close up dramatic front 3/4 angle of Porsche GT3 RS Weissach in Ice Grey with exposed carbon front bonnet and carbon fiber aero vents, indoor dark studio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqaTC_xwjP62HsDrm_yHEtB5xIXhVl34hAwcPZCpyAfsNGZTdScWH3BB3_ELUC956GRajjV93aRRtwNO8uhkwUyEsxUAcrWeEbt2gNFvp3ND3Y1dzGIEO2Zx_6XXiIXILtNdzTZAnI5yZkbsWSyluEtOvHGa_dhRnCJGXYWeLNcCIMc3Cii5XXbHYWrRhduOo5JWMrl2EVfgiVgXDcJYquMqaR-jMBn2h2kCS85cJUJ9u2vXPyoxY2"/>
+</button>
+<button class="thumb-btn aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-low transition-all opacity-60 hover:opacity-100" onclick="selectGallery(1)">
+<img alt="Rear Wing DRS" class="w-full h-full object-cover" data-alt="High downforce rear swan-neck carbon fiber active DRS rear wing of Porsche 992 GT3 RS with carbon endplates, rear light bar glowing red in dark studio." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATIxIg8xu9wt7pB9y7g50jkye3i7AQs-ZWMmjZIDNolK_IZTtDNl2MEh1uioNkc0o19N4_mNLKXh7lpz1r2DDFmSJYY54xKQj__Cds-y_zE0yfEJpDgOhRr__38Th-wqP6esp5c-uPT5Q9FfsqmsLvQqtCcZzygmCjX3p-t6oYT72D6O_NiikW2W4GtQHd3b9_ef3WISLUCVhLpIp3EfuQeVvV4JZn9eM6zPyHcd7UougU9O4Np4nx"/>
+</button>
+<button class="thumb-btn aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-low transition-all opacity-60 hover:opacity-100" onclick="selectGallery(2)">
+<img alt="Carbon Interior" class="w-full h-full object-cover" data-alt="Interior driver cabin of Porsche 911 GT3 RS showing full carbon fiber bucket seats with Weissach Package embroidered headrests, Race-Tex steering wheel with red rotary drive-mode dials." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwyYohrhmmc_arVyF3V2sUtASjLTqLJMF2GNduC-mV6j0fvTpJV0cBdESJSbwyBNtXDJN4JcJVLm76wEx_Uf6MG3whCdN39_MMS0qORV2m_G1n_H6hhLQlFxbOA4SDf9aUnPlMDpkGiMXEC_EtEWyHPWbRNDGZ1Ezu6wEmRdAPILgmvb_yTmj4kCgnT6VlaWbJfCbK4Krs_JgLf0q097iKrCcS3Ecgek2zMutF7QK9xZQFEMipMPAl"/>
+</button>
+<button class="thumb-btn aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-low transition-all opacity-60 hover:opacity-100" onclick="selectGallery(3)">
+<img alt="Instrument Cluster" class="w-full h-full object-cover" data-alt="Porsche 911 GT3 RS digital instrument cluster showing central yellow analog tachometer revving to 9000 RPM, digital side displays with tire pressure and oil temp telemetry." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTIBlcnHScxiO1T5LI9_SJdZ3SFWVMmVB-eeKoiNyQ5Zao7zF4trPJCmhyWXkUjGqaaeUvlln_JnlWhXhQVTInUgpF0EgsS7bykUEm7iFZMbn39gxkP1G98Da8LLamwHgW2Yvd59_S_rgC-zISgqYU-1pMXhtGpIVPY-kaaSKjlA0qL1ppxNw6DRa8-6YUPhAtbZUZBxFIiNgsGLXooc90nBxp7f8Pt_Jyn1eMXDTa837L43_Hy1oy"/>
+</button>
+<button class="thumb-btn aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-low transition-all opacity-60 hover:opacity-100" onclick="selectGallery(4)">
+<img alt="4.0L Boxer Engine" class="w-full h-full object-cover" data-alt="Underhood rear view of the Porsche 4.0 liter atmospheric naturally aspirated flat-six engine with carbon intake manifold covers and Weissach RS badging." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA87n8czgclFPA8Z6VNH3tSfqxHTN0jo2ZB9oOgrf85iNCzBqF6P5VN9ic9JQwVYvEeOXWVfVK1U_mJS61PC6lpvy_sQfsk9D4QXVFcr7oh7O1X858_VsIr7sGrBgdGCAGH1lCQiLnVb7RSYW3mubiwkQSYxb0kh0LK7QVB_kPkVMxDhA4dAdFBQfO89r6HerNgBKxbliweCxk-rS7IG68RpPBdx30RcnFsnPDK6703j-sPvu__ZYNt"/>
+</button>
+<button class="thumb-btn aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-low transition-all opacity-60 hover:opacity-100" onclick="selectGallery(5)">
+<img alt="Chassis Identification" class="w-full h-full object-cover" data-alt="Original factory aluminum door jamb chassis plate of Porsche 992 GT3 RS showing VIN stamped, Stuttgart Germany manufacturing seal, and GCC Gulf Conformity stamp." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFSZsH83MyZ5Gqh2CD0U2KKRE-TppSNihszp1LVINmn6t2Adb22kfzhhCtnvzi0HGgWVV1F4SWY8pITvcAgozeNPMCO6ShTc2c2x71uveN8LJwJb6MymQQzWjsBth-iA4AbJlkIxVHDkcz0xzBKUHbg-KHBtfYNE7Yk4yGaj7Kmslb1Kp6auKd_WAy2Qy2QZtPYKrp4CUguCHXsQGQF_0GcOZ_LYmhfodT0qHwZRSertxgbz1Vrc8T"/>
+</button>
+</div>
+</div>
+<!-- Primary Conversion Deck (Sidebar) -->
+<div class="lg:col-span-3 flex flex-col gap-space-md">
+<!-- Direct Action Card -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-md shadow-xl">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Acquisition Inquiry</span>
+<span class="font-data-mono-num text-[11px] text-tertiary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Ready for Handover
+            </span>
+</div>
+<!-- Core CTAs -->
+<div class="flex flex-col gap-2.5">
+<button class="w-full py-3.5 px-4 rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-headline-sm text-body-md uppercase tracking-wider font-semibold transition-all shadow-[0_4px_20px_rgba(212,175,55,0.25)] hover:shadow-[0_4px_24px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2" onclick="openVipModal()">
+<span class="material-symbols-outlined text-[20px]">sports_motorsports</span>
+              Book Private Viewing
+            </button>
+<a class="w-full py-3 px-4 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-tertiary font-body-md font-medium transition-all flex items-center justify-center gap-2" href="https://wa.me/971500000000?text=Inquiry%20regarding%202024%20Porsche%20911%20GT3%20RS%20Weissach%20(DXB-911-RS)" rel="noopener" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+              WhatsApp Concierge
+            </a>
+<button class="w-full py-2.5 px-4 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-md transition-all flex items-center justify-center gap-2" onclick="openEnquiryDrawer()">
+<span class="material-symbols-outlined text-[18px] text-outline">mail</span>
+              Direct Showroom Enquiry
+            </button>
+</div>
+<!-- High-Net-Worth Security Escrow Note -->
+<div class="bg-surface-container/60 p-2.5 rounded-lg flex items-start gap-2 text-on-surface-variant font-body-sm">
+<span class="material-symbols-outlined text-[18px] text-primary-container mt-0.5">verified_user</span>
+<span>RTA registered electronic transfer &amp; central bank audited custodial escrow account available.</span>
+</div>
+<!-- Financing Fast Calculator Preview -->
+<div class="pt-space-xs flex flex-col gap-1.5 font-body-sm text-on-surface-variant">
+<div class="flex justify-between items-center text-body-sm">
+<span>Required Down Payment (20%)</span>
+<span class="font-data-mono-num text-on-surface">AED 284,000</span>
+</div>
+<div class="flex justify-between items-center text-body-sm">
+<span>Profit Rate (Bank Indicative)</span>
+<span class="font-data-mono-num text-on-surface">2.49% p.a.</span>
+</div>
+<div class="flex justify-between items-center text-body-sm">
+<span>Monthly Installment</span>
+<span class="font-data-mono-num text-primary font-semibold">AED 24,150 / 60 Mo</span>
+</div>
+</div>
+</div>
+<!-- Verified Institutional Seller Card -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm shadow-lg">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Authorised Broker</span>
+<span class="px-2 py-0.5 rounded bg-tertiary/10 text-tertiary font-label-caps text-[10px] uppercase">RTA Certified</span>
+</div>
+<div class="flex items-center gap-space-sm pt-1">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center font-headline-md text-primary-container font-bold shadow-inner">
+              APX
+            </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">Apex GT Motors FZCO</span>
+<span class="font-body-sm text-outline text-[12px]">DED Commercial Lic #984210</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-xs pt-1 font-body-sm">
+<div class="bg-surface-container p-2 rounded-lg flex flex-col">
+<span class="text-outline text-[11px]">Dealer Score</span>
+<span class="font-data-mono-num text-primary font-semibold flex items-center gap-1">
+                4.96 <span class="material-symbols-outlined text-[14px]">star</span>
+</span>
+</div>
+<div class="bg-surface-container p-2 rounded-lg flex flex-col">
+<span class="text-outline text-[11px]">Active Allocations</span>
+<span class="font-data-mono-num text-on-surface font-semibold">42 Vehicles</span>
+</div>
+</div>
+<div class="pt-1 flex items-center justify-between text-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-outline">verified</span> RTA Lic #774912</span>
+<a class="text-primary hover:underline text-body-sm" href="#">View Showroom</a>
+</div>
+</div>
+<!-- Immediate Telemetry Fast-Pills -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl flex flex-col gap-space-xs">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Fast Spec Audit</span>
+<div class="flex justify-between py-1 text-body-sm">
+<span class="text-on-surface-variant">Acceleration 0-100</span>
+<span class="font-data-mono-num text-on-surface font-medium">3.2 Seconds</span>
+</div>
+<div class="flex justify-between py-1 text-body-sm">
+<span class="text-on-surface-variant">Peak Downforce</span>
+<span class="font-data-mono-num text-on-surface font-medium">860 kg @ 285 km/h</span>
+</div>
+<div class="flex justify-between py-1 text-body-sm">
+<span class="text-on-surface-variant">Gross Curb Weight</span>
+<span class="font-data-mono-num text-on-surface font-medium">1,450 kg (Weissach)</span>
+</div>
+<div class="flex justify-between py-1 text-body-sm">
+<span class="text-on-surface-variant">RTA Tasjeel Inspection</span>
+<span class="font-data-mono-num text-tertiary font-medium">Class 1 Passed (99/100)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Core Details Grid: 2 Columns (Content & Telemetry) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg mb-space-2xl">
+<!-- Left Content Column -->
+<div class="lg:col-span-8 flex flex-col gap-space-xl">
+<!-- GCC Regional Conformity Banner (Critical for UAE Market) -->
+<div class="bg-gradient-to-r from-surface-container-low via-surface-container to-surface-container-low p-space-lg rounded-xl relative overflow-hidden shadow-lg">
+<div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-primary-container/5 blur-3xl pointer-events-none"></div>
+<div class="flex items-start gap-space-md">
+<div class="p-3 rounded-xl bg-tertiary-container/10 text-tertiary shrink-0">
+<span class="material-symbols-outlined text-[28px]">verified</span>
+</div>
+<div class="flex flex-col gap-space-xs w-full">
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<h3 class="font-headline-md text-headline-md text-on-surface">GCC Official Specification Audit</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-caps text-label-caps tracking-wider uppercase">Authentic GCC Dealer Car</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                First registered through <span class="text-on-surface font-medium">Ali &amp; Sons Porsche Centre (Abu Dhabi / Dubai)</span>. Fully configured for GCC extreme thermal requirements:
+              </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm mt-space-xs">
+<div class="bg-surface-container-lowest/80 p-2.5 rounded-lg flex flex-col">
+<span class="font-label-caps text-[10px] text-outline uppercase">Thermal Package</span>
+<span class="font-body-sm text-on-surface font-medium">Tropical Twin Central Coolers</span>
+</div>
+<div class="bg-surface-container-lowest/80 p-2.5 rounded-lg flex flex-col">
+<span class="font-label-caps text-[10px] text-outline uppercase">Dust &amp; Sand Ingress</span>
+<span class="font-body-sm text-on-surface font-medium">Heavy Dust Pre-Filtration</span>
+</div>
+<div class="bg-surface-container-lowest/80 p-2.5 rounded-lg flex flex-col">
+<span class="font-label-caps text-[10px] text-outline uppercase">Warranty Window</span>
+<span class="font-body-sm text-tertiary font-medium">Active until June 2027</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1 text-body-sm text-outline">
+<span class="material-symbols-outlined text-[16px] text-primary">info</span>
+<span>Qualifies for Porsche Approved Extended Warranty up to 15 years from original delivery date.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- VIN & Security Disclosure Card -->
+<div class="bg-surface-container-low p-space-lg rounded-xl flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-primary-container">fingerprint</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Digital Chassis Identity &amp; Anti-Cloning</h3>
+</div>
+<span class="font-data-mono-num text-body-sm text-outline">RTA Registry Code: DXB-2024-911RS</span>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between p-space-md rounded-lg bg-surface-container-lowest gap-space-md">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase">Chassis Identification Number (VIN)</span>
+<span class="font-data-mono-num text-headline-sm tracking-wider text-on-surface font-semibold" id="masked-vin">WP0AF2A97RS••••••</span>
+<span class="font-body-sm text-outline text-[12px]">Last 6 digits obfuscated to prevent cloned secondary export paperwork.</span>
+</div>
+<button class="px-space-md py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-primary font-body-sm font-medium transition-colors shrink-0 flex items-center gap-1.5" onclick="requestVinAccess()">
+<span class="material-symbols-outlined text-[18px]">lock_open</span>
+              Request Full VIN for RTA Audit
+            </button>
+</div>
+</div>
+<!-- Full Technical Dossier Bento Grid -->
+<div class="flex flex-col gap-space-md">
+<h3 class="font-headline-md text-headline-md text-on-surface">Factory Mechanical Dossier</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-space-sm">
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Powertrain</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">4.0L Naturally Aspirated</span>
+<span class="font-data-mono-num text-body-sm text-outline">Flat-6 Boxer / Dry Sump</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Power Output</span>
+<span class="font-body-md text-body-md font-semibold text-primary">518 BHP @ 8,500 RPM</span>
+<span class="font-data-mono-num text-body-sm text-outline">465 Nm @ 6,300 RPM</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Transmission</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">7-Speed PDK</span>
+<span class="font-data-mono-num text-body-sm text-outline">Motorsport Short Ratio</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Top Velocity</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">296 km/h</span>
+<span class="font-data-mono-num text-body-sm text-outline">Aero Dependent</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Exterior Hue</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Ice Grey Metallic</span>
+<span class="font-data-mono-num text-body-sm text-outline">Code: M7X / Carbon Weave</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Interior Spec</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Race-Tex / Black Leather</span>
+<span class="font-data-mono-num text-body-sm text-outline">Guards Red Contrast</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Wheel Specification</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">20"/21" Forged Magnesium</span>
+<span class="font-data-mono-num text-body-sm text-outline">Satin Pyro Red Finish</span>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-outline uppercase">Braking Apparatus</span>
+<span class="font-body-md text-body-md font-semibold text-primary-container">PCCB Carbon Ceramics</span>
+<span class="font-data-mono-num text-body-sm text-outline">410mm Front / 390mm Rear</span>
+</div>
+</div>
+</div>
+<!-- Condition, Physical Inspection & Provenance Section -->
+<div class="bg-surface-container-low p-space-lg rounded-xl flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-xs pb-space-xs">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Condition &amp; Physical Provenance Report</h3>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">Physical evaluation performed at Porsche Centre Dubai &amp; certified by Tasjeel Shamil.</p>
+</div>
+<span class="px-3 py-1 rounded-full bg-tertiary-container/20 text-tertiary font-data-mono-num text-body-sm font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">check_circle</span> 99/100 Grade Tier 1
+            </span>
+</div>
+<!-- Paint Depth Visualizer Grid -->
+<div class="p-space-md bg-surface-container-lowest rounded-lg flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Digital Paint Thickness Meter Readings (Microns µm)</span>
+<span class="font-data-mono-num text-body-sm text-tertiary font-medium">100% Factory Paint Confirmed</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-space-xs font-data-mono-num text-center">
+<div class="bg-surface-container p-2 rounded flex flex-col">
+<span class="text-[10px] text-outline uppercase">Front Hood</span>
+<span class="text-body-md text-on-surface font-semibold">Carbon OEM</span>
+<span class="text-[10px] text-tertiary">XPEL PPF</span>
+</div>
+<div class="bg-surface-container p-2 rounded flex flex-col">
+<span class="text-[10px] text-outline uppercase">LF Fender</span>
+<span class="text-body-md text-on-surface font-semibold">120 µm</span>
+<span class="text-[10px] text-tertiary">Factory Range</span>
+</div>
+<div class="bg-surface-container p-2 rounded flex flex-col">
+<span class="text-[10px] text-outline uppercase">RF Fender</span>
+<span class="text-body-md text-on-surface font-semibold">122 µm</span>
+<span class="text-[10px] text-tertiary">Factory Range</span>
+</div>
+<div class="bg-surface-container p-2 rounded flex flex-col">
+<span class="text-[10px] text-outline uppercase">Driver Door</span>
+<span class="text-body-md text-on-surface font-semibold">118 µm</span>
+<span class="text-[10px] text-tertiary">Factory Range</span>
+</div>
+<div class="bg-surface-container p-2 rounded flex flex-col">
+<span class="text-[10px] text-outline uppercase">Pass Door</span>
+<span class="text-body-md text-on-surface font-semibold">121 µm</span>
+<span class="text-[10px] text-tertiary">Factory Range</span>
+</div>
+<div class="bg-surface-container p-2 rounded flex flex-col">
+<span class="text-[10px] text-outline uppercase">Rear Quarters</span>
+<span class="text-body-md text-on-surface font-semibold">124 µm</span>
+<span class="text-[10px] text-tertiary">Factory Range</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-body-sm text-outline pt-1">
+<span class="material-symbols-outlined text-[16px] text-primary">security</span>
+<span>Full-body XPEL Stealth Satin Paint Protection Film (PPF) professionally installed from Day 1 delivery. No stone chips or gravel rash.</span>
+</div>
+</div>
+<!-- Chronology Verification -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm">
+<div class="p-3 bg-surface-container rounded-lg flex flex-col gap-1">
+<span class="font-label-caps text-[10px] text-outline uppercase">Last Physical Inspection</span>
+<span class="font-data-mono-num text-body-md text-on-surface font-semibold">18 February 2025</span>
+<span class="text-[11px] text-outline">RTA Shamil Al Quoz Center</span>
+</div>
+<div class="p-3 bg-surface-container rounded-lg flex flex-col gap-1">
+<span class="font-label-caps text-[10px] text-outline uppercase">Chassis Geometry Test</span>
+<span class="font-body-md text-tertiary font-semibold">Zero Structural Defect</span>
+<span class="text-[11px] text-outline">Laser Frame Alignment Verified</span>
+</div>
+<div class="p-3 bg-surface-container rounded-lg flex flex-col gap-1">
+<span class="font-label-caps text-[10px] text-outline uppercase">Service Records</span>
+<span class="font-body-md text-on-surface font-semibold">1,500 KM Break-in Complete</span>
+<span class="text-[11px] text-outline">Ali &amp; Sons Official Stamp</span>
+</div>
+</div>
+</div>
+<!-- Interactive Spec Tabs Section -->
+<div class="bg-surface-container-low p-space-lg rounded-xl flex flex-col gap-space-md">
+<!-- Tab Headers -->
+<div class="flex border-b border-surface-container-highest overflow-x-auto gap-space-sm pb-1">
+<button class="tab-trigger pb-2 px-space-sm font-headline-sm text-body-md font-semibold text-primary border-b-2 border-primary transition-all whitespace-nowrap" id="tab-btn-options" onclick="switchTab('options')">
+              Weissach Factory Options
+            </button>
+<button class="tab-trigger pb-2 px-space-sm font-headline-sm text-body-md font-medium text-outline hover:text-on-surface transition-all whitespace-nowrap" id="tab-btn-service" onclick="switchTab('service')">
+              Official Service Log &amp; Invoices
+            </button>
+<button class="tab-trigger pb-2 px-space-sm font-headline-sm text-body-md font-medium text-outline hover:text-on-surface transition-all whitespace-nowrap" id="tab-btn-transfer" onclick="switchTab('transfer')">
+              RTA Registration &amp; Transfer Costs
+            </button>
+</div>
+<!-- Tab 1: Factory Options -->
+<div class="tab-panel flex flex-col gap-space-sm" id="tab-content-options">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
+<div class="p-3 bg-surface-container rounded-lg flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="font-body-md font-semibold text-on-surface">Full Weissach Package (P70)</span>
+<span class="text-body-sm text-outline">Carbon exterior hood, roof, rear wing, roll cage, anti-roll bars, carbon paddle shifters with magnetic technology.</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container rounded-lg flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="font-body-md font-semibold text-on-surface">PCCB Ceramic Composite Brakes (0PC)</span>
+<span class="text-body-sm text-outline">Yellow calipers, 410mm cross-drilled ceramic discs with extreme high-heat threshold.</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container rounded-lg flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="font-body-md font-semibold text-on-surface">Hydraulic Front Axle Lift System (2UH)</span>
+<span class="text-body-sm text-outline">Smart GPS memory front suspension lifter with automatic location speedbump clearing.</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container rounded-lg flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<div class="flex items-start flex-col">
+<span class="font-body-md font-semibold text-on-surface">LED Matrix Headlights in Black (8JU)</span>
+<span class="text-body-sm text-outline">Porsche Dynamic Light System Plus (PDLS+) with tinted aerodynamic surrounds.</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container rounded-lg flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="font-body-md font-semibold text-on-surface">Bose® High-End Surround Sound (9VL)</span>
+<span class="text-body-sm text-outline">12 active speakers with lightweight acoustic enclosure integration.</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container rounded-lg flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="font-body-md font-semibold text-on-surface">Club Sport Package + 6-Point Harnesses</span>
+<span class="text-body-sm text-outline">Factory roll cage bolted to chassis points with fire extinguisher and FIA driver harness.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab 2: Service History -->
+<div class="tab-panel hidden flex flex-col gap-space-sm" id="tab-content-service">
+<div class="p-3 bg-surface-container rounded-lg flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Pre-Delivery &amp; Running-in Inspection (1,500 KM)</span>
+<span class="font-data-mono-num text-body-sm text-tertiary">Completed 12 Jan 2025</span>
+</div>
+<p class="font-body-sm text-outline">Authorized Porsche Centre Dubai. Replaced initial break-in engine oil (Mobil 1 C40 GT 0W-40), differential fluid inspection, electronic torque validation on center-lock magnesium wheels.</p>
+<div class="flex items-center gap-2 pt-1">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface text-[11px] font-data-mono-num">Inv #PCD-90223</span>
+<span class="text-tertiary text-body-sm flex items-center gap-1 font-medium"><span class="material-symbols-outlined text-[14px]">check</span> Invoice Verified</span>
+</div>
+</div>
+</div>
+<!-- Tab 3: RTA Transfer Breakdown -->
+<div class="tab-panel hidden flex flex-col gap-space-sm" id="tab-content-transfer">
+<div class="p-space-md bg-surface-container rounded-lg flex flex-col gap-2 font-body-sm">
+<span class="font-headline-sm text-body-md text-on-surface font-semibold">Estimated UAE Ownership Transfer Costs</span>
+<div class="flex justify-between py-1.5 border-b border-surface-container-highest">
+<span class="text-on-surface-variant">RTA Vehicle Comprehensive Technical Test</span>
+<span class="font-data-mono-num text-on-surface">AED 420</span>
+</div>
+<div class="flex justify-between py-1.5 border-b border-surface-container-highest">
+<span class="text-on-surface-variant">RTA Ownership Transfer Fee (Traffic File)</span>
+<span class="font-data-mono-num text-on-surface">AED 350</span>
+</div>
+<div class="flex justify-between py-1.5 border-b border-surface-container-highest">
+<span class="text-on-surface-variant">Standard Dubai License Plate Issuance</span>
+<span class="font-data-mono-num text-on-surface">AED 70</span>
+</div>
+<div class="flex justify-between py-1.5 border-b border-surface-container-highest">
+<span class="text-on-surface-variant">Knowledge &amp; Innovation Dirham Fees</span>
+<span class="font-data-mono-num text-on-surface">AED 20</span>
+</div>
+<div class="flex justify-between py-2 text-primary font-semibold text-body-md">
+<span>Total Mandatory Government Transfer Charges</span>
+<span class="font-data-mono-num">AED 860</span>
+</div>
+<p class="text-[12px] text-outline italic pt-1">Apex GT Motors provides complimentary full concierge representation at Tasjeel Al Barsha. Same-day transfer completion available within 45 minutes.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Location, In-Vault Stock Map & Comparable Benchmark -->
+<div class="lg:col-span-4 flex flex-col gap-space-lg">
+<!-- Physical Location & Inspection Facility Card -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm shadow-xl">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Physical Location</span>
+<span class="font-data-mono-num text-body-sm text-primary">Dubai, UAE</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Apex Collector Vault • Al Quoz</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Showroom 12, Street 8, Al Quoz Industrial 4, behind Porsche Centre Dubai. Climate-controlled dehumidified facility.
+          </p>
+<!-- Map View Trigger -->
+<div class="w-full h-44 rounded-lg bg-cover bg-center relative overflow-hidden group shadow-md" data-location="Al Quoz Industrial 4, Dubai, UAE" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCaFKCh6OBgshoY0jOYvphHS_cBLhxvOQFnXuL5kEkjl3SMyv79zdfdBU7x3fNmNnO-m-yPAQaWklIxCvmyfEGWwJq3yS7fRPU-fJHER6yU_vEaTnCUh8zx8_hUzcMiHNX-vld21aRcHLsuZL7y9ncDI0CWGxDcOS95MDwBiVvbpahlhf_CAHdAWYWRvXlrxRcWVieDrODOg0Ihlb_JwgLXjtZzjRWJHbZsg4mP8ABzMlYSUwtNvhkE')">
+<div class="absolute inset-0 bg-surface-container-lowest/40 backdrop-blur-[1px] group-hover:backdrop-blur-none transition-all flex items-center justify-center">
+<span class="px-3 py-1.5 rounded-lg bg-surface-container-lowest/90 text-on-surface font-body-sm font-medium flex items-center gap-1.5 shadow-lg">
+<span class="material-symbols-outlined text-primary text-[18px]">near_me</span>
+                Open in Apple / Google Maps
+              </span>
+</div>
+</div>
+<div class="flex flex-col gap-1 text-body-sm font-data-mono-num pt-1 text-on-surface-variant">
+<div class="flex justify-between">
+<span class="text-outline">Private Viewing Hours:</span>
+<span class="text-on-surface">10:00 AM - 9:00 PM GST</span>
+</div>
+<div class="flex justify-between">
+<span class="text-outline">Direct Desk:</span>
+<span class="text-on-surface">+971 4 820 9000</span>
+</div>
+</div>
+</div>
+<!-- Comparable UAE Market Benchmark -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm shadow-xl">
+<div class="flex items-center justify-between pb-1">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">GCC Valuation Index</span>
+<span class="font-data-mono-num text-[11px] text-tertiary">Real-time Verified</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-on-surface-variant">2024 GCC Weissach Median</span>
+<span class="font-data-mono-num text-on-surface font-semibold">AED 1,460,000</span>
+</div>
+<!-- Progress Line Indicator -->
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden relative">
+<div class="absolute top-0 bottom-0 left-0 bg-primary-container rounded-full" style="width: 78%;"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] text-outline font-data-mono-num">
+<span>AED 1.35M (High km)</span>
+<span class="text-primary font-bold">This Car: AED 1.42M</span>
+<span>AED 1.55M (Delivery Only)</span>
+</div>
+</div>
+<p class="font-body-sm text-outline text-[12px] pt-1">
+            Priced <span class="text-tertiary font-semibold">2.8% below</span> current GCC average for Weissach Package equipped with under 2,000 km and Ceramic Braking (PCCB).
+          </p>
+</div>
+<!-- Security & Legal Guarantee Note -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl flex flex-col gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary-container">gavel</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Sovereign Buyer Protection</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            All vehicles traded through Automotive.OS undergo official UAE Ministry of Interior &amp; Dubai Police database checks for encumbrances, unpaid fines, or active customs carnets.
+          </p>
+<div class="flex items-center gap-1.5 text-body-sm text-tertiary">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Zero Accident History Confirmed</span>
+</div>
+<div class="flex items-center gap-1.5 text-body-sm text-tertiary">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>No Outstanding Mortgages or Bank Liens</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Mobile Action Dock (Handheld displays) -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-xl p-space-sm shadow-[0_-4px_24px_rgba(0,0,0,0.8)]">
+<div class="flex items-center justify-between gap-space-sm max-w-md mx-auto">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-label-caps text-outline">Price</span>
+<span class="font-data-mono-num text-body-md font-bold text-primary-container">AED 1,420,000</span>
+</div>
+<div class="flex items-center gap-2">
+<a class="p-2.5 rounded-lg bg-surface-container-high text-tertiary flex items-center justify-center" href="https://wa.me/971500000000">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+</a>
+<button class="py-2 px-4 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-body-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-md" onclick="openVipModal()">
+<span class="material-symbols-outlined text-[16px]">sports_motorsports</span>
+          Test Drive
+        </button>
+</div>
+</div>
+</div>
+<!-- VIP Test Drive Modal Dialogue -->
+<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-space-md" id="vip-modal">
+<div class="bg-surface-container-low max-w-lg w-full rounded-2xl p-space-xl flex flex-col gap-space-md shadow-2xl relative">
+<button class="absolute top-space-md right-space-md text-outline hover:text-on-surface" onclick="closeVipModal()">
+<span class="material-symbols-outlined text-[24px]">close</span>
+</button>
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">VIP Service</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Book Private Viewing Session</h3>
+<p class="font-body-sm text-on-surface-variant">Experience this 2024 Porsche 911 GT3 RS Weissach Package in the private Apex collector showroom with an accredited Porsche product specialist.</p>
+</div>
+<form class="flex flex-col gap-space-sm" onsubmit="handleVipSubmit(event)">
+<div class="flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-outline uppercase">Full Name</label>
+<input class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-md focus:outline-none focus:ring-1 focus:ring-primary-container" placeholder="H.E. / Sheikh / Mr. / Ms." required="" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-space-xs">
+<div class="flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-outline uppercase">Mobile (UAE/GCC)</label>
+<input class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-md focus:outline-none focus:ring-1 focus:ring-primary-container" placeholder="+971 50 000 0000" required="" type="tel"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-caps text-label-caps text-outline uppercase">Preferred Date</label>
+<input class="w-full h-11 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-md focus:outline-none focus:ring-1 focus:ring-primary-container" required="" type="date"/>
+</div>
+</div>
+<div class="flex items-center gap-2 pt-1">
+<input class="rounded accent-primary-container" id="nda-agree" type="checkbox"/>
+<label class="font-body-sm text-outline text-[12px]" for="nda-agree">Request private off-street enclosed track demonstration.</label>
+</div>
+<button class="w-full py-3.5 mt-space-xs rounded-lg bg-primary-container hover:bg-primary text-on-primary-container font-headline-sm text-body-md uppercase font-semibold transition-all" type="submit">
+          Confirm VIP Appointment
+        </button>
+</form>
+</div>
+</div>
+<!-- Interactive JavaScript Engine -->
+<script>
+    // Gallery State Controller
+    const galleryImages = [
+      {
+        src: 'placeholder',
+        alt: 'Obsidian studio darkroom wide 3/4 front angle of a 2024 Porsche 911 GT3 RS Weissach Package in Ice Grey Metallic with exposed carbon fiber aerodynamic hood, dual hood nostrils, dramatic roof strakes, and satin pyro red magnesium wheels on brushed dark asphalt floor. Cinematic moody lighting, rim highlights, raytracing hypercar reflections, UAE luxury showroom ambience.'
+      },
+      {
+        src: 'placeholder',
+        alt: 'High downforce rear swan-neck carbon fiber active DRS rear wing of Porsche 992 GT3 RS with carbon endplates, rear light bar glowing red in dark studio.'
+      },
+      {
+        src: 'placeholder',
+        alt: 'Interior driver cabin of Porsche 911 GT3 RS showing full carbon fiber bucket seats with Weissach Package embroidered headrests, Race-Tex steering wheel with red rotary drive-mode dials.'
+      },
+      {
+        src: 'placeholder',
+        alt: 'Porsche 911 GT3 RS digital instrument cluster showing central yellow analog tachometer revving to 9000 RPM, digital side displays with tire pressure and oil temp telemetry.'
+      },
+      {
+        src: 'placeholder',
+        alt: 'Underhood rear view of the Porsche 4.0 liter atmospheric naturally aspirated flat-six engine with carbon intake manifold covers and Weissach RS badging.'
+      },
+      {
+        src: 'placeholder',
+        alt: 'Original factory aluminum door jamb chassis plate of Porsche 992 GT3 RS showing VIN stamped, Stuttgart Germany manufacturing seal, and GCC Gulf Conformity stamp.'
+      }
+    ];
+
+    let currentIdx = 0;
+
+    function selectGallery(index) {
+      currentIdx = index;
+      updateGalleryDisplay();
+    }
+
+    function prevGalleryImage() {
+      currentIdx = (currentIdx - 1 + galleryImages.length) % galleryImages.length;
+      updateGalleryDisplay();
+    }
+
+    function nextGalleryImage() {
+      currentIdx = (currentIdx + 1) % galleryImages.length;
+      updateGalleryDisplay();
+    }
+
+    function updateGalleryDisplay() {
+      const hero = document.getElementById('main-hero-display');
+      const counter = document.getElementById('gallery-counter');
+      const thumbButtons = document.querySelectorAll('.thumb-btn');
+
+      hero.setAttribute('src', galleryImages[currentIdx].src);
+      hero.setAttribute('data-alt', galleryImages[currentIdx].alt);
+      counter.innerText = `${currentIdx + 1} / 28 High-Res Photos`;
+
+      thumbButtons.forEach((btn, idx) => {
+        if (idx === currentIdx) {
+          btn.classList.add('ring-2', 'ring-primary-container', 'opacity-100');
+          btn.classList.remove('opacity-60');
+        } else {
+          btn.classList.remove('ring-2', 'ring-primary-container', 'opacity-100');
+          btn.classList.add('opacity-60');
+        }
+      });
+    }
+
+    // Tab Switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+      document.querySelectorAll('.tab-trigger').forEach(btn => {
+        btn.classList.remove('text-primary', 'border-b-2', 'border-primary', 'font-semibold');
+        btn.classList.add('text-outline', 'font-medium');
+      });
+
+      const activePanel = document.getElementById(`tab-content-${tabName}`);
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+
+      if (activePanel) activePanel.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.classList.add('text-primary', 'border-b-2', 'border-primary', 'font-semibold');
+        activeBtn.classList.remove('text-outline', 'font-medium');
+      }
+    }
+
+    // VIN Obfuscation Toggle with Feedback
+    function requestVinAccess() {
+      const vinEl = document.getElementById('masked-vin');
+      if (vinEl.innerText.includes('••••••')) {
+        vinEl.innerText = 'WP0AF2A97RS394108';
+        vinEl.classList.add('text-primary');
+        alert('RTA Identity Token verified. Full chassis string unlocked for official Roads and Transport Authority (Dubai) provenance query.');
+      } else {
+        vinEl.innerText = 'WP0AF2A97RS••••••';
+        vinEl.classList.remove('text-primary');
+      }
+    }
+
+    // Audio Engine Simulation
+    let isPlayingAudio = false;
+    function playEngineAudio() {
+      const btnText = document.getElementById('audio-text');
+      const icon = document.getElementById('audio-icon');
+
+      if (!isPlayingAudio) {
+        isPlayingAudio = true;
+        icon.innerText = 'pause_circle';
+        btnText.innerText = 'Revs Acoustic (Simulated 9,000 RPM)';
+        setTimeout(() => {
+          isPlayingAudio = false;
+          icon.innerText = 'volume_up';
+          btnText.innerText = 'Boxer-6 Cold Start (9,000 RPM)';
+        }, 3500);
+      } else {
+        isPlayingAudio = false;
+        icon.innerText = 'volume_up';
+        btnText.innerText = 'Boxer-6 Cold Start (9,000 RPM)';
+      }
+    }
+
+    // Modal Operations
+    function openVipModal() {
+      const modal = document.getElementById('vip-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeVipModal() {
+      const modal = document.getElementById('vip-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleVipSubmit(e) {
+      e.preventDefault();
+      alert('Your VIP Viewing Request has been registered with Apex GT Motors Concierge. A private client liaison will contact you within 15 minutes.');
+      closeVipModal();
+    }
+
+    function openEnquiryDrawer() {
+      openVipModal();
+    }
+
+    function openMediaModal(type) {
+      alert(`Activating high-fidelity ${type} digital studio view.`);
+    }
+
+    function toggleSave() {
+      const icon = document.getElementById('save-icon');
+      const label = document.getElementById('save-label');
+      if (icon.innerText === 'favorite_border') {
+        icon.innerText = 'favorite';
+        icon.classList.add('text-primary');
+        label.innerText = 'Spec Bookmarked';
+      } else {
+        icon.innerText = 'favorite_border';
+        icon.classList.remove('text-primary');
+        label.innerText = 'Bookmark Spec';
+      }
+    }
+
+    function copyShareLink() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Vehicle dossier link copied to clipboard.');
+      } else {
+        alert('Listing URL: https://automotive.os/listing/dxb-911-rs');
+      }
+    }
+  </script>
+</div></main><footer class="w-full bg-surface-container-lowest border-t border-white/[0.07] text-on-surface-variant"><div class="max-w-[1440px] mx-auto px-margin py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-xl mb-space-2xl"><div class="lg:col-span-2 flex flex-col gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-headline-md text-headline-md uppercase tracking-wider text-on-surface">Automotive<span class="text-primary-container">.OS</span></span></div><p class="font-body-md text-body-md text-on-surface-variant max-w-md">The benchmark sovereign digital infrastructure for fine collector automobiles, hypercars, and certified pre-owned institutional inventory in the United Arab Emirates.</p><div class="flex items-center gap-space-sm mt-space-sm"><div class="px-space-sm py-1 rounded-lg bg-surface-container border border-white/[0.07] text-primary-container font-label-caps text-label-caps uppercase tracking-wider flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">verified</span>RTA Certified Dealer Portal</div><div class="px-space-sm py-1 rounded-lg bg-surface-container border border-white/[0.07] text-outline font-label-caps text-label-caps uppercase tracking-wider">DED License #984210</div></div></div><div class="flex flex-col gap-space-sm"><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface">Inventory</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Hypercars &amp; Special Projects</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Classic &amp; Historical</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Off-Market Allocations</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">GCC Specification Only</a></div><div class="flex flex-col gap-space-sm"><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface">UAE Emirates</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Dubai International Financial Centre</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Abu Dhabi - Al Maryah Island</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Sharjah Auto City Hub</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Ras Al Khaimah Private Vaults</a></div><div class="flex flex-col gap-space-sm"><span class="font-label-caps text-label-caps uppercase tracking-widest text-on-surface">Compliance &amp; Advisory</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Roads and Transport Authority (RTA)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Export Customs &amp; Carnet ATA</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Escrow Custody Services</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Private Inspection &amp; Dyno</a></div></div><div class="pt-space-lg border-t border-white/[0.04] flex flex-col md:flex-row items-center justify-between gap-space-md"><span class="font-body-sm text-body-sm text-outline">© 2025 Automotive OS FZ-LLC. All rights reserved. Sovereign UAE automotive marketplace exchange.</span><div class="flex items-center gap-space-lg"><a class="font-body-sm text-body-sm text-outline hover:text-on-surface transition-colors" href="#">Privacy Policy</a><a class="font-body-sm text-body-sm text-outline hover:text-on-surface transition-colors" href="#">Terms of Brokerage</a><a class="font-body-sm text-body-sm text-outline hover:text-on-surface transition-colors" href="#">Security &amp; AML</a></div></div></div></footer></body></html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-surface-variant":"#d0c5af","secondary-fixed":"#c4e7ff","on-tertiary-container":"#005035","error-container":"#93000a","surface-tint":"#e9c349","surface-dim":"#101419","outline":"#99907c","tertiary-container":"#33ca90","tertiary":"#58e7aa","surface-container":"#1c2025","outline-variant":"#4d4635","surface":"#101419","on-background":"#e0e2ea","on-secondary":"#00354a","primary":"#f2ca50","on-tertiary":"#003824","on-tertiary-fixed-variant":"#005236","on-secondary-fixed-variant":"#004c69","on-error-container":"#ffdad6","surface-container-highest":"#31353b","on-primary-fixed":"#241a00","inverse-on-surface":"#2d3136","error":"#ffb4ab","secondary-container":"#00a6e0","surface-container-lowest":"#0a0e13","secondary-fixed-dim":"#7bd0ff","background":"#101419","on-primary-container":"#554300","tertiary-fixed":"#6ffbbe","inverse-primary":"#735c00","primary-fixed-dim":"#e9c349","surface-container-high":"#262a30","on-surface":"#e0e2ea","on-error":"#690005","inverse-surface":"#e0e2ea","on-primary":"#3c2f00","on-primary-fixed-variant":"#574500","surface-variant":"#31353b","on-secondary-container":"#00374d","tertiary-fixed-dim":"#4edea3","surface-bright":"#36393f","on-tertiary-fixed":"#002113","on-secondary-fixed":"#001e2c","primary-container":"#d4af37","secondary":"#7bd0ff","primary-fixed":"#ffe088","surface-container-low":"#181c21"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-mobile":"1rem","gutter":"1.5rem","margin":"2rem","margin-desktop-wide":"3rem","gutter-desktop-wide":"2rem","space-sm":"0.5rem","space-3xl":"4rem","space-lg":"1.5rem","space-xs":"0.25rem","space-2xl":"3rem","space-md":"1rem","space-xl":"2rem","gutter-mobile":"0.75rem"},"fontFamily":{"headline-xl-mobile":["Outfit"],"display-hero":["Outfit"],"headline-lg":["Outfit"],"data-currency-lg":["Outfit"],"headline-sm":["Outfit"],"body-md":["Inter"],"data-mono-num":["JetBrains Mono"],"body-lg":["Inter"],"label-caps":["Inter"],"headline-xl":["Outfit"],"headline-md":["Outfit"],"display-hero-mobile":["Outfit"],"body-sm":["Inter"]},"fontSize":{"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"display-hero":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"500"}],"data-currency-lg":["32px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"data-mono-num":["13px",{"lineHeight":"18px","letterSpacing":"-0.01em","fontWeight":"500"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"600"}],"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"500"}],"display-hero-mobile":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary selection:text-on-primary"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-20 max-w-7xl mx-auto px-space-md lg:px-space-xl flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><a class="flex items-center gap-space-sm group" data-path="sign-in" href="#"><div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors"><span class="material-symbols-outlined text-[24px]">directions_car</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm uppercase tracking-wider text-on-surface">Automotive<span class="text-primary font-headline-sm text-headline-sm ml-1">OS</span></span><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">UAE Digital Portal</span></div></a><div class="hidden xl:flex items-center gap-space-xs bg-surface-container-low px-space-md py-1.5 rounded-full"><span class="material-symbols-outlined text-tertiary text-[16px]">verified_user</span><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">UAE PASS Ready</span></div></div><nav class="hidden md:flex items-center gap-space-xs bg-surface-container-lowest/80 p-1.5 rounded-xl" data-active-classes="bg-surface-container-high text-primary font-semibold"><a aria-current="page" class="px-space-md py-2 rounded-lg transition-colors bg-surface-container-high text-primary font-semibold" data-path="sign-in" href="#">Sign In</a><a class="px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="uae-pass-auth" href="#">UAE PASS</a><a class="px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="account-security" href="#">Security Center</a><a class="px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="support-desk" href="#">Concierge Support</a></nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-xs text-on-surface-variant bg-surface-container-low px-space-md py-1.5 rounded-lg"><span class="material-symbols-outlined text-primary text-[18px]">lock</span><span class="font-data-mono-num text-data-mono-num text-on-surface-variant">256-BIT SSL</span></div><button class="flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-body-md text-body-md" type="button"><span class="material-symbols-outlined text-[16px]">language</span><span class="font-body-md text-body-md">EN / العربية</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-surface flex-1 flex flex-col"><div class="flex flex-col w-full">
+<div class="relative w-full overflow-hidden pb-space-3xl">
+<div class="absolute top-0 left-1/4 w-[640px] h-[640px] rounded-full bg-primary/5 blur-[140px] pointer-events-none -translate-y-1/2"></div>
+<div class="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full bg-secondary-container/5 blur-[120px] pointer-events-none"></div>
+<!-- Stepper Top Bar -->
+<section class="w-full bg-surface-container-low shadow-sm">
+<div class="max-w-7xl mx-auto px-space-md lg:px-space-xl py-space-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md mb-space-md">
+<div>
+<div class="flex items-center gap-space-xs text-primary mb-1">
+<span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Client Onboarding Protocol</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Create Your Luxury Automotive Profile</h1>
+</div>
+<div class="flex items-center gap-space-sm bg-surface-container px-space-md py-1.5 rounded-full self-start md:self-auto">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-data-mono-num text-data-mono-num text-on-surface-variant">SECURITY CLEARANCE: LEVEL 1 ESCROW</span>
+</div>
+</div>
+<!-- 4-Step Progress Track -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-space-sm pt-space-xs">
+<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container-high text-primary">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-data-mono-num text-data-mono-num font-semibold">1</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-primary">Step 1</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium truncate">Account Type</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container text-on-surface-variant">
+<div class="w-7 h-7 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-data-mono-num text-data-mono-num">2</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-outline">Step 2</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Identity &amp; Emirates ID</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container text-on-surface-variant">
+<div class="w-7 h-7 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-data-mono-num text-data-mono-num">3</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-outline">Step 3</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Garage Preferences</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm p-space-sm rounded-lg bg-surface-container text-on-surface-variant">
+<div class="w-7 h-7 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-data-mono-num text-data-mono-num">4</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-outline">Step 4</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Security Credentials</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Container -->
+<main class="max-w-7xl mx-auto px-space-md lg:px-space-xl pt-space-xl w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- Left: Primary Form Sequence -->
+<div class="lg:col-span-8 flex flex-col gap-space-xl">
+<!-- Section 1: Account Tier Selection -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-md">
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center font-data-mono-num text-data-mono-num font-semibold">01</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Select Registry Profile Tier</h2>
+</div>
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Required Field</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md" id="tier-selector">
+<!-- Tier 1: Private Collector -->
+<div class="tier-card cursor-pointer rounded-xl p-space-md bg-surface-container-high transition-all relative overflow-hidden group shadow-md" data-tier="collector">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110"></div>
+<div class="flex items-center justify-between mb-space-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">stars</span>
+<div class="tier-indicator w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[14px] font-bold">check</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Private Collector</h3>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider block mb-space-sm">Luxury Buyer</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Tailored for High-Net-Worth individuals and private auto syndicates.</p>
+<div class="space-y-1.5 pt-space-xs bg-surface-container-lowest/60 p-space-sm rounded-lg">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-tertiary text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">VIP Dedicated Concierge</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-tertiary text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">Track &amp; Test Drive Booking</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-tertiary text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">Escrow AED Settlement</span>
+</div>
+</div>
+</div>
+<!-- Tier 2: Corporate Fleet -->
+<div class="tier-card cursor-pointer rounded-xl p-space-md bg-surface-container transition-all relative overflow-hidden group hover:bg-surface-container-high" data-tier="corporate">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[28px] group-hover:text-primary transition-colors">corporate_fare</span>
+<div class="tier-indicator w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-transparent text-[14px]">check</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">Corporate Fleet</h3>
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider block mb-space-sm">Business Entity</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Structured for corporate hospitality, rental fleets, and holding firms.</p>
+<div class="space-y-1.5 pt-space-xs bg-surface-container-lowest/60 p-space-sm rounded-lg">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">TRN Tax Compliant Invoicing</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">Bulk Asset Procurement</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">Multi-Vehicle Consignment</span>
+</div>
+</div>
+</div>
+<!-- Tier 3: Licensed Dealership -->
+<div class="tier-card cursor-pointer rounded-xl p-space-md bg-surface-container transition-all relative overflow-hidden group hover:bg-surface-container-high" data-tier="dealer">
+<div class="flex items-center justify-between mb-space-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[28px] group-hover:text-primary transition-colors">storefront</span>
+<div class="tier-indicator w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-transparent text-[14px]">check</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1">UAE Dealership</h3>
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider block mb-space-sm">Licensed Agency</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">For licensed showrooms, exotic brokers, and authorized workshops.</p>
+<div class="space-y-1.5 pt-space-xs bg-surface-container-lowest/60 p-space-sm rounded-lg">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">DED Trade License Link</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">Full Inventory DMS Terminal</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-outline text-[16px]">check_circle</span>
+<span class="font-body-sm text-body-sm">Workshop Job-Card Portal</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: UAE PASS Quick Fill & Identity -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center font-data-mono-num text-data-mono-num font-semibold">02</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Verified UAE Identity Details</h2>
+</div>
+<div class="flex items-center gap-1.5 bg-tertiary-container/20 text-tertiary px-space-sm py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Gov-Secured Gateway</span>
+</div>
+</div>
+<!-- UAE PASS Fast-Fill Action Card -->
+<div class="bg-surface-container p-space-md rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md mb-space-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-tertiary shrink-0">
+<span class="material-symbols-outlined text-[30px]">fingerprint</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Instant Verify with UAE PASS</span>
+<span class="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Fast-Fill</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Bypass manual typing. Authenticate your Emirates ID, Full Legal Name, and Mobile Number securely.</p>
+</div>
+</div>
+<button class="w-full md:w-auto shrink-0 px-space-lg py-2.5 rounded-lg bg-surface-bright hover:bg-surface-tint hover:text-on-primary-fixed text-on-surface font-headline-sm text-body-md font-semibold transition-all flex items-center justify-center gap-2 shadow-sm" id="uae-pass-trigger" type="button">
+<span class="material-symbols-outlined text-[20px] text-tertiary">bolt</span>
+<span>Connect UAE PASS</span>
+</button>
+</div>
+<!-- Manual / Verified Form Fields Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant flex items-center justify-between" for="legal-name">
+<span>Full Legal Name (as per Emirates ID)</span>
+<span class="text-primary font-label-caps text-label-caps">AR / EN</span>
+</label>
+<div class="relative">
+<input class="w-full h-11 px-space-md bg-surface-container rounded-lg text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="legal-name" placeholder="First Middle Last" type="text" value="Sheikh Mansoor Al-Ketbi"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-tertiary">check_circle</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant flex items-center justify-between" for="emirates-id">
+<span>Emirates ID Registry Number</span>
+<span class="font-data-mono-num text-body-sm text-outline">784-XXXX-XXXXXXX-X</span>
+</label>
+<div class="relative">
+<input class="w-full h-11 px-space-md bg-surface-container rounded-lg text-on-surface font-data-mono-num text-data-mono-num focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="emirates-id" placeholder="784-YYYY-NNNNNNN-C" type="text" value="784-1988-4920194-1"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-tertiary">badge</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant" for="mobile-number">Mobile Contact (UAE Dial Code)</label>
+<div class="flex items-center gap-2">
+<div class="h-11 px-3 bg-surface-container-high rounded-lg flex items-center gap-1.5 text-on-surface shrink-0">
+<span class="text-[14px]">🇦🇪</span>
+<span class="font-data-mono-num text-data-mono-num font-semibold">+971</span>
+</div>
+<input class="w-full h-11 px-space-md bg-surface-container rounded-lg text-on-surface font-data-mono-num text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="mobile-number" placeholder="5X XXX XXXX" type="tel" value="50 892 4114"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant" for="email-address">Confidential Communications Email</label>
+<div class="relative">
+<input class="w-full h-11 px-space-md bg-surface-container rounded-lg text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="email-address" placeholder="name@domain.ae" type="email" value="m.alketbi@holding.ae"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-outline">mail</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: VIP Garage Preferences -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-md">
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center font-data-mono-num text-data-mono-num font-semibold">03</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Curated Garage Preferences</h2>
+</div>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Algorithmic Feed Tuning</span>
+</div>
+<!-- Marques Chips -->
+<div class="mb-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant block mb-space-sm">Target Marques &amp; Manufacturers (Multi-Select)</span>
+<div class="flex flex-wrap gap-2" id="marque-chips">
+<button class="marque-btn px-4 py-2 rounded-full font-body-sm text-body-sm font-semibold bg-on-surface text-surface flex items-center gap-1.5 transition-all shadow-sm" data-selected="true" type="button">
+<span>Ferrari</span>
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<button class="marque-btn px-4 py-2 rounded-full font-body-sm text-body-sm font-semibold bg-on-surface text-surface flex items-center gap-1.5 transition-all shadow-sm" data-selected="true" type="button">
+<span>Porsche</span>
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<button class="marque-btn px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center gap-1.5 transition-all" data-selected="false" type="button">
+<span>Mercedes-AMG</span>
+<span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="marque-btn px-4 py-2 rounded-full font-body-sm text-body-sm font-semibold bg-on-surface text-surface flex items-center gap-1.5 transition-all shadow-sm" data-selected="true" type="button">
+<span>Rolls-Royce</span>
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<button class="marque-btn px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center gap-1.5 transition-all" data-selected="false" type="button">
+<span>Aston Martin</span>
+<span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="marque-btn px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center gap-1.5 transition-all" data-selected="false" type="button">
+<span>Bugatti</span>
+<span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="marque-btn px-4 py-2 rounded-full font-body-sm text-body-sm bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center gap-1.5 transition-all" data-selected="false" type="button">
+<span>McLaren</span>
+<span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+</div>
+</div>
+<!-- Primary Emirate Hub Selection -->
+<div class="mb-space-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant block mb-space-sm">Primary Delivery &amp; Inspection Emirate</span>
+<div class="grid grid-cols-3 gap-space-sm" id="emirate-selector">
+<button class="emirate-btn py-2.5 px-space-md rounded-lg bg-surface-container-highest text-primary font-headline-sm text-body-md font-semibold flex items-center justify-center gap-2 shadow-sm" data-active="true" type="button">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>Dubai</span>
+</button>
+<button class="emirate-btn py-2.5 px-space-md rounded-lg bg-surface-container text-on-surface-variant font-headline-sm text-body-md hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2" data-active="false" type="button">
+<span class="material-symbols-outlined text-[18px]">domain</span>
+<span>Abu Dhabi</span>
+</button>
+<button class="emirate-btn py-2.5 px-space-md rounded-lg bg-surface-container text-on-surface-variant font-headline-sm text-body-md hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2" data-active="false" type="button">
+<span class="material-symbols-outlined text-[18px]">apartment</span>
+<span>Sharjah</span>
+</button>
+</div>
+</div>
+<!-- Priority Telemetry & Alerts -->
+<div>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mb-space-sm">VIP Dispatch &amp; Market Intelligence Channels</span>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
+<label class="flex items-center gap- space-sm p-3 rounded-lg bg-surface-container cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0 bg-surface-container-highest accent-primary" type="checkbox"/>
+<div class="ml-2 flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface font-medium">WhatsApp Private Drops</span>
+<span class="font-body-sm text-[11px] text-outline">Direct off-market listings</span>
+</div>
+</label>
+<label class="flex items-center gap- space-sm p-3 rounded-lg bg-surface-container cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0 bg-surface-container-highest accent-primary" type="checkbox"/>
+<div class="ml-2 flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Valuation Drop Signals</span>
+<span class="font-body-sm text-[11px] text-outline">Real-time dealer repricing</span>
+</div>
+</label>
+<label class="flex items-center gap- space-sm p-3 rounded-lg bg-surface-container cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0 bg-surface-container-highest accent-primary" type="checkbox"/>
+<div class="ml-2 flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Escrow Ledger Status</span>
+<span class="font-body-sm text-[11px] text-outline">Central Bank wired milestones</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Section 4: Security Credentials & Password Strength -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-md">
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center font-data-mono-num text-data-mono-num font-semibold">04</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Cryptographic Authentication &amp; Password</h2>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]">shield_lock</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md mb-space-md">
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant" for="password-input">Master Portal Password</label>
+<div class="relative">
+<input class="w-full h-11 px-space-md pr-10 bg-surface-container rounded-lg text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="password-input" placeholder="Enter secure key phrase" type="password" value="V12-Ghibli#Apex2025"/>
+<button class="absolute right-3 top-3 text-outline hover:text-on-surface transition-colors" id="toggle-password" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant" for="password-confirm">Confirm Master Password</label>
+<div class="relative">
+<input class="w-full h-11 px-space-md pr-10 bg-surface-container rounded-lg text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" id="password-confirm" placeholder="Re-enter password" type="password" value="V12-Ghibli#Apex2025"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-[18px] text-tertiary">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Password Strength Bar & Requirements Grid -->
+<div class="bg-surface-container p-space-md rounded-xl">
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Cryptographic Entropy Rating</span>
+<span class="font-data-mono-num text-data-mono-num text-tertiary font-bold">96% - MILITARY SPEC</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden mb-space-md flex gap-1">
+<div class="h-full w-1/4 bg-tertiary rounded-full"></div>
+<div class="h-full w-1/4 bg-tertiary rounded-full"></div>
+<div class="h-full w-1/4 bg-tertiary rounded-full"></div>
+<div class="h-full w-1/4 bg-tertiary rounded-full"></div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-xs text-on-surface">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary text-[16px]">done</span>
+<span class="font-body-sm text-body-sm text-on-surface">12+ Characters</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary text-[16px]">done</span>
+<span class="font-body-sm text-body-sm text-on-surface">Special Symbol</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary text-[16px]">done</span>
+<span class="font-body-sm text-body-sm text-on-surface">Numerical Digits</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary text-[16px]">done</span>
+<span class="font-body-sm text-body-sm text-on-surface">FIDO2 Biometrics</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 5: Legal Check & Execution Trigger -->
+<div class="bg-surface-container-low p-space-lg rounded-xl shadow-md">
+<div class="space-y-space-sm mb-space-lg">
+<label class="flex items-start gap-space-sm cursor-pointer group">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary focus:ring-0 bg-surface-container-highest accent-primary shrink-0" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
+                  I consent to identity validation and credit authorization through the <strong class="text-on-surface font-medium">UAE Central Bank Regulatory Sandbox &amp; UAE PASS Sovereign Cloud API</strong>.
+                </span>
+</label>
+<label class="flex items-start gap-space-sm cursor-pointer group">
+<input checked="" class="mt-1 w-4 h-4 rounded text-primary focus:ring-0 bg-surface-container-highest accent-primary shrink-0" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
+                  I have reviewed and accepted the <a class="text-primary underline hover:text-primary-fixed" href="#">Terms of VIP Protocol Service</a> and agree to data processing under <strong class="text-on-surface font-medium">UAE Federal Decree-Law No. 45 of 2021</strong> on the Protection of Personal Data (PDPL).
+                </span>
+</label>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-xs">
+<button class="w-full sm:w-auto px-space-xl py-3.5 rounded-lg bg-primary hover:bg-primary-fixed text-on-primary font-headline-sm text-body-lg font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-primary/20" type="button">
+<span>Complete VIP Registration &amp; Access Virtual Garage</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="#">
+<span>Already registered?</span>
+<span class="font-medium text-primary underline">Sign In</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Right: VIP Summary Rail & Concierge Showcase -->
+<aside class="lg:col-span-4 flex flex-col gap-space-md lg:sticky lg:top-24">
+<!-- Virtual Garage Preview Card -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden shadow-xl">
+<div class="relative h-48 w-full bg-cover bg-center" data-alt="A cinematic luxury hypercar in a dimly lit obsidian private garage in Dubai, bathed in warm amber overhead spotlights highlighting sculpted carbon fiber lines, with polished reflective concrete floor and modern architectural pillars in deep void black tones." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDH6_pnkif4JqPapb0LAjDNAFoGdy6HQL-XY8dZE-tNO6UVNn9w0LwD5pgaqEcQ0Io3b5mpV4akDs96-GNgIfb2FUdnP95QaK8ffD-_hgOHmPwIGd9H5RJm2P4BUfhnA3M8K7xEpfrPCXmwgMEBk8aJadSisyX7DFMqxwg4rbdJnpbY_Uk4Qk4agCQGFWvCos6EafaFlYjzJNDUmuK7oZ3Gr8dC3QITk3lPAkygocBE0YNQ0kt8qUxW')">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-surface-container-low/30 to-transparent"></div>
+<div class="absolute top-3 left-3 bg-surface-container-lowest/80 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Vault Preview</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+<div>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest block">Featured Allocation</span>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold">2024 Daytona SP3 Icona</h4>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-outline block">ESTIMATED AED</span>
+<span class="font-data-mono-num text-headline-sm text-on-surface font-bold">14,200,000</span>
+</div>
+</div>
+</div>
+<div class="p-space-md space-y-space-md">
+<div class="flex items-center justify-between text-on-surface-variant text-body-sm">
+<span>Membership Allocation Status:</span>
+<span class="text-tertiary font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                  Complimentary Fast-Track
+                </span>
+</div>
+<!-- Membership Benefits Micro-List -->
+<div class="space-y-2 bg-surface-container p-space-sm rounded-lg">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">key</span>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-medium text-on-surface">Escrow-Shielded Settlement</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">UAE Central Bank compliant escrow vaults for multi-million dirham exchanges.</span>
+</div>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">airport_shuttle</span>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-medium text-on-surface">Closed-Transporter Delivery</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Climate-monitored enclosed flatbed dispatch direct to your private residence.</span>
+</div>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">gavel</span>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm font-medium text-on-surface">RTA Number Plate Clearing</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Expedited transfer of single and dual-digit collector registration plates.</span>
+</div>
+</div>
+</div>
+<!-- Security Telemetry Badge Card -->
+<div class="bg-surface-container-high p-space-sm rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[20px]">encrypted</span>
+<div class="flex flex-col">
+<span class="font-data-mono-num text-[11px] text-on-surface font-semibold">TLS 1.3 / E2EE PROTOCOL</span>
+<span class="font-label-caps text-[10px] text-outline">HASH: 4F92...B91C</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">verified_user</span>
+</div>
+</div>
+</div>
+<!-- Secondary Concierge Help Card -->
+<div class="bg-surface-container-low p-space-md rounded-xl shadow-md flex items-center gap-space-md">
+<div class="relative w-12 h-12 rounded-full overflow-hidden shrink-0 shadow-md">
+<img class="w-full h-full object-cover" data-alt="Portrait of an immaculate automotive luxury liaison concierge officer in tailored dark suit with subtle gold lapel pin against a minimalist luxury lounge backdrop in Dubai." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGGTUF6bhkNdXAUwIIxrsB6VlikYjJKHUZM36G2K6CK7ELzRHsXyv7Otqq-w-GEZq2pXd9DlXGhaz4QgaocSBmbZlYTQnsenj4iYWz7N4A63O5v0_7Hrh_UPbXXHjm7bo57JbN60h_8E3s4-HQhQs9cUSewmGTJ3wiBFzU_7BnVe_ML4iZz7nnqzeeF2jvtLC4QqNEhjQOxfN9RhRPhghn-Z_tS2pHb1VAMa1g9XLkiGBZGky-2Bb1"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Dedicated Desk</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Tariq Al-Hashemi</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Senior Private Client Advisor</span>
+</div>
+<a class="w-9 h-9 rounded-lg bg-surface-container-high hover:bg-primary hover:text-on-primary flex items-center justify-center text-primary transition-colors ml-auto shrink-0 shadow-sm" href="tel:+97148002886">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</a>
+</div>
+<!-- Protocol Compliance Stamp -->
+<div class="px-space-sm py-2 flex items-center justify-between text-outline text-[11px]">
+<span>REG ID: UAE-AUTO-OS-2025-C</span>
+<span class="font-data-mono-num text-data-mono-num">BUILD 14.8.2</span>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</div>
+<script>
+  // Interactive Tier Selection
+  const tierCards = document.querySelectorAll('#tier-selector .tier-card');
+  tierCards.forEach(card => {
+    card.addEventListener('click', () => {
+      tierCards.forEach(c => {
+        c.classList.remove('bg-surface-container-high', 'shadow-md');
+        c.classList.add('bg-surface-container');
+        const ind = c.querySelector('.tier-indicator');
+        if (ind) {
+          ind.classList.remove('bg-primary');
+          ind.classList.add('bg-surface-container-highest');
+          const checkIcon = ind.querySelector('.material-symbols-outlined');
+          if (checkIcon) {
+            checkIcon.classList.remove('text-on-primary');
+            checkIcon.classList.add('text-transparent');
+          }
+        }
+      });
+      card.classList.remove('bg-surface-container');
+      card.classList.add('bg-surface-container-high', 'shadow-md');
+      const activeInd = card.querySelector('.tier-indicator');
+      if (activeInd) {
+        activeInd.classList.remove('bg-surface-container-highest');
+        activeInd.classList.add('bg-primary');
+        const activeCheck = activeInd.querySelector('.material-symbols-outlined');
+        if (activeCheck) {
+          activeCheck.classList.remove('text-transparent');
+          activeCheck.classList.add('text-on-primary');
+        }
+      }
+    });
+  });
+
+  // Interactive Marque Chips
+  const marqueBtns = document.querySelectorAll('.marque-btn');
+  marqueBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isSelected = btn.getAttribute('data-selected') === 'true';
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (isSelected) {
+        btn.setAttribute('data-selected', 'false');
+        btn.classList.remove('bg-on-surface', 'text-surface', 'font-semibold');
+        btn.classList.add('bg-surface-container', 'text-on-surface-variant');
+        if (icon) {
+          icon.textContent = 'add';
+          icon.classList.add('text-outline');
+        }
+      } else {
+        btn.setAttribute('data-selected', 'true');
+        btn.classList.add('bg-on-surface', 'text-surface', 'font-semibold');
+        btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        if (icon) {
+          icon.textContent = 'check';
+          icon.classList.remove('text-outline');
+        }
+      }
+    });
+  });
+
+  // Emirate Hub Switcher
+  const emirateBtns = document.querySelectorAll('.emirate-btn');
+  emirateBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      emirateBtns.forEach(b => {
+        b.classList.remove('bg-surface-container-highest', 'text-primary', 'shadow-sm');
+        b.classList.add('bg-surface-container', 'text-on-surface-variant');
+        b.setAttribute('data-active', 'false');
+      });
+      btn.classList.add('bg-surface-container-highest', 'text-primary', 'shadow-sm');
+      btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
+      btn.setAttribute('data-active', 'true');
+    });
+  });
+
+  // Password Visibility Toggle
+  const togglePassBtn = document.getElementById('toggle-password');
+  const passInput = document.getElementById('password-input');
+  if (togglePassBtn && passInput) {
+    togglePassBtn.addEventListener('click', () => {
+      const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passInput.setAttribute('type', type);
+      const icon = togglePassBtn.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+      }
+    });
+  }
+
+  // UAE PASS Pre-fill Simulation
+  const uaePassBtn = document.getElementById('uae-pass-trigger');
+  if (uaePassBtn) {
+    uaePassBtn.addEventListener('click', () => {
+      uaePassBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>Authenticating...</span>';
+      setTimeout(() => {
+        uaePassBtn.innerHTML = '<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span><span class="text-tertiary font-bold">UAE PASS Verified</span>';
+        uaePassBtn.classList.remove('bg-surface-bright');
+        uaePassBtn.classList.add('bg-tertiary-container/20');
+      }, 700);
+    });
+  }
+</script></main><footer class="w-full bg-surface-container-lowest shadow-[0_-1px_8px_rgba(0,0,0,0.3)] mt-auto"><div class="max-w-7xl mx-auto px-space-md lg:px-space-xl py-space-xl"><div class="flex flex-col md:flex-row items-center justify-between gap-space-md text-on-surface-variant"><div class="flex flex-wrap items-center justify-center md:justify-start gap-space-md"><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-tertiary text-[18px]">shield</span><span class="font-body-sm text-body-sm text-on-surface-variant">UAE Digital Identity Framework Compliant</span></div><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-primary text-[18px]">gavel</span><span class="font-body-sm text-body-sm text-on-surface-variant">GCC Automotive Transaction Protocol v4.2</span></div></div><div class="flex items-center gap-space-lg"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="support-desk" href="#">VIP Concierge: +971 4 800 AUTO</a><span class="font-body-sm text-body-sm text-outline-variant">|</span><span class="font-body-sm text-body-sm text-on-surface-variant">© 2025 Automotive OS LLC. All rights reserved.</span></div></div></div></footer></body></html>

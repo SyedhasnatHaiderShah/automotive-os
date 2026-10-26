@@ -14,7 +14,11 @@
   "devDependencies": {
     "@opennextjs/cloudflare": "^1.20.13",
     "@playwright/test": "^1.64.1",
+    "@types/pixelmatch": "^7.1.0",
+    "@types/pngjs": "^6.0.5",
+    "pixelmatch": "^8.0.0",
     "playwright": "^1.64.1",
+    "pngjs": "^7.0.0",
     "prettier": "^3.5.1",
     "tsx": "^4.19.3",
     "turbo": "^2.4.4",

@@ -515,8 +515,8 @@ export async function fetchPublicListings(
     }
     throw new Error(`Marketplace API returned HTTP ${response.status}`);
   } catch (err) {
-    // Only deliberate local component previews may show Stitch fixtures.
-    if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
+    // Only deliberate local component previews or audit runs with explicit flag may show Stitch fixtures.
+    if (process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
       throw err;
     }
   }
@@ -1026,6 +1026,118 @@ export async function fetchPublicDealerBySlug(slug: string): Promise<PublicDeale
         licenseExpiry: '2028-12-31T00:00:00.000Z',
         jurisdiction: 'Dubai DED',
         isKybVerified: true,
+      },
+      isFixture: true,
+    };
+  }
+
+  if (slug === 'al-quoz') {
+    return {
+      ...SILBERARROWS_DEALER_FIXTURE,
+      id: 'al-quoz-showroom-4-id',
+      slug: 'al-quoz',
+      legalName: 'Al Quoz Showroom 4 Luxury LLC',
+      displayName: 'Al Quoz Showroom 4',
+      tagline: 'Tier-1 Institutional Partner | Al Quoz Industrial 3 Flagship',
+      contact: {
+        ...SILBERARROWS_DEALER_FIXTURE.contact,
+        address: 'Al Quoz Industrial 3, Dubai, UAE',
+      },
+      verification: {
+        status: 'APPROVED',
+        tradeLicenseRef: 'DED #894102',
+        licenseExpiry: '2028-12-31T00:00:00.000Z',
+        jurisdiction: 'Dubai DED',
+        isKybVerified: true,
+      },
+      stats: {
+        ...SILBERARROWS_DEALER_FIXTURE.stats,
+        liveGroundedStock: 42,
+        collectorRating: 4.96,
+      },
+      isFixture: true,
+    };
+  }
+
+  if (slug === 'yas-marina') {
+    return {
+      ...SILBERARROWS_DEALER_FIXTURE,
+      id: 'yas-marina-luxury-motors-id',
+      slug: 'yas-marina',
+      legalName: 'Yas Marina Luxury Motors LLC',
+      displayName: 'Yas Marina Luxury Motors',
+      tagline: 'Trackside Performance & Hypercar Allocations | Abu Dhabi',
+      contact: {
+        ...SILBERARROWS_DEALER_FIXTURE.contact,
+        address: 'Yas Marina Circuit, Abu Dhabi, UAE',
+      },
+      verification: {
+        status: 'APPROVED',
+        tradeLicenseRef: 'AD-DED #44109',
+        licenseExpiry: '2028-12-31T00:00:00.000Z',
+        jurisdiction: 'Abu Dhabi DED',
+        isKybVerified: true,
+      },
+      stats: {
+        ...SILBERARROWS_DEALER_FIXTURE.stats,
+        liveGroundedStock: 31,
+        collectorRating: 4.98,
+      },
+      isFixture: true,
+    };
+  }
+
+  if (slug === 'sheikh-zayed') {
+    return {
+      ...SILBERARROWS_DEALER_FIXTURE,
+      id: 'sheikh-zayed-gallery-id',
+      slug: 'sheikh-zayed',
+      legalName: 'Sheikh Zayed Rd Gallery Motors LLC',
+      displayName: 'Sheikh Zayed Rd Gallery',
+      tagline: 'Premier Collector Showroom | Between 3rd & 4th Interchange',
+      contact: {
+        ...SILBERARROWS_DEALER_FIXTURE.contact,
+        address: 'Between 3rd & 4th Interchange, Sheikh Zayed Road, Dubai, UAE',
+      },
+      verification: {
+        status: 'APPROVED',
+        tradeLicenseRef: 'DED #772910',
+        licenseExpiry: '2028-12-31T00:00:00.000Z',
+        jurisdiction: 'Dubai DED',
+        isKybVerified: true,
+      },
+      stats: {
+        ...SILBERARROWS_DEALER_FIXTURE.stats,
+        liveGroundedStock: 68,
+        collectorRating: 4.92,
+      },
+      isFixture: true,
+    };
+  }
+
+  if (slug === 'sharjah-oasis') {
+    return {
+      ...SILBERARROWS_DEALER_FIXTURE,
+      id: 'sharjah-auto-oasis-id',
+      slug: 'sharjah-oasis',
+      legalName: 'Sharjah Auto Oasis Hub LLC',
+      displayName: 'Sharjah Auto Oasis Hub',
+      tagline: 'Northern Emirates Premier Automotive Exchange | Souq Al Haraj',
+      contact: {
+        ...SILBERARROWS_DEALER_FIXTURE.contact,
+        address: 'Al Souq Al Haraj, Sector 1, Sharjah, UAE',
+      },
+      verification: {
+        status: 'APPROVED',
+        tradeLicenseRef: 'SHJ-LIC #30198',
+        licenseExpiry: '2028-12-31T00:00:00.000Z',
+        jurisdiction: 'Sharjah SEDD',
+        isKybVerified: true,
+      },
+      stats: {
+        ...SILBERARROWS_DEALER_FIXTURE.stats,
+        liveGroundedStock: 26,
+        collectorRating: 4.89,
       },
       isFixture: true,
     };
