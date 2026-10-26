@@ -572,7 +572,10 @@ export async function fetchModerationListing(id: string): Promise<AdminListingMo
     });
     if (res.ok) {
       const data = await res.json();
-      return { ...MOCK_MODERATION_DETAIL, ...data };
+      if (!data || typeof data !== 'object' || !data.id) {
+        throw new Error('Moderation API returned an incomplete dossier');
+      }
+      return data as AdminListingModerationDetail;
     }
   } catch {
     // Graceful fallback to approved Stitch mock data
@@ -622,7 +625,10 @@ export async function fetchKybDossier(id: string): Promise<DealerKybDossierDetai
     });
     if (res.ok) {
       const data = await res.json();
-      return { ...MOCK_KYB_DOSSIER, ...data };
+      if (!data || typeof data !== 'object' || !data.id) {
+        throw new Error('Dealer verification API returned an incomplete dossier');
+      }
+      return data as DealerKybDossierDetail;
     }
   } catch {
     // Fallback to approved Stitch mock data

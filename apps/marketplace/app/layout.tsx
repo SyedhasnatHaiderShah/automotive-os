@@ -39,6 +39,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container flex flex-col">
         {children}
+        {process.env.NEXT_PUBLIC_APP_ENV === 'staging' && (
+          <div data-staging-badge role="status" className="pointer-events-none fixed bottom-3 right-3 z-[80] max-w-[calc(100vw-1.5rem)] rounded-lg border border-primary/40 bg-surface-container-lowest/95 px-3 py-2 text-[11px] font-semibold text-primary shadow-lg backdrop-blur-sm">
+            STAGING · SYNTHETIC DATA · No live external approvals
+          </div>
+        )}
       </body>
     </html>
   );
