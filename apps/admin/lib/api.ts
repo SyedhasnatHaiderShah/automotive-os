@@ -577,6 +577,9 @@ export async function fetchModerationListing(id: string): Promise<AdminListingMo
   } catch {
     // Graceful fallback to approved Stitch mock data
   }
+  if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
+    throw new Error('Moderation dossier could not be loaded.');
+  }
   return MOCK_MODERATION_DETAIL;
 }
 
@@ -589,35 +592,23 @@ export async function submitModerationDecision(
     overrideFlag?: boolean;
   }
 ): Promise<{ success: boolean; status: string; message: string }> {
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/listings/${id}/decision`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      const result = await res.json();
-      return {
-        success: true,
-        status: result.status,
-        message:
-          payload.decision === 'APPROVE'
-            ? 'Vehicle listing successfully approved and published to public marketplace.'
-            : 'Listing rejected with regulatory reason citation dispatched to dealer.',
-      };
-    }
-  } catch {
-    // Fallback simulation
+  const res = await fetch(`${API_BASE}/api/v1/admin/listings/${id}/decision`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    throw new Error(`Moderation decision was NOT saved (HTTP ${res.status}).`);
+  }
+  const result = await res.json();
+  if (!result || !result.status) {
+    throw new Error('Moderation API did not confirm a persisted status.');
   }
   return {
     success: true,
-    status: payload.decision === 'APPROVE' ? 'PUBLISHED' : 'REJECTED',
-    message:
-      payload.decision === 'APPROVE'
-        ? 'Vehicle listing successfully approved and published to public marketplace with cryptographic HSM signature.'
-        : 'Listing rejected. Rejection reason and cure notice dispatched to dealer inventory.',
+    status: result.status,
+    message: 'Moderation decision saved by API.',
   };
 }
 
@@ -636,6 +627,9 @@ export async function fetchKybDossier(id: string): Promise<DealerKybDossierDetai
   } catch {
     // Fallback to approved Stitch mock data
   }
+  if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
+    throw new Error('Dealer KYB dossier could not be loaded.');
+  }
   return MOCK_KYB_DOSSIER;
 }
 
@@ -648,28 +642,23 @@ export async function submitKybAccreditation(
     twoFactorConfirmed: boolean;
   }
 ): Promise<{ success: boolean; status: string; message: string }> {
-  try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/verifications/${id}/decision`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      return {
-        success: true,
-        status: 'VERIFIED',
-        message: 'Dealership accreditation committed and smart contract sovereign badge minted.',
-      };
-    }
-  } catch {
-    // Fallback simulation
+  const res = await fetch(`${API_BASE}/api/v1/admin/verifications/${id}/decision`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    throw new Error(`KYB decision was NOT saved (HTTP ${res.status}).`);
+  }
+  const result = await res.json();
+  if (!result || !result.status) {
+    throw new Error('KYB API did not confirm a persisted status.');
   }
   return {
     success: true,
-    status: 'VERIFIED',
-    message: 'Dealership accreditation committed and smart contract sovereign badge minted.',
+    status: result.status,
+    message: 'Dealer verification decision saved by API.',
   };
 }
 

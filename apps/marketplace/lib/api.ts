@@ -109,6 +109,8 @@ export interface PublicListingSearchResponse {
 export interface PublicListingQuery {
   emirate?: string;
   make?: string;
+  q?: string;
+  sort?: 'recent' | 'price-asc' | 'price-desc';
   model?: string;
   condition?: string;
   gccSpec?: boolean;
@@ -480,6 +482,8 @@ export async function fetchPublicListings(
       params.append('emirate', query.emirate);
     }
     if (query?.make) params.append('make', query.make);
+    if (query?.q) params.append('q', query.q);
+    if (query?.sort) params.append('sort', query.sort);
     if (query?.model) params.append('model', query.model);
     if (query?.dealerSlug) params.append('dealerSlug', query.dealerSlug);
     if (query?.condition) params.append('condition', query.condition);
@@ -496,7 +500,7 @@ export async function fetchPublicListings(
 
     if (response.ok) {
       const data = await response.json();
-      if (data.items && data.items.length > 0) {
+      if (Array.isArray(data.items)) {
         return {
           items: data.items.map((item: any) => ({
             ...item,
@@ -507,9 +511,14 @@ export async function fetchPublicListings(
           limit: data.limit,
         };
       }
+      throw new Error('Invalid marketplace API response: expected items array');
     }
-  } catch (_err) {
-    // Graceful fallback to verified Stitch fixtures
+    throw new Error(`Marketplace API returned HTTP ${response.status}`);
+  } catch (err) {
+    // Only deliberate local component previews may show Stitch fixtures.
+    if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
+      throw err;
+    }
   }
 
   // Filter fixtures locally
@@ -565,8 +574,12 @@ export async function fetchPublicListingBySlug(slug: string): Promise<PublicList
         isFixture: false,
       };
     }
-  } catch (_err) {
-    // Fallback to verified Stitch fixtures
+    if (response.status === 404) return null;
+    throw new Error(`Vehicle details API returned HTTP ${response.status}`);
+  } catch (err) {
+    if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
+      throw err;
+    }
   }
 
   // Check if requested slug matches Porsche 911 GT3 RS
@@ -618,6 +631,9 @@ export async function submitVehicleLeadEnquiry(
   payload: CreateLeadEnquiryPayload
 ): Promise<LeadEnquiryResponse> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const isLocalPreview = process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_ENABLE_FIXTURES === 'true';
+  // A synthetic token and success receipt are NEVER permitted in deployed staging.
+  if (!isLocalPreview) throw new Error('Buyer authentication is required before sending an enquiry. No enquiry was submitted.');
 
   try {
     // Acquire dev token if executing in local environment
