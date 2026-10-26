@@ -1,0 +1,43 @@
+name: Staging Live Read-only Browser Smoke
+
+on:
+  push:
+    branches: ['audit/railway-staging-live-smoke']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout smoke test branch
+        uses: actions/checkout@v4
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.15.9
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium dependencies
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Read-only browser and API smoke tests
+        env:
+          CI: true
+        run: pnpm exec playwright test --config tests/staging-live/playwright.config.ts
+      - name: Preserve all screenshots and HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-live-smoke-evidence
+          path: |
+            tests/staging-live/artifacts/
+            tests/staging-live/report/
+          if-no-files-found: warn
+          retention-days: 7
