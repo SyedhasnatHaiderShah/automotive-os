@@ -9,7 +9,7 @@ export default function AdminOverviewPage() {
   const [isRtl, setIsRtl] = useState(false);
   const [cockpitMode, setCockpitMode] = useState<'normal' | 'circuit' | 'auditor'>('normal');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [triageItems, setTriageItems] = useState([
+  const [triageItems] = useState([
     {
       id: 'triage-1',
       title: 'Apex GT Motors FZCO',
@@ -74,24 +74,11 @@ export default function AdminOverviewPage() {
   };
 
   const handleCircuitBreakerClick = () => {
-    if (cockpitMode === 'circuit') {
-      setCockpitMode('normal');
-      showToast(isRtl ? 'تم إلغاء قاطع الدائرة واستئناف نشاط المنصة' : 'Circuit breaker disengaged. Platform resumed normal ops.');
-      return;
-    }
-
-    const confirmed = window.confirm(
-      'CONFIRM SOVEREIGN MARKET CIRCUIT BREAKER?\n\nThis will instantly halt all Escrow disbursements across DIFC/CBUAE nodes and suspend automated RTA title mutations.'
-    );
-    if (confirmed) {
-      setCockpitMode('circuit');
-      showToast(isRtl ? 'تم تنشيط قاطع الدائرة الطارئ للمنصة' : 'EMERGENCY MARKET CIRCUIT BREAKER ACTIVATED');
-    }
+    showToast('Emergency regulatory controls are not connected in staging. No action was performed.');
   };
 
-  const handleTriageAction = (id: string, actionName: string) => {
-    showToast(`${actionName}: Executed successfully. Audit entry logged to DIFC ledger.`);
-    setTriageItems(prev => prev.map(item => item.id === id ? { ...item, status: 'resolved' } : item));
+  const handleTriageAction = (_id: string, _actionName: string) => {
+    showToast('This action is a read-only Stitch prototype. No regulatory action or audit entry was created.');
   };
 
   return (
@@ -101,6 +88,7 @@ export default function AdminOverviewPage() {
         <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
+          <div role="status" className="mb-5 rounded-lg border border-primary/40 bg-primary/10 px-4 py-3 text-sm text-on-surface">SYNTHETIC STAGING DEMO — External government, banking, escrow and compliance integrations are disabled. Figures and cases are design examples, not live operational telemetry.</div>
           <div className="flex flex-col w-full gap-space-lg">
             {/* Top Operations Command Banner */}
             <div className="relative overflow-hidden rounded-xl bg-surface-container-low p-space-lg shadow-xl border border-surface-container-high/40">
@@ -151,7 +139,8 @@ export default function AdminOverviewPage() {
                 <div className="flex items-center gap-space-sm flex-wrap">
                   <button
                     id="btn-export-difc"
-                    onClick={() => showToast(isRtl ? 'تم تنزيل تقرير مركز دبي المالي المعتمد' : 'Exporting DIFC Regulatory Report (PDF + Cryptographic Attestation)...')}
+                    disabled
+                    title="Export requires a real regulatory reporting service; unavailable in staging"
                     className="h-10 px-4 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm flex items-center gap-2 transition-colors shadow-sm"
                     type="button"
                   >
@@ -161,7 +150,8 @@ export default function AdminOverviewPage() {
 
                   <button
                     id="btn-force-sync"
-                    onClick={() => showToast(isRtl ? 'تم مزامنة كافة البوابات السيادية بنجاح' : 'Sovereign Gateways synchronized: RTA (12ms), TAMM (16ms), UAE PASS (Active)')}
+                    disabled
+                    title="External integrations disabled; no synchronization will be triggered"
                     className="h-10 px-4 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm flex items-center gap-2 transition-colors shadow-sm"
                     type="button"
                   >
@@ -171,7 +161,8 @@ export default function AdminOverviewPage() {
 
                   <button
                     id="circuit-breaker-btn"
-                    onClick={handleCircuitBreakerClick}
+                    disabled
+                    title="Emergency circuit breaker is not connected to a live enforcement service"
                     className={`h-10 px-4 rounded font-body-sm font-medium flex items-center gap-2 transition-all shadow-sm ${
                       cockpitMode === 'circuit'
                         ? 'bg-error text-on-error font-semibold animate-pulse shadow-lg'
@@ -604,8 +595,8 @@ export default function AdminOverviewPage() {
                             </span>
                           ) : (
                             <button
-                              disabled={cockpitMode === 'auditor'}
-                              onClick={() => handleTriageAction(item.id, item.actionText)}
+                              disabled
+                              title="Read-only synthetic case. No real regulatory action is available."
                               className={`px-3 py-1.5 rounded font-body-sm font-medium transition-colors flex items-center gap-1 ${
                                 item.actionType === 'primary'
                                   ? 'bg-primary text-on-primary hover:bg-primary-fixed'

@@ -17,20 +17,30 @@ export default function MarketplaceHomePage() {
   const [selectedCondition, setSelectedCondition] = useState('ALL');
   const [vehicles, setVehicles] = useState<PublicListingItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
   const [favorites, setFavorites] = useState<string[]>([]);
 
   const isArabic = locale === 'ar';
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      const res = await fetchPublicListings({
-        emirate: selectedEmirate,
-      });
-      setVehicles(res.items);
-      setLoading(false);
-    }
-    loadData();
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    fetchPublicListings({ emirate: selectedEmirate, page: 1, limit: 12 })
+      .then((res) => {
+        if (!active) return;
+        setVehicles(res.items);
+        setTotalCount(res.total);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setVehicles([]);
+        setTotalCount(0);
+        setLoadError(err instanceof Error ? err.message : 'Unable to retrieve listings');
+      })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [selectedEmirate]);
 
   const toggleFavorite = (id: string) => {
@@ -49,12 +59,12 @@ export default function MarketplaceHomePage() {
   };
 
   const popularMakes = [
-    { name: 'Porsche', count: 184 },
-    { name: 'Toyota', count: 420 },
-    { name: 'Mercedes-Benz', count: 312 },
-    { name: 'Land Rover', count: 195 },
-    { name: 'Ferrari', count: 48 },
-    { name: 'Bentley', count: 36 },
+    { name: 'Porsche' },
+    { name: 'Toyota' },
+    { name: 'Mercedes-Benz' },
+    { name: 'Land Rover' },
+    { name: 'Ferrari' },
+    { name: 'Bentley' },
   ];
 
   return (
@@ -101,7 +111,7 @@ export default function MarketplaceHomePage() {
                   {isArabic ? 'بوابة وكلاء الإمارات المعتمدة' : 'Direct Dealer Exchange'}
                 </span>
                 <span className="text-outline text-xs font-data-mono-num">
-                  • 1,482 GCC SPEC LISTINGS
+                  • {totalCount.toLocaleString('en-US')} available listings
                 </span>
               </div>
 
@@ -222,7 +232,7 @@ export default function MarketplaceHomePage() {
                   <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-surface-container/90 backdrop-blur-md border border-outline-variant/40 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] font-label-caps text-secondary uppercase tracking-wider block">
-                        VIP Showcase • Dubai
+                        Static concept showcase • Dubai
                       </span>
                       <h4 className="font-headline-sm text-sm font-bold text-on-surface">
                         2024 Porsche 911 GT3 RS
@@ -240,7 +250,7 @@ export default function MarketplaceHomePage() {
                         href="/cars"
                         className="text-[11px] text-tertiary hover:underline font-medium"
                       >
-                        {isArabic ? 'عرض التفاصيل →' : 'View Dossier →'}
+                        {isArabic ? 'عرض السيارات المتاحة →' : 'Browse live stock →'}
                       </a>
                     </div>
                   </div>
@@ -260,9 +270,7 @@ export default function MarketplaceHomePage() {
                   className="px-3.5 py-1.5 rounded-full bg-surface-container-high border border-outline-variant/30 text-xs font-medium text-on-surface hover:border-primary/60 hover:text-primary transition-all flex items-center gap-1.5"
                 >
                   <span>{make.name}</span>
-                  <span className="text-[10px] text-outline font-data-mono-num">
-                    {make.count}
-                  </span>
+
                 </a>
               ))}
             </div>
@@ -290,14 +298,22 @@ export default function MarketplaceHomePage() {
               href="/cars"
               className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-container transition-colors"
             >
-              <span>{isArabic ? 'عرض كافة السيارات (1,482)' : 'View All Available Stock (1,482)'}</span>
+              <span>{isArabic ? 'عرض كافة السيارات' : 'View All Available Stock'} ({totalCount.toLocaleString('en-US')})</span>
               <span>→</span>
             </a>
           </div>
 
           {/* Grid Render */}
-          {loading ? (
+          {loadError && !loading ? (
+            <section role="alert" className="rounded-lg border border-error/40 bg-surface-container p-6">
+              <h3 className="text-lg font-semibold">Vehicle inventory unavailable</h3>
+              <p className="mt-2 text-sm text-on-surface-variant">{loadError}</p>
+              <a className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 text-on-primary" href="/">Retry loading</a>
+            </section>
+          ) : loading ? (
             <VehicleGridSkeleton count={6} />
+          ) : vehicles.length === 0 ? (
+            <div role="status" className="rounded-lg border border-outline-variant/40 bg-surface-container p-6">No published vehicles are available in this location yet.</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {vehicles.map((v) => (
