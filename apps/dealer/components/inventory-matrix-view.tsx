@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DealerSidebar } from './dealer-sidebar';
 import { DealerHeader } from './dealer-header';
 import { VehicleIntakeModal } from './vehicle-intake-modal';
@@ -30,6 +30,8 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
   const [isIntakeOpen, setIsIntakeOpen] = useState(false);
   const [rtaSyncStatus, setRtaSyncStatus] = useState<string | null>(null);
   const [pendingVehicleId, setPendingVehicleId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
   const exportVisibleCsv = () => {
@@ -109,10 +111,10 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === filteredVehicles.length) {
+    if (pageVehicles.length > 0 && pageVehicles.every((item) => selectedIds.has(item.id))) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filteredVehicles.map((v) => v.id)));
+      setSelectedIds(new Set(pageVehicles.map((v) => v.id)));
     }
   };
 
@@ -177,6 +179,10 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
 
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / PAGE_SIZE));
+  const pageVehicles = filteredVehicles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  useEffect(() => { setCurrentPage(1); }, [activeFilter, searchQuery]);
 
   const selectedVehicles = vehicles.filter((v) => selectedIds.has(v.id));
   const combinedSelectedValue = selectedVehicles.reduce(
@@ -644,7 +650,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                       <input
                         type="checkbox"
                         id="select-all-check"
-                        checked={selectedIds.size === filteredVehicles.length && filteredVehicles.length > 0}
+                        checked={pageVehicles.length > 0 && pageVehicles.every((item) => selectedIds.has(item.id))}
                         onChange={toggleSelectAll}
                         className="rounded bg-surface-container-high border-0 accent-primary text-primary focus:ring-0 cursor-pointer w-4 h-4"
                       />
@@ -677,7 +683,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                       </td>
                     </tr>
                   )}
-                  {filteredVehicles.map((vehicle) => {
+                  {pageVehicles.map((vehicle) => {
                     const isSelected = selectedIds.has(vehicle.id);
                     const isVinRevealed = revealedVins.has(vehicle.id);
                     const askingAed = Math.round(Number(vehicle.askingPriceFils) / 100);
@@ -911,6 +917,16 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                 </tbody>
               </table>
             </div>
+            {filteredVehicles.length > 0 && (
+              <nav aria-label="Inventory pagination" className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 bg-surface-container p-3 text-sm">
+                <span className="text-on-surface-variant">Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filteredVehicles.length)} of {filteredVehicles.length} vehicles</span>
+                <div className="flex items-center gap-2">
+                  <button type="button" disabled={currentPage <= 1} onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 disabled:opacity-40">Previous</button>
+                  <span>Page {currentPage} / {totalPages}</span>
+                  <button type="button" disabled={currentPage >= totalPages} onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} className="min-h-11 rounded-lg border border-outline-variant/50 px-4 disabled:opacity-40">Next</button>
+                </div>
+              </nav>
+            )}
           </div>
         </main>
       </div>
