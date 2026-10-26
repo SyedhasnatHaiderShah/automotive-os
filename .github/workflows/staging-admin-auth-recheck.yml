@@ -1,0 +1,17 @@
+name: Staging Admin Authentication Recheck
+on:
+  push:
+    branches: ['qa/staging-cc5bc235-smoke']
+jobs:
+  admin-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Probe anonymous and forged-token GETs
+        run: node tests/staging-qa/admin-auth-recheck.cjs
