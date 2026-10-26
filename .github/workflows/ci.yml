@@ -182,6 +182,9 @@ jobs:
         with:
           kustomize-version: "5.3.0"
 
+      - name: Verify Railway service-specific staging configuration
+        run: node scripts/verify-railway-staging-config.mjs
+
       - name: Validate K8s Manifests via Kustomize
         run: |
           kustomize build deploy/k8s > /dev/null
