@@ -23,8 +23,8 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
 
   const navItems = [
     { label: isArabic ? 'تصفح السيارات' : 'Browse Stock', href: '/cars', path: '/cars' },
-    { label: isArabic ? 'الوكلاء المعتمدون' : 'Verified Dealers', href: '#', path: '/dealers' },
-    { label: isArabic ? 'بيع وتفويض' : 'Sell & Consign', href: '#', path: '/sell' },
+    { label: isArabic ? 'الوكلاء المعتمدون' : 'Verified Dealers', href: null, path: '/dealers' },
+    { label: isArabic ? 'بيع وتفويض' : 'Sell & Consign', href: null, path: '/sell' },
     { label: isArabic ? 'مقارنة السيارات' : 'Compare Vehicles', href: '/compare', path: '/compare' },
   ];
 
@@ -97,17 +97,29 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
           {navItems.map((item) => {
             const isActive = activePath === item.path;
             return (
-              <a
-                key={item.href}
-                href={item.href}
-                className={`py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'text-primary font-semibold border-b-2 border-primary'
-                    : 'text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                {item.label}
-              </a>
+              item.href ? (
+                <a
+                  key={item.path}
+                  href={item.href}
+                  className={`py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-primary font-semibold border-b-2 border-primary'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <span
+                  key={item.path}
+                  aria-disabled="true"
+                  title={isArabic ? 'غير متاح حالياً في النسخة التجريبية' : 'Coming soon — not available in staging'}
+                  className="py-2 text-sm text-on-surface-variant/50 cursor-not-allowed"
+                >
+                  {item.label}
+                  <span className="ms-1 text-[9px] opacity-80">{isArabic ? 'قريباً' : 'Soon'}</span>
+                </span>
+              )
             );
           })}
         </nav>

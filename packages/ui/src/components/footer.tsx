@@ -44,15 +44,9 @@ export const MarketplaceFooter: React.FC<MarketplaceFooterProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-outline font-body-sm">
           <p>© {new Date().getFullYear()} Automotive OS UAE. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-primary transition-colors">
-              {isArabic ? 'سياسة الخصوصية' : 'Privacy Notice'}
-            </a>
-            <a href="#" className="hover:text-primary transition-colors">
-              {isArabic ? 'شروط الخدمة' : 'Terms of Service'}
-            </a>
-            <a href="#" className="hover:text-primary transition-colors">
-              {isArabic ? 'إفصاح حماية المستهلك' : 'UAE Consumer Rights'}
-            </a>
+            <span aria-disabled="true" title={isArabic ? 'سيتم نشر الوثائق القانونية قبل إطلاق الخدمة' : 'Legal document is not published for this staging demonstration'} className="text-on-surface-variant/60 cursor-not-allowed">{isArabic ? 'سياسة الخصوصية' : 'Privacy Notice'}</span>
+            <span aria-disabled="true" title={isArabic ? 'سيتم نشر الوثائق القانونية قبل إطلاق الخدمة' : 'Legal document is not published for this staging demonstration'} className="text-on-surface-variant/60 cursor-not-allowed">{isArabic ? 'شروط الخدمة' : 'Terms of Service'}</span>
+            <span aria-disabled="true" title={isArabic ? 'سيتم نشر الوثائق القانونية قبل إطلاق الخدمة' : 'Legal document is not published for this staging demonstration'} className="text-on-surface-variant/60 cursor-not-allowed">{isArabic ? 'إفصاح حماية المستهلك' : 'UAE Consumer Rights'}</span>
           </div>
         </div>
       </div>
