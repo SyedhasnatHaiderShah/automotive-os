@@ -4,7 +4,7 @@
 **Stitch ID:** `25f8c91796994dafa16e145333eb0cc0`  
 **Target Route:** `/cars` (`apps/marketplace/app/cars/page.tsx`)  
 **Design Theme:** Obsidian Dark Mode with `#d4af37` Metallic Gold Accent  
-**Date (UTC):** 2026-10-23T09:09:44.035Z  
+**Date (UTC):** 2026-10-26T06:10:09.799Z  
 **Overall Result:** VERIFIED (PASS)
 
 ---
@@ -14,9 +14,9 @@
 | Check | Result | Details |
 |---|---|---|
 | HTTP 200 Response | **PASS** | Status code: 200 |
-| Results Header Rendered | **PASS** | Title: "Verified Showroom Stock (6)" |
+| Results Header Rendered | **PASS** | Title: "Verified Showroom Stock (2)" |
 | Faceted Filter Sidebar Present | **PASS** | Desktop aside container for faceted search |
-| Vehicle Results Rendered | **PASS** | Found 12 vehicle listing cards |
+| Vehicle Results Rendered | **PASS** | Found 4 vehicle listing cards |
 | Sort Control Present | **PASS** | Sort dropdown rendered |
 | 1440px Desktop Screenshot Captured | **PASS** | H:/Personal/Automotiv OS/docs/qa/evidence/S02/rendered-desktop.png |
 | Arabic RTL Bi-directional Toggle | **PASS** | Page container dir="rtl" verified |

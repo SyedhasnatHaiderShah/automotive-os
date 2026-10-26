@@ -4,7 +4,7 @@
 **Stitch Screen ID:** `7b3928ad8d7640fcbb51ed02c9b1e623`  
 **Route:** `/auth/forgot-password`  
 **Delivery Tier:** P0 (Sovereign Auth Suite)  
-**Evaluation Date (UTC):** 2026-10-23T09:13:09.745Z  
+**Evaluation Date (UTC):** 2026-10-26T06:14:19.819Z  
 **Verdict:** **PASS (VERIFIED)**
 
 ---

@@ -21,8 +21,8 @@ async function verifyS17() {
 
     console.log('Navigating to http://localhost:3002/disputes ...');
     const response = await page.goto('http://localhost:3002/disputes', {
-      waitUntil: 'networkidle',
-      timeout: 30000
+      waitUntil: 'domcontentloaded',
+      timeout: 15000
     });
     const statusCode = response.status();
     results.push({
@@ -31,7 +31,7 @@ async function verifyS17() {
       detail: `Status code: ${statusCode}`
     });
 
-    // 1. Case Command Header Banner & Sovereign Badges
+    await page.waitForSelector('text=DSP-2025-019', { timeout: 10000 });
     const bodyText = await page.textContent('body');
     const hasCaseRef = bodyText.includes('DSP-2025-019');
     const hasUaeLaw = bodyText.includes('UAE Federal Law No. 15 Compliant');

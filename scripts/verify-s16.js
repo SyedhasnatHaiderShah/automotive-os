@@ -21,8 +21,8 @@ async function verifyS16() {
 
     console.log('Navigating to http://localhost:3002/moderation/listings/mod-9921 ...');
     const response = await page.goto('http://localhost:3002/moderation/listings/mod-9921', {
-      waitUntil: 'networkidle',
-      timeout: 30000
+      waitUntil: 'domcontentloaded',
+      timeout: 15000
     });
     const statusCode = response.status();
     results.push({
@@ -31,7 +31,7 @@ async function verifyS16() {
       detail: `Status code: ${statusCode}`
     });
 
-    // 2. Top Sticky Audit Strip Breadcrumbs & Priority Flag
+    await page.waitForSelector('#btn-approve-publish', { timeout: 10000 });
     const bodyText = await page.textContent('body');
     const hasAuditCode = bodyText.includes('AUDIT #MOD-9921') || bodyText.includes('#MOD-9921');
     const hasPriority = bodyText.includes('Priority: P1-Regulatory') || bodyText.includes('P1-Regulatory');
@@ -163,18 +163,30 @@ async function verifyS16() {
 
     // 13. Responsive Screenshots & Arabic RTL Capture
     console.log('Capturing responsive screenshots...');
+    async function captureScreenshot(targetPath, opts = {}) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          await page.screenshot({ path: targetPath, fullPage: true, ...opts });
+          return;
+        } catch (e) {
+          if (attempt === 2) throw e;
+          await page.waitForTimeout(500);
+        }
+      }
+    }
+
     // Desktop 1440px
-    await page.screenshot({ path: path.join(evidenceDir, 's16-desktop-1440.png'), fullPage: true });
+    await captureScreenshot(path.join(evidenceDir, 's16-desktop-1440.png'));
 
     // Tablet 1024px
     await page.setViewportSize({ width: 1024, height: 768 });
     await page.waitForTimeout(300);
-    await page.screenshot({ path: path.join(evidenceDir, 's16-tablet-1024.png'), fullPage: true });
+    await captureScreenshot(path.join(evidenceDir, 's16-tablet-1024.png'));
 
     // Mobile 390px
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForTimeout(300);
-    await page.screenshot({ path: path.join(evidenceDir, 's16-mobile-390.png'), fullPage: true });
+    await captureScreenshot(path.join(evidenceDir, 's16-mobile-390.png'));
 
     // Arabic RTL capture (reset to 1440px and click "عربي")
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -183,7 +195,7 @@ async function verifyS16() {
       await arToggle.click();
       await page.waitForTimeout(500);
     }
-    await page.screenshot({ path: path.join(evidenceDir, 's16-arabic-rtl.png'), fullPage: true });
+    await captureScreenshot(path.join(evidenceDir, 's16-arabic-rtl.png'));
 
     results.push({
       check: 'Multi-device Responsive & Arabic RTL Screenshots Generated',
@@ -253,8 +265,19 @@ ${results.map((r, i) => `| ${i + 1} | ${r.check} | **${r.passed ? 'PASS' : 'FAIL
 - Arabic RTL: \`docs/qa/evidence/S16/s16-arabic-rtl.png\`
 `;
 
-  fs.writeFileSync(reportPath, markdown, 'utf-8');
-  console.log(`Report written to ${reportPath}`);
+  let written = false;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      fs.writeFileSync(reportPath, markdown, 'utf-8');
+      written = true;
+      break;
+    } catch {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 300);
+    }
+  }
+  if (written) {
+    console.log(`Report written to ${reportPath}`);
+  }
 
   if (passCount !== results.length) {
     process.exit(1);

@@ -1,6 +1,6 @@
 # QA Test Report: S17 — Seller Sanctions & Escrow Dispute Review
 
-**Timestamp:** 2026-10-23T09:11:23.630Z
+**Timestamp:** 2026-10-26T06:11:59.116Z
 **Target Route:** `http://localhost:3002/disputes`
 **Stitch Screen ID:** `10ebda02e492484d9444279dcbfdaa23`
 **Cohort:** P1-GATED (Escrow disbursement restricted to partner-approved legal banking custody)
