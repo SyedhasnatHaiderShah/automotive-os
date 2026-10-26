@@ -1,0 +1,157 @@
+[
+  {
+    "id": "S01",
+    "app": "marketplace",
+    "path": "/"
+  },
+  {
+    "id": "S02",
+    "app": "marketplace",
+    "path": "/cars"
+  },
+  {
+    "id": "S03",
+    "app": "marketplace",
+    "path": "/cars"
+  },
+  {
+    "id": "S04",
+    "app": "marketplace",
+    "path": "/compare"
+  },
+  {
+    "id": "S05",
+    "app": "marketplace",
+    "path": "/cars/2024-toyota-land-cruiser-gr-sport-dubai"
+  },
+  {
+    "id": "S06",
+    "app": "marketplace",
+    "path": "/dealers/{DEALER_SLUG}"
+  },
+  {
+    "id": "S07",
+    "app": "marketplace",
+    "path": "/cars/2024-toyota-land-cruiser-gr-sport-dubai/enquiry"
+  },
+  {
+    "id": "S08",
+    "app": "marketplace",
+    "path": "/account/enquiries"
+  },
+  {
+    "id": "S09",
+    "app": "marketplace",
+    "path": "/account/garage"
+  },
+  {
+    "id": "S10",
+    "app": "marketplace",
+    "path": "/account/saved"
+  },
+  {
+    "id": "S11",
+    "app": "marketplace",
+    "path": "/account/profile"
+  },
+  {
+    "id": "S12",
+    "app": "dealer",
+    "path": "/"
+  },
+  {
+    "id": "S13",
+    "app": "dealer",
+    "path": "/inventory"
+  },
+  {
+    "id": "S14",
+    "app": "admin",
+    "path": "/"
+  },
+  {
+    "id": "S15",
+    "app": "admin",
+    "path": "/verifications/{KYB_ID}"
+  },
+  {
+    "id": "S16",
+    "app": "admin",
+    "path": "/moderation/listings/{MODERATION_ID}"
+  },
+  {
+    "id": "S17",
+    "app": "admin",
+    "path": "/disputes"
+  },
+  {
+    "id": "S18",
+    "app": "dealer",
+    "path": "/sales"
+  },
+  {
+    "id": "S19",
+    "app": "dealer",
+    "path": "/workshop"
+  },
+  {
+    "id": "S20",
+    "app": "dealer",
+    "path": "/parts"
+  },
+  {
+    "id": "S21",
+    "app": "dealer",
+    "path": "/finance"
+  },
+  {
+    "id": "S22",
+    "app": "dealer",
+    "path": "/accounting"
+  },
+  {
+    "id": "S23",
+    "app": "dealer",
+    "path": "/fleet"
+  },
+  {
+    "id": "S24",
+    "app": "dealer",
+    "path": "/accounting/exception/export"
+  },
+  {
+    "id": "S25",
+    "app": "dealer",
+    "path": "/finance/exception"
+  },
+  {
+    "id": "S26",
+    "app": "dealer",
+    "path": "/fleet/exception"
+  },
+  {
+    "id": "S27",
+    "app": "marketplace",
+    "path": "/auth/login"
+  },
+  {
+    "id": "S28",
+    "app": "marketplace",
+    "path": "/auth/register"
+  },
+  {
+    "id": "S29",
+    "app": "marketplace",
+    "path": "/auth/forgot-password"
+  },
+  {
+    "id": "S30",
+    "app": "marketplace",
+    "path": "/account/settings"
+  },
+  {
+    "id": "S31",
+    "app": "marketplace",
+    "path": "/account/profile/dossier"
+  }
+]
