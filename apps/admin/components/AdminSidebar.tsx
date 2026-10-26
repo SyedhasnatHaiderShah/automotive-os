@@ -10,7 +10,13 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
   const pathname = usePathname();
-  useEffect(() => { document.body.classList.remove('admin-mobile-nav-open'); }, [pathname]);
+  useEffect(() => {
+    const close = () => { document.body.classList.remove('admin-mobile-nav-open'); window.dispatchEvent(new Event('admin-nav-closed')); };
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') close(); };
+    close();
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [pathname]);
 
   const isListingActive = pathname?.includes('/moderation') ?? false;
   const isKybActive = pathname?.includes('/verifications') ?? false;
@@ -24,7 +30,7 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
       } top-0 h-full w-60 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-50 flex flex-col justify-between`}
     >
       <div className="flex flex-col flex-1 overflow-y-auto">
-        <button type="button" className="lg:hidden absolute top-3 right-3 rounded-lg p-2 text-on-surface" aria-label="Close admin navigation" onClick={() => document.body.classList.remove("admin-mobile-nav-open")}>✕</button>
+        <button type="button" className="lg:hidden absolute top-3 right-3 rounded-lg p-2 text-on-surface" aria-label="Close admin navigation" onClick={() => { document.body.classList.remove("admin-mobile-nav-open"); window.dispatchEvent(new Event("admin-nav-closed")); }}>✕</button>
         {/* Brand Header */}
         <div className="h-16 px-space-md flex items-center gap-space-sm bg-surface-container-lowest">
           <div className="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center">

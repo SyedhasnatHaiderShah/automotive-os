@@ -17,13 +17,17 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
 }) => {
   const isArabic = locale === 'ar';
   const [mobileOpen, setMobileOpen] = useState(false);
-  useEffect(() => () => { document.body.classList.remove('dealer-mobile-nav-open'); }, []);
+  useEffect(() => {
+    const closed = () => setMobileOpen(false);
+    window.addEventListener('dealer-nav-closed', closed);
+    return () => { document.body.classList.remove('dealer-mobile-nav-open'); window.removeEventListener('dealer-nav-closed', closed); };
+  }, []);
 
   return (
     <header className="dealer-app-header fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-6 flex items-center justify-between border-b border-white/[0.06]">
       {/* Left: Hub Selector & Real-Time RTA Status */}
       <div className="flex items-center gap-2 sm:gap-4">
-        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg p-2 text-on-surface hover:bg-surface-container-high" aria-label="Toggle dealer navigation" aria-expanded={mobileOpen} onClick={() => { const next = !mobileOpen; setMobileOpen(next); document.body.classList.toggle("dealer-mobile-nav-open", next); }}><span className="material-symbols-outlined">menu</span></button>
+        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg p-2 text-on-surface hover:bg-surface-container-high" aria-label="Toggle dealer navigation" aria-expanded={mobileOpen} onClick={() => { const next = !document.body.classList.contains("dealer-mobile-nav-open"); setMobileOpen(next); document.body.classList.toggle("dealer-mobile-nav-open", next); }}><span className="material-symbols-outlined">menu</span></button>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface transition-colors border border-white/[0.05]">
           <span className="material-symbols-outlined text-[18px] text-primary">storefront</span>
           <span className="font-body-sm text-xs sm:text-sm font-semibold">

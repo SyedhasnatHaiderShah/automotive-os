@@ -14,7 +14,13 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
   locale = 'en',
 }) => {
   const pathname = usePathname();
-  useEffect(() => { document.body.classList.remove('dealer-mobile-nav-open'); }, [pathname]);
+  useEffect(() => {
+    const close = () => { document.body.classList.remove('dealer-mobile-nav-open'); window.dispatchEvent(new Event('dealer-nav-closed')); };
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') close(); };
+    close();
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [pathname]);
   const isArabic = locale === 'ar';
 
   const navItems = [
@@ -68,7 +74,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({
   return (
     <aside aria-label="Dealer navigation" className="dealer-app-sidebar fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)] border-r border-white/[0.06]">
       <div className="flex flex-col">
-        <button type="button" className="lg:hidden absolute top-3 right-3 rounded-lg p-2 text-on-surface" aria-label="Close dealer navigation" onClick={() => document.body.classList.remove("dealer-mobile-nav-open")}>✕</button>
+        <button type="button" className="lg:hidden absolute top-3 right-3 rounded-lg p-2 text-on-surface" aria-label="Close dealer navigation" onClick={() => { document.body.classList.remove("dealer-mobile-nav-open"); window.dispatchEvent(new Event("dealer-nav-closed")); }}>✕</button>
         {/* Dealership Suite Branding */}
         <div className="h-16 px-4 flex items-center justify-between bg-surface-container/60 border-b border-white/[0.05]">
           <div className="flex items-center gap-3">

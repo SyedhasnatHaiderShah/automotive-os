@@ -9,7 +9,11 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  useEffect(() => () => { document.body.classList.remove('admin-mobile-nav-open'); }, []);
+  useEffect(() => {
+    const closed = () => setMobileOpen(false);
+    window.addEventListener('admin-nav-closed', closed);
+    return () => { document.body.classList.remove('admin-mobile-nav-open'); window.removeEventListener('admin-nav-closed', closed); };
+  }, []);
   return (
     <header
       className={`admin-app-header fixed top-0 ${
@@ -17,7 +21,7 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
       } h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-40 px-gutter border-b border-surface-container-high/40`}
     >
       <div className="h-16 w-full flex items-center justify-between gap-space-md">
-        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg text-on-surface hover:bg-surface-container-high" aria-label="Toggle admin navigation" aria-expanded={mobileOpen} onClick={() => { const next = !mobileOpen; setMobileOpen(next); document.body.classList.toggle("admin-mobile-nav-open", next); }}><span className="material-symbols-outlined">menu</span></button>
+        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg text-on-surface hover:bg-surface-container-high" aria-label="Toggle admin navigation" aria-expanded={mobileOpen} onClick={() => { const next = !document.body.classList.contains("admin-mobile-nav-open"); setMobileOpen(next); document.body.classList.toggle("admin-mobile-nav-open", next); }}><span className="material-symbols-outlined">menu</span></button>
         {/* Left Info & Clearance Badge */}
         <div className="flex items-center gap-space-md min-w-0 flex-1">
           <div className="flex flex-col min-w-0">
