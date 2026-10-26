@@ -297,15 +297,19 @@ export class ListingsService {
           },
         },
       });
+      // Unlike AuditService.logAction (which swallows errors), this insert must
+      // participate in the same transaction and abort the status change if it fails.
+      await tx.auditEvent.create({
+        data: {
+          tenantId,
+          actorUserId: actorUserId || null,
+          action: 'LISTING_UNPUBLISHED',
+          targetType: 'listing',
+          targetId: listingId,
+          metadata: { vehicleId: listing.vehicleId, source: 'dealer' },
+        },
+      });
       return result;
-    });
-    await this.auditService.logAction({
-      tenantId,
-      actorUserId: actorUserId || null,
-      action: 'LISTING_UNPUBLISHED',
-      targetType: 'listing',
-      targetId: listingId,
-      metadata: { vehicleId: listing.vehicleId, source: 'dealer' },
     });
     return this.mapListingResponse(updated);
   }
@@ -542,7 +546,14 @@ export class ListingsService {
     };
 
     if (query.q?.trim()) {
-      where.title = { contains: query.q.trim(), mode: 'insensitive' };
+      const keyword = query.q.trim();
+      // Filter before pagination/count so search works for dealer and emirate
+      // as well as title, preserving the original buyer search behavior.
+      where.OR = [
+        { title: { contains: keyword, mode: "insensitive" } },
+        { tenant: { displayName: { contains: keyword, mode: "insensitive" } } },
+        { vehicle: { branch: { emirate: { contains: keyword, mode: "insensitive" } } } },
+      ];
     }
 
     if (query.dealerSlug) {

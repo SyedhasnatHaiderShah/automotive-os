@@ -562,28 +562,59 @@ export const MOCK_KYB_DOSSIER: DealerKybDossierDetail = {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
+/**
+ * The current admin endpoint returns a compact listing summary, not the
+ * Stitch forensic moderation contract. Do not cast it to a full dossier:
+ * that fabricates unverified attestation data and breaks images.slice().
+ *
+ * When the backend supplies a complete dossier contract, this validation
+ * admits it. Until then the screen renders an explicit unsupported state.
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+export function isModerationDossier(value: unknown): value is AdminListingModerationDetail {
+  if (!isRecord(value)) return false;
+  return typeof value.id === 'string'
+    && typeof value.title === 'string'
+    && typeof value.dealerName === 'string'
+    && typeof value.auditCode === 'string'
+    && Array.isArray(value.images)
+    && Array.isArray(value.attestations)
+    && Array.isArray(value.attachedDocs)
+    && Array.isArray(value.scans)
+    && Array.isArray(value.queuePipeline)
+    && value.images.every((image) => isRecord(image) && typeof image.url === 'string');
+}
+
+function localStitchPreviewEnabled(): boolean {
+  return process.env.NODE_ENV === 'development'
+    && process.env.NEXT_PUBLIC_ENABLE_FIXTURES === 'true';
+}
+
+function apiLoadError(context: string, err: unknown): Error {
+  return err instanceof Error
+    ? new Error(`${context}: ${err.message}`)
+    : new Error(`${context}: request failed`);
+}
+
 export async function fetchModerationListing(id: string): Promise<AdminListingModerationDetail> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/listings/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 0 },
+    const res = await fetch(`${API_BASE}/api/v1/admin/listings/${encodeURIComponent(id)}`, {
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (!data || typeof data !== 'object' || !data.id) {
-        throw new Error('Moderation API returned an incomplete dossier');
-      }
-      return data as AdminListingModerationDetail;
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data: unknown = await res.json();
+    if (!isModerationDossier(data)) {
+      throw new Error('Detailed listing moderation evidence is unavailable from this API. No attestation has been verified.');
     }
-  } catch {
-    // Graceful fallback to approved Stitch mock data
+    return data;
+  } catch (err) {
+    if (localStitchPreviewEnabled()) return MOCK_MODERATION_DETAIL;
+    throw apiLoadError('Moderation dossier not loaded', err);
   }
-  if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
-    throw new Error('Moderation dossier could not be loaded.');
-  }
-  return MOCK_MODERATION_DETAIL;
 }
 
 export async function submitModerationDecision(
@@ -615,28 +646,36 @@ export async function submitModerationDecision(
   };
 }
 
+export function isKybDossier(value: unknown): value is DealerKybDossierDetail {
+  if (!isRecord(value)) return false;
+  return typeof value.id === 'string'
+    && typeof value.caseNumber === 'string'
+    && typeof value.legalEntityName === 'string'
+    && typeof value.displayName === 'string'
+    && Array.isArray(value.beneficialOwners)
+    && Array.isArray(value.dualSigners)
+    && Array.isArray(value.queueRibbon)
+    && isRecord(value.facility)
+    && Array.isArray(value.facility.photos)
+    && value.beneficialOwners.every((owner) => isRecord(owner) && typeof owner.name === 'string');
+}
+
 export async function fetchKybDossier(id: string): Promise<DealerKybDossierDetail> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/admin/verifications/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 0 },
+    const res = await fetch(`${API_BASE}/api/v1/admin/verifications/${encodeURIComponent(id)}`, {
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (!data || typeof data !== 'object' || !data.id) {
-        throw new Error('Dealer verification API returned an incomplete dossier');
-      }
-      return data as DealerKybDossierDetail;
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data: unknown = await res.json();
+    if (!isKybDossier(data)) {
+      throw new Error('Complete KYB evidence is not available from this API. Beneficial owners and facility checks have NOT been verified.');
     }
-  } catch {
-    // Fallback to approved Stitch mock data
+    return data;
+  } catch (err) {
+    if (localStitchPreviewEnabled()) return MOCK_KYB_DOSSIER;
+    throw apiLoadError('Dealer KYB dossier not loaded', err);
   }
-  if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
-    throw new Error('Dealer KYB dossier could not be loaded.');
-  }
-  return MOCK_KYB_DOSSIER;
 }
 
 export async function submitKybAccreditation(

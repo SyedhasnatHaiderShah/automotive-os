@@ -18,6 +18,8 @@ export default function ListingModerationPage() {
 
   const [isRtl, setIsRtl] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [listing, setListing] = useState<AdminListingModerationDetail>(MOCK_MODERATION_DETAIL);
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D'>('A');
   const [citationText, setCitationText] = useState(
@@ -28,6 +30,7 @@ export default function ListingModerationPage() {
   const [attestation3, setAttestation3] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionFeedback, setSubmissionFeedback] = useState<string | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   // Modal for Reject or Clarification
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -37,40 +40,56 @@ export default function ListingModerationPage() {
   );
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      const data = await fetchModerationListing(listingId);
-      setListing(data);
-      setLoading(false);
-    }
-    loadData();
-  }, [listingId]);
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    fetchModerationListing(listingId)
+      .then((data) => { if (active) setListing(data); })
+      .catch((err: unknown) => {
+        if (active) setLoadError(err instanceof Error ? err.message : 'Moderation dossier could not be loaded');
+      })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [listingId, retryCount]);
 
   const handleCommitAdjudication = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
     setSubmissionFeedback(null);
-
-    const isReject = selectedOption === 'C';
-    const res = await submitModerationDecision(listing.id, {
-      decision: isReject ? 'REJECT' : 'APPROVE',
-      reason: isReject ? citationText : undefined,
-      discloseBadge: selectedOption === 'A' ? listing.discloseBadgeLabel : undefined,
-      overrideFlag: selectedOption === 'B',
-    });
-
-    setIsSubmitting(false);
-    setSubmissionFeedback(res.message);
+    setSubmissionError(null);
+    try {
+      const isReject = selectedOption === 'C';
+      const res = await submitModerationDecision(listing.id, {
+        decision: isReject ? 'REJECT' : 'APPROVE',
+        reason: isReject ? citationText : undefined,
+        discloseBadge: selectedOption === 'A' ? listing.discloseBadgeLabel : undefined,
+        overrideFlag: selectedOption === 'B',
+      });
+      setSubmissionFeedback(res.message);
+    } catch (err) {
+      setSubmissionError(`Decision was NOT saved. ${err instanceof Error ? err.message : 'Please retry.'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleConfirmReject = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
-    const res = await submitModerationDecision(listing.id, {
-      decision: 'REJECT',
-      reason: `[${rejectReason}] ${rejectNotes}`,
-    });
-    setIsSubmitting(false);
-    setRejectModalOpen(false);
-    setSubmissionFeedback(res.message);
+    setSubmissionFeedback(null);
+    setSubmissionError(null);
+    try {
+      const res = await submitModerationDecision(listing.id, {
+        decision: 'REJECT',
+        reason: `[${rejectReason}] ${rejectNotes}`,
+      });
+      setRejectModalOpen(false);
+      setSubmissionFeedback(res.message);
+    } catch (err) {
+      setSubmissionError(`Rejection was NOT saved. ${err instanceof Error ? err.message : 'Please retry.'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -88,6 +107,22 @@ export default function ListingModerationPage() {
     );
   }
 
+  if (loadError) {
+    return (
+      <main role="alert" className="min-h-screen bg-background text-on-surface flex items-center justify-center p-6">
+        <section className="max-w-xl w-full rounded-xl border border-error/50 bg-surface-container p-6 space-y-4">
+          <h1 className="text-xl font-semibold">Moderation dossier unavailable</h1>
+          <p className="text-on-surface-variant">{loadError}</p>
+          <p className="text-sm text-on-surface-variant">No moderation approval or verification has been performed.</p>
+          <div className="flex flex-wrap gap-3">
+            <button type="button" className="rounded-lg bg-primary px-4 py-2 text-on-primary" onClick={() => setRetryCount((n) => n + 1)}>Retry</button>
+            <Link href="/moderation" className="rounded-lg border border-outline-variant px-4 py-2">Back to queue</Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
@@ -96,6 +131,13 @@ export default function ListingModerationPage() {
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col w-full">
+            {submissionError && (
+              <div role="alert" className="mb-space-md rounded-lg border border-error/50 bg-error-container/20 p-4 text-on-surface">
+                <strong className="text-error">Action failed</strong>
+                <p className="mt-1 text-sm">{submissionError}</p>
+                <button type="button" className="mt-2 underline" onClick={() => setSubmissionError(null)}>Dismiss</button>
+              </div>
+            )}
             {/* Notification Banner when Adjudication is committed */}
             {submissionFeedback && (
               <div className="mb-space-md p-space-md rounded-xl bg-tertiary-container/20 border border-tertiary text-on-surface flex items-center justify-between shadow-lg">

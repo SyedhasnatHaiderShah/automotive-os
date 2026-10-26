@@ -21,6 +21,8 @@ export default function KybVerificationDetailPage() {
 
   const [isRtl, setIsRtl] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [dossier, setDossier] = useState<DealerKybDossierDetail>(MOCK_KYB_DOSSIER);
 
   // Form states
@@ -45,47 +47,50 @@ export default function KybVerificationDetailPage() {
   );
 
   const [notification, setNotification] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      const data = await fetchKybDossier(kybId);
-      setDossier(data);
-      setLoading(false);
-    }
-    loadData();
-  }, [kybId]);
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    fetchKybDossier(kybId)
+      .then((data) => { if (active) setDossier(data); })
+      .catch((err: unknown) => {
+        if (active) setLoadError(err instanceof Error ? err.message : 'KYB dossier could not be loaded');
+      })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [kybId, retryCount]);
 
   const handleExecuteBiometricSign = async () => {
+    if (isBroadcasting) return;
     setIsBroadcasting(true);
-
-    // Simulate smart contract broadcast & HSM signing
-    setTimeout(async () => {
-      setIsBroadcasting(false);
-      setBroadcastingComplete(true);
-
-      await submitKybAccreditation(dossier.id, {
+    setBroadcastingComplete(false);
+    setNotification(null);
+    setActionError(null);
+    try {
+      // This calls the real API; no timer or simulated hardware attestation.
+      const result = await submitKybAccreditation(dossier.id, {
         tier: selectedTier,
         reasonCode,
         operatorNote: auditNote,
-        twoFactorConfirmed: true,
+        twoFactorConfirmed: false, // UI does not perform real hardware 2FA.
       });
-
-      setTimeout(() => {
-        setBiometricModalOpen(false);
-        setBroadcastingComplete(false);
-        setNotification(
-          `Accreditation committed successfully. Royal Apex Motors is now minted as a Tier-1 Sovereign Dealer.`
-        );
-      }, 1000);
-    }, 1200);
+      setBroadcastingComplete(true);
+      setBiometricModalOpen(false);
+      setNotification(result.message);
+    } catch (err) {
+      setActionError(`Accreditation was NOT saved. ${err instanceof Error ? err.message : 'Please retry.'}`);
+    } finally {
+      setIsBroadcasting(false);
+    }
   };
 
   const handleConfirmReject = () => {
+    // Current API has no supported KYB rejection contract.
     setRejectModalOpen(false);
-    setNotification(
-      `Application rejected. Regulatory notice dispatched with reason code: [${rejectionReason}].`
-    );
+    setNotification(null);
+    setActionError(`KYB rejection [${rejectionReason}] is not connected to an API. No decision was saved.`);
   };
 
   if (loading) {
@@ -103,6 +108,22 @@ export default function KybVerificationDetailPage() {
     );
   }
 
+  if (loadError) {
+    return (
+      <main role="alert" className="min-h-screen bg-background text-on-surface flex items-center justify-center p-6">
+        <section className="max-w-xl w-full rounded-xl border border-error/50 bg-surface-container p-6 space-y-4">
+          <h1 className="text-xl font-semibold">Dealer KYB evidence unavailable</h1>
+          <p className="text-on-surface-variant">{loadError}</p>
+          <p className="text-sm text-on-surface-variant">No verification or dealer approval has occurred.</p>
+          <div className="flex flex-wrap gap-3">
+            <button type="button" className="rounded-lg bg-primary px-4 py-2 text-on-primary" onClick={() => setRetryCount((n) => n + 1)}>Retry</button>
+            <Link href="/verifications" className="rounded-lg border border-outline-variant px-4 py-2">Back to verifications</Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
@@ -111,6 +132,13 @@ export default function KybVerificationDetailPage() {
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col w-full">
+            {actionError && (
+              <div role="alert" className="mb-space-md rounded-lg border border-error/50 bg-error-container/20 p-4 text-on-surface">
+                <strong className="text-error">Action not completed</strong>
+                <p className="mt-1 text-sm">{actionError}</p>
+                <button type="button" className="mt-2 underline" onClick={() => setActionError(null)}>Dismiss</button>
+              </div>
+            )}
             {/* Success / Action Notification */}
             {notification && (
               <div className="mb-space-md p-space-md rounded-xl bg-tertiary-container/20 border border-tertiary text-on-surface flex items-center justify-between shadow-lg">
@@ -1048,10 +1076,10 @@ export default function KybVerificationDetailPage() {
               </span>
               <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider group-hover:text-primary transition-colors">
                 {broadcastingComplete
-                  ? 'Cryptographic Accreditation Minted!'
+                  ? 'API request confirmed'
                   : isBroadcasting
-                  ? 'Broadcasting to Sovereign Ledger...'
-                  : 'Tap Hardware YubiKey or Sensor to Sign'}
+                  ? 'Submitting to API...'
+                  : 'Request accreditation (no hardware 2FA)'}
               </span>
             </div>
 
