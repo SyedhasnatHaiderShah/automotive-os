@@ -5,6 +5,19 @@ import { AuthService, OidcJwtPayload } from './auth.service';
 
 const DEFAULT_DEV_SECRET = 'dev-jwt-secret-replace-in-production-min-32-chars-long';
 
+export const cookieExtractor = (req: any): string | null => {
+  if (req && req.cookies && req.cookies['ao_session']) {
+    return req.cookies['ao_session'];
+  }
+  if (req && req.headers && typeof req.headers.cookie === 'string') {
+    const match = req.headers.cookie.match(/(?:^|;\s*)ao_session=([^;]+)/);
+    if (match && match[1]) {
+      return decodeURIComponent(match[1]);
+    }
+  }
+  return null;
+};
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
@@ -22,7 +35,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const expectedAudience = process.env.JWT_AUDIENCE || 'autonexa-api';
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        cookieExtractor,
+      ]),
       ignoreExpiration: false,
       secretOrKey: configuredSecret || DEFAULT_DEV_SECRET,
       issuer: expectedIssuer,
@@ -51,6 +67,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('User authentication failed: subject not authorized');
     }
+
     return user;
   }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   HttpCode,
@@ -17,12 +18,14 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AdminService } from "./admin.service";
+import { AdminService, AuditLogListResponse } from "./admin.service";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { PlatformAdminGuard } from "../common/guards/platform-admin.guard";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { AdminTenantSummaryDto } from "./dto/admin-tenant-summary.dto";
 import { UpdateTenantStatusDto } from "./dto/update-tenant-status.dto";
+import { AdminUserFilterDto, AdminUpdateUserDto } from "./dto/admin-user.dto";
+import { AdminCreateDealerDto, AdminInviteDealerStaffDto } from "./dto/admin-dealer.dto";
 
 @ApiTags("admin")
 @ApiBearerAuth()
@@ -30,6 +33,10 @@ import { UpdateTenantStatusDto } from "./dto/update-tenant-status.dto";
 @Controller("api/v1/admin")
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
+
+  // ==========================================
+  // Dealerships Platform Oversight
+  // ==========================================
 
   @Get("tenants")
   @ApiOperation({
@@ -42,6 +49,36 @@ export class AdminController {
     @Headers("x-correlation-id") correlationId?: string,
   ): Promise<AdminTenantSummaryDto[]> {
     return this.adminService.listAllTenants(adminUserId, correlationId);
+  }
+
+  @Get("dealers")
+  @ApiOperation({ summary: "Alias for listing dealerships" })
+  async listDealers(
+    @CurrentUser("id") adminUserId: string,
+    @Headers("x-correlation-id") correlationId?: string,
+  ) {
+    return this.adminService.listAllTenants(adminUserId, correlationId);
+  }
+
+  @Post("dealers")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Provision new verified dealership with initial owner" })
+  async createDealer(
+    @CurrentUser("id") adminUserId: string,
+    @Body() dto: AdminCreateDealerDto,
+  ) {
+    return this.adminService.createDealer(dto, adminUserId);
+  }
+
+  @Post("dealers/:id/invite")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Issue cryptographic invitation for new dealership employee" })
+  async inviteDealerStaff(
+    @CurrentUser("id") adminUserId: string,
+    @Param("id") tenantId: string,
+    @Body() dto: AdminInviteDealerStaffDto,
+  ) {
+    return this.adminService.inviteDealerStaff(tenantId, dto, adminUserId);
   }
 
   @Get("tenants/:id")
@@ -98,6 +135,79 @@ export class AdminController {
       correlationId,
     );
   }
+
+  // ==========================================
+  // Platform User Administration
+  // ==========================================
+
+  @Get("users")
+  @ApiOperation({ summary: "List and filter platform users with pagination" })
+  async listUsers(
+    @CurrentUser("id") adminUserId: string,
+    @Query() filter: AdminUserFilterDto,
+  ) {
+    return this.adminService.listUsers(filter, adminUserId);
+  }
+
+  @Get("users/:id")
+  @ApiOperation({ summary: "Get detailed user identity, memberships, and session activity" })
+  async getUser(
+    @CurrentUser("id") adminUserId: string,
+    @Param("id") userId: string,
+  ) {
+    return this.adminService.getUserById(userId, adminUserId);
+  }
+
+  @Patch("users/:id")
+  @ApiOperation({ summary: "Update user status (ACTIVE, SUSPENDED, DISABLED) or role elevation" })
+  async updateUser(
+    @CurrentUser("id") adminUserId: string,
+    @Param("id") userId: string,
+    @Body() dto: AdminUpdateUserDto,
+  ) {
+    return this.adminService.updateUser(userId, dto, adminUserId);
+  }
+
+  @Post("users/:id/revoke-sessions")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Immediately terminate all active sessions for a user" })
+  async revokeSessions(
+    @CurrentUser("id") adminUserId: string,
+    @Param("id") userId: string,
+  ) {
+    return this.adminService.revokeUserSessions(userId, adminUserId);
+  }
+
+  @Delete("users/:id")
+  @ApiOperation({ summary: "Soft delete user (sets status to DISABLED and revokes sessions)" })
+  async deleteUser(
+    @CurrentUser("id") adminUserId: string,
+    @Param("id") userId: string,
+  ) {
+    return this.adminService.deleteUser(userId, adminUserId);
+  }
+
+  // ==========================================
+  // Audit Log Trail
+  // ==========================================
+
+  @Get("audit-logs")
+  @ApiOperation({ summary: "Stream paginated audit log events" })
+  async listAuditLogs(
+    @CurrentUser("id") adminUserId: string,
+    @Query("limit") limit?: number,
+    @Query("offset") offset?: number,
+    @Query("targetType") targetType?: string,
+  ): Promise<AuditLogListResponse> {
+    return this.adminService.listAuditLogs(
+      { limit: limit ? Number(limit) : 50, offset: offset ? Number(offset) : 0, targetType },
+      adminUserId
+    );
+  }
+
+  // ==========================================
+  // Outbox Processing & Worker Hooks
+  // ==========================================
 
   @Post("outbox/process")
   @HttpCode(HttpStatus.OK)

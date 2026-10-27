@@ -1,10 +1,35 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+
+export interface AuditLogListResponse {
+  events: Array<{
+    id: string;
+    action: string;
+    tenantId: string | null;
+    actorUserId: string | null;
+    targetType: string;
+    targetId: string;
+    metadata: any;
+    createdAt: string;
+  }>;
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { createHash, randomBytes } from "node:crypto";
 import { PrismaService } from "../database/prisma.service";
 import { AuditService } from "../audit/audit.service";
 import { OutboxService, OutboxMetricsDto } from "../listings/outbox.service";
 import { AdminTenantSummaryDto } from "./dto/admin-tenant-summary.dto";
 import { UpdateTenantStatusDto } from "./dto/update-tenant-status.dto";
-import { ListingStatus, TenantStatus } from "@automotive-os/database";
+import { AdminUserFilterDto, AdminUpdateUserDto } from "./dto/admin-user.dto";
+import { AdminCreateDealerDto, AdminInviteDealerStaffDto } from "./dto/admin-dealer.dto";
+import { ListingStatus, MembershipRole, TenantStatus, UserStatus } from "@automotive-os/database";
 
 @Injectable()
 export class AdminService {
@@ -18,7 +43,6 @@ export class AdminService {
     adminUserId: string,
     correlationId?: string,
   ): Promise<AdminTenantSummaryDto[]> {
-    // Audit hook: every platform administration inspection is recorded
     await this.auditService.logAction({
       tenantId: null,
       actorUserId: adminUserId,
@@ -121,11 +145,6 @@ export class AdminService {
     };
   }
 
-  /**
-   * Update dealership operational status (e.g. SUSPENDED, ACTIVE).
-   * When suspended, atomicity guarantees that active published listings unpublish
-   * and transactional outbox events are appended.
-   */
   async updateTenantStatus(
     adminUserId: string,
     tenantId: string,
@@ -159,7 +178,6 @@ export class AdminService {
         },
       });
 
-      // If tenant is suspended or closed, unpublish all active listings
       if (
         newStatus === TenantStatus.SUSPENDED ||
         newStatus === TenantStatus.CLOSED
@@ -182,7 +200,6 @@ export class AdminService {
             },
           });
 
-          // Outbox event for each unpublishing listing
           for (const listing of publishedListings) {
             await tx.outboxEvent.create({
               data: {
@@ -201,45 +218,39 @@ export class AdminService {
             });
           }
         }
-
-        // Outbox event for tenant suspension
-        await tx.outboxEvent.create({
-          data: {
-            tenantId,
-            aggregateType: "tenant",
-            aggregateId: tenantId,
-            eventType: "tenant.suspended",
-            payload: {
-              tenantId,
-              previousStatus,
-              newStatus,
-              reason: dto.reason,
-            },
-          },
-        });
       }
 
-      // Audit log entry in the same transaction
-      await tx.auditEvent.create({
+      await tx.outboxEvent.create({
         data: {
           tenantId,
-          actorUserId: adminUserId,
-          action:
-            newStatus === TenantStatus.SUSPENDED
-              ? "TENANT_SUSPENDED"
-              : "TENANT_STATUS_UPDATED",
-          targetType: "tenant",
-          targetId: tenantId,
-          correlationId: correlationId || null,
-          metadata: {
+          aggregateType: "tenant",
+          aggregateId: tenantId,
+          eventType: "tenant.status_updated",
+          payload: {
+            tenantId,
             previousStatus,
             newStatus,
-            reason: dto.reason,
+            reason: dto.reason || "Platform administration update",
+            updatedByUserId: adminUserId,
           },
         },
       });
 
       return t;
+    });
+
+    await this.auditService.logAction({
+      tenantId,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_UPDATE_TENANT_STATUS",
+      targetType: "tenant",
+      targetId: tenantId,
+      correlationId: correlationId || null,
+      metadata: {
+        previousStatus,
+        newStatus,
+        reason: dto.reason || null,
+      },
     });
 
     return {
@@ -257,9 +268,488 @@ export class AdminService {
     };
   }
 
-  /**
-   * Process pending Outbox events on demand (Audited Platform Admin action).
-   */
+  // ==========================================
+  // Platform User Administration
+  // ==========================================
+
+  async listUsers(filter: AdminUserFilterDto, adminUserId: string) {
+    await this.auditService.logAction({
+      tenantId: null,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_LIST_USERS",
+      targetType: "users",
+      targetId: "ALL",
+      metadata: { filter },
+    });
+
+    const where: any = {};
+
+    if (filter.search) {
+      const q = filter.search.trim();
+      where.OR = [
+        { email: { contains: q, mode: "insensitive" } },
+        { displayName: { contains: q, mode: "insensitive" } },
+        { phoneE164: { contains: q } },
+      ];
+    }
+
+    if (filter.status) {
+      where.status = filter.status;
+    }
+
+    if (filter.role) {
+      if (filter.role === "PLATFORM_ADMIN") {
+        where.isPlatformAdmin = true;
+      } else if (filter.role === "BUYER") {
+        where.buyer = { isNot: null };
+      } else {
+        where.memberships = {
+          some: {
+            role: filter.role as MembershipRole,
+            active: true,
+          },
+        };
+      }
+    }
+
+    if (filter.tenantId) {
+      where.memberships = {
+        some: {
+          tenantId: filter.tenantId,
+        },
+      };
+    }
+
+    const page = Math.max(1, filter.page || 1);
+    const limit = Math.max(1, Math.min(100, filter.limit || 20));
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          buyer: true,
+          memberships: {
+            include: {
+              tenant: {
+                select: {
+                  id: true,
+                  displayName: true,
+                  slug: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      users: users.map((u) => ({
+        id: u.id,
+        email: u.email,
+        displayName: u.displayName,
+        phoneE164: u.phoneE164,
+        isPlatformAdmin: u.isPlatformAdmin,
+        status: u.status,
+        createdAt: u.createdAt.toISOString(),
+        updatedAt: u.updatedAt.toISOString(),
+        emailVerifiedAt: u.emailVerifiedAt ? u.emailVerifiedAt.toISOString() : null,
+        memberships: u.memberships.map((m) => ({
+          tenantId: m.tenantId,
+          tenantName: m.tenant.displayName,
+          tenantSlug: m.tenant.slug,
+          role: m.role,
+          active: m.active,
+        })),
+        isBuyer: !!u.buyer,
+      })),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getUserById(userId: string, adminUserId: string) {
+    await this.auditService.logAction({
+      tenantId: null,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_GET_USER",
+      targetType: "user",
+      targetId: userId,
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        buyer: true,
+        memberships: {
+          include: {
+            tenant: true,
+          },
+        },
+        sessions: {
+          where: { revokedAt: null, expiresAt: { gt: new Date() } },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return {
+      id: user.id,
+      identitySubject: user.identitySubject,
+      email: user.email,
+      phoneE164: user.phoneE164,
+      displayName: user.displayName,
+      isPlatformAdmin: user.isPlatformAdmin,
+      status: user.status,
+      emailVerifiedAt: user.emailVerifiedAt?.toISOString() || null,
+      mfaEnabled: user.mfaEnabled,
+      failedLoginAttempts: user.failedLoginAttempts,
+      lockedUntil: user.lockedUntil?.toISOString() || null,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+      memberships: user.memberships.map((m) => ({
+        tenantId: m.tenantId,
+        tenantName: m.tenant.displayName,
+        tenantSlug: m.tenant.slug,
+        tenantStatus: m.tenant.status,
+        role: m.role,
+        active: m.active,
+      })),
+      buyer: user.buyer,
+      activeSessionCount: user.sessions.length,
+      recentSessions: user.sessions.map((s) => ({
+        id: s.id,
+        userAgent: s.userAgent,
+        ipAddress: s.ipAddress,
+        createdAt: s.createdAt.toISOString(),
+        expiresAt: s.expiresAt.toISOString(),
+      })),
+    };
+  }
+
+  async updateUser(userId: string, dto: AdminUpdateUserDto, adminUserId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User ${userId} not found`);
+    }
+
+    // Protection: Prevent demoting or disabling the last active platform admin
+    if (
+      user.isPlatformAdmin &&
+      (dto.isPlatformAdmin === false ||
+        dto.status === "DISABLED" ||
+        dto.status === "SUSPENDED")
+    ) {
+      const activeAdminCount = await this.prisma.user.count({
+        where: {
+          isPlatformAdmin: true,
+          status: "ACTIVE",
+          id: { not: userId },
+        },
+      });
+
+      if (activeAdminCount === 0) {
+        throw new BadRequestException(
+          "CANNOT_DISABLE_LAST_PLATFORM_ADMIN: Automotive OS requires at least one active platform administrator."
+        );
+      }
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(dto.displayName ? { displayName: dto.displayName.trim() } : {}),
+        ...(dto.status ? { status: dto.status } : {}),
+        ...(typeof dto.isPlatformAdmin === "boolean"
+          ? { isPlatformAdmin: dto.isPlatformAdmin }
+          : {}),
+      },
+    });
+
+    // If disabled or suspended, immediately revoke sessions
+    if (dto.status === "DISABLED" || dto.status === "SUSPENDED") {
+      await this.prisma.session.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+    }
+
+    await this.auditService.logAction({
+      tenantId: null,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_UPDATE_USER",
+      targetType: "user",
+      targetId: userId,
+      metadata: {
+        previousStatus: user.status,
+        newStatus: updated.status,
+        isPlatformAdmin: updated.isPlatformAdmin,
+        reason: dto.reason || "Platform administration update",
+      },
+    });
+
+    return {
+      id: updated.id,
+      email: updated.email,
+      displayName: updated.displayName,
+      isPlatformAdmin: updated.isPlatformAdmin,
+      status: updated.status,
+      updatedAt: updated.updatedAt.toISOString(),
+    };
+  }
+
+  async revokeUserSessions(userId: string, adminUserId: string) {
+    const result = await this.prisma.session.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+
+    await this.auditService.logAction({
+      tenantId: null,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_REVOKE_SESSIONS",
+      targetType: "user",
+      targetId: userId,
+      metadata: { revokedCount: result.count },
+    });
+
+    return { revokedCount: result.count, success: true };
+  }
+
+  async deleteUser(userId: string, adminUserId: string) {
+    // Soft-delete pattern: set status to DISABLED and revoke sessions
+    return this.updateUser(
+      userId,
+      { status: "DISABLED", reason: "Soft-deleted by platform administrator" },
+      adminUserId
+    );
+  }
+
+  // ==========================================
+  // Dealership Provisioning & Management
+  // ==========================================
+
+  async createDealer(dto: AdminCreateDealerDto, adminUserId: string) {
+    const normalizedSlug = dto.slug.toLowerCase().trim();
+    const existingSlug = await this.prisma.tenant.findUnique({
+      where: { slug: normalizedSlug },
+    });
+
+    if (existingSlug) {
+      throw new ConflictException(
+        `Dealership with slug '${normalizedSlug}' already exists.`
+      );
+    }
+
+    const normalizedAdminEmail = dto.adminEmail.toLowerCase().trim();
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      // 1. Create tenant
+      const tenant = await tx.tenant.create({
+        data: {
+          slug: normalizedSlug,
+          legalName: dto.legalName.trim(),
+          displayName: dto.displayName.trim(),
+          currency: dto.currency || "AED",
+          status: "ACTIVE",
+          verification: {
+            create: {
+              status: "APPROVED",
+              reviewedByUserId: adminUserId,
+              reviewedAt: new Date(),
+              reviewNotes: "Directly provisioned via Platform Administration Console",
+            },
+          },
+          branches: {
+            create: {
+              name: `${dto.displayName} — Flagship Branch`,
+              emirate: "Dubai",
+              city: "Dubai",
+            },
+          },
+        },
+      });
+
+      // 2. Resolve or provision dealer principal user
+      let dealerUser = await tx.user.findFirst({
+        where: { email: { equals: normalizedAdminEmail, mode: "insensitive" } },
+      });
+
+      if (!dealerUser) {
+        dealerUser = await tx.user.create({
+          data: {
+            identitySubject: `email_${normalizedAdminEmail}`,
+            email: normalizedAdminEmail,
+            displayName: dto.adminName.trim(),
+            status: "ACTIVE",
+            emailVerifiedAt: new Date(),
+          },
+        });
+      }
+
+      // 3. Create active OWNER membership
+      await tx.membership.create({
+        data: {
+          tenantId: tenant.id,
+          userId: dealerUser.id,
+          role: MembershipRole.OWNER,
+          active: true,
+        },
+      });
+
+      // 4. Outbox event
+      await tx.outboxEvent.create({
+        data: {
+          tenantId: tenant.id,
+          aggregateType: "tenant",
+          aggregateId: tenant.id,
+          eventType: "tenant.created",
+          payload: {
+            tenantId: tenant.id,
+            slug: tenant.slug,
+            displayName: tenant.displayName,
+            adminUserId: dealerUser.id,
+            adminEmail: normalizedAdminEmail,
+          },
+        },
+      });
+
+      return { tenant, dealerUser };
+    });
+
+    await this.auditService.logAction({
+      tenantId: result.tenant.id,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_CREATE_DEALER",
+      targetType: "tenant",
+      targetId: result.tenant.id,
+      metadata: {
+        slug: result.tenant.slug,
+        displayName: result.tenant.displayName,
+        adminEmail: normalizedAdminEmail,
+      },
+    });
+
+    return {
+      id: result.tenant.id,
+      slug: result.tenant.slug,
+      legalName: result.tenant.legalName,
+      displayName: result.tenant.displayName,
+      status: result.tenant.status,
+      adminEmail: normalizedAdminEmail,
+      createdAt: result.tenant.createdAt.toISOString(),
+    };
+  }
+
+  async inviteDealerStaff(
+    tenantId: string,
+    dto: AdminInviteDealerStaffDto,
+    adminUserId: string
+  ) {
+    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant) {
+      throw new NotFoundException(`Tenant ${tenantId} not found`);
+    }
+
+    const normalizedEmail = dto.email.toLowerCase().trim();
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48-hour expiration
+
+    const invitation = await this.prisma.userInvitation.create({
+      data: {
+        email: normalizedEmail,
+        tokenHash,
+        tenantId,
+        role: dto.role,
+        isPlatformAdmin: false,
+        invitedById: adminUserId,
+        expiresAt,
+      },
+    });
+
+    await this.auditService.logAction({
+      tenantId,
+      actorUserId: adminUserId,
+      action: "PLATFORM_ADMIN_INVITE_DEALER_STAFF",
+      targetType: "invitation",
+      targetId: invitation.id,
+      metadata: {
+        email: normalizedEmail,
+        role: dto.role,
+        tenantId,
+      },
+    });
+
+    return {
+      success: true,
+      invitationId: invitation.id,
+      email: normalizedEmail,
+      role: dto.role,
+      expiresAt: expiresAt.toISOString(),
+      activationToken: rawToken,
+    };
+  }
+
+  // ==========================================
+  // Platform Audit Trail Stream
+  // ==========================================
+
+  async listAuditLogs(
+    query: { limit?: number; offset?: number; targetType?: string },
+    adminUserId: string
+  ): Promise<AuditLogListResponse> {
+    const limit = Math.max(1, Math.min(100, query.limit || 50));
+    const offset = Math.max(0, query.offset || 0);
+
+    const where: any = {};
+    if (query.targetType) {
+      where.targetType = query.targetType;
+    }
+
+    const [events, total] = await Promise.all([
+      this.prisma.auditEvent.findMany({
+        where,
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: "desc" },
+      }),
+      this.prisma.auditEvent.count({ where }),
+    ]);
+
+    return {
+      events: events.map((e) => ({
+        id: e.id,
+        action: e.action,
+        tenantId: e.tenantId,
+        actorUserId: e.actorUserId,
+        targetType: e.targetType,
+        targetId: e.targetId,
+        metadata: e.metadata,
+        createdAt: e.createdAt.toISOString(),
+      })),
+      total,
+      limit,
+      offset,
+    };
+  }
+
+  // ==========================================
+  // Outbox Processing & Worker Hooks
+  // ==========================================
+
   async processOutbox(
     adminUserId: string,
     limit = 50,
@@ -270,9 +760,9 @@ export class AdminService {
       actorUserId: adminUserId,
       action: "PLATFORM_ADMIN_PROCESS_OUTBOX",
       targetType: "outbox",
-      targetId: "ALL",
+      targetId: "QUEUE",
       correlationId: correlationId || null,
-      metadata: { limit },
+      metadata: { limit, reason: "manual_admin_trigger" },
     });
 
     const processedCount = await this.outboxService.processPendingEvents(limit);
@@ -284,16 +774,10 @@ export class AdminService {
     };
   }
 
-  /**
-   * Get Outbox metrics and health statistics.
-   */
   async getOutboxMetrics(adminUserId: string): Promise<OutboxMetricsDto> {
     return this.outboxService.getMetrics();
   }
 
-  /**
-   * Retry failed outbox events.
-   */
   async retryFailedOutboxEvents(
     adminUserId: string,
   ): Promise<{ retriedCount: number }> {

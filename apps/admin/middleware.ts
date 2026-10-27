@@ -78,16 +78,41 @@ async function verifyCloudflareAccessJwt(jwt: string, aud: string, certsUrl: str
   }
 }
 
+async function verifyHs256Session(token: string, secret: string): Promise<any | null> {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return null;
+
+    const [headerB64, payloadB64, signatureB64] = parts;
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      enc.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+    const data = enc.encode(`${headerB64}.${payloadB64}`);
+    const signature = Uint8Array.from(Buffer.from(signatureB64, 'base64url'));
+    const isValid = await crypto.subtle.verify('HMAC', key, signature, data);
+    if (!isValid) return null;
+
+    const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp < now) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   // Allow health checks unconditionally
   if (request.nextUrl.pathname.startsWith('/api/health')) {
     return NextResponse.next();
   }
 
-  // An upstream reverse proxy can surface localhost as request.nextUrl.hostname
-  // even when the original request originated publicly. Only *development*
-  // may use the local preview bypass. Staging/production must always enforce
-  // authentication even if a proxy rewrites the hostname to localhost.
+  // Development bypass
   const isLocalhost =
     request.nextUrl.hostname === 'localhost' ||
     request.nextUrl.hostname === '127.0.0.1' ||
@@ -100,7 +125,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 1. Cloudflare Access Verification (ONLY if explicitly configured)
+  // 1. Unified Auth Session Cookie Verification
+  const sessionCookie = request.cookies.get('ao_session')?.value;
+  const jwtSecret = process.env.JWT_SECRET || 'dev-jwt-secret-replace-in-production-min-32-chars-long';
+
+  if (sessionCookie) {
+    const payload = await verifyHs256Session(sessionCookie, jwtSecret);
+    if (payload && payload.isPlatformAdmin === true) {
+      return NextResponse.next();
+    }
+  }
+
+  // 2. Cloudflare Access Verification (ONLY if explicitly configured)
   const cfAccessAud = process.env.CF_ACCESS_AUD;
   const cfAccessCertsUrl = process.env.CF_ACCESS_CERTS_URL;
   const cfToken = request.headers.get('cf-access-jwt-assertion');
@@ -122,40 +158,41 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  // 2. Strong Staging Basic Authentication
-  // Reject arbitrary token headers - no fake 21-character bypass or hardcoded credentials
+  // 3. Staging Basic Authentication Fallback
   const configuredUser = process.env.ADMIN_AUTH_USER;
   const configuredPass = process.env.ADMIN_AUTH_PASSWORD;
 
-  // Fail closed if server credentials are not configured
-  if (!configuredUser || !configuredPass) {
-    return new NextResponse('Access Denied: Admin authentication credentials unconfigured on server', {
-      status: 500,
-    });
-  }
-
-  const authHeader = request.headers.get('authorization');
-  if (authHeader && authHeader.startsWith('Basic ')) {
-    const base64Credentials = authHeader.slice(6).trim();
-    if (base64Credentials) {
-      try {
-        const decoded = Buffer.from(base64Credentials, 'base64').toString('utf8');
-        const colonIndex = decoded.indexOf(':');
-        if (colonIndex !== -1) {
-          const user = decoded.slice(0, colonIndex);
-          const pass = decoded.slice(colonIndex + 1);
-          if (timingSafeEqual(user, configuredUser) && timingSafeEqual(pass, configuredPass)) {
-            return NextResponse.next();
+  if (configuredUser && configuredPass) {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Basic ')) {
+      const base64Credentials = authHeader.slice(6).trim();
+      if (base64Credentials) {
+        try {
+          const decoded = Buffer.from(base64Credentials, 'base64').toString('utf8');
+          const colonIndex = decoded.indexOf(':');
+          if (colonIndex !== -1) {
+            const user = decoded.slice(0, colonIndex);
+            const pass = decoded.slice(colonIndex + 1);
+            if (timingSafeEqual(user, configuredUser) && timingSafeEqual(pass, configuredPass)) {
+              return NextResponse.next();
+            }
           }
+        } catch {
+          // Fall through
         }
-      } catch {
-        // Fall through to 401
       }
     }
   }
 
-  // Reject missing, forged, or invalid credentials fail-closed
-  return new NextResponse('Access Denied: Authentication Required for Platform Admin Console', {
+  // 4. If neither valid session nor basic auth, redirect browser requests to /auth
+  const acceptHeader = request.headers.get('accept') || '';
+  if (acceptHeader.includes('text/html')) {
+    const authUrl = new URL('/auth?tab=login', request.url);
+    authUrl.searchParams.set('redirect', request.nextUrl.pathname);
+    return NextResponse.redirect(authUrl);
+  }
+
+  return new NextResponse('Access Denied: Platform Administrator Authentication Required', {
     status: 401,
     headers: {
       'WWW-Authenticate': 'Basic realm="Automotive OS Admin Protected Gate"',
