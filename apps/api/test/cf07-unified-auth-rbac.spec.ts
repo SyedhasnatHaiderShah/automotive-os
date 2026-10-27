@@ -240,17 +240,14 @@ describe('CF-07 Unified Authentication, RBAC & Security Remediation (S1-S4) E2E 
     });
   });
 
-  describe('2. Administrator Activation & MFA Workflow (S2)', () => {
+  describe('2. Administrator Invitation & Password-Only Activation (S2)', () => {
     let activationToken: string;
     let adminInvitationEmail: string;
-    let mfaSecretKey: string;
 
-    it('should create admin invitation without premature isPlatformAdmin elevation on user', async () => {
+    it('provisions a pending identity without premature platform admin elevation', async () => {
       adminInvitationEmail = `bootstrap_admin_${Date.now()}@autonexa.ae`;
       const rawToken = randomBytes(32).toString('hex');
       const tokenHash = createHash('sha256').update(rawToken).digest('hex');
-
-      // Create unverified target user without platform admin privileges
       const targetUser = await prisma.user.create({
         data: {
           identitySubject: `email_${adminInvitationEmail}`,
@@ -260,7 +257,6 @@ describe('CF-07 Unified Authentication, RBAC & Security Remediation (S1-S4) E2E 
           status: 'PENDING_VERIFICATION',
         },
       });
-
       await prisma.userInvitation.create({
         data: {
           email: adminInvitationEmail,
@@ -270,77 +266,45 @@ describe('CF-07 Unified Authentication, RBAC & Security Remediation (S1-S4) E2E 
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
         },
       });
-
       activationToken = rawToken;
-
       expect(targetUser.isPlatformAdmin).toBe(false);
-      expect(targetUser.status).toBe('PENDING_VERIFICATION');
     });
 
-    it('should verify activation token and return TOTP secret for MFA setup', async () => {
+    it('verifies invitation metadata without an MFA enrollment secret', async () => {
       const res = await request(app.getHttpServer())
         .get(`/api/v1/auth/activate/verify?token=${activationToken}`);
-
       expect(res.status).toBe(200);
       expect(res.body.valid).toBe(true);
       expect(res.body.email).toBe(adminInvitationEmail);
       expect(res.body.isPlatformAdmin).toBe(true);
-      expect(res.body.requiresMfa).toBe(true);
-      expect(res.body.mfaSecret).toBeDefined();
-
-      mfaSecretKey = res.body.mfaSecret;
+      expect(res.body.requiresMfa).toBe(false);
+      expect(res.body.mfaSecret).toBeUndefined();
     });
 
-    it('should reject activation completion if MFA code is missing or invalid', async () => {
+    it('rejects activation using an incorrect invitation token', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/auth/activate/complete')
-        .set('x-mfa-secret', mfaSecretKey)
-        .send({
-          token: activationToken,
-          password: 'NewAdminPassword123!@#',
-          mfaCode: '000000',
-        });
-
+        .send({ token: randomBytes(32).toString('hex'), password: 'NewAdminPassword123!@#' });
       expect(res.status).toBe(400);
-      expect(res.body.error?.message).toContain('INVALID_MFA_CODE');
     });
 
-    it('should successfully complete activation with valid password and valid TOTP code', async () => {
-      const validTotp = generateTotpCode(mfaSecretKey);
-
+    it('completes activation using invitation and strong password only', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/auth/activate/complete')
-        .set('x-mfa-secret', mfaSecretKey)
-        .send({
-          token: activationToken,
-          password: 'NewAdminPassword123!@#',
-          mfaCode: validTotp,
-        });
-
+        .send({ token: activationToken, password: 'NewAdminPassword123!@#' });
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-
-      // Verify user in database is now active platform admin with MFA enabled
-      const activatedUser = await prisma.user.findFirst({
-        where: { email: adminInvitationEmail },
-      });
+      const activatedUser = await prisma.user.findFirst({ where: { email: adminInvitationEmail } });
       expect(activatedUser?.isPlatformAdmin).toBe(true);
       expect(activatedUser?.status).toBe('ACTIVE');
-      expect(activatedUser?.mfaEnabled).toBe(true);
-      expect(activatedUser?.mfaSecret).toBe(mfaSecretKey);
+      expect(activatedUser?.mfaEnabled).toBe(false);
+      expect(activatedUser?.mfaSecret).toBeNull();
     });
 
-    it('should reject reuse of an already accepted activation token', async () => {
-      const validTotp = generateTotpCode(mfaSecretKey);
-
+    it('rejects reuse of an accepted invitation', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/auth/activate/complete')
-        .send({
-          token: activationToken,
-          password: 'AnotherPassword123!',
-          mfaCode: validTotp,
-        });
-
+        .send({ token: activationToken, password: 'AnotherPassword123!' });
       expect(res.status).toBe(400);
       expect(res.body.error?.message).toContain('already accepted');
     });
