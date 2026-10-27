@@ -57,26 +57,49 @@ export default function DashboardResolverPage() {
           return;
         }
 
-        // 3. Platform Administrator
+        // 3. Use server-resolved authoritative destination if available
+        if (user.resolvedDashboardUrl && typeof user.resolvedDashboardUrl === 'string') {
+          const destination = user.resolvedDashboardUrl.startsWith('/') && !user.resolvedDashboardUrl.startsWith('//')
+            ? user.resolvedDashboardUrl
+            : '/account/garage';
+
+          if (destination.startsWith('/admin')) {
+            setStatusText('Authorizing Platform Administrator Console...');
+          } else if (destination.startsWith('/dealer')) {
+            setStatusText('Loading Dealership Console...');
+          } else {
+            setStatusText('Loading Private Garage & Dossier...');
+          }
+
+          router.replace(destination);
+          return;
+        }
+
+        // 4. Fallback Role Resolution
         if (user.isPlatformAdmin) {
           setStatusText('Authorizing Platform Administrator Console...');
           router.replace('/admin');
           return;
         }
 
-        // 4. Dealership Staff
         const activeMembership = user.memberships?.find((m: any) => m.active);
         if (activeMembership) {
           if (activeMembership.tenantStatus !== 'ACTIVE') {
             router.replace('/access-suspended?reason=tenant_suspended');
             return;
           }
+          let dealerLanding = '/dealer';
+          if (activeMembership.role === 'SALES_MANAGER') dealerLanding = '/dealer/crm';
+          else if (activeMembership.role === 'SALES_AGENT') dealerLanding = '/dealer/leads';
+          else if (activeMembership.role === 'INVENTORY_MANAGER') dealerLanding = '/dealer/inventory';
+          else if (activeMembership.role === 'SERVICE_ADVISOR') dealerLanding = '/dealer/service';
+          else if (activeMembership.role === 'FINANCE_MANAGER') dealerLanding = '/dealer/finance';
+
           setStatusText(`Loading Dealership Console (${activeMembership.tenantName || 'Dealer Desk'})...`);
-          router.replace('/dealer');
+          router.replace(dealerLanding);
           return;
         }
 
-        // 5. Retail Buyer / Private Collector
         setStatusText('Loading Private Garage & Dossier...');
         router.replace('/account/garage');
       } catch (err: any) {

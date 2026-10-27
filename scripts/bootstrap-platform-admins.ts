@@ -8,9 +8,12 @@ const ADMIN_TARGETS = [
 
 async function bootstrap() {
   const prisma = new PrismaClient();
+  const isProductionOrStaging =
+    process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
+
   console.log('================================================================');
   console.log('AUTOMOTIVE OS — PLATFORM ADMINISTRATOR BOOTSTRAP INITIALIZER');
-  console.log('Zero-Trust Cryptographic Provisioning Framework');
+  console.log('Zero-Trust Cryptographic Provisioning Framework (S2 Standard)');
   console.log('================================================================\n');
 
   try {
@@ -23,29 +26,26 @@ async function bootstrap() {
       });
 
       if (!user) {
+        // Create unverified identity with NO administrative elevation (Zero-Trust S2)
         user = await prisma.user.create({
           data: {
             identitySubject: `email_${normalizedEmail}`,
             email: normalizedEmail,
             displayName: 'Platform Administrator',
-            isPlatformAdmin: true,
+            isPlatformAdmin: false, // Strict S2: NOT elevated until activation and MFA challenge
             status: 'PENDING_VERIFICATION',
-            mfaEnabled: true, // Mandatory MFA for platform admins
+            emailVerifiedAt: null,
+            mfaEnabled: false, // Email/password-only admin authentication per product policy
           },
         });
-        console.log(`  [+] Created platform admin identity record (ID: ${user.id})`);
+        console.log(`  [+] Created unverified identity record (ID: ${user.id}). Elevation withheld until activation.`);
       } else {
-        if (!user.isPlatformAdmin) {
-          user = await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              isPlatformAdmin: true,
-              mfaEnabled: true,
-            },
-          });
-          console.log(`  [+] Elevated existing user record to platform administrator (ID: ${user.id})`);
+        if (user.isPlatformAdmin && user.status === 'ACTIVE') {
+          console.log(`  [i] User is already confirmed active platform administrator (ID: ${user.id})`);
         } else {
-          console.log(`  [i] User is already confirmed platform administrator (ID: ${user.id})`);
+          console.log(
+            `  [i] Existing user record detected (ID: ${user.id}). Administrative privileges withheld until activation completion.`
+          );
         }
       }
 
@@ -63,7 +63,7 @@ async function bootstrap() {
         },
       });
 
-      await prisma.userInvitation.create({
+      const invitation = await prisma.userInvitation.create({
         data: {
           email: normalizedEmail,
           tokenHash,
@@ -76,12 +76,13 @@ async function bootstrap() {
       // Record audit event
       await prisma.auditEvent.create({
         data: {
-          action: 'PLATFORM_ADMIN_BOOTSTRAP_PROVISIONED',
+          action: 'PLATFORM_ADMIN_BOOTSTRAP_INVITATION_ISSUED',
           actorUserId: user.id,
           targetType: 'User',
           targetId: user.id,
           metadata: {
             email: normalizedEmail,
+            invitationId: invitation.id,
             isPlatformAdmin: true,
             status: user.status,
             expiresAt: expiresAt.toISOString(),
@@ -89,16 +90,22 @@ async function bootstrap() {
         },
       });
 
-      console.log(`  [+] Generated secure single-use activation token (expires in 24 hours)`);
-      console.log(`  [>] Activation URL:`);
-      console.log(`      https://automotive-marketplace-staging.up.railway.app/auth/activate?token=${rawToken}`);
-      console.log(`      Local dev: http://localhost:3000/auth/activate?token=${rawToken}\n`);
+      console.log(`  [+] Created secure single-use activation invitation (ID: ${invitation.id})`);
+
+      if (isProductionOrStaging) {
+        console.log(`  [>] Secure activation token generated. Plaintext suppressed in production/staging logs.`);
+        console.log(`  [>] Token delivery required via out-of-band administrative channel.\n`);
+      } else {
+        console.log(`  [>] Local Dev Activation URL:`);
+        console.log(`      http://localhost:3000/auth/activate?token=${rawToken}\n`);
+      }
     }
 
     console.log('================================================================');
     console.log('SUCCESS: All designated platform administrators provisioned.');
-    console.log('No default passwords generated. Administrators must complete');
-    console.log('password setup and mandatory MFA activation via the token URL.');
+    console.log('Zero default passwords generated. Administrative privileges remain');
+    console.log('unusable until email ownership, password creation, and MFA');
+    console.log('enrollment are completed via the activation workflow.');
     console.log('================================================================');
   } catch (err) {
     console.error('CRITICAL_BOOTSTRAP_FAILURE:', err);

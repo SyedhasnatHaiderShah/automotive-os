@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from 'next/server';
 export const config = {
   matcher: [
     /*
-     * Match all request paths except:
+     * Match root and all request paths except:
      * 1. /api/health (health check)
      * 2. /_next/static (static files)
      * 3. /_next/image (image optimization files)
      * 4. /favicon.ico (favicon file)
      */
+    '/',
     '/((?!api/health|_next/static|_next/image|favicon.ico).*)',
   ],
 };
@@ -125,14 +126,33 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 1. Unified Auth Session Cookie Verification
+  // 1. Unified Auth Session Cookie Verification with Authoritative State Validation (S3 Security Gate)
   const sessionCookie = request.cookies.get('ao_session')?.value;
   const jwtSecret = process.env.JWT_SECRET || 'dev-jwt-secret-replace-in-production-min-32-chars-long';
 
   if (sessionCookie) {
     const payload = await verifyHs256Session(sessionCookie, jwtSecret);
     if (payload && payload.isPlatformAdmin === true) {
-      return NextResponse.next();
+      // Authoritative validation against PostgreSQL/API: prevents stale JWT claims from authorizing demoted or revoked admins
+      try {
+        const apiBaseUrl = process.env.API_SERVICE_URL || 'http://localhost:4000';
+        const verifyRes = await fetch(`${apiBaseUrl}/api/v1/auth/verify-admin-session`, {
+          headers: {
+            Authorization: `Bearer ${sessionCookie}`,
+            Cookie: `ao_session=${sessionCookie}`,
+          },
+          signal: AbortSignal.timeout(4000),
+        });
+
+        if (verifyRes.ok) {
+          const data = await verifyRes.json();
+          if (data && data.valid === true) {
+            return NextResponse.next();
+          }
+        }
+      } catch {
+        // Fall through to authentication challenge if authoritative validation fails
+      }
     }
   }
 
@@ -189,7 +209,11 @@ export async function middleware(request: NextRequest) {
   if (acceptHeader.includes('text/html')) {
     const authUrl = new URL('/auth?tab=login', request.url);
     authUrl.searchParams.set('redirect', request.nextUrl.pathname);
-    return NextResponse.redirect(authUrl);
+    const redirectRes = NextResponse.redirect(authUrl);
+    if (sessionCookie) {
+      redirectRes.cookies.delete('ao_session');
+    }
+    return redirectRes;
   }
 
   return new NextResponse('Access Denied: Platform Administrator Authentication Required', {

@@ -12,6 +12,7 @@ describe('AuthService', () => {
   let jwt: JwtService;
 
   const mockPrisma = {
+    auditEvent: { create: jest.fn().mockResolvedValue({}) },
     user: {
       findFirst: jest.fn(),
       findUnique: jest.fn(),
@@ -134,6 +135,7 @@ describe('AuthService', () => {
         identitySubject: 'email_buyer@autonexa.ae',
         isPlatformAdmin: false,
         status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
         failedLoginAttempts: 0,
         lockedUntil: null,
         memberships: [],
@@ -154,6 +156,7 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('mock-jwt-token');
       expect(result.user.redirectUrl).toBe('/account/garage');
       expect(mockPrisma.session.create).toHaveBeenCalled();
+      expect(mockPrisma.auditEvent.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ action: 'AUTH_LOGIN_SUCCESS' }) }));
     });
 
     it('should reject invalid password and increment failed attempts', async () => {
@@ -166,6 +169,7 @@ describe('AuthService', () => {
         failedLoginAttempts: 2,
         lockedUntil: null,
         status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
         memberships: [],
       });
 
@@ -192,6 +196,7 @@ describe('AuthService', () => {
         failedLoginAttempts: 4,
         lockedUntil: null,
         status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
         memberships: [],
       });
 
@@ -262,12 +267,12 @@ describe('AuthService', () => {
       ).rejects.toThrow(ConflictException);
     });
 
-    it('should successfully register customer as verified buyer', async () => {
+    it('should successfully register customer as unverified buyer', async () => {
       mockPrisma.user.findFirst.mockResolvedValue(null);
       mockPrisma.user.create.mockResolvedValue({
         id: 'new-user-id',
         email: 'newbuyer@autonexa.ae',
-        status: 'ACTIVE',
+        status: 'PENDING_VERIFICATION',
         isPlatformAdmin: false,
       });
 

@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -17,8 +18,21 @@ import { DevLoginDto, AuthTokenResponseDto } from './dto/dev-login.dto';
 import { RegisterVipLeadDto, RegisterVipResponseDto } from './dto/register-vip.dto';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { CustomerSignupDto, CustomerSignupResponseDto } from './dto/customer-signup.dto';
+import {
+  VerifyEmailDto,
+  VerifyEmailResponseDto,
+  ResendVerificationDto,
+  ResendVerificationResponseDto,
+} from './dto/verify-email.dto';
+import {
+  VerifyActivationTokenDto,
+  VerifyActivationTokenResponseDto,
+  CompleteActivationDto,
+  CompleteActivationResponseDto,
+} from './dto/activate.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { PlatformAdminGuard } from '../common/guards/platform-admin.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('auth')
@@ -65,6 +79,56 @@ export class AuthController {
     return this.authService.signupCustomer(dto);
   }
 
+  @Public()
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify customer email address with cryptographic token' })
+  @ApiResponse({ status: 200, type: VerifyEmailResponseDto })
+  async verifyEmail(@Body() dto: VerifyEmailDto): Promise<VerifyEmailResponseDto> {
+    return this.authService.verifyEmail(dto.token);
+  }
+
+  @Public()
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend email verification link' })
+  @ApiResponse({ status: 200, type: ResendVerificationResponseDto })
+  async resendVerification(
+    @Body() dto: ResendVerificationDto
+  ): Promise<ResendVerificationResponseDto> {
+    return this.authService.resendVerification(dto.email);
+  }
+
+  @Public()
+  @Get('activate/verify')
+  @ApiOperation({ summary: 'Verify activation token and retrieve invitation metadata' })
+  @ApiResponse({ status: 200, type: VerifyActivationTokenResponseDto })
+  async verifyActivationToken(
+    @Query('token') token: string
+  ): Promise<VerifyActivationTokenResponseDto> {
+    return this.authService.verifyActivationToken(token);
+  }
+
+  @Public()
+  @Post('activate/complete')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Complete activation, set password, and verify MFA' })
+  @ApiResponse({ status: 200, type: CompleteActivationResponseDto })
+  async completeActivation(
+    @Body() dto: CompleteActivationDto,
+    @Req() req: Request
+  ): Promise<CompleteActivationResponseDto> {
+    return this.authService.completeActivation(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, PlatformAdminGuard)
+  @Get('verify-admin-session')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Authoritative platform administrator session verification' })
+  async verifyAdminSession(@CurrentUser() user: AuthenticatedUser) {
+    return this.authService.verifyAdminSession(user);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
   @ApiBearerAuth()
@@ -94,9 +158,9 @@ export class AuthController {
     const isProductionOrStaging =
       process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
 
-    if (isProductionOrStaging) {
+    if (isProductionOrStaging || process.env.ALLOW_DEV_TOKENS !== 'true') {
       throw new ForbiddenException(
-        'Development JWT token issuance is strictly prohibited in staging and production environments'
+        'Development JWT token issuance is strictly prohibited in staging, production, or unflagged environments'
       );
     }
 
