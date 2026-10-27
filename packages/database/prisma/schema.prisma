@@ -23,6 +23,13 @@ enum TenantStatus {
   CLOSED
 }
 
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+  PENDING_VERIFICATION
+}
+
 enum VerificationStatus {
   NOT_SUBMITTED
   IN_REVIEW
@@ -139,21 +146,31 @@ enum MediaKind {
 // ==========================================
 
 model User {
-  id              String        @id @default(uuid()) @db.Uuid
-  identitySubject String        @unique @map("identity_subject")
-  email           String?       @unique
-  phoneE164       String?       @unique @map("phone_e164")
-  displayName     String        @map("display_name")
-  isPlatformAdmin Boolean       @default(false) @map("is_platform_admin")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  id                  String           @id @default(uuid()) @db.Uuid
+  identitySubject     String           @unique @map("identity_subject")
+  email               String?          @unique
+  phoneE164           String?          @unique @map("phone_e164")
+  displayName         String           @map("display_name")
+  isPlatformAdmin     Boolean          @default(false) @map("is_platform_admin")
+  status              UserStatus       @default(ACTIVE)
+  passwordHash        String?          @map("password_hash")
+  emailVerifiedAt     DateTime?        @map("email_verified_at")
+  failedLoginAttempts Int              @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime?        @map("locked_until")
+  mfaSecret           String?          @map("mfa_secret")
+  mfaEnabled          Boolean          @default(false) @map("mfa_enabled")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
 
-  buyer           BuyerProfile?
-  memberships     Membership[]
-  favorites       Favorite[]
-  savedSearches   SavedSearch[]
-  buyerLeads      Lead[]
-  appointments    Appointment[]
+  buyer               BuyerProfile?
+  memberships         Membership[]
+  favorites           Favorite[]
+  savedSearches       SavedSearch[]
+  buyerLeads          Lead[]
+  appointments        Appointment[]
+  sessions            Session[]
+  invitationsSent     UserInvitation[] @relation("InvitedBy")
+  invitationReceived  UserInvitation?  @relation("InvitedUser")
 
   @@map("users")
 }
@@ -208,6 +225,7 @@ model Tenant {
   subscriptions Subscription[]
   auditEvents   AuditEvent[]
   outboxEvents  OutboxEvent[]
+  invitations   UserInvitation[]
 
   @@map("tenants")
 }
@@ -560,4 +578,48 @@ model OutboxEvent {
   @@index([status, occurredAt])
   @@index([tenantId, occurredAt])
   @@map("outbox_events")
+}
+
+// ==========================================
+// Authentication Sessions & Invitations
+// ==========================================
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  userAgent String?   @map("user_agent")
+  ipAddress String?   @map("ip_address")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@map("sessions")
+}
+
+model UserInvitation {
+  id              String          @id @default(uuid()) @db.Uuid
+  email           String
+  tokenHash       String          @unique @map("token_hash")
+  tenantId        String?         @map("tenant_id") @db.Uuid
+  role            MembershipRole?
+  isPlatformAdmin Boolean         @default(false) @map("is_platform_admin")
+  invitedById     String?         @map("invited_by_id") @db.Uuid
+  invitedUserId   String?         @unique @map("invited_user_id") @db.Uuid
+  expiresAt       DateTime        @map("expires_at")
+  acceptedAt      DateTime?       @map("accepted_at")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  tenant          Tenant?         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invitedBy       User?           @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  invitedUser     User?           @relation("InvitedUser", fields: [invitedUserId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([tenantId])
+  @@map("user_invitations")
 }
