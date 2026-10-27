@@ -20,7 +20,6 @@ import {
   CompleteActivationResponseDto,
 } from './dto/activate.dto';
 import { hashPassword, verifyPassword, validatePasswordStrength } from './password.util';
-import { generateBase32Secret, verifyTotpCode } from './totp.util';
 
 export interface OidcJwtPayload {
   sub: string;
@@ -551,30 +550,19 @@ export class AuthService {
         );
       }
 
-      let mfaSecret: string | undefined;
-      let otpauthUrl: string | undefined;
-
-      if (invitation.isPlatformAdmin) {
-        mfaSecret = generateBase32Secret(20);
-        otpauthUrl = `otpauth://totp/AutomotiveOS:${invitation.email}?secret=${mfaSecret}&issuer=AutomotiveOS`;
-      }
-
       return {
         valid: true,
         email: invitation.email,
         isPlatformAdmin: invitation.isPlatformAdmin,
-        requiresMfa: invitation.isPlatformAdmin,
+        requiresMfa: false,
         role: invitation.role,
         tenantName: invitation.tenant?.displayName,
-        mfaSecret,
-        otpauthUrl,
       };
     });
   }
 
   async completeActivation(
-    dto: CompleteActivationDto,
-    setupMfaSecret?: string
+    dto: CompleteActivationDto
   ): Promise<CompleteActivationResponseDto> {
     const strength = validatePasswordStrength(dto.password);
     if (!strength.valid) {
@@ -597,28 +585,6 @@ export class AuthService {
         throw new BadRequestException('Activation token has expired.');
       }
 
-      let mfaSecretToSave: string | null = null;
-      let mfaEnabled = false;
-
-      if (invitation.isPlatformAdmin) {
-        if (!dto.mfaCode || !/^\d{6}$/.test(dto.mfaCode)) {
-          throw new BadRequestException(
-            'MFA_REQUIRED: A valid 6-digit TOTP verification code is required for platform administrator activation.'
-          );
-        }
-
-        const secretToVerify = setupMfaSecret || invitation.tokenHash.slice(0, 32).toUpperCase();
-        const isTotpValid = verifyTotpCode(dto.mfaCode, secretToVerify);
-        if (!isTotpValid) {
-          throw new BadRequestException(
-            'INVALID_MFA_CODE: The provided 6-digit verification code is invalid or has expired.'
-          );
-        }
-
-        mfaSecretToSave = secretToVerify;
-        mfaEnabled = true;
-      }
-
       const passwordHash = await hashPassword(dto.password);
       const normalizedEmail = invitation.email.toLowerCase().trim();
 
@@ -638,8 +604,8 @@ export class AuthService {
             status: 'ACTIVE',
             emailVerifiedAt: new Date(),
             isPlatformAdmin: invitation.isPlatformAdmin,
-            mfaSecret: mfaSecretToSave,
-            mfaEnabled,
+            mfaSecret: null,
+            mfaEnabled: false,
           },
         });
       } else {
@@ -650,8 +616,8 @@ export class AuthService {
             status: 'ACTIVE',
             emailVerifiedAt: user.emailVerifiedAt || new Date(),
             isPlatformAdmin: invitation.isPlatformAdmin ? true : user.isPlatformAdmin,
-            mfaSecret: mfaSecretToSave || user.mfaSecret,
-            mfaEnabled: mfaEnabled || user.mfaEnabled,
+            mfaSecret: null,
+            mfaEnabled: false,
           },
         });
       }
