@@ -22,6 +22,9 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
   const isKybActive = pathname?.includes('/verifications') ?? false;
   const isDisputesActive = pathname?.includes('/disputes') ?? false;
   const isCommandActive = pathname === '/' || pathname === '/operations-command';
+  const isUsersActive = pathname?.includes('/users') ?? false;
+  const isDealersActive = pathname?.includes('/dealers') ?? false;
+  const isAuditActive = pathname?.includes('/audit-logs') ?? false;
 
   return (
     <aside
@@ -137,11 +140,53 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
               {isRtl ? 'البنية التحتية للمنصة' : 'Platform Infrastructure'}
             </span>
             <nav className="flex flex-col gap-space-xs">
+              <Link
+                href="/dealers"
+                className={`flex items-center gap-space-sm px-space-sm py-2 rounded-lg transition-colors ${
+                  isDealersActive
+                    ? 'bg-surface-container-high text-primary font-medium'
+                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px]">apartment</span>
+                <span className="font-body-sm text-body-sm">
+                  {isRtl ? 'إدارة الوكالات المعتمدة' : 'Institutional Dealers'}
+                </span>
+              </Link>
+
+              <Link
+                href="/users"
+                className={`flex items-center gap-space-sm px-space-sm py-2 rounded-lg transition-colors ${
+                  isUsersActive
+                    ? 'bg-surface-container-high text-primary font-medium'
+                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px]">manage_accounts</span>
+                <span className="font-body-sm text-body-sm">
+                  {isRtl ? 'حوكمة المستخدمين والجلسات' : 'User Governance'}
+                </span>
+              </Link>
+
+              <Link
+                href="/audit-logs"
+                className={`flex items-center gap-space-sm px-space-sm py-2 rounded-lg transition-colors ${
+                  isAuditActive
+                    ? 'bg-surface-container-high text-primary font-medium'
+                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px]">lock_clock</span>
+                <span className="font-body-sm text-body-sm">
+                  {isRtl ? 'سجل التدقيق غير القابل للتغيير' : 'Audit Activity Ledger'}
+                </span>
+              </Link>
+
               <a
                 aria-disabled="true"
                 title="Not available on staging: server-side integration required"
                 tabIndex={-1}
-                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant transition-colors cursor-not-allowed opacity-50"
+                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant opacity-50 cursor-not-allowed"
               >
                 <span className="material-symbols-outlined text-[18px]">receipt_long</span>
                 <span className="font-body-sm text-body-sm">
@@ -153,35 +198,11 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                 aria-disabled="true"
                 title="Not available on staging: server-side integration required"
                 tabIndex={-1}
-                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[18px]">lock_clock</span>
-                <span className="font-body-sm text-body-sm">
-                  {isRtl ? 'سجل التدقيق غير القابل للتغيير' : 'Audit Activity Ledger'}
-                </span>
-              </a>
-
-              <a
-                aria-disabled="true"
-                title="Not available on staging: server-side integration required"
-                tabIndex={-1}
-                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
+                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant opacity-50 cursor-not-allowed"
               >
                 <span className="material-symbols-outlined text-[18px]">hub</span>
                 <span className="font-body-sm text-body-sm">
                   {isRtl ? 'البوابات السيادية' : 'Sovereign Gateways'}
-                </span>
-              </a>
-
-              <a
-                aria-disabled="true"
-                title="Not available on staging: server-side integration required"
-                tabIndex={-1}
-                className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[18px]">key</span>
-                <span className="font-body-sm text-body-sm">
-                  {isRtl ? 'الصلاحيات والمفاتيح' : 'RBAC & Keyring'}
                 </span>
               </a>
             </nav>
