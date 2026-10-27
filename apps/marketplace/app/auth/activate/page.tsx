@@ -27,7 +27,6 @@ function ActivateAccountContent() {
   // Form states
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [mfaCode, setMfaCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [formError, setFormError] = useState('');
@@ -82,18 +81,10 @@ function ActivateAccountContent() {
       return;
     }
 
-    if (invitation?.requiresMfa && (!mfaCode || mfaCode.length !== 6)) {
-      setFormError('Please enter the 6-digit verification code from your authenticator app.');
-      return;
-    }
-
     setSubmitting(true);
 
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (invitation?.mfaSecret) {
-        headers['x-mfa-secret'] = invitation.mfaSecret;
-      }
 
       const res = await fetch('/api/v1/auth/activate/complete', {
         method: 'POST',
@@ -101,7 +92,6 @@ function ActivateAccountContent() {
         body: JSON.stringify({
           token,
           password,
-          mfaCode: invitation?.requiresMfa ? mfaCode.trim() : undefined,
         }),
       });
 
@@ -224,42 +214,6 @@ function ActivateAccountContent() {
             className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 placeholder-stone-500 text-sm focus:outline-none focus:border-[#d4af37]"
           />
         </div>
-
-        {invitation.requiresMfa && (
-          <div className="border border-stone-800 bg-stone-950/60 rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#d4af37] uppercase tracking-wider">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Mandatory Multi-Factor Authentication (MFA)
-            </div>
-            <p className="text-xs text-stone-400">
-              Platform administrator accounts require RFC 6238 TOTP authentication. Add this secret to your Authenticator app (1Password, Google Authenticator, or Bitwarden):
-            </p>
-
-            <div className="p-3 bg-stone-900 border border-stone-800 rounded-lg text-center">
-              <p className="text-xs text-stone-500 uppercase tracking-widest mb-1">Authenticator Secret Key</p>
-              <code className="text-sm font-mono font-bold text-[#d4af37] tracking-widest select-all">
-                {invitation.mfaSecret}
-              </code>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-stone-300 mb-1.5">
-                Enter 6-Digit Authenticator Code
-              </label>
-              <input
-                type="text"
-                value={mfaCode}
-                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="123456"
-                required
-                maxLength={6}
-                className="w-full text-center tracking-widest font-mono text-lg py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 placeholder-stone-600 focus:outline-none focus:border-[#d4af37]"
-              />
-            </div>
-          </div>
-        )}
 
         <button
           type="submit"
