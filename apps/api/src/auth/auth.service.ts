@@ -296,6 +296,19 @@ export class AuthService {
           },
         });
 
+        await this.prisma.auditEvent.create({
+          data: {
+            action: lockedUntil ? 'AUTH_LOGIN_ACCOUNT_LOCKED' : 'AUTH_LOGIN_FAILED',
+            actorUserId: user.id,
+            targetType: 'User',
+            targetId: user.id,
+            metadata: {
+              failedAttempts: attempts,
+              lockedUntil: lockedUntil?.toISOString() ?? null,
+            },
+          },
+        });
+
         throw new UnauthorizedException('Invalid email or password');
       }
 
@@ -339,6 +352,18 @@ export class AuthService {
           expiresIn: '7d',
         }
       );
+
+      await this.prisma.auditEvent.create({
+        data: {
+          action: 'AUTH_LOGIN_SUCCESS',
+          actorUserId: user.id,
+          targetType: 'Session',
+          targetId: session.id,
+          metadata: {
+            isPlatformAdmin: user.isPlatformAdmin,
+          },
+        },
+      });
 
       const redirectInfo = resolveUserRedirect({
         isPlatformAdmin: user.isPlatformAdmin,
