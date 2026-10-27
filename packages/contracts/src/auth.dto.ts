@@ -32,6 +32,47 @@ export interface CustomerSignupRequestDto {
   phone?: string;
   emirate?: string;
   consentPdpl: boolean;
+  consentMarketing?: boolean;
+}
+
+export interface VerifyEmailRequestDto {
+  token: string;
+}
+
+export interface VerifyEmailResponseDto {
+  success: boolean;
+  message: string;
+  email?: string;
+}
+
+export interface ResendVerificationRequestDto {
+  email: string;
+}
+
+export interface VerifyActivationTokenResponseDto {
+  valid: boolean;
+  email: string;
+  isPlatformAdmin: boolean;
+  requiresMfa: boolean;
+  role?: string | null;
+  tenantName?: string | null;
+}
+
+export interface CompleteActivationRequestDto {
+  token: string;
+  password: string;
+  mfaCode?: string;
+}
+
+export interface CompleteActivationResponseDto {
+  success: boolean;
+  message: string;
+  redirectUrl: string;
+}
+
+export interface MfaSetupResponseDto {
+  secret: string;
+  otpauthUrl: string;
 }
 
 export interface SignupResponseDto {

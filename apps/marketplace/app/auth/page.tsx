@@ -152,29 +152,14 @@ export default function UnifiedAuthPage() {
 
       setRegSuccessMessage(
         isArabic
-          ? 'تم إنشاء حساب العميل بنجاح! جاري تسجيل الدخول...'
-          : 'Customer account registered successfully! Logging you in...'
+          ? 'تم إنشاء الحساب بنجاح! يرجى فتح رابط التحقق المرسل إلى بريدك الإلكتروني لتفعيل الحساب.'
+          : 'Account registered successfully! Please check your email to verify your account before logging in.'
       );
 
-      // Auto-login with the newly created credentials
-      const loginRes = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: regEmail.trim().toLowerCase(), password: regPassword }),
-      });
-      const loginData = await loginRes.json();
-      if (loginRes.ok && loginData.accessToken) {
-        localStorage.setItem('ao_token', loginData.accessToken);
-        localStorage.setItem('ao_user', JSON.stringify(loginData.user));
-        setTimeout(() => {
-          router.push(loginData.user?.redirectUrl || '/account/garage');
-        }, 1000);
-      } else {
-        setTimeout(() => {
-          setActiveTab('login');
-          setLoginEmail(regEmail);
-        }, 1500);
-      }
+      setTimeout(() => {
+        setActiveTab('login');
+        setLoginEmail(regEmail);
+      }, 4000);
     } catch (err: any) {
       setRegError(err.message || 'Registration failed');
     } finally {

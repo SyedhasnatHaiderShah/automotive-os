@@ -13,7 +13,14 @@ import { MembershipRole } from '@automotive-os/database';
 import { RegisterVipLeadDto, RegisterVipResponseDto } from './dto/register-vip.dto';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { CustomerSignupDto, CustomerSignupResponseDto } from './dto/customer-signup.dto';
+import { VerifyEmailResponseDto, ResendVerificationResponseDto } from './dto/verify-email.dto';
+import {
+  VerifyActivationTokenResponseDto,
+  CompleteActivationDto,
+  CompleteActivationResponseDto,
+} from './dto/activate.dto';
 import { hashPassword, verifyPassword, validatePasswordStrength } from './password.util';
+import { generateBase32Secret, verifyTotpCode } from './totp.util';
 
 export interface OidcJwtPayload {
   sub: string;
@@ -79,8 +86,31 @@ export function resolveUserRedirect(user: {
         tenantSlug: activeMembership.tenantSlug,
       };
     }
+
+    let roleLanding = '/dealer';
+    switch (activeMembership.role) {
+      case 'SALES_MANAGER':
+        roleLanding = '/dealer/crm';
+        break;
+      case 'SALES_AGENT':
+        roleLanding = '/dealer/leads';
+        break;
+      case 'INVENTORY_MANAGER':
+        roleLanding = '/dealer/inventory';
+        break;
+      case 'SERVICE_ADVISOR':
+        roleLanding = '/dealer/service';
+        break;
+      case 'FINANCE_MANAGER':
+        roleLanding = '/dealer/finance';
+        break;
+      default:
+        roleLanding = '/dealer';
+        break;
+    }
+
     return {
-      redirectUrl: '/dealer',
+      redirectUrl: roleLanding,
       primaryRole: activeMembership.role,
       tenantId: activeMembership.tenantId,
       tenantSlug: activeMembership.tenantSlug,
@@ -152,9 +182,28 @@ export class AuthService {
         });
       }
 
+      // Authoritative Session & User Status Enforcement (S3 Security Gate)
+      if (payload.sessionId) {
+        const session = await this.prisma.session.findUnique({
+          where: { id: payload.sessionId },
+        });
+
+        if (!session || session.revokedAt || session.expiresAt < new Date()) {
+          throw new UnauthorizedException(
+            'SESSION_REVOKED: This session has been revoked, invalidated, or expired. Please log in again.'
+          );
+        }
+      }
+
       if (user.status === 'DISABLED') {
         throw new ForbiddenException(
           'ACCOUNT_DISABLED: Your account has been disabled by security administration.'
+        );
+      }
+
+      if (user.status === 'SUSPENDED') {
+        throw new ForbiddenException(
+          'ACCOUNT_SUSPENDED: Your account has been suspended by platform administration.'
         );
       }
 
@@ -209,6 +258,18 @@ export class AuthService {
       if (user.status === 'DISABLED') {
         throw new ForbiddenException(
           'ACCOUNT_DISABLED: This account has been disabled. Please contact platform administration.'
+        );
+      }
+
+      if (user.status === 'SUSPENDED') {
+        throw new ForbiddenException(
+          'ACCOUNT_SUSPENDED: This account has been suspended. Please contact platform administration.'
+        );
+      }
+
+      if (user.status === 'PENDING_VERIFICATION' || !user.emailVerifiedAt) {
+        throw new ForbiddenException(
+          'EMAIL_NOT_VERIFIED: Your email address has not been verified. Please verify your email before logging in.'
         );
       }
 
@@ -343,6 +404,11 @@ export class AuthService {
       const passwordHash = await hashPassword(dto.password);
       const identitySubject = `email_${normalizedEmail}`;
 
+      // Cryptographically secure 256-bit email verification token (S1 Security Standard)
+      const rawVerificationToken = randomBytes(32).toString('hex');
+      const verificationTokenHash = createHash('sha256').update(rawVerificationToken).digest('hex');
+      const verificationExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24-hour expiration
+
       const user = await this.prisma.user.create({
         data: {
           identitySubject,
@@ -350,14 +416,17 @@ export class AuthService {
           displayName: dto.displayName.trim(),
           phoneE164: dto.phone || null,
           passwordHash,
-          status: 'ACTIVE',
+          status: 'PENDING_VERIFICATION',
           isPlatformAdmin: false, // Strict: Customer self-registration can never grant admin
-          emailVerifiedAt: new Date(),
+          emailVerifiedAt: null,
+          emailVerificationTokenHash: verificationTokenHash,
+          emailVerificationExpiresAt: verificationExpiresAt,
           buyer: {
             create: {
               preferredLanguage: 'en',
               preferredEmirate: dto.emirate || 'Dubai',
-              marketingConsentAt: new Date(),
+              pdplConsentAt: new Date(),
+              marketingConsentAt: dto.consentMarketing ? new Date() : null,
             },
           },
         },
@@ -368,9 +437,286 @@ export class AuthService {
         userId: user.id,
         email: user.email!,
         status: user.status,
-        message: 'Account registered successfully as verified customer buyer.',
+        message: 'Account registered successfully. Please verify your email to activate your account.',
+        verificationToken: process.env.NODE_ENV !== 'production' ? rawVerificationToken : undefined,
       };
     });
+  }
+
+  async verifyEmail(rawToken: string): Promise<VerifyEmailResponseDto> {
+    if (!rawToken || !rawToken.trim()) {
+      throw new BadRequestException('Verification token is required');
+    }
+
+    const tokenHash = createHash('sha256').update(rawToken.trim()).digest('hex');
+
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const user = await this.prisma.user.findFirst({
+        where: { emailVerificationTokenHash: tokenHash },
+      });
+
+      if (!user) {
+        throw new BadRequestException('Invalid or already used email verification token.');
+      }
+
+      if (user.emailVerificationExpiresAt && user.emailVerificationExpiresAt < new Date()) {
+        throw new BadRequestException(
+          'Email verification token has expired. Please request a new verification link.'
+        );
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          status: user.status === 'PENDING_VERIFICATION' ? 'ACTIVE' : user.status,
+          emailVerifiedAt: user.emailVerifiedAt || new Date(),
+          emailVerificationTokenHash: null,
+          emailVerificationExpiresAt: null,
+        },
+      });
+
+      await this.prisma.auditEvent.create({
+        data: {
+          action: 'USER_EMAIL_VERIFIED',
+          actorUserId: user.id,
+          targetType: 'User',
+          targetId: user.id,
+          metadata: { email: user.email },
+        },
+      });
+
+      return {
+        success: true,
+        message: 'Email address verified successfully. You may now log in.',
+        email: user.email || undefined,
+      };
+    });
+  }
+
+  async resendVerification(email: string): Promise<ResendVerificationResponseDto> {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const user = await this.prisma.user.findFirst({
+        where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+      });
+
+      const genericMessage =
+        'If an unverified account exists with this email address, a verification link has been sent.';
+
+      if (!user || user.emailVerifiedAt) {
+        return { success: true, message: genericMessage };
+      }
+
+      const rawVerificationToken = randomBytes(32).toString('hex');
+      const verificationTokenHash = createHash('sha256').update(rawVerificationToken).digest('hex');
+      const verificationExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          emailVerificationTokenHash: verificationTokenHash,
+          emailVerificationExpiresAt: verificationExpiresAt,
+        },
+      });
+
+      return {
+        success: true,
+        message: genericMessage,
+        verificationToken: process.env.NODE_ENV !== 'production' ? rawVerificationToken : undefined,
+      };
+    });
+  }
+
+  async verifyActivationToken(rawToken: string): Promise<VerifyActivationTokenResponseDto> {
+    if (!rawToken || !rawToken.trim()) {
+      throw new BadRequestException('Activation token is required');
+    }
+
+    const tokenHash = createHash('sha256').update(rawToken.trim()).digest('hex');
+
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const invitation = await this.prisma.userInvitation.findUnique({
+        where: { tokenHash },
+        include: { tenant: true },
+      });
+
+      if (!invitation || invitation.acceptedAt !== null) {
+        throw new BadRequestException('Invalid or already accepted activation token.');
+      }
+
+      if (invitation.expiresAt < new Date()) {
+        throw new BadRequestException(
+          'Activation token has expired. Please contact administration for a new invitation.'
+        );
+      }
+
+      let mfaSecret: string | undefined;
+      let otpauthUrl: string | undefined;
+
+      if (invitation.isPlatformAdmin) {
+        mfaSecret = generateBase32Secret(20);
+        otpauthUrl = `otpauth://totp/AutomotiveOS:${invitation.email}?secret=${mfaSecret}&issuer=AutomotiveOS`;
+      }
+
+      return {
+        valid: true,
+        email: invitation.email,
+        isPlatformAdmin: invitation.isPlatformAdmin,
+        requiresMfa: invitation.isPlatformAdmin,
+        role: invitation.role,
+        tenantName: invitation.tenant?.displayName,
+        mfaSecret,
+        otpauthUrl,
+      };
+    });
+  }
+
+  async completeActivation(
+    dto: CompleteActivationDto,
+    setupMfaSecret?: string
+  ): Promise<CompleteActivationResponseDto> {
+    const strength = validatePasswordStrength(dto.password);
+    if (!strength.valid) {
+      throw new BadRequestException(strength.message);
+    }
+
+    const tokenHash = createHash('sha256').update(dto.token.trim()).digest('hex');
+
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const invitation = await this.prisma.userInvitation.findUnique({
+        where: { tokenHash },
+        include: { tenant: true },
+      });
+
+      if (!invitation || invitation.acceptedAt !== null) {
+        throw new BadRequestException('Invalid or already accepted activation token.');
+      }
+
+      if (invitation.expiresAt < new Date()) {
+        throw new BadRequestException('Activation token has expired.');
+      }
+
+      let mfaSecretToSave: string | null = null;
+      let mfaEnabled = false;
+
+      if (invitation.isPlatformAdmin) {
+        if (!dto.mfaCode || !/^\d{6}$/.test(dto.mfaCode)) {
+          throw new BadRequestException(
+            'MFA_REQUIRED: A valid 6-digit TOTP verification code is required for platform administrator activation.'
+          );
+        }
+
+        const secretToVerify = setupMfaSecret || invitation.tokenHash.slice(0, 32).toUpperCase();
+        const isTotpValid = verifyTotpCode(dto.mfaCode, secretToVerify);
+        if (!isTotpValid) {
+          throw new BadRequestException(
+            'INVALID_MFA_CODE: The provided 6-digit verification code is invalid or has expired.'
+          );
+        }
+
+        mfaSecretToSave = secretToVerify;
+        mfaEnabled = true;
+      }
+
+      const passwordHash = await hashPassword(dto.password);
+      const normalizedEmail = invitation.email.toLowerCase().trim();
+
+      let user = invitation.invitedUserId
+        ? await this.prisma.user.findUnique({ where: { id: invitation.invitedUserId } })
+        : await this.prisma.user.findFirst({
+            where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+          });
+
+      if (!user) {
+        user = await this.prisma.user.create({
+          data: {
+            identitySubject: `email_${normalizedEmail}`,
+            email: normalizedEmail,
+            displayName: normalizedEmail.split('@')[0] || 'User',
+            passwordHash,
+            status: 'ACTIVE',
+            emailVerifiedAt: new Date(),
+            isPlatformAdmin: invitation.isPlatformAdmin,
+            mfaSecret: mfaSecretToSave,
+            mfaEnabled,
+          },
+        });
+      } else {
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            passwordHash,
+            status: 'ACTIVE',
+            emailVerifiedAt: user.emailVerifiedAt || new Date(),
+            isPlatformAdmin: invitation.isPlatformAdmin ? true : user.isPlatformAdmin,
+            mfaSecret: mfaSecretToSave || user.mfaSecret,
+            mfaEnabled: mfaEnabled || user.mfaEnabled,
+          },
+        });
+      }
+
+      if (invitation.tenantId && invitation.role) {
+        await this.prisma.membership.upsert({
+          where: {
+            tenantId_userId: {
+              tenantId: invitation.tenantId,
+              userId: user.id,
+            },
+          },
+          update: {
+            role: invitation.role,
+            active: true,
+          },
+          create: {
+            tenantId: invitation.tenantId,
+            userId: user.id,
+            role: invitation.role,
+            active: true,
+          },
+        });
+      }
+
+      await this.prisma.userInvitation.update({
+        where: { id: invitation.id },
+        data: {
+          acceptedAt: new Date(),
+          invitedUserId: user.id,
+        },
+      });
+
+      await this.prisma.auditEvent.create({
+        data: {
+          action: invitation.isPlatformAdmin
+            ? 'PLATFORM_ADMIN_ACTIVATED'
+            : 'USER_INVITATION_ACCEPTED',
+          actorUserId: user.id,
+          targetType: 'User',
+          targetId: user.id,
+          metadata: {
+            email: user.email,
+            isPlatformAdmin: invitation.isPlatformAdmin,
+            tenantId: invitation.tenantId,
+            role: invitation.role,
+          },
+        },
+      });
+
+      return {
+        success: true,
+        message: 'Account activated successfully. You may now log in.',
+        redirectUrl: '/auth?tab=login',
+      };
+    });
+  }
+
+  async verifyAdminSession(user: AuthenticatedUser) {
+    if (!user || !user.isPlatformAdmin || user.status !== 'ACTIVE') {
+      throw new ForbiddenException(
+        'PLATFORM_ADMIN_REQUIRED: Active platform administrator privileges are required.'
+      );
+    }
+    return { valid: true, user };
   }
 
   async getMe(userId: string) {

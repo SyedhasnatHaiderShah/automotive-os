@@ -35,6 +35,14 @@ export class CustomerSignupDto {
   @IsBoolean()
   @Equals(true, { message: 'Explicit consent under UAE Federal PDPL Law No. 45/2021 is required' })
   consentPdpl!: boolean;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Optional marketing and promotional communications consent',
+  })
+  @IsOptional()
+  @IsBoolean()
+  consentMarketing?: boolean;
 }
 
 export class CustomerSignupResponseDto {
@@ -47,9 +55,12 @@ export class CustomerSignupResponseDto {
   @ApiProperty({ example: 'buyer@autonexa.ae' })
   email!: string;
 
-  @ApiProperty({ example: 'ACTIVE' })
+  @ApiProperty({ example: 'PENDING_VERIFICATION' })
   status!: string;
 
-  @ApiProperty({ example: 'Account registered successfully.' })
+  @ApiProperty({ example: 'Account registered successfully. Please verify your email to continue.' })
   message!: string;
+
+  @ApiPropertyOptional({ example: 'a1b2c3d4e5...' })
+  verificationToken?: string; // Returned in test/dev environments for automated verification
 }
