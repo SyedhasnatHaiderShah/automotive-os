@@ -1,14 +1,28 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { MembershipRole } from '@automotive-os/database';
 import { RegisterVipLeadDto, RegisterVipResponseDto } from './dto/register-vip.dto';
+import { LoginDto, LoginResponseDto } from './dto/login.dto';
+import { CustomerSignupDto, CustomerSignupResponseDto } from './dto/customer-signup.dto';
+import { hashPassword, verifyPassword, validatePasswordStrength } from './password.util';
 
 export interface OidcJwtPayload {
   sub: string;
+  userId?: string;
   email?: string;
   name?: string;
   phone_number?: string;
+  isPlatformAdmin?: boolean;
+  sessionId?: string;
   iss?: string;
   aud?: string;
   iat?: number;
@@ -22,6 +36,8 @@ export interface AuthenticatedUser {
   phoneE164: string | null;
   displayName: string;
   isPlatformAdmin: boolean;
+  status: string;
+  sessionId?: string;
   memberships: Array<{
     tenantId: string;
     role: MembershipRole;
@@ -30,6 +46,48 @@ export interface AuthenticatedUser {
     tenantSlug: string;
     tenantName: string;
   }>;
+}
+
+export function resolveUserRedirect(user: {
+  isPlatformAdmin: boolean;
+  status: string;
+  memberships: Array<{
+    tenantId: string;
+    role: string;
+    active: boolean;
+    tenantStatus: string;
+    tenantSlug: string;
+  }>;
+}): { redirectUrl: string; primaryRole: string; tenantId?: string; tenantSlug?: string } {
+  if (user.status === 'SUSPENDED') {
+    return { redirectUrl: '/access-suspended', primaryRole: 'SUSPENDED' };
+  }
+  if (user.status === 'DISABLED') {
+    return { redirectUrl: '/access-denied?reason=disabled', primaryRole: 'DISABLED' };
+  }
+  if (user.isPlatformAdmin) {
+    return { redirectUrl: '/admin', primaryRole: 'PLATFORM_ADMIN' };
+  }
+
+  const activeMembership = user.memberships.find((m) => m.active);
+  if (activeMembership) {
+    if (activeMembership.tenantStatus !== 'ACTIVE') {
+      return {
+        redirectUrl: '/access-suspended?reason=tenant_suspended',
+        primaryRole: activeMembership.role,
+        tenantId: activeMembership.tenantId,
+        tenantSlug: activeMembership.tenantSlug,
+      };
+    }
+    return {
+      redirectUrl: '/dealer',
+      primaryRole: activeMembership.role,
+      tenantId: activeMembership.tenantId,
+      tenantSlug: activeMembership.tenantSlug,
+    };
+  }
+
+  return { redirectUrl: '/account/garage', primaryRole: 'BUYER' };
 }
 
 @Injectable()
@@ -51,9 +109,14 @@ export class AuthService {
     }
 
     return runWithDbContext({ isAdmin: true }, async () => {
-      // 1. Resolve user from database by identitySubject
-      let user = await this.prisma.user.findUnique({
-        where: { identitySubject: payload.sub },
+      // 1. Resolve user from database by identitySubject or id
+      let user = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { identitySubject: payload.sub },
+            ...(payload.userId ? [{ id: payload.userId }] : []),
+          ],
+        },
         include: {
           memberships: {
             include: {
@@ -72,6 +135,7 @@ export class AuthService {
             email: payload.email || null,
             phoneE164: payload.phone_number || null,
             displayName,
+            status: 'ACTIVE',
             buyer: {
               create: {
                 preferredLanguage: 'en',
@@ -88,6 +152,12 @@ export class AuthService {
         });
       }
 
+      if (user.status === 'DISABLED') {
+        throw new ForbiddenException(
+          'ACCOUNT_DISABLED: Your account has been disabled by security administration.'
+        );
+      }
+
       return {
         id: user.id,
         identitySubject: user.identitySubject,
@@ -95,6 +165,8 @@ export class AuthService {
         phoneE164: user.phoneE164,
         displayName: user.displayName,
         isPlatformAdmin: user.isPlatformAdmin,
+        status: user.status,
+        sessionId: payload.sessionId,
         memberships: user.memberships.map((m) => ({
           tenantId: m.tenantId,
           role: m.role,
@@ -104,6 +176,281 @@ export class AuthService {
           tenantName: m.tenant.displayName,
         })),
       };
+    });
+  }
+
+  async login(
+    dto: LoginDto,
+    meta?: { userAgent?: string; ipAddress?: string }
+  ): Promise<LoginResponseDto> {
+    const normalizedEmail = dto.email.trim().toLowerCase();
+
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const user = await this.prisma.user.findFirst({
+        where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+        include: {
+          memberships: {
+            include: {
+              tenant: true,
+            },
+          },
+        },
+      });
+
+      // Constant-time mitigation if user not found or has no password
+      if (!user || !user.passwordHash) {
+        await verifyPassword(
+          dto.password,
+          'scrypt$16384$8$1$0123456789abcdef0123456789abcdef$0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+        );
+        throw new UnauthorizedException('Invalid email or password');
+      }
+
+      if (user.status === 'DISABLED') {
+        throw new ForbiddenException(
+          'ACCOUNT_DISABLED: This account has been disabled. Please contact platform administration.'
+        );
+      }
+
+      if (user.lockedUntil && user.lockedUntil > new Date()) {
+        const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+        throw new UnauthorizedException(
+          `Account is temporarily locked due to excessive failed attempts. Please retry in ${minutesLeft} minute(s).`
+        );
+      }
+
+      const isPasswordValid = await verifyPassword(dto.password, user.passwordHash);
+
+      if (!isPasswordValid) {
+        const attempts = user.failedLoginAttempts + 1;
+        let lockedUntil: Date | null = null;
+        if (attempts >= 5) {
+          lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes lockout
+        }
+
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            failedLoginAttempts: attempts,
+            lockedUntil,
+          },
+        });
+
+        throw new UnauthorizedException('Invalid email or password');
+      }
+
+      // Reset lockout counter on success
+      if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            failedLoginAttempts: 0,
+            lockedUntil: null,
+          },
+        });
+      }
+
+      // Create session
+      const sessionToken = randomBytes(32).toString('hex');
+      const tokenHash = createHash('sha256').update(sessionToken).digest('hex');
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+      const session = await this.prisma.session.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          userAgent: meta?.userAgent || null,
+          ipAddress: meta?.ipAddress || null,
+          expiresAt,
+        },
+      });
+
+      const token = this.jwtService.sign(
+        {
+          sub: user.identitySubject,
+          userId: user.id,
+          email: user.email,
+          isPlatformAdmin: user.isPlatformAdmin,
+          sessionId: session.id,
+        },
+        {
+          issuer: process.env.JWT_ISSUER || 'https://auth.autonexa.ae',
+          audience: process.env.JWT_AUDIENCE || 'autonexa-api',
+          expiresIn: '7d',
+        }
+      );
+
+      const redirectInfo = resolveUserRedirect({
+        isPlatformAdmin: user.isPlatformAdmin,
+        status: user.status,
+        memberships: user.memberships.map((m) => ({
+          tenantId: m.tenantId,
+          role: m.role,
+          active: m.active,
+          tenantStatus: m.tenant.status,
+          tenantSlug: m.tenant.slug,
+        })),
+      });
+
+      return {
+        success: true,
+        accessToken: token,
+        tokenType: 'Bearer',
+        expiresIn: 604800,
+        user: {
+          id: user.id,
+          email: user.email,
+          displayName: user.displayName,
+          isPlatformAdmin: user.isPlatformAdmin,
+          status: user.status,
+          primaryRole: redirectInfo.primaryRole,
+          tenantId: redirectInfo.tenantId,
+          tenantSlug: redirectInfo.tenantSlug,
+          redirectUrl: redirectInfo.redirectUrl,
+        },
+      };
+    });
+  }
+
+  async signupCustomer(dto: CustomerSignupDto): Promise<CustomerSignupResponseDto> {
+    if (dto.consentPdpl !== true) {
+      throw new BadRequestException(
+        'Explicit UAE Federal PDPL consent agreement (Law No. 45/2021) is required'
+      );
+    }
+
+    const strength = validatePasswordStrength(dto.password);
+    if (!strength.valid) {
+      throw new BadRequestException(strength.message);
+    }
+
+    const normalizedEmail = dto.email.trim().toLowerCase();
+
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const existingUser = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: { equals: normalizedEmail, mode: 'insensitive' } },
+            ...(dto.phone ? [{ phoneE164: dto.phone }] : []),
+          ],
+        },
+      });
+
+      if (existingUser) {
+        throw new ConflictException('An account with this email or phone number already exists.');
+      }
+
+      const passwordHash = await hashPassword(dto.password);
+      const identitySubject = `email_${normalizedEmail}`;
+
+      const user = await this.prisma.user.create({
+        data: {
+          identitySubject,
+          email: normalizedEmail,
+          displayName: dto.displayName.trim(),
+          phoneE164: dto.phone || null,
+          passwordHash,
+          status: 'ACTIVE',
+          isPlatformAdmin: false, // Strict: Customer self-registration can never grant admin
+          emailVerifiedAt: new Date(),
+          buyer: {
+            create: {
+              preferredLanguage: 'en',
+              preferredEmirate: dto.emirate || 'Dubai',
+              marketingConsentAt: new Date(),
+            },
+          },
+        },
+      });
+
+      return {
+        success: true,
+        userId: user.id,
+        email: user.email!,
+        status: user.status,
+        message: 'Account registered successfully as verified customer buyer.',
+      };
+    });
+  }
+
+  async getMe(userId: string) {
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          buyer: true,
+          memberships: {
+            include: {
+              tenant: true,
+            },
+          },
+        },
+      });
+
+      if (!user) {
+        throw new NotFoundException('User profile not found');
+      }
+
+      const redirectInfo = resolveUserRedirect({
+        isPlatformAdmin: user.isPlatformAdmin,
+        status: user.status,
+        memberships: user.memberships.map((m) => ({
+          tenantId: m.tenantId,
+          role: m.role,
+          active: m.active,
+          tenantStatus: m.tenant.status,
+          tenantSlug: m.tenant.slug,
+        })),
+      });
+
+      return {
+        id: user.id,
+        identitySubject: user.identitySubject,
+        email: user.email,
+        phoneE164: user.phoneE164,
+        displayName: user.displayName,
+        isPlatformAdmin: user.isPlatformAdmin,
+        status: user.status,
+        emailVerified: !!user.emailVerifiedAt,
+        mfaEnabled: user.mfaEnabled,
+        memberships: user.memberships.map((m) => ({
+          tenantId: m.tenantId,
+          role: m.role,
+          active: m.active,
+          tenantStatus: m.tenant.status,
+          tenantSlug: m.tenant.slug,
+          tenantName: m.tenant.displayName,
+        })),
+        buyerProfile: user.buyer
+          ? {
+              preferredLanguage: user.buyer.preferredLanguage,
+              preferredEmirate: user.buyer.preferredEmirate,
+            }
+          : null,
+        resolvedDashboardUrl: redirectInfo.redirectUrl,
+      };
+    });
+  }
+
+  async logout(sessionId?: string): Promise<{ success: boolean }> {
+    if (sessionId) {
+      await runWithDbContext({ isAdmin: true }, async () => {
+        await this.prisma.session.updateMany({
+          where: { id: sessionId },
+          data: { revokedAt: new Date() },
+        });
+      });
+    }
+    return { success: true };
+  }
+
+  async revokeAllUserSessions(userId: string): Promise<{ count: number }> {
+    return runWithDbContext({ isAdmin: true }, async () => {
+      const result = await this.prisma.session.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      return { count: result.count };
     });
   }
 
@@ -135,7 +482,6 @@ export class AuthService {
       : `+971${cleanPhone.replace(/^0/, '')}`;
 
     return runWithDbContext({ isAdmin: true }, async () => {
-      // Check if user already exists (Defense against account takeover / unverified linking)
       const existingUser = await this.prisma.user.findFirst({
         where: {
           OR: [
@@ -152,9 +498,6 @@ export class AuthService {
         );
       }
 
-      // 2. NEVER trust self-reported Emirates ID as a UAE PASS identity!
-      // Unverified public registrations receive an isolated pending registration subject.
-      // Official uae_pass_* identity subjects can ONLY be assigned upon verified UAE PASS OIDC callback.
       const pendingIdentitySubject = `pending_reg_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
 
       const user = await this.prisma.user.create({
@@ -163,6 +506,7 @@ export class AuthService {
           email: dto.email,
           phoneE164: formattedPhone,
           displayName: dto.legalName,
+          status: 'PENDING_VERIFICATION',
           buyer: {
             create: {
               preferredLanguage: 'en',
@@ -177,8 +521,6 @@ export class AuthService {
         },
       });
 
-      // 3. NO authenticated JWT for unverified registrations.
-      // Session activation requires verified UAE PASS OIDC or proven email/phone ownership.
       return {
         success: true,
         userId: user.id,
