@@ -35,7 +35,7 @@ async function bootstrap() {
             isPlatformAdmin: false, // Strict S2: NOT elevated until activation and MFA challenge
             status: 'PENDING_VERIFICATION',
             emailVerifiedAt: null,
-            mfaEnabled: true, // Mandatory MFA required upon activation
+            mfaEnabled: false, // Email/password-only admin authentication per product policy
           },
         });
         console.log(`  [+] Created unverified identity record (ID: ${user.id}). Elevation withheld until activation.`);
