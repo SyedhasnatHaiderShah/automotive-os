@@ -12,6 +12,7 @@ describe('AuthService', () => {
   let jwt: JwtService;
 
   const mockPrisma = {
+    auditEvent: { create: jest.fn().mockResolvedValue({}) },
     user: {
       findFirst: jest.fn(),
       findUnique: jest.fn(),
@@ -155,6 +156,7 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('mock-jwt-token');
       expect(result.user.redirectUrl).toBe('/account/garage');
       expect(mockPrisma.session.create).toHaveBeenCalled();
+      expect(mockPrisma.auditEvent.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ action: 'AUTH_LOGIN_SUCCESS' }) }));
     });
 
     it('should reject invalid password and increment failed attempts', async () => {
