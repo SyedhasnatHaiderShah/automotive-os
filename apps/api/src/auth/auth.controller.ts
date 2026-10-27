@@ -118,8 +118,7 @@ export class AuthController {
     @Body() dto: CompleteActivationDto,
     @Req() req: Request
   ): Promise<CompleteActivationResponseDto> {
-    const setupMfaSecret = req.headers['x-mfa-secret'] as string | undefined;
-    return this.authService.completeActivation(dto, setupMfaSecret);
+    return this.authService.completeActivation(dto);
   }
 
   @UseGuards(JwtAuthGuard, PlatformAdminGuard)
