@@ -54,6 +54,11 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
               className={`w-full h-9 ${
                 isRtl ? 'pr-9 pl-4' : 'pl-9 pr-4'
               } rounded-lg bg-surface-container-high text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary-container`}
+              aria-label={
+                isRtl
+                  ? 'البحث برقم الهيكل، القضية، الوكيل، أو الرخصة'
+                  : 'Query VIN, Case, Dealership, or DED License'
+              }
               placeholder={
                 isRtl
                   ? 'بحث برقم الهيكل، القضية، الوكيل، رخصة دائرة التنمية الاقتصادية...'
@@ -76,6 +81,8 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
           {/* Language Switcher */}
           <div className="flex items-center bg-surface-container-high rounded p-0.5 font-label-caps text-label-caps">
             <button
+              type="button"
+              aria-label="Switch interface to English"
               onClick={() => {
                 if (isRtl && onToggleRtl) onToggleRtl();
               }}
@@ -88,6 +95,8 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
               EN
             </button>
             <button
+              type="button"
+              aria-label="التحويل إلى اللغة العربية"
               onClick={() => {
                 if (!isRtl && onToggleRtl) onToggleRtl();
               }}
@@ -105,6 +114,11 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
           <button
             className="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
             type="button"
+            aria-label={
+              isRtl
+                ? 'الإشعارات (4 غير مقروءة - غير متاحة في البيئة التجريبية)'
+                : 'Notifications (4 unread - unavailable in staging)'
+            }
             title="Notifications unavailable in staging"
             disabled
           >
