@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   MarketplaceHeader,
   MarketplaceFooter,
@@ -87,12 +87,12 @@ export default function VehicleComparisonPage() {
     setLoading(false);
   };
 
-  // Check if a spec row differs across compared vehicles
-  const isDifferent = (extractor: (v: PublicListingDetail) => any) => {
+  // Optimization (⚡ Bolt): Memoize isDifferent function so it isn't recreated on every render
+  const isDifferent = useCallback((extractor: (v: PublicListingDetail) => any) => {
     if (comparedVehicles.length <= 1 || !comparedVehicles[0]) return false;
     const firstVal = extractor(comparedVehicles[0]);
     return comparedVehicles.some((v) => extractor(v) !== firstVal);
-  };
+  }, [comparedVehicles]);
 
   // Print/PDF Handler
   const handlePrint = () => {
@@ -101,7 +101,9 @@ export default function VehicleComparisonPage() {
     }
   };
 
-  const comparisonAttributes = [
+  // Optimization (⚡ Bolt): Memoize comparisonAttributes structure to avoid recreating array, category objects,
+  // render functions, and extractor functions on every state change (e.g., toggling highlightDifferences or opening modal).
+  const comparisonAttributes = useMemo(() => [
     {
       category: isArabic ? 'نظرة عامة والأسعار' : 'Overview & Pricing',
       items: [
@@ -238,7 +240,13 @@ export default function VehicleComparisonPage() {
         },
       ],
     },
-  ];
+  ], [isArabic]);
+
+  // Optimization (⚡ Bolt): Pre-compute selected vehicle IDs set and memoize available items for modal lookup
+  const selectableListings = useMemo(() => {
+    const comparedIds = new Set(comparedVehicles.map((v) => v.id));
+    return availableListings.filter((item) => !comparedIds.has(item.id));
+  }, [availableListings, comparedVehicles]);
 
   return (
     <div
@@ -497,10 +505,8 @@ export default function VehicleComparisonPage() {
             </div>
 
             <div className="overflow-y-auto flex flex-col gap-2.5 pr-1">
-              {availableListings
-                .filter((item) => !comparedVehicles.some((v) => v.id === item.id))
-                .map((item) => (
-                  <div
+              {selectableListings.map((item) => (
+                <div
                     key={item.id}
                     onClick={() => addVehicle(item)}
                     className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 cursor-pointer transition-colors"
