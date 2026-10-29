@@ -5,6 +5,7 @@ import { AuthService, resolveUserRedirect } from './auth.service';
 import { PrismaService } from '../database/prisma.service';
 import { hashPassword } from './password.util';
 import { MembershipRole } from '@automotive-os/database';
+import { ClientTier } from './dto/register-vip.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -291,6 +292,34 @@ describe('AuthService', () => {
           data: expect.objectContaining({
             isPlatformAdmin: false,
             buyer: expect.any(Object),
+          }),
+        })
+      );
+    });
+  });
+
+  describe('registerVipLead', () => {
+    it('should create pending user with cryptographically random pending_reg_ identity subject', async () => {
+      mockPrisma.user.findFirst.mockResolvedValue(null);
+      mockPrisma.user.create.mockResolvedValue({
+        id: 'vip-user-uuid',
+        email: 'viplead@autonexa.ae',
+      });
+
+      const res = await service.registerVipLead({
+        legalName: 'VIP Lead',
+        email: 'viplead@autonexa.ae',
+        phone: '+971500000000',
+        tier: ClientTier.COLLECTOR,
+        consentPdpl: true,
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.userId).toBe('vip-user-uuid');
+      expect(mockPrisma.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            identitySubject: expect.stringMatching(/^pending_reg_\d+_[a-f0-9]{16}$/),
           }),
         })
       );
