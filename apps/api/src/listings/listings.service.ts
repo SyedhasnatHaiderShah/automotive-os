@@ -471,7 +471,7 @@ export class ListingsService {
   /**
    * Platform admin retrieves full listing dossier for moderation review.
    */
-  async getAdminListingById(listingId: string): Promise<any> {
+  async getAdminListingById(listingId: string, adminUserId?: string): Promise<any> {
     const isUuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         listingId,
@@ -515,6 +515,25 @@ export class ListingsService {
         };
       }),
     );
+
+    // Issuing a link to a private object (documents, unpublished photos) is a
+    // sensitive read, so it is audited. Only ids are recorded, never the URL.
+    const privateMediaIds = media
+      .filter((m) => m.previewUrl && !m.isPublic)
+      .map((m) => m.id);
+    if (privateMediaIds.length > 0) {
+      await this.auditService.logAction({
+        tenantId: listing.tenantId,
+        actorUserId: adminUserId || null,
+        action: "ADMIN_PRIVATE_MEDIA_PREVIEW_ISSUED",
+        targetType: "listing",
+        targetId: listing.id,
+        metadata: {
+          mediaIds: privateMediaIds,
+          expiresAt: previewExpiresAt,
+        },
+      });
+    }
 
     return {
       id: listing.id,

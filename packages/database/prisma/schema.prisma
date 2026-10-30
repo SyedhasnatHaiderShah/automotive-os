@@ -191,8 +191,8 @@ model BuyerProfile {
   settlementCurrency   String    @default("AED") @map("settlement_currency")
   escrowIban           String?   @map("escrow_iban")
   garageVisibility     Boolean   @default(true) @map("garage_visibility")
-  aecbRefreshConsent   Boolean   @default(true) @map("aecb_refresh_consent")
-  whatsappCommsConsent Boolean   @default(true) @map("whatsapp_comms_consent")
+  aecbRefreshConsent   Boolean   @default(false) @map("aecb_refresh_consent")
+  whatsappCommsConsent Boolean   @default(false) @map("whatsapp_comms_consent")
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 

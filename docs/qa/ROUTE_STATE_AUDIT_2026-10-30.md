@@ -258,3 +258,12 @@ Checks after Medium fixes:
 - Browser/E2E — NOT RUN
 
 Decisions needed: MK-09 migration and backfill; AD-08 moderator access to private documents (and whether to audit each open); AD-04 transition rules; review of all new Arabic copy; `NEXT_PUBLIC_SUPPORT_EMAIL` and `NEXT_PUBLIC_ENABLE_PREVIEW_MODULES` deploy settings.
+
+## Decisions applied (2026-10-30)
+
+- **MK-09 / consent (approved):** migration `20261030150000_consent_defaults_opt_in` changes `whatsapp_comms_consent` and `aecb_refresh_consent` defaults to `false` and resets every existing `true` value to `false`; buyers opt in again from settings. API fallbacks for both are now `false`. Migration is applied manually with `prisma migrate deploy` (the API container does not migrate on start).
+- **AD-08:** moderators keep 5-minute signed previews; each response that issues a link to private media writes `ADMIN_PRIVATE_MEDIA_PREVIEW_ISSUED` (media ids and expiry only, never the URL).
+- **AD-10:** tenant-list reads are no longer audited (test updated). Single-record reads and all mutations remain audited.
+- **AD-04:** transition rules kept as built.
+
+Checks: API typecheck PASS; API jest 27 suites, 252/252 PASS; Prisma validate PASS. Migration NOT RUN against any database from this machine.

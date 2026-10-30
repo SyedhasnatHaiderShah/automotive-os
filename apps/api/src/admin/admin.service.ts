@@ -51,20 +51,12 @@ export class AdminService {
     private readonly outboxService: OutboxService,
   ) {}
 
+  // List reads are not audited (AD-10): they flooded the ledger on every page
+  // load. Single-record reads and all mutations remain audited.
   async listAllTenants(
-    adminUserId: string,
-    correlationId?: string,
+    _adminUserId: string,
+    _correlationId?: string,
   ): Promise<AdminTenantSummaryDto[]> {
-    await this.auditService.logAction({
-      tenantId: null,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_LIST_ALL_TENANTS",
-      targetType: "tenants",
-      targetId: "ALL",
-      correlationId: correlationId || null,
-      metadata: { reason: "cross_tenant_platform_inspection" },
-    });
-
     const tenants = await this.prisma.tenant.findMany({
       // SEC-17: bounded result set until the dealer directory is paginated.
       take: 500,

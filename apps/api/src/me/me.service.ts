@@ -739,7 +739,7 @@ export class MeService {
       settlementCurrency: buyer?.settlementCurrency || 'AED',
       escrowIban: buyer?.escrowIban || null,
       garageVisibility: buyer?.garageVisibility ?? true,
-      aecbRefreshConsent: buyer?.aecbRefreshConsent ?? true,
+      aecbRefreshConsent: buyer?.aecbRefreshConsent ?? false,
       // No buyer row means the user never opted in (MK-09).
       whatsappCommsConsent: buyer?.whatsappCommsConsent ?? false,
       updatedAt: (buyer?.updatedAt || user.updatedAt).toISOString(),
@@ -775,7 +775,7 @@ export class MeService {
         settlementCurrency: dto.settlementCurrency || 'AED',
         escrowIban: dto.escrowIban,
         garageVisibility: dto.garageVisibility ?? true,
-        aecbRefreshConsent: dto.aecbRefresh ?? true,
+        aecbRefreshConsent: dto.aecbRefresh ?? false,
         whatsappCommsConsent: dto.whatsappComms ?? false,
       },
       update: {
