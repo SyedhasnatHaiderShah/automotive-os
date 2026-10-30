@@ -183,15 +183,38 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
     });
   }, [vehicles, activeFilter, searchQuery]);
 
+  // Optimization (⚡ Bolt): Single-pass memoized status counts to prevent 4x full array traversals
+  // on every component render (e.g. search input, selection toggle, VIN reveal, page change).
+  const statusCounts = useMemo(() => {
+    let published = 0;
+    let review = 0;
+    let escrow = 0;
+    let draft = 0;
+    for (const v of vehicles) {
+      if (v.listingStatus === 'PUBLISHED') published++;
+      else if (v.listingStatus === 'PENDING_REVIEW') review++;
+      else if (!v.listingStatus || v.listingStatus === 'DRAFT') draft++;
+
+      if (v.stockStatus === 'RESERVED' || v.stockStatus === 'SOLD') escrow++;
+    }
+    return { published, review, escrow, draft };
+  }, [vehicles]);
+
   const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / PAGE_SIZE));
   const pageVehicles = filteredVehicles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   useEffect(() => { setCurrentPage(1); }, [activeFilter, searchQuery]);
 
-  const selectedVehicles = vehicles.filter((v) => selectedIds.has(v.id));
-  const combinedSelectedValue = selectedVehicles.reduce(
-    (sum, v) => sum + Math.round(Number(v.askingPriceFils) / 100),
-    0
-  );
+  // Optimization (⚡ Bolt): Memoize combined selected value to prevent O(N) array filtering on unrelated state updates.
+  const combinedSelectedValue = useMemo(() => {
+    if (selectedIds.size === 0) return 0;
+    let sum = 0;
+    for (const v of vehicles) {
+      if (selectedIds.has(v.id)) {
+        sum += Math.round(Number(v.askingPriceFils) / 100);
+      }
+    }
+    return sum;
+  }, [vehicles, selectedIds]);
 
   return (
     <div className={`min-h-screen bg-background text-on-surface flex ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
@@ -485,7 +508,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
                   <span>Published</span>
                   <span className="text-[10px] opacity-70">
-                    {vehicles.filter((v) => v.listingStatus === 'PUBLISHED').length}
+                    {statusCounts.published}
                   </span>
                 </button>
 
@@ -501,7 +524,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   <span>Under Review</span>
                   <span className="text-[10px] opacity-70">
-                    {vehicles.filter((v) => v.listingStatus === 'PENDING_REVIEW').length}
+                    {statusCounts.review}
                   </span>
                 </button>
 
@@ -517,7 +540,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
                   <span>Sold / Escrow</span>
                   <span className="text-[10px] opacity-70">
-                    {vehicles.filter((v) => v.stockStatus === 'RESERVED' || v.stockStatus === 'SOLD').length}
+                    {statusCounts.escrow}
                   </span>
                 </button>
 
@@ -533,7 +556,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-outline" />
                   <span>Draft</span>
                   <span className="text-[10px] opacity-70">
-                    {vehicles.filter((v) => !v.listingStatus || v.listingStatus === 'DRAFT').length}
+                    {statusCounts.draft}
                   </span>
                 </button>
               </div>
