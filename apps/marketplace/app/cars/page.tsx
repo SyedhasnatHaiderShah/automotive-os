@@ -19,6 +19,14 @@ import {
 } from '../../lib/api';
 import { BuyerAuthRequiredError } from '../../lib/buyer-api-client';
 
+/** The top slider position means "no price cap", so higher-priced stock is never hidden by default. */
+const PRICE_ANY_AED = 3000000;
+
+function formatMaxPrice(aed: number, isArabic: boolean): string {
+  if (aed >= PRICE_ANY_AED) return isArabic ? 'أي سعر' : 'Any price';
+  return `AED ${aed.toLocaleString('en-US')}`;
+}
+
 export default function SearchResultsPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
   const [selectedEmirate, setSelectedEmirate] = useState('All Emirates');
@@ -27,8 +35,8 @@ export default function SearchResultsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedMake, setSelectedMake] = useState('ALL');
   const [selectedCondition, setSelectedCondition] = useState('ALL');
-  const [gccOnly, setGccOnly] = useState(true);
-  const [maxPriceAed, setMaxPriceAed] = useState<number>(2000000);
+  const [gccOnly, setGccOnly] = useState(false);
+  const [maxPriceAed, setMaxPriceAed] = useState<number>(PRICE_ANY_AED);
   const [sortBy, setSortBy] = useState<'recent' | 'price-asc' | 'price-desc'>('recent');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -53,8 +61,9 @@ export default function SearchResultsPage() {
       setSelectedEmirate(params.get('emirate') || 'All Emirates');
       setSelectedCondition(params.get('condition') || 'ALL');
       setSelectedMake(params.get('make') || 'ALL');
-      setGccOnly(params.get('gcc') !== 'false');
-      setMaxPriceAed(Number(params.get('maxPrice')) > 0 ? Number(params.get('maxPrice')) : 2000000);
+      setGccOnly(params.get('gcc') === 'true');
+      const urlMaxPrice = Number(params.get('maxPrice'));
+      setMaxPriceAed(urlMaxPrice > 0 && urlMaxPrice < PRICE_ANY_AED ? urlMaxPrice : PRICE_ANY_AED);
       const sort = params.get('sort');
       setSortBy(sort === 'price-asc' || sort === 'price-desc' ? sort : 'recent');
       setPage(Math.max(1, Number(params.get('page')) || 1));
@@ -77,8 +86,8 @@ export default function SearchResultsPage() {
     if (selectedEmirate !== 'All Emirates') params.set('emirate', selectedEmirate);
     if (selectedCondition !== 'ALL') params.set('condition', selectedCondition);
     if (selectedMake !== 'ALL') params.set('make', selectedMake);
-    if (!gccOnly) params.set('gcc', 'false');
-    if (maxPriceAed !== 2000000) params.set('maxPrice', String(maxPriceAed));
+    if (gccOnly) params.set('gcc', 'true');
+    if (maxPriceAed < PRICE_ANY_AED) params.set('maxPrice', String(maxPriceAed));
     if (sortBy !== 'recent') params.set('sort', sortBy);
     if (page > 1) params.set('page', String(page));
     const query = params.toString();
@@ -97,7 +106,7 @@ export default function SearchResultsPage() {
       make: selectedMake !== 'ALL' ? selectedMake : undefined,
       condition: selectedCondition !== 'ALL' ? selectedCondition : undefined,
       gccSpec: gccOnly ? true : undefined,
-      maxPriceFils: maxPriceAed * 100,
+      maxPriceFils: maxPriceAed < PRICE_ANY_AED ? maxPriceAed * 100 : undefined,
       sort: sortBy,
       page,
       limit: PAGE_SIZE,
@@ -173,8 +182,8 @@ export default function SearchResultsPage() {
     setSearchQuery('');
     setSelectedMake('ALL');
     setSelectedCondition('ALL');
-    setGccOnly(true);
-    setMaxPriceAed(2000000);
+    setGccOnly(false);
+    setMaxPriceAed(PRICE_ANY_AED);
     setSortBy('recent');
     setPage(1);
   };
@@ -397,13 +406,13 @@ export default function SearchResultsPage() {
                       {isArabic ? 'أقصى سعر (درهم)' : 'Max Price (AED)'}
                     </label>
                     <span className="font-data-mono-num text-xs font-semibold text-primary">
-                      AED {maxPriceAed.toLocaleString('en-US')}
+                      {formatMaxPrice(maxPriceAed, isArabic)}
                     </span>
                   </div>
                   <input
                     type="range"
                     min={100000}
-                    max={3000000}
+                    max={PRICE_ANY_AED}
                     step={50000}
                     value={maxPriceAed}
                     onChange={(e) => { setMaxPriceAed(Number(e.target.value)); setPage(1); }}
@@ -436,8 +445,15 @@ export default function SearchResultsPage() {
                   </Badge>
                 )}
                 {gccOnly && (
-                  <Badge variant="gcc">
-                    <span>GCC SPEC</span>
+                  <Badge variant="gcc" className="gap-1 cursor-pointer" onClick={() => { setGccOnly(false); setPage(1); }}>
+                    <span>{isArabic ? 'مواصفات خليجية' : 'GCC SPEC'}</span>
+                    <span>×</span>
+                  </Badge>
+                )}
+                {maxPriceAed < PRICE_ANY_AED && (
+                  <Badge variant="outline" className="gap-1 cursor-pointer" onClick={() => { setMaxPriceAed(PRICE_ANY_AED); setPage(1); }}>
+                    <span>{isArabic ? 'حتى' : 'Up to'} {formatMaxPrice(maxPriceAed, isArabic)}</span>
+                    <span className="text-outline">×</span>
                   </Badge>
                 )}
               </div>
@@ -564,12 +580,12 @@ export default function SearchResultsPage() {
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-xs">
                     <span className="text-outline uppercase font-label-caps">Max Price</span>
-                    <span className="text-primary font-bold">AED {maxPriceAed.toLocaleString('en-US')}</span>
+                    <span className="text-primary font-bold">{formatMaxPrice(maxPriceAed, isArabic)}</span>
                   </div>
                   <input
                     type="range"
                     min={100000}
-                    max={3000000}
+                    max={PRICE_ANY_AED}
                     step={50000}
                     value={maxPriceAed}
                     onChange={(e) => { setMaxPriceAed(Number(e.target.value)); setPage(1); }}

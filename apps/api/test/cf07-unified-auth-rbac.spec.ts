@@ -326,7 +326,7 @@ describe('CF-07 Unified Authentication, RBAC & Security Remediation (S1-S4) E2E 
       platformAdminToken = res.body.accessToken;
     });
 
-    it('should authenticate dealer staff and return role-specific redirect to /dealer/crm', async () => {
+    it('should authenticate dealer staff and return role-specific redirect to /dealer/leads', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({
@@ -336,7 +336,7 @@ describe('CF-07 Unified Authentication, RBAC & Security Remediation (S1-S4) E2E 
 
       expect(res.status).toBe(200);
       expect(res.body.user.primaryRole).toBe('SALES_MANAGER');
-      expect(res.body.user.redirectUrl).toBe('/dealer/crm');
+      expect(res.body.user.redirectUrl).toBe('/dealer/leads');
 
       dealerStaffToken = res.body.accessToken;
     });

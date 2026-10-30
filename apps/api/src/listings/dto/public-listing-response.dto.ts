@@ -76,6 +76,9 @@ export class PublicListingSummaryDto {
   @ApiProperty({ type: [PublicMediaDto], description: 'Public exterior/interior images only' })
   media!: PublicMediaDto[];
 
+  @ApiProperty({ description: 'GCC specification flag', nullable: true })
+  gccSpec!: boolean | null;
+
   @ApiProperty({ description: 'Publication timestamp' })
   publishedAt!: string;
 }
@@ -101,9 +104,6 @@ export class PublicListingDetailDto extends PublicListingSummaryDto {
 
   @ApiProperty({ description: 'Transmission', nullable: true })
   transmission!: string | null;
-
-  @ApiProperty({ description: 'GCC specification flag', nullable: true })
-  gccSpec!: boolean | null;
 
   @ApiProperty({ description: 'Privacy-masked VIN (e.g. 1GNEK1337*******)', nullable: true })
   maskedVin!: string | null;

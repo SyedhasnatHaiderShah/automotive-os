@@ -372,6 +372,7 @@ export class ListingSearchSyncService {
       year: doc.year,
       mileageKm: doc.mileageKm,
       condition: doc.condition,
+      gccSpec: doc.gccSpec,
       emirate: doc.emirate,
       seller: doc.seller,
       media: doc.media,

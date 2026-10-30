@@ -808,6 +808,7 @@ export class ListingsService {
       year: listing.vehicle.modelYear,
       mileageKm: listing.vehicle.mileageKm,
       condition: listing.vehicle.condition,
+      gccSpec: listing.vehicle.gccSpec ?? null,
       emirate: listing.vehicle.branch?.emirate || "UAE",
       seller: {
         id: listing.tenant.id,

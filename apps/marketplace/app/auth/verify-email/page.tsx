@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { EMAIL_DELIVERY_AVAILABLE, apiErrorMessage } from '../../../lib/email-delivery';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -41,7 +42,7 @@ function VerifyEmailContent() {
           setMessage(data.message || 'Email verified successfully. You may now log in.');
         } else {
           setStatus('error');
-          setMessage(data.message || 'Invalid or expired verification token.');
+          setMessage(apiErrorMessage(data, 'Invalid or expired verification token.'));
         }
       } catch {
         if (!isMounted) return;
@@ -71,11 +72,21 @@ function VerifyEmailContent() {
         body: JSON.stringify({ email: resendEmail.trim() }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setResendStatus('error');
+        setResendMessage(
+          res.status === 429
+            ? 'Too many requests. Please wait a few minutes and try again.'
+            : apiErrorMessage(data, 'The verification link could not be requested.')
+        );
+        return;
+      }
       setResendStatus('success');
       setResendMessage(
-        data.message ||
-          'If an unverified account exists for this email, a verification link has been sent.'
+        EMAIL_DELIVERY_AVAILABLE
+          ? 'If an unverified account exists for this email, a verification link has been sent.'
+          : 'Request recorded, but verification emails are not being sent yet. Please contact support to activate your account.'
       );
     } catch {
       setResendStatus('error');
@@ -173,6 +184,7 @@ function VerifyEmailContent() {
           <form onSubmit={handleResend} className="space-y-3">
             <input
               type="email"
+              aria-label="Registered email address"
               value={resendEmail}
               onChange={(e) => setResendEmail(e.target.value)}
               placeholder="Enter your registered email"
@@ -187,7 +199,12 @@ function VerifyEmailContent() {
               {resendStatus === 'loading' ? 'Sending...' : 'Send Verification Link'}
             </button>
             {resendMessage && (
-              <p className="text-xs text-stone-400 mt-2 text-center">{resendMessage}</p>
+              <p
+                role={resendStatus === 'error' ? 'alert' : 'status'}
+                className={`text-xs mt-2 text-center ${resendStatus === 'error' ? 'text-red-400' : 'text-stone-400'}`}
+              >
+                {resendMessage}
+              </p>
             )}
           </form>
 

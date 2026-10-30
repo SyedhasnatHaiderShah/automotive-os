@@ -89,22 +89,16 @@ export function resolveUserRedirect(user: {
       };
     }
 
+    // Only routes that exist in apps/dealer and run on live data. Service and
+    // finance modules are sample-data previews, so those roles land on the dashboard.
     let roleLanding = '/dealer';
     switch (activeMembership.role) {
       case 'SALES_MANAGER':
-        roleLanding = '/dealer/crm';
-        break;
       case 'SALES_AGENT':
         roleLanding = '/dealer/leads';
         break;
       case 'INVENTORY_MANAGER':
         roleLanding = '/dealer/inventory';
-        break;
-      case 'SERVICE_ADVISOR':
-        roleLanding = '/dealer/service';
-        break;
-      case 'FINANCE_MANAGER':
-        roleLanding = '/dealer/finance';
         break;
       default:
         roleLanding = '/dealer';

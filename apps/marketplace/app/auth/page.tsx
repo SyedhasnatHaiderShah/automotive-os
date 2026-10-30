@@ -17,6 +17,7 @@ import {
   X,
   Sparkles,
 } from 'lucide-react';
+import { EMAIL_DELIVERY_AVAILABLE } from '../../lib/email-delivery';
 
 export default function UnifiedAuthPage() {
   const router = useRouter();
@@ -161,9 +162,13 @@ export default function UnifiedAuthPage() {
       }
 
       setRegSuccessMessage(
-        isArabic
-          ? 'تم إنشاء الحساب بنجاح! يرجى فتح رابط التحقق المرسل إلى بريدك الإلكتروني لتفعيل الحساب.'
-          : 'Account registered successfully! Please check your email to verify your account before logging in.'
+        EMAIL_DELIVERY_AVAILABLE
+          ? isArabic
+            ? 'تم إنشاء الحساب. يرجى فتح رابط التحقق المرسل إلى بريدك الإلكتروني لتفعيل الحساب.'
+            : 'Account created. Please open the verification link sent to your email before logging in.'
+          : isArabic
+            ? 'تم إنشاء الحساب، لكن رسائل التحقق عبر البريد الإلكتروني غير مفعّلة بعد. لا يمكن تفعيل الحساب حتى يتم تفعيل خدمة البريد أو يقوم فريق الدعم بتفعيله.'
+            : 'Account created, but verification emails are not being sent yet. Your account cannot be activated until email delivery is connected or support activates it.'
       );
 
       setTimeout(() => {

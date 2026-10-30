@@ -1287,14 +1287,14 @@ export default function SubprimeDbrExceptionPage() {
 
             {croSubmitted ? (
               <div className="py-6 text-center space-y-3">
-                <span className="material-symbols-outlined text-[48px] text-tertiary">check_circle</span>
+                <span className="material-symbols-outlined text-[48px] text-outline">info</span>
                 <h4 className="font-headline-sm text-on-surface font-semibold">
                   {isRtl ? 'معاينة فقط — لم يتم إرسال أي شيء.' : 'Preview only — nothing was sent.'}
                 </h4>
                 <p className="text-[12px] text-on-surface-variant max-w-sm mx-auto">
                   {isRtl
-                    ? 'تم تسجيل الاستثناء برقم CBUAE-OVR-2025-0812 وإرسال الإشعار لجهات التمويل لفك تجميد الاكتتاب.'
-                    : 'Override logged as CBUAE-OVR-2025-0812 with SHA-256 digital stamp. Automated syndication lock cleared under bilateral protocol.'}
+                    ? 'هذه معاينة ببيانات تجريبية. لم يتم تسجيل أي استثناء أو إرسال أي إشعار إلى أي جهة خارجية.'
+                    : 'This is a sample-data preview. No override was logged and nothing was sent to any regulator, lender or court.'}
                 </p>
                 <button
                   type="button"

@@ -891,8 +891,8 @@ export default function CustodyFreezeExceptionPage() {
                             : 'Interpleader Motion (Restricted to Principal)'
                           : isRelieved
                             ? isRtl
-                              ? 'تم تقديم دعوى التنازع وإيداع الكفالة (عرض)'
-                              : 'Interpleader Motion Filed (View Order)'
+                              ? 'معاينة مكتملة — لم يتم تقديم شيء'
+                              : 'Preview completed — nothing was filed'
                             : isRtl
                               ? 'تقديم دعوى تنازع وإيداع قضائي (عاجل)'
                               : 'Submit Dealership Interpleader Motion'}
@@ -1110,14 +1110,14 @@ export default function CustodyFreezeExceptionPage() {
 
             {interpleaderFiled ? (
               <div className="py-6 text-center space-y-3">
-                <span className="material-symbols-outlined text-[48px] text-tertiary">verified</span>
+                <span className="material-symbols-outlined text-[48px] text-outline">info</span>
                 <h4 className="font-headline-sm text-on-surface font-semibold">
                   {isRtl ? 'معاينة فقط — لم يتم إرسال أي شيء.' : 'Preview only — nothing was sent.'}
                 </h4>
                 <p className="text-[12px] text-on-surface-variant max-w-sm mx-auto">
                   {isRtl
-                    ? 'تم إيداع مبلغ 1,650,000 درهم في خزينة محكمة دبي التجارية برقم #DXB-ESCROW-2025-0994. تم فك مسؤولية المعرض وإلغاء حظر العزل.'
-                    : 'AED 1,650,000 bond deposited into Dubai Commercial Court Escrow (#DXB-ESCROW-2025-0994). Dealership discharged from bailment liability; vehicle quarantine lifted.'}
+                    ? 'هذه معاينة ببيانات تجريبية. لم يتم تقديم أي دعوى أو إيداع أي كفالة لدى أي محكمة أو جهة ضمان.'
+                    : 'This is a sample-data preview. No motion was filed and no bond was deposited with any court or escrow agent.'}
                 </p>
                 <button
                   type="button"
