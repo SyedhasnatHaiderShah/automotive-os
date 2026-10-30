@@ -284,6 +284,8 @@ export class ListingSearchSyncService {
 
   /**
    * Query the synchronized projection index with multi-attribute filtering.
+   * Optimized to perform single-pass filtering with pre-calculated filter predicates,
+   * avoiding multiple intermediate array allocations and repeated string operations per item.
    */
   searchProjected(query: PublicListingQueryDto): {
     items: PublicListingSummaryDto[];
@@ -294,56 +296,63 @@ export class ListingSearchSyncService {
     const page = Math.max(1, query.page || 1);
     const limit = Math.min(50, Math.max(1, query.limit || 20));
 
-    let results = Array.from(this.projectionIndex.values());
+    // Pre-calculate query filter conditions once to avoid repeated processing inside loops
+    const hasEmirate = Boolean(query.emirate && query.emirate !== 'All Emirates');
+    const qEmirate = hasEmirate ? query.emirate!.toLowerCase() : '';
 
-    // Filter: Emirate
-    if (query.emirate && query.emirate !== 'All Emirates') {
-      const qEmirate = query.emirate.toLowerCase();
-      results = results.filter(
-        (doc) => doc.branch.emirate.toLowerCase() === qEmirate
-      );
-    }
+    const hasMake = Boolean(query.make);
+    const qMake = hasMake ? query.make!.toLowerCase() : '';
 
-    // Filter: Make
-    if (query.make) {
-      const qMake = query.make.toLowerCase();
-      results = results.filter(
-        (doc) =>
-          doc.make.slug.toLowerCase() === qMake ||
-          doc.make.name.toLowerCase() === qMake
-      );
-    }
+    const hasModel = Boolean(query.model);
+    const qModel = hasModel ? query.model!.toLowerCase() : '';
 
-    // Filter: Model
-    if (query.model) {
-      const qModel = query.model.toLowerCase();
-      results = results.filter(
-        (doc) =>
-          doc.model.slug.toLowerCase() === qModel ||
-          doc.model.name.toLowerCase() === qModel
-      );
-    }
+    const hasCondition = Boolean(query.condition);
+    const qCondition = query.condition;
 
-    // Filter: Condition
-    if (query.condition) {
-      results = results.filter((doc) => doc.condition === query.condition);
-    }
+    const hasGccSpec = query.gccSpec !== undefined;
+    const qGccSpec = query.gccSpec;
 
-    // Filter: GCC Spec
-    if (query.gccSpec !== undefined) {
-      results = results.filter((doc) => doc.gccSpec === query.gccSpec);
-    }
+    const hasMinPrice = query.minPriceFils !== undefined;
+    const minFils = hasMinPrice ? BigInt(query.minPriceFils!) : 0n;
 
-    // Filter: Min Price
-    if (query.minPriceFils !== undefined) {
-      const minFils = BigInt(query.minPriceFils);
-      results = results.filter((doc) => doc.askingPriceFils >= minFils);
-    }
+    const hasMaxPrice = query.maxPriceFils !== undefined;
+    const maxFils = hasMaxPrice ? BigInt(query.maxPriceFils!) : 0n;
 
-    // Filter: Max Price
-    if (query.maxPriceFils !== undefined) {
-      const maxFils = BigInt(query.maxPriceFils);
-      results = results.filter((doc) => doc.askingPriceFils <= maxFils);
+    const results: ProjectedListingDoc[] = [];
+
+    // Single-pass predicate evaluation over projected documents
+    for (const doc of this.projectionIndex.values()) {
+      if (hasEmirate && doc.branch.emirate.toLowerCase() !== qEmirate) {
+        continue;
+      }
+      if (
+        hasMake &&
+        doc.make.slug.toLowerCase() !== qMake &&
+        doc.make.name.toLowerCase() !== qMake
+      ) {
+        continue;
+      }
+      if (
+        hasModel &&
+        doc.model.slug.toLowerCase() !== qModel &&
+        doc.model.name.toLowerCase() !== qModel
+      ) {
+        continue;
+      }
+      if (hasCondition && doc.condition !== qCondition) {
+        continue;
+      }
+      if (hasGccSpec && doc.gccSpec !== qGccSpec) {
+        continue;
+      }
+      if (hasMinPrice && doc.askingPriceFils < minFils) {
+        continue;
+      }
+      if (hasMaxPrice && doc.askingPriceFils > maxFils) {
+        continue;
+      }
+
+      results.push(doc);
     }
 
     // Sort by publishedAt desc

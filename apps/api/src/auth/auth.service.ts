@@ -849,7 +849,7 @@ export class AuthService {
         );
       }
 
-      const pendingIdentitySubject = `pending_reg_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+      const pendingIdentitySubject = `pending_reg_${Date.now()}_${randomBytes(16).toString('hex')}`;
 
       const user = await this.prisma.user.create({
         data: {

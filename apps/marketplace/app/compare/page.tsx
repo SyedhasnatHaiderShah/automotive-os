@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   MarketplaceHeader,
   MarketplaceFooter,
@@ -83,12 +83,12 @@ export default function VehicleComparisonPage() {
     }
   };
 
-  // Check if a spec row differs across compared vehicles
-  const isDifferent = (extractor: (v: PublicListingDetail) => any) => {
+  // Optimization (⚡ Bolt): Memoize isDifferent function so it isn't recreated on every render
+  const isDifferent = useCallback((extractor: (v: PublicListingDetail) => any) => {
     if (comparedVehicles.length <= 1 || !comparedVehicles[0]) return false;
     const firstVal = extractor(comparedVehicles[0]);
     return comparedVehicles.some((v) => extractor(v) !== firstVal);
-  };
+  }, [comparedVehicles]);
 
   // Print/PDF Handler
   const handlePrint = () => {
@@ -97,7 +97,9 @@ export default function VehicleComparisonPage() {
     }
   };
 
-  const comparisonAttributes = [
+  // Optimization (⚡ Bolt): Memoize comparisonAttributes structure to avoid recreating array, category objects,
+  // render functions, and extractor functions on every state change (e.g., toggling highlightDifferences or opening modal).
+  const comparisonAttributes = useMemo(() => [
     {
       category: isArabic ? 'نظرة عامة والأسعار' : 'Overview & Pricing',
       items: [
@@ -236,7 +238,13 @@ export default function VehicleComparisonPage() {
         },
       ],
     },
-  ];
+  ], [isArabic]);
+
+  // Optimization (⚡ Bolt): Pre-compute selected vehicle IDs set and memoize available items for modal lookup
+  const selectableListings = useMemo(() => {
+    const comparedIds = new Set(comparedVehicles.map((v) => v.id));
+    return availableListings.filter((item) => !comparedIds.has(item.id));
+  }, [availableListings, comparedVehicles]);
 
   return (
     <div
@@ -523,13 +531,12 @@ export default function VehicleComparisonPage() {
               </p>
             )}
             <div className="overflow-y-auto flex flex-col gap-2.5 pr-1">
-              {availableListings.filter((item) => !comparedVehicles.some((v) => v.id === item.id)).length === 0 && (
+              {selectableListings.length === 0 && (
                 <p className="text-sm text-outline text-center py-6">
                   {isArabic ? 'لا توجد سيارات متاحة للإضافة.' : 'No more published vehicles to add.'}
                 </p>
               )}
-              {availableListings
-                .filter((item) => !comparedVehicles.some((v) => v.id === item.id))
+              {selectableListings
                 .filter((item) => !pickerQuery.trim() || item.title.toLowerCase().includes(pickerQuery.trim().toLowerCase()))
                 .map((item) => (
                   <button

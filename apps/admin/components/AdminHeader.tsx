@@ -100,6 +100,7 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
           <div className="flex items-center bg-surface-container-high rounded p-0.5 font-label-caps text-label-caps">
             <button
               type="button"
+              aria-label="Switch interface to English"
               onClick={() => {
                 if (isRtl && onToggleRtl) onToggleRtl();
               }}
@@ -114,6 +115,7 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
             </button>
             <button
               type="button"
+              aria-label="التحويل إلى اللغة العربية"
               onClick={() => {
                 if (!isRtl && onToggleRtl) onToggleRtl();
               }}
