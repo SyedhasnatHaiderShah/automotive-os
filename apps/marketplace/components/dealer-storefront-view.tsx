@@ -240,10 +240,12 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
                           {dealer.contact.address}
                         </span>
                         <span className="text-[#4d4635]">•</span>
-                        <span className="flex items-center gap-1.5">
-                          <span className="text-[#58e7aa]">⏳</span>
-                          {dealer.stats.establishedYears} {isRtl ? 'سنوات خبرة في دبي' : 'Years Established in Dubai'}
-                        </span>
+                        {dealer.stats.establishedYears !== null && (
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-[#58e7aa]">⏳</span>
+                            {dealer.stats.establishedYears} {isRtl ? 'سنوات خبرة' : 'Years Established'}
+                          </span>
+                        )}
                         <span className="text-[#4d4635]">•</span>
                         <span className="flex items-center gap-1.5">
                           <span className="text-[#d4af37]">🔒</span>
@@ -266,14 +268,16 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
 
                     <div className="grid grid-cols-2 gap-2">
                       <a
-                        href={`tel:${dealer.contact.directPhone}`}
+                        href={dealer.contact.directPhone ? `tel:${dealer.contact.directPhone}` : undefined}
+                        aria-disabled={!dealer.contact.directPhone}
                         className="px-4 py-2.5 rounded-lg bg-[#262a30] text-white text-xs hover:bg-[#31353b] transition-colors flex items-center justify-center gap-1.5 border border-white/5"
                       >
                         <span className="text-[#d4af37]">📞</span>
                         VIP Desk
                       </a>
                       <a
-                        href={`https://wa.me/${dealer.contact.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                        href={dealer.contact.whatsappNumber ? `https://wa.me/${dealer.contact.whatsappNumber.replace(/[^0-9]/g, '')}` : undefined}
+                        aria-disabled={!dealer.contact.whatsappNumber}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-4 py-2.5 rounded-lg bg-[#262a30] text-[#58e7aa] text-xs hover:bg-[#31353b] transition-colors flex items-center justify-center gap-1.5 border border-white/5"
@@ -323,9 +327,8 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
                     <div className="flex items-baseline gap-2 mt-1">
                       <div className="flex items-center gap-1 text-[#d4af37]">
                         <span>★</span>
-                        <span className="text-2xl font-bold text-white">{dealer.stats.collectorRating}</span>
+                        <span className="text-2xl font-bold text-white">{dealer.stats.collectorRating ?? '—'}</span>
                       </div>
-                      <span className="text-xs text-[#99907c] font-mono">(210 audits)</span>
                     </div>
                   </div>
 
@@ -335,7 +338,7 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
                       <span className="text-2xl font-bold text-white">
-                        {dealer.stats.facilitySqFt.toLocaleString()}
+                        {dealer.stats.facilitySqFt !== null ? dealer.stats.facilitySqFt.toLocaleString() : '—'}
                       </span>
                       <span className="text-xs text-[#99907c]">SQ. FT</span>
                     </div>
@@ -426,10 +429,10 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
                   <div className="text-center">
                     <span className="text-3xl mb-2 block">🗺️</span>
                     <span className="font-mono text-xs text-[#d4af37] font-semibold">
-                      {dealer.contact.gpsCoordinates}
+                      {dealer.contact.gpsCoordinates ?? (isRtl ? 'الموقع غير متوفر' : 'Location not provided')}
                     </span>
                     <span className="block text-[11px] text-[#99907c] mt-1">
-                      Makani: {dealer.contact.makaniNumber}
+                      Makani: {dealer.contact.makaniNumber ?? '—'}
                     </span>
                   </div>
                   <div className="absolute top-3 right-3 px-2.5 py-1 bg-[#0a0e13]/90 rounded-md flex items-center gap-1.5 border border-white/10">

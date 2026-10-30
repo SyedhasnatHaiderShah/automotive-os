@@ -1,3 +1,4 @@
+import { buyerApiFetch, BuyerApiError } from './buyer-api-client';
 /**
  * Automotive OS Marketplace Typed API Client
  * Connects to NestJS Backend (/api/v1/public/listings & /api/v1/public/listings/:id/leads)
@@ -630,87 +631,31 @@ export async function submitVehicleLeadEnquiry(
   listingId: string,
   payload: CreateLeadEnquiryPayload
 ): Promise<LeadEnquiryResponse> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-  const isLocalPreview = process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_ENABLE_FIXTURES === 'true';
-  // A synthetic token and success receipt are NEVER permitted in deployed staging.
-  if (!isLocalPreview) throw new Error('Buyer authentication is required before sending an enquiry. No enquiry was submitted.');
+  // Client-side call: same-origin session cookie; throws BuyerAuthRequiredError when signed out.
+  const data = await buyerApiFetch<any>(`/api/v1/public/listings/${listingId}/leads`, {
+    method: 'POST',
+    body: JSON.stringify({
+      intent: payload.intent,
+      preferredContact: payload.preferredContact,
+      message: payload.message || undefined,
+      fieldsToShare: payload.fieldsToShare,
+      consentTextVersion: payload.consentTextVersion,
+    }),
+  });
 
-  try {
-    // Acquire dev token if executing in local environment
-    let token = '';
-    try {
-      const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          identitySubject: 'vip-buyer-dubai-01',
-          email: payload.buyerEmail || 'tariq.nuaimi@holding.ae',
-          name: payload.buyerName || 'H.H. Sheikh Tariq Al-Nuaimi',
-        }),
-        signal: AbortSignal.timeout(3000),
-      });
-      if (authRes.ok) {
-        const authData = await authRes.json();
-        token = authData.accessToken;
-      }
-    } catch (_authErr) {
-      // Dev auth not reachable
-    }
-
-    if (token) {
-      const response = await fetch(`${apiUrl}/api/v1/public/listings/${listingId}/leads`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          intent: payload.intent,
-          preferredContact: payload.preferredContact,
-          message: payload.message || `VIP Viewing Request for ${payload.targetDate || 'upcoming slot'}`,
-          fieldsToShare: payload.fieldsToShare,
-          consentTextVersion: payload.consentTextVersion,
-        }),
-        signal: AbortSignal.timeout(4000),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          id: data.id,
-          status: data.status,
-          listingId: data.listingId,
-          tenantId: data.tenantId,
-          createdAt: data.createdAt,
-          referenceCode: `TD-DXB-${data.id.slice(0, 4).toUpperCase()}`,
-          hostName: 'Marcus Von Berg (Apex GT Brand Principal)',
-          scheduledDate: payload.targetDate || 'Sunday, May 18, 2025',
-          scheduledSlot: payload.targetSlot || '06:00 PM GST',
-          venue: 'Dubai Autodrome • Club Circuit Paddock 3',
-          isFixture: false,
-        };
-      }
-    }
-  } catch (_err) {
-    // Graceful fallback to verified design state simulation
-  }
-
-  // Fallback demo confirmation matching Stitch Screen 1ff78cd6f95845538cc81b3849e62c88
   return {
-    id: 'lead-fixture-778899',
-    status: 'NEW',
-    listingId,
-    tenantId: 'apex-gt-motors-fz-id',
-    createdAt: new Date().toISOString(),
-    referenceCode: 'TD-DXB-9402',
-    hostName: 'Marcus Von Berg',
-    scheduledDate: payload.targetDate || 'Sunday, May 18, 2025',
-    scheduledSlot: payload.targetSlot || '06:00 PM GST',
-    venue:
-      payload.evaluationMode === 'LOUNGE'
-        ? 'Apex Collector Vault 4 • Al Quoz Showroom'
-        : 'Dubai Autodrome • Club Circuit Paddock 3',
-    isFixture: true,
+    id: data.id,
+    status: data.status,
+    listingId: data.listingId,
+    tenantId: data.tenantId,
+    createdAt: data.createdAt,
+    referenceCode: `LEAD-${String(data.id).slice(0, 8).toUpperCase()}`,
+    // Host, date, slot and venue are assigned by the dealer later; never invented here.
+    hostName: '',
+    scheduledDate: payload.targetDate || '',
+    scheduledSlot: payload.targetSlot || '',
+    venue: '',
+    isFixture: false,
   };
 }
 
@@ -742,15 +687,15 @@ export interface PublicDealerProfile {
   stats: {
     liveGroundedStock: number;
     inventoryValueFils: string;
-    collectorRating: number;
-    facilitySqFt: number;
-    establishedYears: number;
+    collectorRating: number | null;
+    facilitySqFt: number | null;
+    establishedYears: number | null;
   };
   contact: {
-    directPhone: string;
-    whatsappNumber: string;
-    makaniNumber: string;
-    gpsCoordinates: string;
+    directPhone: string | null;
+    whatsappNumber: string | null;
+    makaniNumber: string | null;
+    gpsCoordinates: string | null;
     address: string;
   };
   inventory: PublicListingItem[];
@@ -927,223 +872,70 @@ export const SILBERARROWS_DEALER_FIXTURE: PublicDealerProfile = {
 /**
  * Fetch verified dealership profile and tenant-scoped live inventory
  */
-export async function fetchPublicDealerBySlug(slug: string): Promise<PublicDealerProfile> {
+export async function fetchPublicDealerBySlug(slug: string): Promise<PublicDealerProfile | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   try {
-    const dealerRes = await fetch(`${apiUrl}/api/v1/public/dealers/${slug}`, {
+    const dealerRes = await fetch(`${apiUrl}/api/v1/public/dealers/${encodeURIComponent(slug)}`, {
       next: { revalidate: 10 },
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(5000),
     });
 
-    if (dealerRes.ok) {
-      const dealer = await dealerRes.json();
+    if (dealerRes.status === 404) return null;
+    if (!dealerRes.ok) throw new Error(`Dealer storefront API returned HTTP ${dealerRes.status}`);
+    const dealer = await dealerRes.json();
 
-      // Fetch tenant-scoped published listings
-      const inventoryRes = await fetch(`${apiUrl}/api/v1/public/listings?dealerSlug=${slug}&limit=20`, {
-        next: { revalidate: 10 },
-        signal: AbortSignal.timeout(3000),
-      });
+    // Tenant-scoped published listings; an empty stock list stays empty.
+    const inventoryRes = await fetch(
+      `${apiUrl}/api/v1/public/listings?dealerSlug=${encodeURIComponent(slug)}&limit=20`,
+      { next: { revalidate: 10 }, signal: AbortSignal.timeout(5000) }
+    );
+    if (!inventoryRes.ok) throw new Error(`Dealer inventory API returned HTTP ${inventoryRes.status}`);
+    const invData = await inventoryRes.json();
+    const items: PublicListingItem[] = Array.isArray(invData.items) ? invData.items : [];
 
-      let items: PublicListingItem[] = [];
-      if (inventoryRes.ok) {
-        const invData = await inventoryRes.json();
-        items = invData.items || [];
-      }
-
-      // If tenant has no listings yet, provide fallback showcase
-      const inventory = items.length > 0 ? items : SILBERARROWS_DEALER_FIXTURE.inventory;
-
-      return {
-        id: dealer.id,
-        slug: dealer.slug,
-        legalName: dealer.legalName,
-        displayName: dealer.displayName,
-        country: dealer.country || 'AE',
-        currency: dealer.currency || 'AED',
-        tagline:
-          slug === 'silberarrows'
-            ? SILBERARROWS_DEALER_FIXTURE.tagline
-            : `Verified UAE Premier Dealership | Curated Sovereign Inventory`,
-        description:
-          slug === 'silberarrows'
-            ? SILBERARROWS_DEALER_FIXTURE.description
-            : `Licensed commercial automotive showroom operating under UAE regulatory standards. Fully vetted physical inventory grounded in our UAE facility.`,
-        verification: dealer.verification
-          ? {
-              status: dealer.verification.status,
-              tradeLicenseRef: dealer.verification.tradeLicenseRef || 'RTA Lic #D-8422 Verified',
-              licenseExpiry: dealer.verification.licenseExpiry,
-              jurisdiction: dealer.verification.jurisdiction || 'Dubai DED',
-              isKybVerified: Boolean(dealer.verification.isKybVerified),
-            }
-          : undefined,
-        branches: dealer.branches || [],
-        stats: {
-          liveGroundedStock: items.length || dealer.stats?.liveGroundedStock || 28,
-          inventoryValueFils:
-            items.length > 0
-              ? items
-                  .reduce((sum, item) => sum + BigInt(item.price.amountFils), BigInt(0))
-                  .toString()
-              : dealer.stats?.inventoryValueFils || '4280000000',
-          collectorRating: dealer.stats?.collectorRating || 4.98,
-          facilitySqFt: dealer.stats?.facilitySqFt || 18500,
-          establishedYears: dealer.stats?.establishedYears || 12,
-        },
-        contact: {
-          directPhone: dealer.contact?.directPhone || '+971 4 380 5515',
-          whatsappNumber: dealer.contact?.whatsappNumber || '+971 50 123 4567',
-          makaniNumber: dealer.contact?.makaniNumber || '21948 83120',
-          gpsCoordinates: dealer.contact?.gpsCoordinates || '25.1412° N, 55.2281° E',
-          address:
-            dealer.branches?.[0]?.address ||
-            'Street 4B, Al Quoz Industrial 1, Sheikh Zayed Road Exit 43, Dubai, UAE',
-        },
-        inventory,
-        isFixture: false,
-      };
+    return {
+      id: dealer.id,
+      slug: dealer.slug,
+      legalName: dealer.legalName,
+      displayName: dealer.displayName,
+      country: dealer.country || 'AE',
+      currency: dealer.currency || 'AED',
+      verification: dealer.verification
+        ? {
+            status: dealer.verification.status,
+            tradeLicenseRef: dealer.verification.tradeLicenseRef,
+            licenseExpiry: dealer.verification.licenseExpiry,
+            jurisdiction: dealer.verification.jurisdiction,
+            isKybVerified: Boolean(dealer.verification.isKybVerified),
+          }
+        : undefined,
+      branches: dealer.branches || [],
+      stats: {
+        liveGroundedStock: dealer.stats?.liveGroundedStock ?? items.length,
+        inventoryValueFils: dealer.stats?.inventoryValueFils ?? '0',
+        collectorRating: dealer.stats?.collectorRating ?? null,
+        facilitySqFt: dealer.stats?.facilitySqFt ?? null,
+        establishedYears: dealer.stats?.establishedYears ?? null,
+      },
+      contact: {
+        directPhone: dealer.contact?.directPhone ?? null,
+        whatsappNumber: dealer.contact?.whatsappNumber ?? null,
+        makaniNumber: dealer.contact?.makaniNumber ?? null,
+        gpsCoordinates: dealer.contact?.gpsCoordinates ?? null,
+        address: dealer.branches?.[0]?.address || [dealer.branches?.[0]?.city, dealer.branches?.[0]?.emirate].filter(Boolean).join(', '),
+      },
+      inventory: items,
+      isFixture: false,
+    };
+  } catch (err) {
+    // Only deliberate local previews may show the Stitch storefront fixture.
+    if (process.env.NODE_ENV !== 'development' || process.env.NEXT_PUBLIC_ENABLE_FIXTURES !== 'true') {
+      throw err;
     }
-  } catch (_err) {
-    // API not reachable or timeout -> use verified Stitch fallback
   }
 
-  if (slug === 'al-futtaim-prestige') {
-    return {
-      ...SILBERARROWS_DEALER_FIXTURE,
-      id: 'al-futtaim-prestige-id',
-      slug: 'al-futtaim-prestige',
-      legalName: 'Al Futtaim Prestige Motors LLC',
-      displayName: 'Al Futtaim Prestige Motors',
-      tagline: 'Premier Luxury & Exotic Vehicles | Sheikh Zayed Road Flagship',
-      contact: {
-        ...SILBERARROWS_DEALER_FIXTURE.contact,
-        address: 'Sheikh Zayed Rd, Exit 45, Dubai, UAE',
-      },
-      verification: {
-        status: 'APPROVED',
-        tradeLicenseRef: 'TL-DXB-987654',
-        licenseExpiry: '2028-12-31T00:00:00.000Z',
-        jurisdiction: 'Dubai DED',
-        isKybVerified: true,
-      },
-      isFixture: true,
-    };
-  }
-
-  if (slug === 'al-quoz') {
-    return {
-      ...SILBERARROWS_DEALER_FIXTURE,
-      id: 'al-quoz-showroom-4-id',
-      slug: 'al-quoz',
-      legalName: 'Al Quoz Showroom 4 Luxury LLC',
-      displayName: 'Al Quoz Showroom 4',
-      tagline: 'Tier-1 Institutional Partner | Al Quoz Industrial 3 Flagship',
-      contact: {
-        ...SILBERARROWS_DEALER_FIXTURE.contact,
-        address: 'Al Quoz Industrial 3, Dubai, UAE',
-      },
-      verification: {
-        status: 'APPROVED',
-        tradeLicenseRef: 'DED #894102',
-        licenseExpiry: '2028-12-31T00:00:00.000Z',
-        jurisdiction: 'Dubai DED',
-        isKybVerified: true,
-      },
-      stats: {
-        ...SILBERARROWS_DEALER_FIXTURE.stats,
-        liveGroundedStock: 42,
-        collectorRating: 4.96,
-      },
-      isFixture: true,
-    };
-  }
-
-  if (slug === 'yas-marina') {
-    return {
-      ...SILBERARROWS_DEALER_FIXTURE,
-      id: 'yas-marina-luxury-motors-id',
-      slug: 'yas-marina',
-      legalName: 'Yas Marina Luxury Motors LLC',
-      displayName: 'Yas Marina Luxury Motors',
-      tagline: 'Trackside Performance & Hypercar Allocations | Abu Dhabi',
-      contact: {
-        ...SILBERARROWS_DEALER_FIXTURE.contact,
-        address: 'Yas Marina Circuit, Abu Dhabi, UAE',
-      },
-      verification: {
-        status: 'APPROVED',
-        tradeLicenseRef: 'AD-DED #44109',
-        licenseExpiry: '2028-12-31T00:00:00.000Z',
-        jurisdiction: 'Abu Dhabi DED',
-        isKybVerified: true,
-      },
-      stats: {
-        ...SILBERARROWS_DEALER_FIXTURE.stats,
-        liveGroundedStock: 31,
-        collectorRating: 4.98,
-      },
-      isFixture: true,
-    };
-  }
-
-  if (slug === 'sheikh-zayed') {
-    return {
-      ...SILBERARROWS_DEALER_FIXTURE,
-      id: 'sheikh-zayed-gallery-id',
-      slug: 'sheikh-zayed',
-      legalName: 'Sheikh Zayed Rd Gallery Motors LLC',
-      displayName: 'Sheikh Zayed Rd Gallery',
-      tagline: 'Premier Collector Showroom | Between 3rd & 4th Interchange',
-      contact: {
-        ...SILBERARROWS_DEALER_FIXTURE.contact,
-        address: 'Between 3rd & 4th Interchange, Sheikh Zayed Road, Dubai, UAE',
-      },
-      verification: {
-        status: 'APPROVED',
-        tradeLicenseRef: 'DED #772910',
-        licenseExpiry: '2028-12-31T00:00:00.000Z',
-        jurisdiction: 'Dubai DED',
-        isKybVerified: true,
-      },
-      stats: {
-        ...SILBERARROWS_DEALER_FIXTURE.stats,
-        liveGroundedStock: 68,
-        collectorRating: 4.92,
-      },
-      isFixture: true,
-    };
-  }
-
-  if (slug === 'sharjah-oasis') {
-    return {
-      ...SILBERARROWS_DEALER_FIXTURE,
-      id: 'sharjah-auto-oasis-id',
-      slug: 'sharjah-oasis',
-      legalName: 'Sharjah Auto Oasis Hub LLC',
-      displayName: 'Sharjah Auto Oasis Hub',
-      tagline: 'Northern Emirates Premier Automotive Exchange | Souq Al Haraj',
-      contact: {
-        ...SILBERARROWS_DEALER_FIXTURE.contact,
-        address: 'Al Souq Al Haraj, Sector 1, Sharjah, UAE',
-      },
-      verification: {
-        status: 'APPROVED',
-        tradeLicenseRef: 'SHJ-LIC #30198',
-        licenseExpiry: '2028-12-31T00:00:00.000Z',
-        jurisdiction: 'Sharjah SEDD',
-        isKybVerified: true,
-      },
-      stats: {
-        ...SILBERARROWS_DEALER_FIXTURE.stats,
-        liveGroundedStock: 26,
-        collectorRating: 4.89,
-      },
-      isFixture: true,
-    };
-  }
-
-  return SILBERARROWS_DEALER_FIXTURE;
+  return { ...SILBERARROWS_DEALER_FIXTURE, isFixture: true };
 }
 
 export interface BuyerEnquiryItem {
@@ -1272,111 +1064,35 @@ export const BUYER_ENQUIRIES_FIXTURE: BuyerEnquiryItem[] = [
 /**
  * Fetch authenticated buyer enquiries timeline
  */
-export async function fetchBuyerEnquiries(): Promise<BuyerEnquiryItem[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    let token = '';
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      token = authData.accessToken;
-    }
-
-    if (token) {
-      const res = await fetch(`${apiUrl}/api/v1/me/enquiries`, {
-        headers: { Authorization: `Bearer ${token}` },
-        next: { revalidate: 10 },
-        signal: AbortSignal.timeout(3000),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          return data.map((item: any) => ({
-            id: item.id,
-            tenantId: item.tenantId,
-            listing: {
-              id: item.listing.id,
-              slug: item.listing.slug,
-              title: item.listing.title,
-              dealershipName: item.listing.dealershipName,
-              priceAed: 1420000,
-              heroUrl: BUYER_ENQUIRIES_FIXTURE[0]?.listing?.heroUrl || 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800',
-              vinChassis: 'DXB-911-RS',
-            },
-            status: item.status,
-            intent: item.intent,
-            preferredContact: item.preferredContact,
-            message: item.message,
-            grant: {
-              fields: item.grant?.fields || ['name', 'phone'],
-              revokedAt: item.grant?.revokedAt || null,
-            },
-            appointments: item.appointments || [],
-            stageNumber: 3,
-            stageName: 'Tasjeel Shamil Vault Inspection',
-            escrowNumber: 'ESC-89214',
-            escrowIban: 'AE94 0300 0000 8921 4010 9',
-            escrowStatus: 'ACTIVE_DEPOSIT_LOCKED',
-            createdAt: item.createdAt,
-          }));
-        }
-      }
-    }
-  } catch (_err) {
-    // API not reachable -> use verified Stitch fallback
-  }
-
-  return BUYER_ENQUIRIES_FIXTURE;
+export async function fetchBuyerEnquiries(sessionToken?: string): Promise<BuyerEnquiryItem[]> {
+  const data = await buyerApiFetch<any[]>('/api/v1/me/enquiries', {}, sessionToken);
+  return (Array.isArray(data) ? data : []).map((item: any) => ({
+    id: item.id,
+    tenantId: item.tenantId,
+    listing: {
+      id: item.listing?.id,
+      slug: item.listing?.slug,
+      title: item.listing?.title,
+      dealershipName: item.listing?.dealershipName,
+    },
+    status: item.status,
+    intent: item.intent,
+    preferredContact: item.preferredContact,
+    message: item.buyerMessage ?? undefined,
+    grant: {
+      fields: item.grant?.fieldsGranted ?? [],
+      revokedAt: item.grant?.revokedAt ?? null,
+    },
+    appointments: Array.isArray(item.appointments) ? item.appointments : [],
+    createdAt: item.createdAt,
+  }));
 }
 
 /**
  * Revoke buyer enquiry data grant
  */
 export async function revokeBuyerEnquiryGrant(leadId: string): Promise<boolean> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      const res = await fetch(`${apiUrl}/api/v1/me/leads/${leadId}/grant/revoke`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authData.accessToken}`,
-        },
-        signal: AbortSignal.timeout(3000),
-      });
-      if (res.ok) {
-        return true;
-      }
-    }
-  } catch (_err) {
-    // Graceful fallback
-  }
-
+  await buyerApiFetch(`/api/v1/me/leads/${leadId}/grant/revoke`, { method: 'POST' });
   return true;
 }
 
@@ -1535,91 +1251,45 @@ export const DEFAULT_BUYER_GARAGE_VEHICLES: BuyerGarageVehicle[] = [
 /**
  * Fetch buyer appointments from API with fallback to Stitch design baseline
  */
-export async function fetchBuyerAppointments(): Promise<BuyerAppointmentItem[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
+export async function fetchBuyerAppointments(sessionToken?: string): Promise<BuyerAppointmentItem[]> {
+  const data = await buyerApiFetch<any[]>('/api/v1/me/appointments', {}, sessionToken);
+  return (Array.isArray(data) ? data : []).map((a: any) => {
+    const startsAt = new Date(a.startsAt);
+    const endsAt = new Date(a.endsAt);
+    const minutes = Math.max(0, Math.round((endsAt.getTime() - startsAt.getTime()) / 60000));
+    return {
+      id: a.id,
+      bookingRef: `#APPT-${String(a.id).slice(0, 8).toUpperCase()}`,
+      carName: a.listing?.title || '',
+      vin: a.listing?.vinMasked || '',
+      dealerName: a.listing?.dealershipName || '',
+      dealerLocation: '',
+      sessionType: a.note || 'Showroom appointment',
+      sessionDuration: minutes ? `${minutes} MIN` : '',
+      sessionDescription: a.note || '',
+      scheduledDate: startsAt.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Asia/Dubai',
       }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      const res = await fetch(`${apiUrl}/api/v1/me/appointments`, {
-        headers: {
-          Authorization: `Bearer ${authData.accessToken}`,
-        },
-        signal: AbortSignal.timeout(3000),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const dbAppointments: BuyerAppointmentItem[] = data.map((a: any, idx: number) => {
-            const fallback =
-              DEFAULT_BUYER_APPOINTMENTS[idx % DEFAULT_BUYER_APPOINTMENTS.length] ||
-              DEFAULT_BUYER_APPOINTMENTS[0]!;
-            return {
-              id: a.id,
-              bookingRef: `#APPT-${a.id.slice(0, 4).toUpperCase()}-DXB`,
-              carName: a.listing?.title || fallback.carName,
-              vin: a.listing?.vinMasked || fallback.vin,
-              dealerName: a.listing?.dealershipName || fallback.dealerName,
-              dealerLocation: 'Al Quoz, Dubai',
-              sessionType: a.note || fallback.sessionType,
-              sessionDuration: '45 MIN VIP SESSION',
-              sessionDescription: fallback.sessionDescription,
-              scheduledDate: new Date(a.startsAt).toLocaleDateString('en-GB', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              }),
-              scheduledSlot: `${new Date(a.startsAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} GST`,
-              venueName: 'VIP Showroom Bay 01',
-              venueDetails: 'Makani #19823 48120',
-              hostName: 'Automotive OS VIP Concierge',
-              hostRole: 'Senior Concierge Specialist',
-              gatePassPin: `#APX-${a.id.slice(0, 4).toUpperCase()}`,
-              statusText:
-                a.status === 'CONFIRMED'
-                  ? 'Confirmed • Track Allocated'
-                  : a.status === 'CANCELLED'
-                  ? 'Cancelled • Escrow Released'
-                  : 'Pending Dealer Slot Confirmation',
-              statusBadgeVariant:
-                a.status === 'CONFIRMED'
-                  ? 'confirmed'
-                  : a.status === 'CANCELLED'
-                  ? 'cancelled'
-                  : 'pending',
-              escrowDepositAed: 5000,
-              imageUrl: a.listing?.imageUrl || fallback.imageUrl,
-            };
-          });
-
-          const combined = [...dbAppointments];
-          DEFAULT_BUYER_APPOINTMENTS.forEach((def) => {
-            if (!combined.some((c) => c.carName.toLowerCase().includes('g 63') && def.carName.toLowerCase().includes('g 63'))) {
-              combined.push(def);
-            }
-          });
-          return combined;
-        }
-      }
-    }
-  } catch (_err) {
-    // API not reachable -> use verified Stitch fallback
-  }
-
-  return DEFAULT_BUYER_APPOINTMENTS;
+      scheduledSlot: `${startsAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Dubai' })} GST`,
+      venueName: '',
+      venueDetails: '',
+      hostName: '',
+      hostRole: '',
+      statusText:
+        a.status === 'CONFIRMED'
+          ? 'Confirmed'
+          : a.status === 'CANCELLED'
+          ? 'Cancelled'
+          : 'Pending dealer confirmation',
+      statusBadgeVariant:
+        a.status === 'CONFIRMED' ? 'confirmed' : a.status === 'CANCELLED' ? 'cancelled' : 'pending',
+      imageUrl: a.listing?.imageUrl || '',
+    };
+  });
 }
 
 /**
@@ -1629,40 +1299,10 @@ export async function cancelBuyerAppointment(
   appointmentId: string,
   reason: string
 ): Promise<boolean> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      const res = await fetch(`${apiUrl}/api/v1/me/appointments/${appointmentId}/cancel`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authData.accessToken}`,
-        },
-        body: JSON.stringify({ reason }),
-        signal: AbortSignal.timeout(3000),
-      });
-
-      if (res.ok) {
-        return true;
-      }
-    }
-  } catch (_err) {
-    // Graceful fallback
-  }
-
+  await buyerApiFetch(`/api/v1/me/appointments/${appointmentId}/cancel`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
   return true;
 }
 
@@ -1858,178 +1498,61 @@ export const DEFAULT_SAVED_FAVORITES: SavedVehicleFavorite[] = [
 /**
  * Fetch saved searches / radars
  */
-export async function fetchSavedRadars(): Promise<SavedRadarItem[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      const res = await fetch(`${apiUrl}/api/v1/me/saved-searches`, {
-        headers: { Authorization: `Bearer ${authData.accessToken}` },
-        signal: AbortSignal.timeout(3000),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const dbRadars: SavedRadarItem[] = data.map((item: any, idx: number) => {
-            const fallback =
-              DEFAULT_SAVED_RADARS[idx % DEFAULT_SAVED_RADARS.length] ||
-              DEFAULT_SAVED_RADARS[0]!;
-            return {
-              id: item.id,
-              radarCode: `#RADAR-${item.id.slice(0, 4).toUpperCase()}`,
-              matchCountLabel: fallback.matchCountLabel,
-              title: item.name || fallback.title,
-              filters: item.filters?.query
-                ? [item.filters.query, 'GCC Spec', 'Verified Dealer']
-                : fallback.filters,
-              channelType: fallback.channelType,
-              channelLabel: fallback.channelLabel,
-              channelDestination: fallback.channelDestination,
-              statusBadge: item.notifyEmail ? 'Active Email' : fallback.statusBadge,
-              isPaused: false,
-              accentColor: fallback.accentColor,
-            };
-          });
-
-          // Retain Stitch design cards
-          const combined = [...dbRadars];
-          DEFAULT_SAVED_RADARS.forEach((def) => {
-            if (!combined.some((r) => r.radarCode === def.radarCode)) {
-              combined.push(def);
-            }
-          });
-          return combined;
-        }
-      }
-    }
-  } catch (_err) {
-    // API not reachable -> use verified Stitch fallback
-  }
-
-  return DEFAULT_SAVED_RADARS;
+export async function fetchSavedRadars(sessionToken?: string): Promise<SavedRadarItem[]> {
+  const data = await buyerApiFetch<any[]>('/api/v1/me/saved-searches', {}, sessionToken);
+  return (Array.isArray(data) ? data : []).map((item: any) => {
+    const filters = item.filterJson && typeof item.filterJson === 'object' ? item.filterJson : {};
+    return {
+      id: item.id,
+      radarCode: `#RADAR-${String(item.id).slice(0, 8).toUpperCase()}`,
+      matchCountLabel: '',
+      title: item.name,
+      filters: Object.entries(filters)
+        .filter(([, v]) => v !== undefined && v !== null && v !== '')
+        .map(([k, v]) => `${k}: ${String(v)}`),
+      channelType: 'SMS' as const,
+      channelLabel: item.alertsEnabled ? 'Alerts enabled' : 'Alerts off',
+      channelDestination: '',
+      statusBadge: item.alertsEnabled ? 'Active' : 'Paused',
+      isPaused: !item.alertsEnabled,
+      accentColor: '#d4af37',
+    };
+  });
 }
 
 /**
  * Fetch vehicle favorites
  */
-export async function fetchSavedFavorites(): Promise<SavedVehicleFavorite[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      const res = await fetch(`${apiUrl}/api/v1/me/favorites`, {
-        headers: { Authorization: `Bearer ${authData.accessToken}` },
-        signal: AbortSignal.timeout(3000),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const dbFavs: SavedVehicleFavorite[] = data.map((item: any, idx: number) => {
-            const fallback =
-              DEFAULT_SAVED_FAVORITES[idx % DEFAULT_SAVED_FAVORITES.length] ||
-              DEFAULT_SAVED_FAVORITES[0]!;
-            return {
-              id: item.listingId || fallback.id,
-              slug: item.listing?.slug || fallback.slug,
-              year: item.listing?.vehicle?.year || fallback.year,
-              badgeLabel: fallback.badgeLabel,
-              badgeVariant: fallback.badgeVariant,
-              tasjeelScore: fallback.tasjeelScore,
-              mileageKm: item.listing?.vehicle?.mileageKm || fallback.mileageKm,
-              specRegion: 'GCC SPEC',
-              dealerName: item.listing?.tenant?.displayName || fallback.dealerName,
-              dealerLocation: fallback.dealerLocation,
-              title: item.listing?.title || fallback.title,
-              subtitle: fallback.subtitle,
-              engine: fallback.engine,
-              performance: fallback.performance,
-              warranty: fallback.warranty,
-              marketTrendLabel: fallback.marketTrendLabel,
-              marketTrendColor: fallback.marketTrendColor,
-              currentValuationAed: item.listing?.priceFils
-                ? Math.round(Number(item.listing.priceFils) / 100)
-                : fallback.currentValuationAed,
-              previousValuationAed: fallback.previousValuationAed,
-              monthlyEstimateAed: fallback.monthlyEstimateAed,
-              ctaActionText: fallback.ctaActionText,
-              ctaIcon: fallback.ctaIcon,
-              imageUrl: fallback.imageUrl,
-              priceDropNote: fallback.priceDropNote,
-            };
-          });
-
-          const combined = [...dbFavs];
-          DEFAULT_SAVED_FAVORITES.forEach((def) => {
-            if (!combined.some((f) => f.title === def.title)) {
-              combined.push(def);
-            }
-          });
-          return combined;
-        }
-      }
-    }
-  } catch (_err) {
-    // API not reachable -> use verified Stitch fallback
-  }
-
-  return DEFAULT_SAVED_FAVORITES;
+export async function fetchSavedFavorites(sessionToken?: string): Promise<SavedVehicleFavorite[]> {
+  const data = await buyerApiFetch<any[]>('/api/v1/me/favorites', {}, sessionToken);
+  return (Array.isArray(data) ? data : []).map((item: any) => ({
+    id: item.listingId,
+    slug: item.slug,
+    year: 0,
+    mileageKm: 0,
+    specRegion: '',
+    dealerName: '',
+    dealerLocation: '',
+    title: item.title,
+    subtitle: item.status === 'PUBLISHED' ? '' : 'No longer listed',
+    engine: '',
+    performance: '',
+    warranty: '',
+    marketTrendLabel: '',
+    marketTrendColor: '',
+    currentValuationAed: Math.round(Number(item.askingPriceFils || 0) / 100),
+    monthlyEstimateAed: 0,
+    ctaActionText: 'View listing',
+    ctaIcon: 'arrow_forward',
+    imageUrl: item.thumbnailUrl || '',
+  }));
 }
 
 /**
  * Remove favorite from backend database
  */
 export async function removeFavoriteApi(listingId: string): Promise<boolean> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      await fetch(`${apiUrl}/api/v1/me/favorites/${listingId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${authData.accessToken}` },
-        signal: AbortSignal.timeout(3000),
-      });
-    }
-  } catch (_err) {
-    // Graceful fallback
-  }
+  await buyerApiFetch(`/api/v1/me/favorites/${listingId}`, { method: 'DELETE' });
   return true;
 }
 
@@ -2037,31 +1560,7 @@ export async function removeFavoriteApi(listingId: string): Promise<boolean> {
  * Delete saved search / radar from backend database
  */
 export async function deleteSavedRadarApi(radarId: string): Promise<boolean> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      await fetch(`${apiUrl}/api/v1/me/saved-searches/${radarId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${authData.accessToken}` },
-        signal: AbortSignal.timeout(3000),
-      });
-    }
-  } catch (_err) {
-    // Graceful fallback
-  }
+  await buyerApiFetch(`/api/v1/me/saved-searches/${radarId}`, { method: 'DELETE' });
   return true;
 }
 
@@ -2161,90 +1660,52 @@ export const FALLBACK_BUYER_PROFILE: BuyerProfileData = {
 /**
  * Fetch buyer profile and privacy permissions data
  */
-export async function fetchBuyerProfileData(): Promise<BuyerProfileData> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+export async function fetchBuyerProfileData(sessionToken?: string): Promise<BuyerProfileData> {
+  const [meData, profileData, enquiries] = await Promise.all([
+    buyerApiFetch<any>('/api/v1/me', {}, sessionToken),
+    // A buyer without a saved profile gets 404; treat as empty preferences.
+    buyerApiFetch<any>('/api/v1/me/buyer-profile', {}, sessionToken).catch((err) => {
+      if (err instanceof BuyerApiError && err.status === 404) return null;
+      throw err;
+    }),
+    buyerApiFetch<any[]>('/api/v1/me/enquiries', {}, sessionToken),
+  ]);
 
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
+  const ephemeralGrants: EphemeralGrantItem[] = (Array.isArray(enquiries) ? enquiries : [])
+    .filter((e: any) => e.grant)
+    .map((e: any) => ({
+      id: e.grant.id,
+      leadId: e.id,
+      dealershipName: e.listing?.dealershipName || '',
+      context: `Enquiry #${String(e.id).slice(0, 8).toUpperCase()}`,
+      expiresText: e.grant.revokedAt ? 'Access revoked' : 'Active until revoked',
+      fieldsGranted: e.grant.fieldsGranted || [],
+      revoked: !!e.grant.revokedAt,
+    }));
 
-    if (!authRes.ok) return FALLBACK_BUYER_PROFILE;
-    const authData = await authRes.json();
-
-    const [meRes, profileRes, enquiriesRes] = await Promise.all([
-      fetch(`${apiUrl}/api/v1/me`, {
-        headers: { Authorization: `Bearer ${authData.accessToken}` },
-        signal: AbortSignal.timeout(3000),
-      }),
-      fetch(`${apiUrl}/api/v1/me/buyer-profile`, {
-        headers: { Authorization: `Bearer ${authData.accessToken}` },
-        signal: AbortSignal.timeout(3000),
-      }),
-      fetch(`${apiUrl}/api/v1/me/enquiries`, {
-        headers: { Authorization: `Bearer ${authData.accessToken}` },
-        signal: AbortSignal.timeout(3000),
-      }),
-    ]);
-
-    let meData: any = null;
-    if (meRes.ok) {
-      meData = await meRes.json();
-    }
-
-    let profileData: any = null;
-    if (profileRes.ok) {
-      profileData = await profileRes.json();
-    }
-
-    let ephemeralGrants: EphemeralGrantItem[] = FALLBACK_BUYER_PROFILE.ephemeralGrants;
-    if (enquiriesRes.ok) {
-      const enquiries = await enquiriesRes.json();
-      if (Array.isArray(enquiries) && enquiries.length > 0) {
-        const grantsFromApi = enquiries
-          .filter((e: any) => e.grant)
-          .map((e: any, index: number) => ({
-            id: e.grant.id,
-            leadId: e.id,
-            dealershipName: e.listing?.dealershipName || (index === 0 ? 'Al Ghandi Motors VIP' : 'Al Tayer Motors Ferrari Atelier'),
-            context: `Enquiry #${e.id.slice(0, 8).toUpperCase()}`,
-            expiresText: e.grant.revokedAt ? 'Access Revoked' : `Expires in ${index === 0 ? '4h 12m' : '22h'}`,
-            fieldsGranted: e.grant.fieldsGranted || ['name', 'phone'],
-            revoked: !!e.grant.revokedAt,
-          }));
-        if (grantsFromApi.length > 0) {
-          ephemeralGrants = grantsFromApi;
-        }
-      }
-    }
-
-    return {
-      userId: meData?.id || FALLBACK_BUYER_PROFILE.userId,
-      fullName: meData?.displayName || FALLBACK_BUYER_PROFILE.fullName,
-      fullNameAr: FALLBACK_BUYER_PROFILE.fullNameAr,
-      emiratesIdMasked: FALLBACK_BUYER_PROFILE.emiratesIdMasked,
-      phoneE164: meData?.phoneE164 || FALLBACK_BUYER_PROFILE.phoneE164,
-      licenseNumber: FALLBACK_BUYER_PROFILE.licenseNumber,
-      preferredLanguage: profileData?.preferredLanguage || FALLBACK_BUYER_PROFILE.preferredLanguage,
-      preferredEmirate: profileData?.preferredEmirate || FALLBACK_BUYER_PROFILE.preferredEmirate,
-      strictGccSpecOnly: true,
-      budgetMinFils: profileData?.budgetMinFils ? Number(profileData.budgetMinFils) : FALLBACK_BUYER_PROFILE.budgetMinFils,
-      budgetMaxFils: profileData?.budgetMaxFils ? Number(profileData.budgetMaxFils) : FALLBACK_BUYER_PROFILE.budgetMaxFils,
-      viewingHubs: FALLBACK_BUYER_PROFILE.viewingHubs,
-      channels: FALLBACK_BUYER_PROFILE.channels,
-      disclosureMatrix: FALLBACK_BUYER_PROFILE.disclosureMatrix,
-      ephemeralGrants,
-    };
-  } catch (_err) {
-    return FALLBACK_BUYER_PROFILE;
-  }
+  return {
+    userId: meData.id,
+    fullName: meData.displayName || '',
+    fullNameAr: '',
+    emiratesIdMasked: '',
+    phoneE164: meData.phoneE164 || '',
+    licenseNumber: '',
+    preferredLanguage: profileData?.preferredLanguage || 'en',
+    preferredEmirate: profileData?.preferredEmirate || '',
+    strictGccSpecOnly: false,
+    budgetMinFils: profileData?.budgetMinFils ? Number(profileData.budgetMinFils) : 0,
+    budgetMaxFils: profileData?.budgetMaxFils ? Number(profileData.budgetMaxFils) : 0,
+    viewingHubs: [],
+    channels: { whatsapp: false, phone: false, privateOffice: false },
+    disclosureMatrix: {
+      shareFullName: false,
+      sharePhone: false,
+      zkProofOfFunds: '',
+      virtualGarage: '',
+      residence: '',
+    },
+    ephemeralGrants,
+  };
 }
 
 /**
@@ -2257,71 +1718,18 @@ export async function updateBuyerProfileApi(payload: {
   budgetMaxFils?: number;
   preferredMakes?: string[];
 }): Promise<boolean> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      const res = await fetch(`${apiUrl}/api/v1/me/buyer-profile`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authData.accessToken}`,
-        },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(3000),
-      });
-      return res.ok;
-    }
-  } catch (_err) {
-    // Graceful fallback
-  }
-  return false;
+  await buyerApiFetch('/api/v1/me/buyer-profile', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+  return true;
 }
 
 /**
  * Revoke data grant for specific lead enquiry
  */
 export async function revokeLeadGrantApi(leadId: string): Promise<boolean> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-
-  try {
-    const authRes = await fetch(`${apiUrl}/api/v1/auth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        identitySubject: 'vip-buyer-dubai-01',
-        email: 'tariq.nuaimi@holding.ae',
-        name: 'H.H. Sheikh Tariq Al-Nuaimi',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      const res = await fetch(`${apiUrl}/api/v1/me/leads/${leadId}/grant/revoke`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${authData.accessToken}`,
-        },
-        signal: AbortSignal.timeout(3000),
-      });
-      return res.ok;
-    }
-  } catch (_err) {
-    // Graceful fallback
-  }
-  return false;
+  await buyerApiFetch(`/api/v1/me/leads/${leadId}/grant/revoke`, { method: 'POST' });
+  return true;
 }
 

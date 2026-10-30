@@ -42,9 +42,13 @@ export function BuyerEnquiriesView({ initialEnquiries }: BuyerEnquiriesViewProps
 
   const handleRevokeConsent = async () => {
     if (activeLead) {
-      await revokeBuyerEnquiryGrant(activeLead.id);
-      setDossierState('cancelled');
-      setIsRevokeModalOpen(false);
+      try {
+        await revokeBuyerEnquiryGrant(activeLead.id);
+        setDossierState('cancelled');
+        setIsRevokeModalOpen(false);
+      } catch (err) {
+        window.alert(`Consent was not revoked: ${err instanceof Error ? err.message : 'Request failed'}`);
+      }
     }
   };
 

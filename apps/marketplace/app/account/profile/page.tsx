@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { BuyerProfileView } from '../../../components/buyer-profile-view';
 import { fetchBuyerProfileData } from '../../../lib/api';
+import { withBuyerSession } from '../../../lib/server-session';
 
 export const metadata: Metadata = {
   title: 'Buyer Profile & Privacy Protocols | Automotive OS',
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function BuyerProfilePage() {
-  const profileData = await fetchBuyerProfileData();
+  const profileData = await withBuyerSession('/account/profile', fetchBuyerProfileData);
 
   return <BuyerProfileView initialProfile={profileData} />;
 }

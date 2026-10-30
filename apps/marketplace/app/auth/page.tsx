@@ -96,8 +96,14 @@ export default function UnifiedAuthPage() {
         localStorage.setItem('ao_user', JSON.stringify(data.user));
       }
 
-      // Redirect based on backend resolved role target
-      const targetUrl = data.user?.redirectUrl || '/dashboard';
+      // Return to the guarded page that sent the user here (same-origin paths only),
+      // otherwise use the backend resolved role target.
+      const requested = searchParams.get('redirect');
+      const safeRequested =
+        requested && requested.startsWith('/') && !requested.startsWith('//') && !requested.startsWith('/\\')
+          ? requested
+          : null;
+      const targetUrl = safeRequested || data.user?.redirectUrl || '/dashboard';
       router.push(targetUrl);
     } catch (err: any) {
       setLoginError(err.message || 'Authentication failed');

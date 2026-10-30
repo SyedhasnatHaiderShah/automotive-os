@@ -31,7 +31,7 @@ export interface DealerVehicleItem {
     | "REJECTED"
     | "UNPUBLISHED"
     | null;
-  mediaUrl: string;
+  mediaUrl: string | null;
   rtaVerified: boolean;
   tasjeelScore?: string;
   engineSpec?: string;
@@ -342,6 +342,31 @@ export const VERIFIED_DEALER_LEADS_FIXTURES: DealerLeadItem[] = [
 ];
 
 /**
+ * API base for dealer calls. On the server we call the API service directly;
+ * in the browser we use same-origin `/api/*`, which the marketplace gateway
+ * rewrites to the API so the httpOnly `ao_session` cookie is sent.
+ */
+export function dealerApiBaseUrl(): string {
+  if (typeof window !== "undefined") return "";
+  return (
+    process.env.API_SERVICE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:4000"
+  ).replace(/\/+$/, "");
+}
+
+/** Browser-side auth headers: the cookie travels with credentials, plus a bearer token when the login page stored one. */
+export function dealerClientAuthHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    const token = window.localStorage.getItem("ao_token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
  * Fetch tenant vehicles with backend API and verified Stitch fallback
  */
 export async function fetchDealerInventory(
@@ -351,23 +376,20 @@ export async function fetchDealerInventory(
   items: DealerVehicleItem[];
   stats: InventoryStats;
 }> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-  const isProdOrStaging =
-    process.env.NODE_ENV === "production" ||
-    (process.env.NODE_ENV as string) === "staging";
+  const apiUrl = dealerApiBaseUrl();
+  const isDev = process.env.NODE_ENV === "development";
+  const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
+  // The tenant comes from the signed-in session. A seeded default tenant is
+  // only allowed for explicit local fixture previews.
   const targetTenantId =
     tenantId ||
-    process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID ||
-    (!isProdOrStaging ? "11111111-1111-1111-1111-111111111111" : undefined);
+    (isDev && enableFixtures ? "11111111-1111-1111-1111-111111111111" : undefined);
 
   if (!targetTenantId) {
     throw new Error(
-      "TENANT_CONTEXT_REQUIRED: No tenantId provided. Default fallback tenant IDs are forbidden in production and staging.",
+      "TENANT_CONTEXT_REQUIRED: Sign in with a dealer account to load tenant data.",
     );
   }
-
-  const isDev = process.env.NODE_ENV === "development";
-  const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
 
   try {
     const headers: Record<string, string> = {
@@ -381,8 +403,9 @@ export async function fetchDealerInventory(
       `${apiUrl}/api/v1/tenants/${targetTenantId}/vehicles`,
       {
         headers,
+        credentials: "include",
         cache: "no-store",
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(5000),
       },
     );
 
@@ -404,10 +427,7 @@ export async function fetchDealerInventory(
 
         return {
           ...item,
-          mediaUrl:
-            item.media?.[0]?.objectKey ||
-            item.mediaUrl ||
-            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
+          mediaUrl: item.media?.[0]?.url || item.mediaUrl || null,
           rtaVerified,
           tasjeelScore: rtaVerified ? item.tasjeelScore || "Certified Pass" : "Not Certified",
           inquiriesCount: typeof item.inquiriesCount === "number" ? item.inquiriesCount : 0,
@@ -480,23 +500,20 @@ export async function fetchDealerLeads(
   tenantId?: string,
   token?: string,
 ): Promise<DealerLeadItem[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-  const isProdOrStaging =
-    process.env.NODE_ENV === "production" ||
-    (process.env.NODE_ENV as string) === "staging";
+  const apiUrl = dealerApiBaseUrl();
+  const isDev = process.env.NODE_ENV === "development";
+  const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
+  // The tenant comes from the signed-in session. A seeded default tenant is
+  // only allowed for explicit local fixture previews.
   const targetTenantId =
     tenantId ||
-    process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID ||
-    (!isProdOrStaging ? "11111111-1111-1111-1111-111111111111" : undefined);
+    (isDev && enableFixtures ? "11111111-1111-1111-1111-111111111111" : undefined);
 
   if (!targetTenantId) {
     throw new Error(
-      "TENANT_CONTEXT_REQUIRED: No tenantId provided. Default fallback tenant IDs are forbidden in production and staging.",
+      "TENANT_CONTEXT_REQUIRED: Sign in with a dealer account to load tenant data.",
     );
   }
-
-  const isDev = process.env.NODE_ENV === "development";
-  const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
 
   try {
     const headers: Record<string, string> = {
@@ -510,8 +527,9 @@ export async function fetchDealerLeads(
       `${apiUrl}/api/v1/tenants/${targetTenantId}/leads`,
       {
         headers,
+        credentials: "include",
         cache: "no-store",
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(5000),
       },
     );
 
@@ -551,6 +569,10 @@ export async function fetchDealerLeads(
 export interface IntakeVehiclePayload {
   makeName: string;
   modelName: string;
+  /** Catalogue IDs required by POST /api/v1/tenants/:tenantId/vehicles. */
+  branchId?: string;
+  makeId?: string;
+  modelId?: string;
   vin: string;
   stockNumber: string;
   modelYear: number;
@@ -564,95 +586,56 @@ export interface IntakeVehiclePayload {
 }
 
 /**
- * Submit Vehicle Intake
+ * Submit Vehicle Intake to the tenant-scoped inventory API. Never fabricates
+ * a created record: any failure is surfaced to the caller.
  */
 export async function createDealerVehicle(
+  tenantId: string | undefined,
   payload: IntakeVehiclePayload,
 ): Promise<DealerVehicleItem> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-  try {
-    const response = await fetch(`${apiUrl}/api/v1/inventory/vehicles`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        makeName: payload.makeName,
-        modelName: payload.modelName,
-        vin: payload.vin,
-        stockNumber: payload.stockNumber,
-        modelYear: payload.modelYear,
-        condition: payload.condition,
-        mileageKm: payload.mileageKm,
-        purchaseCostFils: String(payload.purchaseCostAed * 100),
-        askingPriceFils: String(payload.askingPriceAed * 100),
-        gccSpec: payload.gccSpec,
-        colorExterior: payload.colorExterior,
-      }),
-      signal: AbortSignal.timeout(4000),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      return {
-        ...data,
-        mediaUrl:
-          "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
-        rtaVerified: false,
-        tasjeelScore: "Not Certified",
-        inquiriesCount: 0,
-        vipBookingsCount: 0,
-        isFixture: false,
-      };
-    }
-
-    const isDev = process.env.NODE_ENV === "development";
-    const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
-    if (!isDev || !enableFixtures) {
-      throw new Error(
-        `Failed to intake vehicle: backend service returned HTTP ${response.status}.`,
-      );
-    }
-  } catch (err: any) {
-    const isDev = process.env.NODE_ENV === "development";
-    const enableFixtures = process.env.NEXT_PUBLIC_ENABLE_FIXTURES === "true";
-    if (!isDev || !enableFixtures) {
-      throw new Error(
-        err?.message ||
-          "Failed to intake vehicle: backend service unavailable.",
-      );
-    }
+  if (!tenantId) {
+    throw new Error("TENANT_CONTEXT_REQUIRED: Sign in with a dealer account. Vehicle was NOT created.");
+  }
+  if (!payload.branchId || !payload.makeId || !payload.modelId) {
+    throw new Error(
+      "Branch, make and model must be selected from the catalogue. The API has no catalogue lookup yet, so the vehicle was NOT created.",
+    );
   }
 
+  const response = await fetch(`${dealerApiBaseUrl()}/api/v1/tenants/${tenantId}/vehicles`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...dealerClientAuthHeaders() },
+    credentials: "include",
+    body: JSON.stringify({
+      branchId: payload.branchId,
+      makeId: payload.makeId,
+      modelId: payload.modelId,
+      vin: payload.vin || undefined,
+      stockNumber: payload.stockNumber,
+      modelYear: payload.modelYear,
+      condition: payload.condition,
+      mileageKm: payload.mileageKm,
+      purchaseCostFils: Math.round(payload.purchaseCostAed * 100),
+      askingPriceFils: Math.round(payload.askingPriceAed * 100),
+      gccSpec: payload.gccSpec,
+      colorExterior: payload.colorExterior || undefined,
+    }),
+    signal: AbortSignal.timeout(8000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Vehicle was NOT created: inventory API returned HTTP ${response.status}.`);
+  }
+
+  const data = await response.json();
   return {
-    id: `veh-new-${Date.now()}`,
-    tenantId: "tenant-silberarrows-0829",
-    branchId: "branch-alquoz-1",
-    makeName: payload.makeName,
-    modelName: payload.modelName,
-    vin: payload.vin,
-    stockNumber: payload.stockNumber,
-    trim: "Executive Spec",
-    modelYear: payload.modelYear,
-    condition: payload.condition,
-    mileageKm: payload.mileageKm,
-    colorExterior: payload.colorExterior,
-    fuel: "PETROL",
-    transmission: "Automatic",
-    gccSpec: payload.gccSpec,
-    purchaseCostFils: String(payload.purchaseCostAed * 100),
-    askingPriceFils: String(payload.askingPriceAed * 100),
-    stockStatus: "AVAILABLE",
-    listingId: payload.submitToModeration ? `lst-new-${Date.now()}` : null,
-    listingStatus: payload.submitToModeration ? "PENDING_REVIEW" : "DRAFT",
-    mediaUrl:
-      "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80",
-    rtaVerified: true,
-    tasjeelScore: "Pending 150-Pt Audit",
-    engineSpec: "Factory Certified",
-    horsepower: "450+ HP",
+    ...data,
+    mediaUrl: null,
+    rtaVerified: false,
+    tasjeelScore: "Not Certified",
     inquiriesCount: 0,
     vipBookingsCount: 0,
-    isFixture: true,
+    isFixture: false,
   };
 }
 

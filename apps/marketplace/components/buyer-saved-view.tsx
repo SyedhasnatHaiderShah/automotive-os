@@ -51,12 +51,14 @@ export function BuyerSavedView({
 
   // Remove Favorite
   const handleRemoveFavorite = async (favId: string, favTitle: string) => {
+    const previous = favorites;
     setFavorites((prev) => prev.filter((f) => f.id !== favId));
-    triggerToast(`Vehicle removed from Saved Garage: ${favTitle}`, 'bookmark_remove');
     try {
       await removeFavoriteApi(favId);
-    } catch (_err) {
-      // Graceful fallback
+      triggerToast(`Vehicle removed from Saved Garage: ${favTitle}`, 'bookmark_remove');
+    } catch (err) {
+      setFavorites(previous);
+      triggerToast(`Could not remove ${favTitle}: ${err instanceof Error ? err.message : 'Request failed'}`, 'error');
     }
   };
 
@@ -79,12 +81,14 @@ export function BuyerSavedView({
 
   // Delete Radar
   const handleDeleteRadar = async (radarId: string, radarTitle: string) => {
+    const previous = radars;
     setRadars((prev) => prev.filter((r) => r.id !== radarId));
-    triggerToast(`Radar alert removed: ${radarTitle}`, 'delete');
     try {
       await deleteSavedRadarApi(radarId);
-    } catch (_err) {
-      // Graceful fallback
+      triggerToast(`Radar alert removed: ${radarTitle}`, 'delete');
+    } catch (err) {
+      setRadars(previous);
+      triggerToast(`Could not remove ${radarTitle}: ${err instanceof Error ? err.message : 'Request failed'}`, 'error');
     }
   };
 

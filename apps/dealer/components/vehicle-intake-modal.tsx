@@ -7,6 +7,8 @@ export interface VehicleIntakeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onVehicleCreated: (vehicle: DealerVehicleItem) => void;
+  /** Active tenant resolved from the signed-in session. */
+  tenantId?: string;
   locale?: 'en' | 'ar';
 }
 
@@ -14,6 +16,7 @@ export const VehicleIntakeModal: React.FC<VehicleIntakeModalProps> = ({
   isOpen,
   onClose,
   onVehicleCreated,
+  tenantId,
   locale = 'en',
 }) => {
   const isArabic = locale === 'ar';
@@ -44,7 +47,7 @@ export const VehicleIntakeModal: React.FC<VehicleIntakeModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const created = await createDealerVehicle({
+      const created = await createDealerVehicle(tenantId, {
         makeName,
         modelName,
         vin,

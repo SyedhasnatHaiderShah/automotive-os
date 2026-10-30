@@ -128,8 +128,9 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
       setViewState('success');
     } catch (err: any) {
       setErrorMessage(
-        err?.message ||
-          'The driving license attached failed RTA clearance verification. Test drives require valid RTA license attestation.'
+        err?.name === 'BuyerAuthRequiredError'
+          ? 'Please sign in to send an enquiry. No enquiry was submitted.'
+          : err?.message || 'The enquiry could not be submitted. No data was shared with the dealer.'
       );
       setViewState('error');
     }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { BuyerSavedView } from '../../../components/buyer-saved-view';
 import { fetchSavedRadars, fetchSavedFavorites } from '../../../lib/api';
+import { withBuyerSession } from '../../../lib/server-session';
 
 export const metadata: Metadata = {
   title: 'Saved Searches & Vehicle Favorites | Automotive OS',
@@ -12,10 +13,9 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function BuyerSavedPage() {
-  const [radars, favorites] = await Promise.all([
-    fetchSavedRadars(),
-    fetchSavedFavorites(),
-  ]);
+  const [radars, favorites] = await withBuyerSession('/account/saved', (token) =>
+    Promise.all([fetchSavedRadars(token), fetchSavedFavorites(token)])
+  );
 
   return (
     <BuyerSavedView

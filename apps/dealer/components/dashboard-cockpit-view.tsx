@@ -11,6 +11,8 @@ export interface DashboardCockpitViewProps {
   initialVehicles: DealerVehicleItem[];
   initialLeads: DealerLeadItem[];
   stats: InventoryStats;
+  /** Active tenant resolved from the signed-in session. */
+  tenantId?: string;
   locale?: 'en' | 'ar';
 }
 
@@ -18,6 +20,7 @@ export const DashboardCockpitView: React.FC<DashboardCockpitViewProps> = ({
   initialVehicles,
   initialLeads,
   stats,
+  tenantId,
   locale: defaultLocale = 'en',
 }) => {
   const [vehicles, setVehicles] = useState<DealerVehicleItem[]>(initialVehicles);
@@ -919,6 +922,7 @@ export const DashboardCockpitView: React.FC<DashboardCockpitViewProps> = ({
 
       {/* Intake Vehicle Modal */}
       <VehicleIntakeModal
+        tenantId={tenantId}
         isOpen={isIntakeOpen}
         onClose={() => setIsIntakeOpen(false)}
         onVehicleCreated={(v) => {

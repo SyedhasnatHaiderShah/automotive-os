@@ -4,17 +4,20 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DealerSidebar } from './dealer-sidebar';
 import { DealerHeader } from './dealer-header';
 import { VehicleIntakeModal } from './vehicle-intake-modal';
-import { DealerVehicleItem, InventoryStats } from '../lib/api';
+import { DealerVehicleItem, InventoryStats, dealerApiBaseUrl, dealerClientAuthHeaders } from '../lib/api';
 
 export interface InventoryMatrixViewProps {
   initialVehicles: DealerVehicleItem[];
   initialStats: InventoryStats;
+  /** Active tenant resolved from the signed-in session. */
+  tenantId?: string;
   locale?: 'en' | 'ar';
 }
 
 export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
   initialVehicles,
   initialStats,
+  tenantId,
   locale: defaultLocale = 'en',
 }) => {
   const [vehicles, setVehicles] = useState<DealerVehicleItem[]>(initialVehicles);
@@ -59,29 +62,26 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
 
   const changeListingStatus = async (vehicle: DealerVehicleItem, action: 'submit' | 'unpublish') => {
     setActionFeedback(null);
-    // Until a dealer sign-in workflow is live, never assume a privileged token.
-    const token = typeof window !== 'undefined'
-      ? window.sessionStorage.getItem('automotive_dealer_access_token')
-      : null;
-    if (!token) {
+    // The signed-in session (ao_session cookie) authorizes the call; the API re-checks role and tenant.
+    if (!tenantId) {
       setActionFeedback('Dealer sign-in is required. Listing was NOT changed.');
       return;
     }
-    if (!vehicle.tenantId || vehicle.isFixture) {
+    if (!vehicle.tenantId || vehicle.tenantId !== tenantId || vehicle.isFixture) {
       setActionFeedback('This is not an authorized, persisted dealer record. No change was made.');
       return;
     }
     setPendingVehicleId(vehicle.id);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!baseUrl) throw new Error('Dealer API endpoint is not configured');
-      const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+      const baseUrl = dealerApiBaseUrl();
+      const headers = { ...dealerClientAuthHeaders(), 'Content-Type': 'application/json' };
       let listingId = vehicle.listingId;
       if (action === 'submit' && !listingId) {
         const draft = await fetch(`${baseUrl}/api/v1/tenants/${vehicle.tenantId}/vehicles/${vehicle.id}/listing`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ askingPriceFils: Number(vehicle.askingPriceFils) }),
+          credentials: 'include',
           cache: 'no-store',
         });
         if (!draft.ok) throw new Error(`Create listing failed (HTTP ${draft.status})`);
@@ -93,6 +93,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
       const res = await fetch(`${baseUrl}/api/v1/tenants/${vehicle.tenantId}/listings/${listingId}/${endpoint}`, {
         method: 'POST',
         headers,
+        credentials: 'include',
         cache: 'no-store',
       });
       if (!res.ok) throw new Error(`Listing status change rejected (HTTP ${res.status})`);
@@ -719,7 +720,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
                           <div className="flex items-center gap-3">
                             <div className="relative w-16 h-11 rounded-lg overflow-hidden shrink-0 bg-surface-container-high border border-white/[0.06]">
                               <img
-                                src={vehicle.mediaUrl}
+                                src={vehicle.mediaUrl ?? undefined}
                                 alt={vehicle.modelName}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
@@ -939,6 +940,7 @@ export const InventoryMatrixView: React.FC<InventoryMatrixViewProps> = ({
         isOpen={isIntakeOpen}
         onClose={() => setIsIntakeOpen(false)}
         onVehicleCreated={handleVehicleCreated}
+        tenantId={tenantId}
         locale={locale}
       />
     </div>

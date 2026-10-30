@@ -56,12 +56,18 @@ export function BuyerProfileView({ initialProfile }: BuyerProfileViewProps) {
     if (isEditing) {
       // Save edits to API
       setIsSaving(true);
-      const ok = await updateBuyerProfileApi({
-        preferredLanguage: selectedLanguage,
-        preferredEmirate: selectedEmirate,
-        budgetMinFils: Math.round(budgetMin * 100),
-        budgetMaxFils: Math.round(budgetMax * 100),
-      });
+      let ok = false;
+      let failure = '';
+      try {
+        ok = await updateBuyerProfileApi({
+          preferredLanguage: selectedLanguage,
+          preferredEmirate: selectedEmirate,
+          budgetMinFils: Math.round(budgetMin * 100),
+          budgetMaxFils: Math.round(budgetMax * 100),
+        });
+      } catch (err) {
+        failure = err instanceof Error ? err.message : 'Request failed';
+      }
       setIsSaving(false);
       setIsEditing(false);
       if (ok) {
@@ -76,7 +82,7 @@ export function BuyerProfileView({ initialProfile }: BuyerProfileViewProps) {
       setFeedbackMessage(
         ok
           ? 'Profile preferences updated and synchronized with backend API.'
-          : 'Saved locally (API unreachable).'
+          : `Preferences were not saved: ${failure}`
       );
       setTimeout(() => setFeedbackMessage(null), 4000);
     } else {
@@ -85,7 +91,13 @@ export function BuyerProfileView({ initialProfile }: BuyerProfileViewProps) {
   };
 
   const handleRevokeSingleGrant = async (leadId: string, grantId: string) => {
-    await revokeLeadGrantApi(leadId);
+    try {
+      await revokeLeadGrantApi(leadId);
+    } catch (err) {
+      setFeedbackMessage(`Access was not revoked: ${err instanceof Error ? err.message : 'Request failed'}`);
+      setTimeout(() => setFeedbackMessage(null), 4000);
+      return;
+    }
     setEphemeralGrants((prev) =>
       prev.map((g) =>
         g.id === grantId || g.leadId === leadId
@@ -100,14 +112,28 @@ export function BuyerProfileView({ initialProfile }: BuyerProfileViewProps) {
   };
 
   const handleRevokeAllTokens = async () => {
+    const revokedLeadIds = new Set<string>();
+    let failure = '';
     for (const grant of ephemeralGrants) {
       if (!grant.revoked) {
-        await revokeLeadGrantApi(grant.leadId);
+        try {
+          await revokeLeadGrantApi(grant.leadId);
+          revokedLeadIds.add(grant.leadId);
+        } catch (err) {
+          failure = err instanceof Error ? err.message : 'Request failed';
+        }
       }
     }
     setEphemeralGrants((prev) =>
-      prev.map((g) => ({ ...g, revoked: true, expiresText: 'Access Revoked' }))
+      prev.map((g) =>
+        revokedLeadIds.has(g.leadId) ? { ...g, revoked: true, expiresText: 'Access Revoked' } : g
+      )
     );
+    if (failure) {
+      setFeedbackMessage(`Some dealer access could not be revoked: ${failure}`);
+      setTimeout(() => setFeedbackMessage(null), 6000);
+      return;
+    }
     setFeedbackMessage(
       'Sovereign Lockdown Alert: All active ephemeral dealer tokens have been instantly invalidated.'
     );

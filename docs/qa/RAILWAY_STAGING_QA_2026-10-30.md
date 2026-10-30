@@ -42,3 +42,17 @@ credentials were available. Admin is behind Basic Auth (401). Arabic/RTL pass no
 | QA-09 | FIXED_LOCAL (API) | New `GET /api/v1/public/dealers?emirate=&page=&limit=`, returning active, KYB-approved dealers only. The marketplace `/dealers` page is not wired to it yet. |
 
 Checks: `tsc --noEmit` (api) PASS. API unit specs PASS (55/55, 10 suites). API integration specs in `apps/api/test` NOT RUN (local DB unavailable). Lint NOT RUN (script is an echo stub).
+
+## Fix log — data-flow batch (local, not deployed)
+
+| ID | Status | Change |
+|---|---|---|
+| QA-01 | FIXED_LOCAL | `apps/marketplace/middleware.ts` guards `/account/*` and `/dashboard` by checking the `ao_session` cookie is present. Account pages also call `withBuyerSession` (`lib/server-session.ts`), which redirects to `/auth?tab=login&redirect=` when the API rejects the session. `/auth` honours `redirect` for same-origin paths only. |
+| QA-02 | FIXED_LOCAL | All buyer calls in `apps/marketplace/lib/api.ts` go through `lib/buyer-api-client.ts`: Bearer from the cookie on the server, same-origin `/api` with credentials on the client. The dev `/auth/token` persona, the injected escrow, IBAN, stage, venue and host values, the fixture merges and the always-`true` mutations are all removed. Mutation callers now show the failure, and optimistic removals roll back. The enquiry API mapping is fixed (`buyerMessage`, `grant.fieldsGranted`). Garage vehicles now render an empty list because no API exists for them. The simulated RTA sync now says it is unavailable. |
+| QA-03 | FIXED_LOCAL | `apps/dealer/middleware.ts` uses a relative `Location` so the redirect stays on the gateway. `lib/session.ts` resolves the tenant from `/api/v1/auth/me` memberships. Inventory and leads use the real session and tenant. `createDealerVehicle` now uses the tenant route, but intake fails on purpose until a make/model/branch catalogue API exists. |
+| QA-05 | FIXED_LOCAL | The marketplace storefront no longer refills fake rating, phone, GPS, stock or value, and no longer shows fixture inventory when stock is empty. Null fields render as "—" or are hidden, and empty contact links are disabled. A 404 from the API returns `notFound()`. |
+| QA-08 | OPEN | The dealer P1 fixture pages are unchanged; they need their own backend modules. |
+
+Remaining fabricated UI copy (design batch): hardcoded secondary enquiry cards in `buyer-enquiries-view.tsx:743-776`, escrow and AED 284,000 text, the static `/account/settings` and `/account/profile/dossier` (S30/S31), the home page dealer cards, and the "RTA PASS VALIDATED" badge.
+
+Checks: marketplace `tsc --noEmit` PASS and `next build` PASS. Dealer `tsc --noEmit` PASS and `next build` PASS. Runtime and E2E against the API/DB NOT RUN: the local DB is unavailable and staging is not redeployed.

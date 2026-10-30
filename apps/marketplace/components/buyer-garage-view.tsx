@@ -62,10 +62,9 @@ export function BuyerGarageView({
       setIsCancelModalOpen(false);
       setShowCancellationBanner(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (_err) {
-      // Graceful fallback
-      setIsCancelModalOpen(false);
-      setShowCancellationBanner(true);
+    } catch (err) {
+      // Keep the appointment and modal; the cancellation did not happen.
+      window.alert(`Appointment was not cancelled: ${err instanceof Error ? err.message : 'Request failed'}`);
     } finally {
       setIsCancelling(false);
     }
@@ -73,15 +72,13 @@ export function BuyerGarageView({
 
   // Handle Add Vehicle via RTA
   const handleExecuteRtaSync = () => {
-    setIsSyncing(true);
-    setTimeout(() => {
-      setIsSyncing(false);
-      setIsAddVehicleModalOpen(false);
-      setRtaSuccessNotice(
-        `RTA Gateway Connected: Traffic File #${tcfInput} synchronized. Vehicle title registered in collector fleet.`
-      );
-      setTimeout(() => setRtaSuccessNotice(null), 5000);
-    }, 700);
+    // RTA traffic-file sync is BLOCKED_EXTERNAL (INTEGRATION_TRUTH_TABLE.md); never simulate success.
+    setIsSyncing(false);
+    setIsAddVehicleModalOpen(false);
+    setRtaSuccessNotice(
+      `RTA traffic file sync is not available yet. Traffic File #${tcfInput} was not imported.`
+    );
+    setTimeout(() => setRtaSuccessNotice(null), 5000);
   };
 
   // Sync to calendar
