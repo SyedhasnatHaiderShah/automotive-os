@@ -296,4 +296,36 @@ describe('AuthService', () => {
       );
     });
   });
+
+  describe('registerVipLead', () => {
+    it('should register VIP lead with cryptographically secure pending identity subject', async () => {
+      mockPrisma.user.findFirst.mockResolvedValue(null);
+      mockPrisma.user.create.mockImplementation((args) =>
+        Promise.resolve({
+          id: 'vip-user-id',
+          email: args.data.email,
+          identitySubject: args.data.identitySubject,
+          status: args.data.status,
+        })
+      );
+
+      const res = await service.registerVipLead({
+        legalName: 'VIP User',
+        email: 'viplead@autonexa.ae',
+        phone: '+971500000000',
+        consentPdpl: true,
+        tier: 'PLATINUM' as any,
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.userId).toBe('vip-user-id');
+      expect(mockPrisma.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            identitySubject: expect.stringMatching(/^pending_reg_\d+_[a-f0-9]{32}$/),
+          }),
+        })
+      );
+    });
+  });
 });
