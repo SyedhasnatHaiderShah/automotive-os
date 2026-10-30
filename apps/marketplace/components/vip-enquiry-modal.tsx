@@ -417,9 +417,11 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
               {/* Evaluation Format Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Option 1: Track */}
-                <div
+                <button
+                  type="button"
                   onClick={() => setEvaluationMode('TRACK')}
-                  className={`relative rounded-xl p-3.5 bg-surface-container-lowest hover:bg-surface-container cursor-pointer transition-all flex flex-col justify-between gap-2 border ${
+                  aria-pressed={evaluationMode === 'TRACK'}
+                  className={`text-left rtl:text-right w-full relative rounded-xl p-3.5 bg-surface-container-lowest hover:bg-surface-container cursor-pointer transition-all flex flex-col justify-between gap-2 border focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                     evaluationMode === 'TRACK'
                       ? 'border-primary-container ring-1 ring-primary-container'
                       : 'border-white/[0.06]'
@@ -449,12 +451,14 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
                     <span className="font-label-caps text-primary font-medium">Pre-Warmed Cup 2 R Tires</span>
                     <span className="font-data-mono-num text-on-surface">45 Min Slot</span>
                   </div>
-                </div>
+                </button>
 
                 {/* Option 2: Showroom Lounge */}
-                <div
+                <button
+                  type="button"
                   onClick={() => setEvaluationMode('LOUNGE')}
-                  className={`relative rounded-xl p-3.5 bg-surface-container-lowest hover:bg-surface-container cursor-pointer transition-all flex flex-col justify-between gap-2 border ${
+                  aria-pressed={evaluationMode === 'LOUNGE'}
+                  className={`text-left rtl:text-right w-full relative rounded-xl p-3.5 bg-surface-container-lowest hover:bg-surface-container cursor-pointer transition-all flex flex-col justify-between gap-2 border focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                     evaluationMode === 'LOUNGE'
                       ? 'border-primary-container ring-1 ring-primary-container'
                       : 'border-white/[0.06]'
@@ -484,7 +488,7 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
                     <span className="font-label-caps text-secondary font-medium">Al Quoz Vault 4</span>
                     <span className="font-data-mono-num text-on-surface">Unlimited Time</span>
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Date & Time Slot Windows */}
