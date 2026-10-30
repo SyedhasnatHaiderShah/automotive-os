@@ -61,6 +61,17 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
     return () => clearInterval(interval);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const formatTimer = (secs: number) => {
@@ -322,11 +333,15 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
               {/* Form Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 <div className="flex flex-col gap-1">
-                  <label className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">
+                  <label
+                    htmlFor="vip-buyer-name"
+                    className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium"
+                  >
                     Full Legal Name (as per Passport / Emirates ID)
                   </label>
                   <div className="relative">
                     <input
+                      id="vip-buyer-name"
                       type="text"
                       required
                       value={buyerName}
@@ -340,7 +355,10 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">
+                  <label
+                    htmlFor="vip-buyer-phone"
+                    className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium"
+                  >
                     Verified UAE Mobile (SMS & WhatsApp Confirmation)
                   </label>
                   <div className="flex items-center rounded-lg bg-surface-container-lowest border border-white/[0.08] overflow-hidden focus-within:ring-1 focus-within:ring-primary-container">
@@ -349,6 +367,7 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
                       <span>+971</span>
                     </div>
                     <input
+                      id="vip-buyer-phone"
                       type="tel"
                       required
                       value={buyerPhone}
@@ -360,10 +379,14 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">
+                  <label
+                    htmlFor="vip-buyer-email"
+                    className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium"
+                  >
                     Corporate / Private Office Email
                   </label>
                   <input
+                    id="vip-buyer-email"
                     type="email"
                     required
                     value={buyerEmail}
@@ -373,10 +396,14 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">
+                  <label
+                    htmlFor="vip-license-tier"
+                    className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant font-medium"
+                  >
                     Driving License Tier & Issuance Country
                   </label>
                   <select
+                    id="vip-license-tier"
                     value={licenseTier}
                     onChange={(e) => setLicenseTier(e.target.value)}
                     className="w-full h-10 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-xs sm:text-sm border border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-primary-container cursor-pointer"
@@ -494,10 +521,14 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
               {/* Date & Time Slot Windows */}
               <div className="bg-surface-container-lowest rounded-xl p-3.5 flex flex-col md:flex-row items-center gap-4 border border-white/[0.06]">
                 <div className="w-full md:w-48 shrink-0">
-                  <label className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant block mb-1">
+                  <label
+                    htmlFor="vip-target-date"
+                    className="font-label-caps text-[11px] uppercase tracking-wider text-on-surface-variant block mb-1"
+                  >
                     Target Date
                   </label>
                   <input
+                    id="vip-target-date"
                     type="date"
                     value={targetDate}
                     onChange={(e) => setTargetDate(e.target.value)}
