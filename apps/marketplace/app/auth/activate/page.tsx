@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { apiErrorMessage } from '../../../lib/email-delivery';
 
 interface InvitationDetails {
   valid: boolean;
@@ -43,14 +44,14 @@ function ActivateAccountContent() {
     async function verifyToken() {
       try {
         const res = await fetch(`/api/v1/auth/activate/verify?token=${encodeURIComponent(token!)}`);
-        const data = await res.json();
+        const data = await res.json().catch(() => null);
 
         if (!isMounted) return;
 
-        if (res.ok && data.valid) {
+        if (res.ok && data?.valid) {
           setInvitation(data);
         } else {
-          setErrorMessage(data.message || 'Invalid or expired activation token.');
+          setErrorMessage(apiErrorMessage(data, 'Invalid or expired activation token.'));
         }
       } catch {
         if (!isMounted) return;
@@ -95,15 +96,15 @@ function ActivateAccountContent() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
-      if (res.ok && data.success) {
+      if (res.ok && data?.success) {
         setSubmitSuccess(true);
         setTimeout(() => {
           router.push('/auth?tab=login');
         }, 3000);
       } else {
-        setFormError(data.message || 'Failed to complete activation.');
+        setFormError(apiErrorMessage(data, 'Failed to complete activation.'));
       }
     } catch {
       setFormError('Network error while completing account activation.');
@@ -184,15 +185,17 @@ function ActivateAccountContent() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {formError && (
-          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+          <div role="alert" className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
             {formError}
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-medium text-stone-300 mb-1.5">Create Password</label>
+          <label htmlFor="activate-password" className="block text-xs font-medium text-stone-300 mb-1.5">Create Password</label>
           <input
+            id="activate-password"
             type="password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -203,9 +206,11 @@ function ActivateAccountContent() {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-stone-300 mb-1.5">Confirm Password</label>
+          <label htmlFor="activate-confirm-password" className="block text-xs font-medium text-stone-300 mb-1.5">Confirm Password</label>
           <input
+            id="activate-confirm-password"
             type="password"
+            autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required

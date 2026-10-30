@@ -6,6 +6,10 @@ import {
 } from "@nestjs/common";
 import { PrismaService, runWithDbContext } from "../database/prisma.service";
 import { buildPublicMediaUrl } from "../common/media-url.util";
+import {
+  ADMIN_MEDIA_PREVIEW_TTL_SECONDS,
+  signAdminMediaPreviewUrl,
+} from "./admin-media-preview.util";
 import { AuditService } from "../audit/audit.service";
 import { CreateDraftListingDto } from "./dto/create-draft-listing.dto";
 import {
@@ -467,7 +471,7 @@ export class ListingsService {
   /**
    * Platform admin retrieves full listing dossier for moderation review.
    */
-  async getAdminListingById(listingId: string): Promise<any> {
+  async getAdminListingById(listingId: string, adminUserId?: string): Promise<any> {
     const isUuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         listingId,
@@ -493,6 +497,42 @@ export class ListingsService {
 
     if (!listing) {
       throw new NotFoundException(`Listing ${listingId} not found`);
+    }
+
+    // AD-08: moderators get a short-lived signed GET URL per media object so
+    // they can see photos (public or private) before approving. previewUrl is
+    // null when object storage is not configured (fail closed).
+    const previewExpiresAt = new Date(
+      Date.now() + ADMIN_MEDIA_PREVIEW_TTL_SECONDS * 1000,
+    ).toISOString();
+    const media = await Promise.all(
+      listing.vehicle.media.map(async (m) => {
+        const previewUrl = await signAdminMediaPreviewUrl(m.objectKey);
+        return {
+          ...m,
+          previewUrl,
+          previewExpiresAt: previewUrl ? previewExpiresAt : null,
+        };
+      }),
+    );
+
+    // Issuing a link to a private object (documents, unpublished photos) is a
+    // sensitive read, so it is audited. Only ids are recorded, never the URL.
+    const privateMediaIds = media
+      .filter((m) => m.previewUrl && !m.isPublic)
+      .map((m) => m.id);
+    if (privateMediaIds.length > 0) {
+      await this.auditService.logAction({
+        tenantId: listing.tenantId,
+        actorUserId: adminUserId || null,
+        action: "ADMIN_PRIVATE_MEDIA_PREVIEW_ISSUED",
+        targetType: "listing",
+        targetId: listing.id,
+        metadata: {
+          mediaIds: privateMediaIds,
+          expiresAt: previewExpiresAt,
+        },
+      });
     }
 
     return {
@@ -524,7 +564,7 @@ export class ListingsService {
         transmission: listing.vehicle.transmission,
         gccSpec: listing.vehicle.gccSpec,
         stockStatus: listing.vehicle.stockStatus,
-        media: listing.vehicle.media,
+        media,
       },
       createdAt: listing.createdAt.toISOString(),
       updatedAt: listing.updatedAt.toISOString(),
@@ -808,6 +848,7 @@ export class ListingsService {
       year: listing.vehicle.modelYear,
       mileageKm: listing.vehicle.mileageKm,
       condition: listing.vehicle.condition,
+      gccSpec: listing.vehicle.gccSpec ?? null,
       emirate: listing.vehicle.branch?.emirate || "UAE",
       seller: {
         id: listing.tenant.id,

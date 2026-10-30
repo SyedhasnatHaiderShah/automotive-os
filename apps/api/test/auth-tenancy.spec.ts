@@ -249,7 +249,7 @@ describe('Auth & Tenancy Module (Integration / E2E Authorization Tests)', () => 
       expect(res.body.error.message).toContain('PLATFORM_ADMIN_REQUIRED');
     });
 
-    it('POSITIVE: should allow Platform Admin to list all dealerships and log audit entry', async () => {
+    it('POSITIVE: should allow Platform Admin to list all dealerships without writing a list-read audit row', async () => {
       const correlationId = `corr-test-${Date.now()}`;
 
       const res = await request(app.getHttpServer())
@@ -261,13 +261,12 @@ describe('Auth & Tenancy Module (Integration / E2E Authorization Tests)', () => 
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBeGreaterThanOrEqual(2);
 
-      // Verify audit event was persisted to database
+      // List reads are no longer audited (AD-10); mutations and single-record reads still are.
       const auditLog = await prisma.auditEvent.findFirst({
         where: { correlationId },
       });
 
-      expect(auditLog).toBeDefined();
-      expect(auditLog?.action).toBe('PLATFORM_ADMIN_LIST_ALL_TENANTS');
+      expect(auditLog).toBeNull();
     });
   });
 });

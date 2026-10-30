@@ -33,8 +33,11 @@ export class AdminListingsController {
     summary: "Get full vehicle listing dossier for platform moderation review",
   })
   @ApiResponse({ status: 200 })
-  async getListing(@Param("id") listingId: string) {
-    return this.listingsService.getAdminListingById(listingId);
+  async getListing(
+    @Param("id") listingId: string,
+    @CurrentUser("id") adminUserId: string,
+  ) {
+    return this.listingsService.getAdminListingById(listingId, adminUserId);
   }
 
   @Post(":id/decision")

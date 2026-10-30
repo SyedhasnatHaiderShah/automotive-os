@@ -31,6 +31,7 @@ export function ListingActions({ tenantId, vehicleId, listingId, listingStatus, 
   const run = async (action: 'submit' | 'unpublish') => {
     setPending(true);
     setError(null);
+    let draftCreated = false;
     try {
       const base = `/api/v1/tenants/${encodeURIComponent(tenantId)}`;
       let id = listingId;
@@ -40,12 +41,16 @@ export function ListingActions({ tenantId, vehicleId, listingId, listingStatus, 
           body: { askingPriceFils: Number(askingPriceFils) },
         });
         id = draft.id;
+        draftCreated = true;
       }
       if (!id) throw new Error('This vehicle has no listing yet. Nothing was changed.');
       await dealerClientRequest(`${base}/listings/${encodeURIComponent(id)}/${action}`, { method: 'POST' });
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'The listing was not changed.');
+      const reason = err instanceof Error ? err.message : 'The listing was not changed.';
+      // The draft listing exists even though submission failed, so the table must reload to show it (DL-04).
+      setError(draftCreated ? `Draft listing created, but it was not submitted for review: ${reason}` : reason);
+      if (draftCreated) router.refresh();
     } finally {
       setPending(false);
     }

@@ -1,6 +1,8 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { localeDir } from '../lib/i18n';
+import { getDealerLocale } from '../lib/locale-server';
 
 export const metadata: Metadata = {
   title: 'Automotive OS — Dealer Enterprise Suite & DMS',
@@ -13,13 +15,15 @@ export const viewport: Viewport = {
   themeColor: '#101419',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Persisted locale (DL-08) so `lang`/`dir` are right on first paint and after navigation.
+  const locale = await getDealerLocale();
   return (
-    <html lang="en" className="dark">
+    <html lang={locale} dir={localeDir(locale)} className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

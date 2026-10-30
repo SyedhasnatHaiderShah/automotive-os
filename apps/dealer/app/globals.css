@@ -29,9 +29,10 @@
 
 @media (max-width: 1023px) {
   .dealer-app-sidebar { transform: translateX(-100%); transition: transform 200ms ease; width: min(18rem, 86vw); }
+  [dir='rtl'] .dealer-app-sidebar { transform: translateX(100%); }
   body.dealer-mobile-nav-open .dealer-app-sidebar { transform: translateX(0); }
-  .dealer-app-header { left: 0 !important; right: 0 !important; padding-inline: 1rem !important; }
-  .dealer-app-sidebar ~ div { padding-left: 0 !important; padding-right: 0 !important; width: 100%; min-width: 0; }
+  .dealer-app-header { left: 0 !important; right: 0 !important; inset-inline: 0 !important; padding-inline: 1rem !important; }
+  .dealer-app-sidebar ~ div { padding-left: 0 !important; padding-right: 0 !important; padding-inline: 0 !important; width: 100%; min-width: 0; }
   .dealer-app-sidebar ~ div main { padding-inline: 1rem !important; max-width: 100%; min-width: 0; }
   body.dealer-mobile-nav-open::before { content: ''; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 45; pointer-events: none; }
   body { overflow-x: hidden; }

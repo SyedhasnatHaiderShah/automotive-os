@@ -15,7 +15,8 @@ export default function SubprimeDbrExceptionPage() {
   const [data, setData] = useState<SubprimeDbrExceptionData>(VERIFIED_SUBPRIME_DBR_EXCEPTION_FIXTURE);
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
   const isRtl = locale === 'ar';
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  // Sample role for this preview page; it is not switchable (DL-05).
+  const role = 'PRINCIPAL' as 'PRINCIPAL' | 'SALES_REP';
   const [pipelineFilter, setPipelineFilter] = useState<'ALL' | 'APPROVED' | 'COMMITTEE' | 'SETTLED'>('ALL');
   const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
   // Preview module: feedback never claims an external action happened.
@@ -101,24 +102,23 @@ export default function SubprimeDbrExceptionPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
-                title="Click to toggle between Dealer Principal and Sales Executive RBAC mode"
-                className={`px-3 py-1 rounded-full text-[11px] font-label-caps font-bold uppercase transition-colors border ${
+              {/* Static sample role (DL-05): preview pages do not switch RBAC roles. */}
+              <span
+                className={`px-3 py-1 rounded-full text-[11px] font-label-caps font-bold uppercase border ${
                   role === 'PRINCIPAL'
                     ? 'bg-primary/10 border-primary/30 text-primary'
                     : 'bg-surface-container-highest border-outline-variant text-on-surface-variant'
                 }`}
               >
+                {isRtl ? 'دور تجريبي: ' : 'Sample role: '}
                 {role === 'PRINCIPAL'
                   ? isRtl
-                    ? 'الدور: المدير العام (F&I Director)'
-                    : 'Role: Dealer Principal (CRO Override)'
+                    ? 'المدير العام'
+                    : 'Dealer Principal'
                   : isRtl
-                    ? 'الدور: تنفيذي مبيعات (مقيد الصلاحيات)'
-                    : 'Role: Sales Executive (Restricted)'}
-              </button>
+                    ? 'تنفيذي مبيعات'
+                    : 'Sales Executive'}
+              </span>
               <button
                 type="button"
                 onClick={() => setLocale(locale === 'en' ? 'ar' : 'en')}
@@ -1287,14 +1287,14 @@ export default function SubprimeDbrExceptionPage() {
 
             {croSubmitted ? (
               <div className="py-6 text-center space-y-3">
-                <span className="material-symbols-outlined text-[48px] text-tertiary">check_circle</span>
+                <span className="material-symbols-outlined text-[48px] text-outline">info</span>
                 <h4 className="font-headline-sm text-on-surface font-semibold">
                   {isRtl ? 'معاينة فقط — لم يتم إرسال أي شيء.' : 'Preview only — nothing was sent.'}
                 </h4>
                 <p className="text-[12px] text-on-surface-variant max-w-sm mx-auto">
                   {isRtl
-                    ? 'تم تسجيل الاستثناء برقم CBUAE-OVR-2025-0812 وإرسال الإشعار لجهات التمويل لفك تجميد الاكتتاب.'
-                    : 'Override logged as CBUAE-OVR-2025-0812 with SHA-256 digital stamp. Automated syndication lock cleared under bilateral protocol.'}
+                    ? 'هذه معاينة ببيانات تجريبية. لم يتم تسجيل أي استثناء أو إرسال أي إشعار إلى أي جهة خارجية.'
+                    : 'This is a sample-data preview. No override was logged and nothing was sent to any regulator, lender or court.'}
                 </p>
                 <button
                   type="button"

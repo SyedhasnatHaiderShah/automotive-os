@@ -8,7 +8,16 @@ import {
   VehicleGridSkeleton,
   Button,
 } from '@automotive-os/ui';
-import { fetchPublicListings, fetchPublicDealers, PublicListingItem, PublicDealerSummary } from '../lib/api';
+import {
+  fetchPublicListings,
+  fetchPublicDealers,
+  fetchFavorites,
+  addFavoriteApi,
+  removeFavoriteApi,
+  PublicListingItem,
+  PublicDealerSummary,
+} from '../lib/api';
+import { BuyerAuthRequiredError } from '../lib/buyer-api-client';
 
 export default function MarketplaceHomePage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -24,6 +33,8 @@ export default function MarketplaceHomePage() {
   const [dealersTotal, setDealersTotal] = useState(0);
   const [dealersLoading, setDealersLoading] = useState(true);
   const [dealersError, setDealersError] = useState(false);
+  const [favoriteError, setFavoriteError] = useState<string | null>(null);
+  const [heroImageFailed, setHeroImageFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -60,11 +71,46 @@ export default function MarketplaceHomePage() {
     return () => { active = false; };
   }, [selectedEmirate]);
 
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+  // Real favorites for signed-in buyers (same API as /cars); signed-out visitors start empty.
+  useEffect(() => {
+    let active = true;
+    fetchFavorites()
+      .then((favs) => {
+        if (active) setFavorites(favs.map((f) => f.listingId));
+      })
+      .catch(() => {
+        // Not signed in or API unavailable: nothing is shown as saved.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const toggleFavorite = async (id: string) => {
+    const isSaved = favorites.includes(id);
+    setFavoriteError(null);
+    try {
+      if (isSaved) {
+        await removeFavoriteApi(id);
+        setFavorites((prev) => prev.filter((item) => item !== id));
+      } else {
+        await addFavoriteApi(id);
+        setFavorites((prev) => [...prev, id]);
+      }
+    } catch (err) {
+      if (err instanceof BuyerAuthRequiredError) {
+        const back = window.location.pathname + window.location.search;
+        window.location.href = `/auth?tab=login&redirect=${encodeURIComponent(back)}`;
+        return;
+      }
+      setFavoriteError(err instanceof Error ? err.message : 'Could not update favorites.');
+    }
   };
+
+  // Hero showcases the newest real published listing; no static price is shown.
+  const featured = vehicles[0];
+  const featuredImage = featured?.media[0]?.url;
+  useEffect(() => { setHeroImageFailed(false); }, [featuredImage]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,13 +216,14 @@ export default function MarketplaceHomePage() {
                   {/* Condition Selector Tabs */}
                   <div className="flex items-center gap-2 pb-3 border-b border-outline-variant/20">
                     {[
-                      { key: 'ALL', label: isArabic ? 'معروض صالات العرض' : 'Showroom Inventory' },
-                      { key: 'NEW', label: isArabic ? 'تخصيصات خاصة' : 'Off-Market Allocations' },
-                      { key: 'USED', label: isArabic ? 'إيداع مباشر' : 'Direct Consignment' },
+                      { key: 'ALL', label: isArabic ? 'الكل' : 'All' },
+                      { key: 'NEW', label: isArabic ? 'جديدة' : 'New' },
+                      { key: 'USED', label: isArabic ? 'مستعملة' : 'Used' },
                     ].map((tab) => (
                       <button
                         key={tab.key}
                         type="button"
+                        aria-pressed={selectedCondition === tab.key}
                         onClick={() => setSelectedCondition(tab.key)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                           selectedCondition === tab.key
@@ -192,7 +239,11 @@ export default function MarketplaceHomePage() {
                   {/* Input Fields Row */}
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     <div className="sm:col-span-7 relative">
+                      <label htmlFor="home-search-query" className="sr-only">
+                        {isArabic ? 'البحث عن سيارة' : 'Search vehicles'}
+                      </label>
                       <input
+                        id="home-search-query"
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -206,7 +257,11 @@ export default function MarketplaceHomePage() {
                     </div>
 
                     <div className="sm:col-span-5 relative">
+                      <label htmlFor="home-search-emirate" className="sr-only">
+                        {isArabic ? 'الإمارة' : 'Emirate'}
+                      </label>
                       <select
+                        id="home-search-emirate"
                         value={selectedEmirate}
                         onChange={(e) => setSelectedEmirate(e.target.value)}
                         className="w-full h-12 px-4 rounded-lg bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer transition-colors"
@@ -235,41 +290,64 @@ export default function MarketplaceHomePage() {
                 </form>
               </div>
 
-              {/* Hero Feature Showcase (Porsche 911 GT3 RS) */}
+              {/* Hero Feature Showcase: newest real published listing, never a static priced card (MK-15) */}
               <div className="lg:col-span-5 relative">
                 <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-outline-variant/40 shadow-[0_20px_50px_rgba(0,0,0,0.9)] bg-surface-container">
-                  <img
-                    src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=80"
-                    alt="Porsche 911 GT3 RS in Dark Void Studio"
-                    className="w-full h-full object-cover"
-                  />
+                  {featured && featuredImage && !heroImageFailed ? (
+                    <img
+                      src={featuredImage}
+                      alt={featured.title}
+                      className="w-full h-full object-cover"
+                      onError={() => setHeroImageFailed(true)}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container-lowest text-on-surface-variant" aria-hidden="true">
+                      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M5 17h14l-1.5-5h-11L5 17Z" /><path d="M8 12l2-4h4l2 4M7 17v2m10-2v2M8 15h.01M16 15h.01" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-black/20" />
 
                   {/* Floating Badge Dossier */}
-                  <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-surface-container/90 backdrop-blur-md border border-outline-variant/40 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] font-label-caps text-secondary uppercase tracking-wider block">
-                        Static concept showcase • Dubai
-                      </span>
-                      <h4 className="font-headline-sm text-sm font-bold text-on-surface">
-                        2024 Porsche 911 GT3 RS
-                      </h4>
-                      <span className="text-xs text-outline font-data-mono-num">
-                        Weissach Package • 420 km
-                      </span>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="text-xs font-data-currency-lg font-bold text-primary block">
-                        AED 1,480,000
-                      </span>
-                      <a
-                        href="/cars"
-                        className="text-[11px] text-tertiary hover:underline font-medium"
-                      >
-                        {isArabic ? 'عرض السيارات المتاحة →' : 'Browse live stock →'}
-                      </a>
-                    </div>
+                  <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-surface-container/90 backdrop-blur-md border border-outline-variant/40 flex items-center justify-between gap-3">
+                    {featured ? (
+                      <>
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-label-caps text-secondary uppercase tracking-wider block">
+                            {isArabic ? `أحدث إعلان • ${featured.emirate}` : `Latest listing • ${featured.emirate}`}
+                          </span>
+                          <h4 className="font-headline-sm text-sm font-bold text-on-surface truncate">
+                            {featured.title}
+                          </h4>
+                          <span className="text-xs text-outline">
+                            {featured.seller.displayName}
+                          </span>
+                        </div>
+                        <div className="text-end shrink-0">
+                          <span className="text-xs font-data-currency-lg font-bold text-primary block">
+                            {featured.price.currency || 'AED'} {Math.round(Number(featured.price.amountFils) / 100).toLocaleString('en-US')}
+                          </span>
+                          <a
+                            href={`/cars/${featured.slug}`}
+                            className="text-[11px] text-tertiary hover:underline font-medium"
+                          >
+                            {isArabic ? 'عرض التفاصيل' : 'View details →'}
+                          </a>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-xs text-outline">
+                          {loading
+                            ? (isArabic ? 'جارٍ تحميل الإعلانات…' : 'Loading listings…')
+                            : (isArabic ? 'تصفح السيارات المنشورة من الوكلاء المعتمدين.' : 'Browse published stock from verified dealers.')}
+                        </span>
+                        <a href="/cars" className="text-[11px] text-tertiary hover:underline font-medium shrink-0">
+                          {isArabic ? 'عرض السيارات المتاحة' : 'Browse live stock →'}
+                        </a>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -399,6 +477,12 @@ export default function MarketplaceHomePage() {
               <span>→</span>
             </a>
           </div>
+
+          {favoriteError && (
+            <p role="alert" className="mb-4 text-sm text-error">
+              {favoriteError}
+            </p>
+          )}
 
           {/* Grid Render */}
           {loadError && !loading ? (

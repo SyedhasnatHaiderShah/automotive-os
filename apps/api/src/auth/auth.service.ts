@@ -89,22 +89,16 @@ export function resolveUserRedirect(user: {
       };
     }
 
+    // Only routes that exist in apps/dealer and run on live data. Service and
+    // finance modules are sample-data previews, so those roles land on the dashboard.
     let roleLanding = '/dealer';
     switch (activeMembership.role) {
       case 'SALES_MANAGER':
-        roleLanding = '/dealer/crm';
-        break;
       case 'SALES_AGENT':
         roleLanding = '/dealer/leads';
         break;
       case 'INVENTORY_MANAGER':
         roleLanding = '/dealer/inventory';
-        break;
-      case 'SERVICE_ADVISOR':
-        roleLanding = '/dealer/service';
-        break;
-      case 'FINANCE_MANAGER':
-        roleLanding = '/dealer/finance';
         break;
       default:
         roleLanding = '/dealer';
@@ -153,6 +147,8 @@ export class AuthService {
         where: { identitySubject: payload.sub },
         include: {
           memberships: {
+            // Deterministic order (DL-09): callers pick the first usable membership.
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
             include: {
               tenant: true,
             },
@@ -246,6 +242,8 @@ export class AuthService {
         where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
         include: {
           memberships: {
+            // Deterministic order (DL-09): callers pick the first usable membership.
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
             include: {
               tenant: true,
             },
@@ -730,6 +728,8 @@ export class AuthService {
         include: {
           buyer: true,
           memberships: {
+            // Deterministic order (DL-09): callers pick the first usable membership.
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
             include: {
               tenant: true,
             },

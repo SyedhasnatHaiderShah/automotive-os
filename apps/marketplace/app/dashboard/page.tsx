@@ -85,11 +85,8 @@ export default function DashboardResolverPage() {
             return;
           }
           let dealerLanding = '/dealer';
-          if (activeMembership.role === 'SALES_MANAGER') dealerLanding = '/dealer/crm';
-          else if (activeMembership.role === 'SALES_AGENT') dealerLanding = '/dealer/leads';
+          if (activeMembership.role === 'SALES_MANAGER' || activeMembership.role === 'SALES_AGENT') dealerLanding = '/dealer/leads';
           else if (activeMembership.role === 'INVENTORY_MANAGER') dealerLanding = '/dealer/inventory';
-          else if (activeMembership.role === 'SERVICE_ADVISOR') dealerLanding = '/dealer/service';
-          else if (activeMembership.role === 'FINANCE_MANAGER') dealerLanding = '/dealer/finance';
 
           setStatusText(`Loading Dealership Console (${activeMembership.tenantName || 'Dealer Desk'})...`);
           router.replace(dealerLanding);

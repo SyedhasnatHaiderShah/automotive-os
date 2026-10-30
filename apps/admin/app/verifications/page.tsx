@@ -4,7 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
+import { useLocale } from '../../lib/locale';
 import { AdminTenantSummary, errorMessage, listTenants } from '../../lib/api';
+import { kybBadgeClass } from '../../lib/kyb';
 
 /**
  * Dealer KYB registry.
@@ -23,7 +25,7 @@ const STATUS_ORDER: Record<string, number> = {
 };
 
 export default function KybApplicationsListPage() {
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale } = useLocale();
   const [tenants, setTenants] = useState<AdminTenantSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export default function KybApplicationsListPage() {
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col gap-space-lg">
@@ -174,15 +176,9 @@ export default function KybApplicationsListPage() {
                           <td className="py-3.5 px-4 font-data-mono-num text-primary">/{t.slug}</td>
                           <td className="py-3.5 px-4">
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-label-caps text-label-caps ${
-                                t.verificationStatus === 'APPROVED'
-                                  ? 'bg-tertiary/15 text-tertiary'
-                                  : t.verificationStatus === 'IN_REVIEW'
-                                  ? 'bg-primary/20 text-primary'
-                                  : t.verificationStatus === 'REJECTED' || t.verificationStatus === 'EXPIRED'
-                                  ? 'bg-error-container/40 text-error'
-                                  : 'bg-surface-container-high text-secondary'
-                              }`}
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-label-caps text-label-caps ${kybBadgeClass(
+                                t.verificationStatus,
+                              )}`}
                             >
                               {t.verificationStatus}
                             </span>

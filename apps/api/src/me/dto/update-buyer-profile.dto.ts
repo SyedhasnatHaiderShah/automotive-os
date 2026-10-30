@@ -8,24 +8,25 @@ export class UpdateBuyerProfileDto {
   @IsOptional()
   preferredLanguage?: string;
 
-  @ApiProperty({ description: 'Preferred UAE emirate (e.g. Dubai, Abu Dhabi, Sharjah)', example: 'Dubai', required: false })
+  // null clears the stored value (MK-08); undefined leaves it unchanged.
+  @ApiProperty({ description: 'Preferred UAE emirate (e.g. Dubai, Abu Dhabi, Sharjah); null clears it', example: 'Dubai', required: false, nullable: true })
   @IsString()
   @IsOptional()
-  preferredEmirate?: string;
+  preferredEmirate?: string | null;
 
-  @ApiProperty({ description: 'Minimum budget in integer fils', example: 20000000, required: false })
+  @ApiProperty({ description: 'Minimum budget in integer fils; null clears it', example: 20000000, required: false, nullable: true })
   @IsInt()
   @Min(0)
   @IsOptional()
   @Type(() => Number)
-  budgetMinFils?: number;
+  budgetMinFils?: number | null;
 
-  @ApiProperty({ description: 'Maximum budget in integer fils', example: 45000000, required: false })
+  @ApiProperty({ description: 'Maximum budget in integer fils; null clears it', example: 45000000, required: false, nullable: true })
   @IsInt()
   @Min(0)
   @IsOptional()
   @Type(() => Number)
-  budgetMaxFils?: number;
+  budgetMaxFils?: number | null;
 
   @ApiProperty({ description: 'List of preferred car makes', example: ['Toyota', 'Porsche'], required: false })
   @IsArray()

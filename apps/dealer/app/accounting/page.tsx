@@ -44,7 +44,7 @@ export default function TaxInvoicesAndAccountingPage() {
 
   const handleCreateTaxInvoice = () => {
     setGenerateInvoiceModalOpen(false);
-    const newInvNum = `INV-2025-${Math.floor(150 + Math.random() * 50)}`;
+    const newInvNum = `PREVIEW-INV-${Math.floor(150 + Math.random() * 50)}`;
     const vatRate = newVatCategory === 'STANDARD_5' ? 0.05 : 0;
     const vatAmt = newVehiclePrice * vatRate;
     const grossAmt = newVehiclePrice + vatAmt;
@@ -63,10 +63,11 @@ export default function TaxInvoicesAndAccountingPage() {
           grossAmountAed: grossAmt,
           vatAmountAed: vatAmt,
           vatLabel: newVatCategory === 'STANDARD_5' ? `AED ${vatAmt.toLocaleString()}.00` : 'AED 0.00 (0%)',
-          settlementChannel: 'FAB Escrow',
-          channelBadgeClass: 'bg-secondary/15 text-secondary',
-          ftaStatus: 'XML Filed & Cleared',
-          ftaBadgeClass: 'bg-tertiary/15 text-tertiary',
+          // Local preview row only (DL-06): nothing is filed with the FTA or settled.
+          settlementChannel: isRtl ? 'معاينة — لا تسوية' : 'Preview — no settlement',
+          channelBadgeClass: 'bg-surface-container-high text-on-surface-variant',
+          ftaStatus: isRtl ? 'معاينة — لم يتم التقديم' : 'Preview — not filed',
+          ftaBadgeClass: 'bg-surface-container-high text-on-surface-variant',
         },
         ...prev.recentJournal,
       ],

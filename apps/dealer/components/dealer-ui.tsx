@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import type { DealerStrings } from '../lib/i18n';
 
 export function StatCard({
   label,
@@ -42,6 +43,62 @@ export function StatusPill({ label, tone = 'neutral' }: { label: string; tone?: 
   );
 }
 
+/** Total page count for a paged list (at least 1). */
+export function pageCount(total: number, limit: number): number {
+  return Math.max(1, Math.ceil(total / limit));
+}
+
+/** True when `page` points past the last page of a non-empty list (DL-02). */
+export function isPageOutOfRange(page: number, limit: number, total: number): boolean {
+  return total > 0 && page > pageCount(total, limit);
+}
+
+function pageHref(basePath: string, params: Record<string, string | undefined>, target: number, limit: number) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) if (value) query.set(key, value);
+  query.set('page', String(target));
+  query.set('limit', String(limit));
+  return `${basePath}?${query.toString()}`;
+}
+
+const pagerLinkClass = 'min-h-11 inline-flex items-center rounded-lg border border-outline-variant/50 px-4 hover:bg-surface-container-high';
+const pagerDisabledClass = 'min-h-11 inline-flex items-center rounded-lg border border-outline-variant/30 px-4 opacity-40 cursor-not-allowed';
+
+/**
+ * Empty-table state for a page number past the end of a non-empty list
+ * (DL-02). Shown instead of "No vehicles yet" when stock exists.
+ */
+export function PageOutOfRange({
+  basePath,
+  page,
+  limit,
+  total,
+  params = {},
+  t,
+}: {
+  basePath: string;
+  page: number;
+  limit: number;
+  total: number;
+  params?: Record<string, string | undefined>;
+  t: DealerStrings;
+}) {
+  const totalPages = pageCount(total, limit);
+  return (
+    <div role="status" className="flex flex-col items-center gap-3">
+      <span className="material-symbols-outlined text-5xl text-outline/60" aria-hidden="true">search_off</span>
+      <span className="text-base font-semibold text-on-surface">{t.pageOutOfRangeTitle}</span>
+      <span className="text-sm">{t.pageOutOfRange(page, totalPages)}</span>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <Link href={pageHref(basePath, params, 1, limit)} className={pagerLinkClass}>{t.goToFirstPage}</Link>
+        {totalPages > 1 && (
+          <Link href={pageHref(basePath, params, totalPages, limit)} className={pagerLinkClass}>{t.goToLastPage}</Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /** Prev/next pagination driven by `page`/`limit` search params. */
 export function Pager({
   basePath,
@@ -50,6 +107,7 @@ export function Pager({
   total,
   params = {},
   noun,
+  t,
 }: {
   /** Path inside the /dealer basePath, e.g. "/inventory". */
   basePath: string;
@@ -59,38 +117,36 @@ export function Pager({
   /** Extra search params to keep (filters). */
   params?: Record<string, string | undefined>;
   noun: string;
+  t: DealerStrings;
 }) {
-  const totalPages = Math.max(1, Math.ceil(total / limit));
-  const href = (target: number) => {
-    const query = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) if (value) query.set(key, value);
-    query.set('page', String(target));
-    query.set('limit', String(limit));
-    return `${basePath}?${query.toString()}`;
-  };
+  const totalPages = pageCount(total, limit);
+  const href = (target: number) => pageHref(basePath, params, target, limit);
+  const outOfRange = isPageOutOfRange(page, limit, total);
   const from = total === 0 ? 0 : (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
-  const linkClass = 'min-h-11 inline-flex items-center rounded-lg border border-outline-variant/50 px-4 hover:bg-surface-container-high';
-  const disabledClass = 'min-h-11 inline-flex items-center rounded-lg border border-outline-variant/30 px-4 opacity-40 cursor-not-allowed';
 
   return (
-    <nav aria-label={`${noun} pagination`} className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 bg-surface-container p-3 text-sm">
+    <nav aria-label={t.pagination(noun)} className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 bg-surface-container p-3 text-sm">
       <span className="text-on-surface-variant">
-        Showing {from}–{to} of {total} {noun}
+        {outOfRange ? t.pageOutOfRange(page, totalPages) : t.showing(from, to, total, noun)}
       </span>
       <div className="flex items-center gap-2">
-        {page > 1 ? (
-          <Link href={href(page - 1)} className={linkClass} rel="prev">Previous</Link>
+        {outOfRange ? (
+          <Link href={href(1)} className={pagerLinkClass}>{t.goToFirstPage}</Link>
         ) : (
-          <span className={disabledClass} aria-disabled="true">Previous</span>
-        )}
-        <span>
-          Page {page} / {totalPages}
-        </span>
-        {page < totalPages ? (
-          <Link href={href(page + 1)} className={linkClass} rel="next">Next</Link>
-        ) : (
-          <span className={disabledClass} aria-disabled="true">Next</span>
+          <>
+            {page > 1 ? (
+              <Link href={href(page - 1)} className={pagerLinkClass} rel="prev">{t.previous}</Link>
+            ) : (
+              <span className={pagerDisabledClass} aria-disabled="true">{t.previous}</span>
+            )}
+            <span>{t.pageOf(page, totalPages)}</span>
+            {page < totalPages ? (
+              <Link href={href(page + 1)} className={pagerLinkClass} rel="next">{t.next}</Link>
+            ) : (
+              <span className={pagerDisabledClass} aria-disabled="true">{t.next}</span>
+            )}
+          </>
         )}
       </div>
     </nav>

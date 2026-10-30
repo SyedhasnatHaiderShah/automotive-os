@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
+import { useLocale } from '../../lib/locale';
 import { ConfirmReasonModal } from '../../components/ConfirmReasonModal';
 import {
   Search,
@@ -33,15 +34,18 @@ type PendingAction = { kind: 'SUSPENDED' | 'DISABLED' | 'ACTIVE' | 'REVOKE'; use
 
 const PAGE_SIZE = 20;
 
-const ACTION_COPY: Record<PendingAction['kind'], { title: string; confirm: string }> = {
-  SUSPENDED: { title: 'Suspend this account?', confirm: 'Suspend account' },
-  DISABLED: { title: 'Disable this account?', confirm: 'Disable account' },
-  ACTIVE: { title: 'Reactivate this account?', confirm: 'Reactivate account' },
-  REVOKE: { title: 'Revoke all active sessions?', confirm: 'Revoke sessions' },
+const ACTION_COPY: Record<
+  PendingAction['kind'],
+  { title: string; confirm: string; titleAr: string; confirmAr: string }
+> = {
+  SUSPENDED: { title: 'Suspend this account?', confirm: 'Suspend account', titleAr: 'تعليق هذا الحساب؟', confirmAr: 'تعليق الحساب' },
+  DISABLED: { title: 'Disable this account?', confirm: 'Disable account', titleAr: 'تعطيل هذا الحساب؟', confirmAr: 'تعطيل الحساب' },
+  ACTIVE: { title: 'Reactivate this account?', confirm: 'Reactivate account', titleAr: 'إعادة تفعيل هذا الحساب؟', confirmAr: 'إعادة تفعيل الحساب' },
+  REVOKE: { title: 'Revoke all active sessions?', confirm: 'Revoke sessions', titleAr: 'إلغاء جميع الجلسات النشطة؟', confirmAr: 'إلغاء الجلسات' },
 };
 
 export default function AdminUsersPage() {
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale, t } = useLocale();
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -55,6 +59,9 @@ export default function AdminUsersPage() {
   const [reloadKey, setReloadKey] = useState(0);
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
   const [currentAdminId, setCurrentAdminId] = useState<string | null>(null);
+  // AD-02: mutations stay hidden until the signed-in admin id is known, so the
+  // self-action guard cannot fail open when /auth/me errors.
+  const [currentAdminState, setCurrentAdminState] = useState<'loading' | 'ok' | 'error'>('loading');
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -73,9 +80,21 @@ export default function AdminUsersPage() {
   }, [searchInput, search]);
 
   useEffect(() => {
+    let active = true;
     getCurrentAdmin()
-      .then((me) => setCurrentAdminId(me.id))
-      .catch(() => setCurrentAdminId(null));
+      .then((me) => {
+        if (!active) return;
+        setCurrentAdminId(me.id);
+        setCurrentAdminState(me.id ? 'ok' : 'error');
+      })
+      .catch(() => {
+        if (!active) return;
+        setCurrentAdminId(null);
+        setCurrentAdminState('error');
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -102,12 +121,13 @@ export default function AdminUsersPage() {
         setUsers([]);
         setTotal(0);
         setTotalPages(0);
-        setLoadError(errorMessage(err, 'Users could not be loaded.'));
+        setLoadError(errorMessage(err, t('Users could not be loaded.', 'تعذر تحميل المستخدمين.')));
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, statusFilter, roleFilter, reloadKey]);
 
   const fetchUsers = () => setReloadKey((k) => k + 1);
@@ -130,28 +150,40 @@ export default function AdminUsersPage() {
     try {
       if (kind === 'REVOKE') {
         const data = await revokeUserSessions(user.id);
-        showToast('success', `API revoked ${data?.revokedCount ?? 0} active session(s) for ${user.displayName}.`);
+        const count = data?.revokedCount ?? 0;
+        showToast(
+          'success',
+          t(
+            `API revoked ${count} active session(s) for ${user.displayName}.`,
+            `ألغت الواجهة ${count} جلسة نشطة لـ ${user.displayName}.`,
+          ),
+        );
       } else {
         await updateUserStatus(user.id, kind, reason);
-        showToast('success', `API confirmed status ${kind} for ${user.displayName}.`);
+        showToast(
+          'success',
+          t(`API confirmed status ${kind} for ${user.displayName}.`, `أكدت الواجهة الحالة ${kind} لـ ${user.displayName}.`),
+        );
         setSelectedUser((sel) => (sel && sel.id === user.id ? { ...sel, status: kind } : sel));
       }
       setPendingAction(null);
       fetchUsers();
     } catch (err) {
-      setActionError(`Not saved: ${errorMessage(err, 'Operation failed')}`);
+      setActionError(`${t('Not saved:', 'لم يُحفظ:')} ${errorMessage(err, t('Operation failed', 'فشلت العملية'))}`);
     } finally {
       setActionLoading(false);
     }
   };
 
   const isSelf = (u: UserItem | null) => Boolean(u && currentAdminId && u.id === currentAdminId);
+  const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
+  const NextIcon = isRtl ? ChevronLeft : ChevronRight;
 
   return (
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           {/* Header Title */}
@@ -176,7 +208,7 @@ export default function AdminUsersPage() {
               className="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-xs text-on-surface flex items-center gap-2 transition-colors self-start"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>Refresh Roster</span>
+              <span>{t('Refresh Roster', 'تحديث القائمة')}</span>
             </button>
           </div>
 
@@ -202,30 +234,33 @@ export default function AdminUsersPage() {
           {/* Filters & Search Toolbar */}
           <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="relative w-full md:w-96">
-              <Search className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search
+                className={`w-4 h-4 text-outline absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2`}
+                aria-hidden="true"
+              />
               <input
-                type="text"
+                type="search"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search by email, name, or phone..."
-                aria-label="Search users by email, name, or phone"
-                className="w-full pl-9 pr-4 py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none"
+                placeholder={t('Search by email, name, or phone...', 'ابحث بالبريد أو الاسم أو الهاتف...')}
+                aria-label={t('Search users by email, name, or phone', 'ابحث عن المستخدمين بالبريد أو الاسم أو الهاتف')}
+                className={`w-full ${isRtl ? 'pr-9 pl-4' : 'pl-9 pr-4'} py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none`}
               />
             </div>
 
             <div className="flex items-center gap-3 w-full md:w-auto">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-mono">Status:</span>
+                <span className="text-xs text-outline font-mono" aria-hidden="true">{t('Status:', 'الحالة:')}</span>
                 <select
                   value={statusFilter}
-                  aria-label="Filter by status"
+                  aria-label={t('Filter by status', 'تصفية حسب الحالة')}
                   onChange={(e) => {
                     setStatusFilter(e.target.value);
                     setPage(1);
                   }}
                   className="px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white focus:outline-none"
                 >
-                  <option value="ALL">All Statuses</option>
+                  <option value="ALL">{t('All Statuses', 'كل الحالات')}</option>
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="SUSPENDED">SUSPENDED</option>
                   <option value="DISABLED">DISABLED</option>
@@ -234,23 +269,23 @@ export default function AdminUsersPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-mono">Role:</span>
+                <span className="text-xs text-outline font-mono" aria-hidden="true">{t('Role:', 'الدور:')}</span>
                 <select
                   value={roleFilter}
-                  aria-label="Filter by role"
+                  aria-label={t('Filter by role', 'تصفية حسب الدور')}
                   onChange={(e) => {
                     setRoleFilter(e.target.value);
                     setPage(1);
                   }}
                   className="px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white focus:outline-none"
                 >
-                  <option value="ALL">All Roles</option>
-                  <option value="PLATFORM_ADMIN">Platform Admin</option>
-                  <option value="OWNER">Dealer Owner</option>
-                  <option value="ADMIN">Dealer Admin</option>
-                  <option value="SALES_MANAGER">Sales Manager</option>
-                  <option value="SALES_AGENT">Sales Agent</option>
-                  <option value="BUYER">Retail Buyer</option>
+                  <option value="ALL">{t('All Roles', 'كل الأدوار')}</option>
+                  <option value="PLATFORM_ADMIN">{t('Platform Admin', 'مشرف المنصة')}</option>
+                  <option value="OWNER">{t('Dealer Owner', 'مالك الوكالة')}</option>
+                  <option value="ADMIN">{t('Dealer Admin', 'مسؤول الوكالة')}</option>
+                  <option value="SALES_MANAGER">{t('Sales Manager', 'مدير المبيعات')}</option>
+                  <option value="SALES_AGENT">{t('Sales Agent', 'مندوب مبيعات')}</option>
+                  <option value="BUYER">{t('Retail Buyer', 'مشترٍ')}</option>
                 </select>
               </div>
             </div>
@@ -259,15 +294,15 @@ export default function AdminUsersPage() {
           {/* Users Table */}
           <div className="rounded-xl border border-surface-container-high/40 bg-surface-container-low overflow-hidden shadow-xl">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
+              <table className="w-full text-start text-xs font-mono">
                 <thead className="bg-surface-container-lowest border-b border-white/10 text-outline uppercase tracking-wider text-[11px]">
                   <tr>
-                    <th className="py-3 px-4">User Identity</th>
-                    <th className="py-3 px-4">Role Tier</th>
-                    <th className="py-3 px-4">Dealership Affiliation</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Created</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('User Identity', 'هوية المستخدم')}</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Role Tier', 'الدور')}</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Dealership Affiliation', 'الوكالة التابع لها')}</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Status', 'الحالة')}</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Created', 'تاريخ الإنشاء')}</th>
+                    <th scope="col" className="py-3 px-4 text-end">{t('Actions', 'الإجراءات')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -284,7 +319,7 @@ export default function AdminUsersPage() {
                             onClick={fetchUsers}
                             className="px-3 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
                           >
-                            Retry
+                            {t('Retry', 'إعادة المحاولة')}
                           </button>
                         </div>
                       </td>
@@ -292,13 +327,13 @@ export default function AdminUsersPage() {
                   ) : loading && users.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-outline">
-                        Loading users…
+                        {t('Loading users…', 'جارٍ تحميل المستخدمين…')}
                       </td>
                     </tr>
                   ) : users.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-outline">
-                        No platform users matching criteria.
+                        {t('No platform users matching criteria.', 'لا يوجد مستخدمون مطابقون.')}
                       </td>
                     </tr>
                   ) : (
@@ -314,16 +349,16 @@ export default function AdminUsersPage() {
                               {u.displayName}
                               {u.isPlatformAdmin && (
                                 <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/40 text-[10px] uppercase font-mono">
-                                  Admin
+                                  {t('Admin', 'مشرف')}
                                 </span>
                               )}
                               {isSelf(u) && (
                                 <span className="px-1.5 py-0.5 rounded bg-surface-container-high text-outline text-[10px] uppercase font-mono">
-                                  You
+                                  {t('You', 'أنت')}
                                 </span>
                               )}
                             </span>
-                            <span className="text-gray-400 text-xs">{u.email || 'No email registered'}</span>
+                            <span className="text-gray-400 text-xs">{u.email || t('No email registered', 'لا يوجد بريد مسجل')}</span>
                           </div>
                         </td>
 
@@ -335,7 +370,7 @@ export default function AdminUsersPage() {
                               {u.memberships.map((m) => m.role).join(', ')}
                             </span>
                           ) : u.isBuyer ? (
-                            <span className="text-gray-400">BUYER (Retail)</span>
+                            <span className="text-gray-400">{t('BUYER (Retail)', 'مشترٍ (تجزئة)')}</span>
                           ) : (
                             <span className="text-gray-600">—</span>
                           )}
@@ -373,7 +408,7 @@ export default function AdminUsersPage() {
                           {new Date(u.createdAt).toLocaleDateString('en-GB', { timeZone: 'Asia/Dubai' })}
                         </td>
 
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3 px-4 text-end">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -382,7 +417,7 @@ export default function AdminUsersPage() {
                             }}
                             className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
                           >
-                            Manage
+                            {t('Manage', 'إدارة')}
                           </button>
                         </td>
                       </tr>
@@ -393,7 +428,10 @@ export default function AdminUsersPage() {
             </div>
             <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-white/10 text-xs font-mono text-outline">
               <span>
-                {total} user{total === 1 ? '' : 's'} · page {totalPages === 0 ? 0 : page} of {totalPages}
+                {t(
+                  `${total} user${total === 1 ? '' : 's'} · page ${totalPages === 0 ? 0 : page} of ${totalPages}`,
+                  `${total} مستخدم · الصفحة ${totalPages === 0 ? 0 : page} من ${totalPages}`,
+                )}
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -402,8 +440,8 @@ export default function AdminUsersPage() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                  <span>Prev</span>
+                  <PrevIcon className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>{t('Prev', 'السابق')}</span>
                 </button>
                 <button
                   type="button"
@@ -411,8 +449,8 @@ export default function AdminUsersPage() {
                   onClick={() => setPage((p) => p + 1)}
                   className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <span>Next</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>{t('Next', 'التالي')}</span>
+                  <NextIcon className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -426,18 +464,19 @@ export default function AdminUsersPage() {
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Identity dossier"
+            aria-label={t('Identity dossier', 'ملف الهوية')}
+            dir={isRtl ? 'rtl' : 'ltr'}
             className="w-full max-w-md bg-[#121824] border-l border-white/10 h-full p-6 flex flex-col justify-between overflow-y-auto"
           >
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
                 <div className="flex items-center gap-2">
                   <Shield className="w-5 h-5 text-primary" />
-                  <h2 className="text-lg font-bold font-heading text-white">Identity Dossier</h2>
+                  <h2 className="text-lg font-bold font-heading text-white">{t('Identity Dossier', 'ملف الهوية')}</h2>
                 </div>
                 <button
                   type="button"
-                  aria-label="Close identity dossier"
+                  aria-label={t('Close identity dossier', 'إغلاق ملف الهوية')}
                   onClick={() => setSelectedUser(null)}
                   className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white"
                 >
@@ -448,13 +487,13 @@ export default function AdminUsersPage() {
               {/* Profile Details */}
               <div className="space-y-4 text-xs font-mono">
                 <div>
-                  <span className="text-gray-400 block uppercase tracking-wider text-[10px]">Display Name</span>
+                  <span className="text-gray-400 block uppercase tracking-wider text-[10px]">{t('Display Name', 'الاسم المعروض')}</span>
                   <span className="text-white text-sm font-sans font-bold">{selectedUser.displayName}</span>
                 </div>
 
                 <div>
-                  <span className="text-gray-400 block uppercase tracking-wider text-[10px]">Email Address</span>
-                  <span className="text-white">{selectedUser.email || 'N/A'}</span>
+                  <span className="text-gray-400 block uppercase tracking-wider text-[10px]">{t('Email Address', 'البريد الإلكتروني')}</span>
+                  <span className="text-white">{selectedUser.email || t('N/A', 'غير متوفر')}</span>
                 </div>
 
                 <div>
@@ -463,7 +502,7 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div>
-                  <span className="text-gray-400 block uppercase tracking-wider text-[10px]">Current Status</span>
+                  <span className="text-gray-400 block uppercase tracking-wider text-[10px]">{t('Current Status', 'الحالة الحالية')}</span>
                   <span
                     className={`inline-block mt-1 px-2.5 py-0.5 rounded text-xs font-bold ${
                       selectedUser.status === 'ACTIVE'
@@ -479,12 +518,12 @@ export default function AdminUsersPage() {
 
                 {selectedUser.memberships.length > 0 && (
                   <div className="pt-2">
-                    <span className="text-gray-400 block uppercase tracking-wider text-[10px] mb-2">Dealership Roles</span>
+                    <span className="text-gray-400 block uppercase tracking-wider text-[10px] mb-2">{t('Dealership Roles', 'أدوار الوكالة')}</span>
                     {selectedUser.memberships.map((m) => (
                       <div key={m.tenantId} className="p-3 rounded-lg bg-black/40 border border-white/5 space-y-1 mb-2">
                         <span className="text-white font-sans font-bold block">{m.tenantName}</span>
                         <div className="flex justify-between text-gray-400">
-                          <span>Role:</span>
+                          <span>{t('Role:', 'الدور:')}</span>
                           <span className="text-tertiary font-bold">{m.role}</span>
                         </div>
                       </div>
@@ -497,12 +536,24 @@ export default function AdminUsersPage() {
             {/* Action Buttons */}
             <div className="pt-6 border-t border-white/10 space-y-3">
               <span className="text-gray-400 block uppercase tracking-wider text-[10px] font-mono">
-                Administrative Mutations
+                {t('Administrative Mutations', 'الإجراءات الإدارية')}
               </span>
 
-              {isSelf(selectedUser) ? (
+              {currentAdminState !== 'ok' ? (
+                <p className="text-xs text-outline font-mono" role={currentAdminState === 'error' ? 'alert' : undefined}>
+                  {currentAdminState === 'loading'
+                    ? t('Confirming your administrator identity…', 'جارٍ التحقق من هويتك الإدارية…')
+                    : t(
+                        'Your administrator identity could not be confirmed, so account actions are hidden. Reload the page to retry.',
+                        'تعذر التحقق من هويتك الإدارية، لذا أُخفيت إجراءات الحساب. أعد تحميل الصفحة للمحاولة مجدداً.',
+                      )}
+                </p>
+              ) : isSelf(selectedUser) ? (
                 <p className="text-xs text-outline font-mono">
-                  This is your own account. Suspend, disable and session revocation are not offered for the signed-in administrator.
+                  {t(
+                    'This is your own account. Suspend, disable and session revocation are not offered for the signed-in administrator.',
+                    'هذا حسابك. لا تتوفر خيارات التعليق أو التعطيل أو إلغاء الجلسات للمشرف المسجّل دخوله.',
+                  )}
                 </p>
               ) : (
                 <>
@@ -514,7 +565,7 @@ export default function AdminUsersPage() {
                       className="w-full py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                     >
                       <ShieldAlert className="w-4 h-4" />
-                      <span>Suspend User Account</span>
+                      <span>{t('Suspend User Account', 'تعليق حساب المستخدم')}</span>
                     </button>
                   ) : (
                     <button
@@ -524,7 +575,7 @@ export default function AdminUsersPage() {
                       className="w-full py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                     >
                       <ShieldCheck className="w-4 h-4" />
-                      <span>Reactivate User Account</span>
+                      <span>{t('Reactivate User Account', 'إعادة تفعيل حساب المستخدم')}</span>
                     </button>
                   )}
 
@@ -535,7 +586,7 @@ export default function AdminUsersPage() {
                     className="w-full py-2.5 px-4 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Revoke Active Sessions</span>
+                    <span>{t('Revoke Active Sessions', 'إلغاء الجلسات النشطة')}</span>
                   </button>
 
                   {selectedUser.status !== 'DISABLED' && (
@@ -546,7 +597,7 @@ export default function AdminUsersPage() {
                       className="w-full py-2.5 px-4 rounded-xl bg-red-950/40 hover:bg-red-950/60 border border-red-500/30 text-red-400 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                     >
                       <UserX className="w-4 h-4" />
-                      <span>Disable Account (Soft Delete)</span>
+                      <span>{t('Disable Account (Soft Delete)', 'تعطيل الحساب (حذف مبدئي)')}</span>
                     </button>
                   )}
                 </>
@@ -558,20 +609,31 @@ export default function AdminUsersPage() {
 
       <ConfirmReasonModal
         open={pendingAction !== null}
-        title={pendingAction ? ACTION_COPY[pendingAction.kind].title : ''}
+        title={pendingAction ? t(ACTION_COPY[pendingAction.kind].title, ACTION_COPY[pendingAction.kind].titleAr) : ''}
         description={
           pendingAction
             ? pendingAction.kind === 'REVOKE'
-              ? `${pendingAction.user.displayName} will be signed out of every device immediately.`
-              : `${pendingAction.user.displayName} will be set to ${pendingAction.kind}.`
+              ? t(
+                  `${pendingAction.user.displayName} will be signed out of every device immediately.`,
+                  `سيتم تسجيل خروج ${pendingAction.user.displayName} من جميع الأجهزة فوراً.`,
+                )
+              : t(
+                  `${pendingAction.user.displayName} will be set to ${pendingAction.kind}.`,
+                  `سيتم تعيين ${pendingAction.user.displayName} إلى ${pendingAction.kind}.`,
+                )
             : ''
         }
         note={
           pendingAction?.kind === 'REVOKE'
-            ? 'The API audit-logs session revocation but does not yet store the reason text.'
+            ? t(
+                'The API audit-logs session revocation but does not yet store the reason text.',
+                'تسجّل الواجهة إلغاء الجلسات في سجل التدقيق لكنها لا تحفظ نص السبب بعد.',
+              )
             : undefined
         }
-        confirmLabel={pendingAction ? ACTION_COPY[pendingAction.kind].confirm : 'Confirm'}
+        confirmLabel={
+          pendingAction ? t(ACTION_COPY[pendingAction.kind].confirm, ACTION_COPY[pendingAction.kind].confirmAr) : t('Confirm', 'تأكيد')
+        }
         tone={pendingAction?.kind === 'ACTIVE' ? 'neutral' : pendingAction?.kind === 'SUSPENDED' ? 'warning' : 'danger'}
         busy={actionLoading}
         error={actionError}

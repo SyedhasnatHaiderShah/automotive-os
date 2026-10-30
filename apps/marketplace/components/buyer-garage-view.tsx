@@ -57,6 +57,8 @@ function GarageBody({ initialAppointments }: { initialAppointments: BuyerAppoint
   const [rescheduleId, setRescheduleId] = useState<string | null>(null);
   const [rescheduleValue, setRescheduleValue] = useState('');
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+  // Appointment ids whose thumbnail failed to load; they fall back to the car icon (MK-10).
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(() => new Set());
 
   const handleAuthError = (err: unknown) => {
     if (err instanceof BuyerAuthRequiredError) {
@@ -158,9 +160,14 @@ function GarageBody({ initialAppointments }: { initialAppointments: BuyerAppoint
                 <AccountCard className="flex flex-col gap-4 h-full">
                   <div className="flex gap-4">
                     <div className="w-28 h-20 rounded-lg bg-[#0a0e13] overflow-hidden shrink-0 flex items-center justify-center">
-                      {appt.listing?.imageUrl ? (
+                      {appt.listing?.imageUrl && !brokenImages.has(appt.id) ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={appt.listing.imageUrl} alt={appt.listing.title} className="w-full h-full object-cover" />
+                        <img
+                          src={appt.listing.imageUrl}
+                          alt={appt.listing.title}
+                          className="w-full h-full object-cover"
+                          onError={() => setBrokenImages((prev) => new Set(prev).add(appt.id))}
+                        />
                       ) : (
                         <Car className="w-8 h-8 text-[#4d4635]" aria-hidden="true" />
                       )}

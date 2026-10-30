@@ -34,7 +34,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
   year,
   mileageKm,
   condition,
-  gccSpec = true,
+  gccSpec = false,
   emirate,
   seller,
   mediaUrl,

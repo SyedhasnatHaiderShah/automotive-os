@@ -18,7 +18,11 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { AdminService, AuditLogListResponse } from "./admin.service";
+import {
+  AdminService,
+  AdminTenantCountsResponse,
+  AuditLogListResponse,
+} from "./admin.service";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { PlatformAdminGuard } from "../common/guards/platform-admin.guard";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
@@ -79,6 +83,17 @@ export class AdminController {
     @Body() dto: AdminInviteDealerStaffDto,
   ) {
     return this.adminService.inviteDealerStaff(tenantId, dto, adminUserId);
+  }
+
+  // Declared before "tenants/:id" so "summary" is not captured as an id.
+  @Get("tenants/summary")
+  @ApiOperation({
+    summary:
+      "Dealership counts by operational status and KYB verification status (Platform Admin Only)",
+  })
+  @ApiResponse({ status: 200 })
+  async getTenantCounts(): Promise<AdminTenantCountsResponse> {
+    return this.adminService.getTenantCounts();
   }
 
   @Get("tenants/:id")

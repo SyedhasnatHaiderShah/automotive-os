@@ -16,8 +16,17 @@ import {
   fetchFavorites,
   addFavoriteApi,
   removeFavoriteApi,
+  createSavedSearchApi,
 } from '../../lib/api';
 import { BuyerAuthRequiredError } from '../../lib/buyer-api-client';
+
+/** The top slider position means "no price cap", so higher-priced stock is never hidden by default. */
+const PRICE_ANY_AED = 3000000;
+
+function formatMaxPrice(aed: number, isArabic: boolean): string {
+  if (aed >= PRICE_ANY_AED) return isArabic ? 'أي سعر' : 'Any price';
+  return `AED ${aed.toLocaleString('en-US')}`;
+}
 
 export default function SearchResultsPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -27,8 +36,8 @@ export default function SearchResultsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedMake, setSelectedMake] = useState('ALL');
   const [selectedCondition, setSelectedCondition] = useState('ALL');
-  const [gccOnly, setGccOnly] = useState(true);
-  const [maxPriceAed, setMaxPriceAed] = useState<number>(2000000);
+  const [gccOnly, setGccOnly] = useState(false);
+  const [maxPriceAed, setMaxPriceAed] = useState<number>(PRICE_ANY_AED);
   const [sortBy, setSortBy] = useState<'recent' | 'price-asc' | 'price-desc'>('recent');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -53,8 +62,9 @@ export default function SearchResultsPage() {
       setSelectedEmirate(params.get('emirate') || 'All Emirates');
       setSelectedCondition(params.get('condition') || 'ALL');
       setSelectedMake(params.get('make') || 'ALL');
-      setGccOnly(params.get('gcc') !== 'false');
-      setMaxPriceAed(Number(params.get('maxPrice')) > 0 ? Number(params.get('maxPrice')) : 2000000);
+      setGccOnly(params.get('gcc') === 'true');
+      const urlMaxPrice = Number(params.get('maxPrice'));
+      setMaxPriceAed(urlMaxPrice > 0 && urlMaxPrice < PRICE_ANY_AED ? urlMaxPrice : PRICE_ANY_AED);
       const sort = params.get('sort');
       setSortBy(sort === 'price-asc' || sort === 'price-desc' ? sort : 'recent');
       setPage(Math.max(1, Number(params.get('page')) || 1));
@@ -77,8 +87,8 @@ export default function SearchResultsPage() {
     if (selectedEmirate !== 'All Emirates') params.set('emirate', selectedEmirate);
     if (selectedCondition !== 'ALL') params.set('condition', selectedCondition);
     if (selectedMake !== 'ALL') params.set('make', selectedMake);
-    if (!gccOnly) params.set('gcc', 'false');
-    if (maxPriceAed !== 2000000) params.set('maxPrice', String(maxPriceAed));
+    if (gccOnly) params.set('gcc', 'true');
+    if (maxPriceAed < PRICE_ANY_AED) params.set('maxPrice', String(maxPriceAed));
     if (sortBy !== 'recent') params.set('sort', sortBy);
     if (page > 1) params.set('page', String(page));
     const query = params.toString();
@@ -97,7 +107,7 @@ export default function SearchResultsPage() {
       make: selectedMake !== 'ALL' ? selectedMake : undefined,
       condition: selectedCondition !== 'ALL' ? selectedCondition : undefined,
       gccSpec: gccOnly ? true : undefined,
-      maxPriceFils: maxPriceAed * 100,
+      maxPriceFils: maxPriceAed < PRICE_ANY_AED ? maxPriceAed * 100 : undefined,
       sort: sortBy,
       page,
       limit: PAGE_SIZE,
@@ -168,13 +178,47 @@ export default function SearchResultsPage() {
     }
   };
 
+  const [savingSearch, setSavingSearch] = useState(false);
+  const [saveSearchNotice, setSaveSearchNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+
+  // Stores the current filters as a buyer saved search (MK-17); alerts stay off.
+  const handleSaveSearch = async () => {
+    const filterJson: Record<string, unknown> = {};
+    const nameParts: string[] = [];
+    const q = debouncedQuery.trim();
+    if (q) { filterJson.q = q; nameParts.push(`"${q}"`); }
+    if (selectedMake !== 'ALL') { filterJson.make = selectedMake; nameParts.push(selectedMake); }
+    if (selectedCondition !== 'ALL') { filterJson.condition = selectedCondition; nameParts.push(selectedCondition === 'NEW' ? 'New' : 'Used'); }
+    if (selectedEmirate !== 'All Emirates') { filterJson.emirate = selectedEmirate; nameParts.push(selectedEmirate); }
+    if (gccOnly) { filterJson.gccSpec = true; nameParts.push('GCC spec'); }
+    if (maxPriceAed < PRICE_ANY_AED) { filterJson.maxPriceFils = maxPriceAed * 100; nameParts.push(`Up to AED ${maxPriceAed.toLocaleString('en-US')}`); }
+    if (sortBy !== 'recent') filterJson.sort = sortBy;
+    const name = nameParts.length > 0 ? nameParts.join(' · ') : 'All vehicles';
+
+    setSavingSearch(true);
+    setSaveSearchNotice(null);
+    try {
+      await createSavedSearchApi({ name, filterJson });
+      setSaveSearchNotice({ kind: 'ok', text: isArabic ? 'تم حفظ البحث في حسابك.' : 'Search saved to your account.' });
+    } catch (err) {
+      if (err instanceof BuyerAuthRequiredError) {
+        const back = window.location.pathname + window.location.search;
+        window.location.href = `/auth?tab=login&redirect=${encodeURIComponent(back)}`;
+        return;
+      }
+      setSaveSearchNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Could not save this search.' });
+    } finally {
+      setSavingSearch(false);
+    }
+  };
+
   const handleResetFilters = () => {
     setSelectedEmirate('All Emirates');
     setSearchQuery('');
     setSelectedMake('ALL');
     setSelectedCondition('ALL');
-    setGccOnly(true);
-    setMaxPriceAed(2000000);
+    setGccOnly(false);
+    setMaxPriceAed(PRICE_ANY_AED);
     setSortBy('recent');
     setPage(1);
   };
@@ -191,6 +235,8 @@ export default function SearchResultsPage() {
   };
 
   const filteredVehicles = vehicles;
+  const chipButtonClass = 'rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary';
+  const removeFilterLabel = isArabic ? 'إزالة الفلتر' : 'Remove filter';
 
   const makesList = ['ALL', 'Porsche', 'Toyota', 'Mercedes-AMG', 'Land Rover', 'Ferrari'];
   const emiratesList = ['All Emirates', 'Dubai', 'Abu Dhabi', 'Sharjah'];
@@ -241,19 +287,32 @@ export default function SearchResultsPage() {
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(true)}
+                aria-expanded={mobileFiltersOpen}
                 className="lg:hidden flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container border border-outline-variant/30 text-xs font-semibold text-on-surface hover:border-primary/50"
               >
-                <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
                 <span>{isArabic ? 'تصفية وتحديد' : 'Filters & Refine'}</span>
               </button>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-label-caps uppercase hidden sm:inline-block">
+                <button
+                  type="button"
+                  onClick={handleSaveSearch}
+                  disabled={savingSearch}
+                  className="h-10 px-3 rounded-lg bg-surface-container border border-outline-variant/30 text-xs font-semibold text-on-surface hover:border-primary/50 disabled:opacity-50"
+                >
+                  {savingSearch
+                    ? (isArabic ? 'جارٍ الحفظ…' : 'Saving…')
+                    : (isArabic ? 'حفظ هذا البحث' : 'Save this search')}
+                </button>
+                <label htmlFor="cars-sort" className="text-xs text-outline font-label-caps uppercase hidden sm:inline-block">
                   {isArabic ? 'الترتيب:' : 'Sort:'}
-                </span>
+                </label>
                 <select
+                  id="cars-sort"
+                  aria-label={isArabic ? 'الترتيب' : 'Sort results'}
                   value={sortBy}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => { setSortBy(e.target.value as 'recent' | 'price-asc' | 'price-desc'); setPage(1); }}
                   className="h-10 px-3 rounded-lg bg-surface-container border border-outline-variant/30 text-xs text-on-surface focus:outline-none focus:border-primary cursor-pointer"
@@ -292,10 +351,11 @@ export default function SearchResultsPage() {
               <div className="flex flex-col gap-6">
                 {/* Search Keyword */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-label-caps uppercase text-outline">
+                  <label htmlFor="cars-keywords" className="text-xs font-label-caps uppercase text-outline">
                     {isArabic ? 'البحث بالنص' : 'Keywords'}
                   </label>
                   <input
+                    id="cars-keywords"
                     type="text"
                     value={searchQuery}
                     onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
@@ -306,15 +366,16 @@ export default function SearchResultsPage() {
 
                 {/* Make Selector */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-label-caps uppercase text-outline">
+                  <span id="cars-make-label" className="text-xs font-label-caps uppercase text-outline">
                     {isArabic ? 'الماركة المصنعة' : 'Make'}
-                  </label>
-                  <div className="flex flex-wrap gap-1.5">
+                  </span>
+                  <div role="group" aria-labelledby="cars-make-label" className="flex flex-wrap gap-1.5">
                     {makesList.map((m) => (
                       <button
                         key={m}
                         type="button"
                         onClick={() => { setSelectedMake(m); setPage(1); }}
+                        aria-pressed={selectedMake === m}
                         className={`px-2.5 py-1 rounded text-xs transition-colors ${
                           selectedMake === m
                             ? 'bg-primary text-on-primary font-bold'
@@ -329,10 +390,11 @@ export default function SearchResultsPage() {
 
                 {/* Emirate Filter */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-label-caps uppercase text-outline">
+                  <label htmlFor="cars-emirate" className="text-xs font-label-caps uppercase text-outline">
                     {isArabic ? 'الإمارة' : 'UAE Emirate'}
                   </label>
                   <select
+                    id="cars-emirate"
                     value={selectedEmirate}
                     onChange={(e) => { setSelectedEmirate(e.target.value); setPage(1); }}
                     className="w-full h-9 px-3 rounded bg-surface-container-low border border-outline-variant/30 text-xs text-on-surface focus:outline-none focus:border-primary cursor-pointer"
@@ -347,10 +409,10 @@ export default function SearchResultsPage() {
 
                 {/* Condition Filter */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-label-caps uppercase text-outline">
+                  <span id="cars-condition-label" className="text-xs font-label-caps uppercase text-outline">
                     {isArabic ? 'حالة المركبة' : 'Condition'}
-                  </label>
-                  <div className="flex items-center gap-2">
+                  </span>
+                  <div role="group" aria-labelledby="cars-condition-label" className="flex items-center gap-2">
                     {[
                       { key: 'ALL', label: isArabic ? 'الكل' : 'All' },
                       { key: 'NEW', label: isArabic ? 'جديدة' : 'New' },
@@ -360,6 +422,7 @@ export default function SearchResultsPage() {
                         key={cond.key}
                         type="button"
                         onClick={() => { setSelectedCondition(cond.key); setPage(1); }}
+                        aria-pressed={selectedCondition === cond.key}
                         className={`flex-1 py-1 rounded text-xs text-center transition-colors ${
                           selectedCondition === cond.key
                             ? 'bg-primary text-on-primary font-bold'
@@ -375,14 +438,15 @@ export default function SearchResultsPage() {
                 {/* GCC Spec Toggle */}
                 <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20">
                   <div className="flex flex-col">
-                    <span className="text-xs font-medium text-on-surface">
+                    <label htmlFor="cars-gcc-only" className="text-xs font-medium text-on-surface cursor-pointer">
                       {isArabic ? 'مواصفات خليجية فقط' : 'GCC Spec Only'}
-                    </span>
+                    </label>
                     <span className="text-[10px] text-outline">
                       {isArabic ? 'استبعاد الوارد غير المطابق' : 'Verified UAE specification'}
                     </span>
                   </div>
                   <input
+                    id="cars-gcc-only"
                     type="checkbox"
                     checked={gccOnly}
                     onChange={(e) => { setGccOnly(e.target.checked); setPage(1); }}
@@ -393,17 +457,19 @@ export default function SearchResultsPage() {
                 {/* Max Price Slider */}
                 <div className="flex flex-col gap-2 pt-2 border-t border-outline-variant/20">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-label-caps uppercase text-outline">
+                    <label htmlFor="cars-max-price" className="text-xs font-label-caps uppercase text-outline">
                       {isArabic ? 'أقصى سعر (درهم)' : 'Max Price (AED)'}
                     </label>
                     <span className="font-data-mono-num text-xs font-semibold text-primary">
-                      AED {maxPriceAed.toLocaleString('en-US')}
+                      {formatMaxPrice(maxPriceAed, isArabic)}
                     </span>
                   </div>
                   <input
+                    id="cars-max-price"
+                    aria-valuetext={formatMaxPrice(maxPriceAed, isArabic)}
                     type="range"
                     min={100000}
-                    max={3000000}
+                    max={PRICE_ANY_AED}
                     step={50000}
                     value={maxPriceAed}
                     onChange={(e) => { setMaxPriceAed(Number(e.target.value)); setPage(1); }}
@@ -415,32 +481,66 @@ export default function SearchResultsPage() {
 
             {/* Results Grid Column */}
             <div className="lg:col-span-9 flex flex-col gap-6">
-              {/* Active Filter Chips */}
+              {/* Active Filter Chips: real buttons so they are keyboard-operable (MK-19) */}
               <div className="flex flex-wrap items-center gap-2">
                 {selectedEmirate !== 'All Emirates' && (
-                  <Badge variant="outline" className="gap-1 cursor-pointer" onClick={() => { setSelectedEmirate('All Emirates'); setPage(1); }}>
-                    <span>{selectedEmirate}</span>
-                    <span className="text-outline">×</span>
-                  </Badge>
+                  <button type="button" className={chipButtonClass} aria-label={`${removeFilterLabel}: ${selectedEmirate}`} onClick={() => { setSelectedEmirate('All Emirates'); setPage(1); }}>
+                    <Badge variant="outline" className="gap-1 cursor-pointer">
+                      <span>{selectedEmirate}</span>
+                      <span className="text-outline" aria-hidden="true">×</span>
+                    </Badge>
+                  </button>
                 )}
                 {selectedMake !== 'ALL' && (
-                  <Badge variant="gold" className="gap-1 cursor-pointer" onClick={() => { setSelectedMake('ALL'); setPage(1); }}>
-                    <span>{selectedMake}</span>
-                    <span className="text-on-primary">×</span>
-                  </Badge>
+                  <button type="button" className={chipButtonClass} aria-label={`${removeFilterLabel}: ${selectedMake}`} onClick={() => { setSelectedMake('ALL'); setPage(1); }}>
+                    <Badge variant="gold" className="gap-1 cursor-pointer">
+                      <span>{selectedMake}</span>
+                      <span className="text-on-primary" aria-hidden="true">×</span>
+                    </Badge>
+                  </button>
                 )}
                 {selectedCondition !== 'ALL' && (
-                  <Badge variant="condition" className="gap-1 cursor-pointer" onClick={() => { setSelectedCondition('ALL'); setPage(1); }}>
-                    <span>{selectedCondition}</span>
-                    <span className="text-outline">×</span>
-                  </Badge>
+                  <button type="button" className={chipButtonClass} aria-label={`${removeFilterLabel}: ${selectedCondition}`} onClick={() => { setSelectedCondition('ALL'); setPage(1); }}>
+                    <Badge variant="condition" className="gap-1 cursor-pointer">
+                      <span>{selectedCondition}</span>
+                      <span className="text-outline" aria-hidden="true">×</span>
+                    </Badge>
+                  </button>
                 )}
                 {gccOnly && (
-                  <Badge variant="gcc">
-                    <span>GCC SPEC</span>
-                  </Badge>
+                  <button type="button" className={chipButtonClass} aria-label={`${removeFilterLabel}: ${isArabic ? 'مواصفات خليجية' : 'GCC spec'}`} onClick={() => { setGccOnly(false); setPage(1); }}>
+                    <Badge variant="gcc" className="gap-1 cursor-pointer">
+                      <span>{isArabic ? 'مواصفات خليجية' : 'GCC SPEC'}</span>
+                      <span aria-hidden="true">×</span>
+                    </Badge>
+                  </button>
+                )}
+                {maxPriceAed < PRICE_ANY_AED && (
+                  <button type="button" className={chipButtonClass} aria-label={`${removeFilterLabel}: ${formatMaxPrice(maxPriceAed, isArabic)}`} onClick={() => { setMaxPriceAed(PRICE_ANY_AED); setPage(1); }}>
+                    <Badge variant="outline" className="gap-1 cursor-pointer">
+                      <span>{isArabic ? 'حتى' : 'Up to'} {formatMaxPrice(maxPriceAed, isArabic)}</span>
+                      <span className="text-outline" aria-hidden="true">×</span>
+                    </Badge>
+                  </button>
                 )}
               </div>
+
+              {saveSearchNotice && (
+                <p
+                  role={saveSearchNotice.kind === 'error' ? 'alert' : 'status'}
+                  className={`text-sm ${saveSearchNotice.kind === 'error' ? 'text-error' : 'text-tertiary'}`}
+                >
+                  {saveSearchNotice.text}
+                  {saveSearchNotice.kind === 'ok' && (
+                    <>
+                      {' '}
+                      <a href="/account/saved" className="underline">
+                        {isArabic ? 'عرض عمليات البحث المحفوظة' : 'View saved searches'}
+                      </a>
+                    </>
+                  )}
+                </p>
+              )}
 
               {favoriteError && (
                 <p role="alert" className="mb-4 text-sm text-error">
@@ -507,7 +607,7 @@ export default function SearchResultsPage() {
 
         {/* Mobile Filter Overlay Drawer (Screen 28fac34d59ea40ed8e273e74e7dbe2a0) */}
         {mobileFiltersOpen && (
-          <div className="fixed inset-0 z-50 flex lg:hidden bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div role="dialog" aria-modal="true" aria-label={isArabic ? 'تصفية السيارات' : 'Filters & Sort'} className="fixed inset-0 z-50 flex lg:hidden bg-black/80 backdrop-blur-sm animate-fade-in">
             <div className="w-full max-w-sm h-full bg-surface-container p-6 overflow-y-auto flex flex-col justify-between shadow-2xl ml-auto border-l border-outline-variant/40">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between pb-4 border-b border-outline-variant/30">
@@ -518,18 +618,19 @@ export default function SearchResultsPage() {
                     type="button"
                     onClick={() => setMobileFiltersOpen(false)}
                     className="p-1 rounded-full text-outline hover:text-on-surface"
-                    aria-label="Close filters"
+                    aria-label={isArabic ? 'إغلاق الفلاتر' : 'Close filters'}
                   >
-                    ✕
+                    <span aria-hidden="true">✕</span>
                   </button>
                 </div>
 
                 {/* Make */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-label-caps uppercase text-outline">
+                  <label htmlFor="cars-mobile-make" className="text-xs font-label-caps uppercase text-outline">
                     {isArabic ? 'الماركة' : 'Make'}
                   </label>
                   <select
+                    id="cars-mobile-make"
                     value={selectedMake}
                     onChange={(e) => { setSelectedMake(e.target.value); setPage(1); }}
                     className="w-full h-10 px-3 rounded bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface"
@@ -544,10 +645,11 @@ export default function SearchResultsPage() {
 
                 {/* Emirate */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-label-caps uppercase text-outline">
+                  <label htmlFor="cars-mobile-emirate" className="text-xs font-label-caps uppercase text-outline">
                     {isArabic ? 'الإمارة' : 'Emirate'}
                   </label>
                   <select
+                    id="cars-mobile-emirate"
                     value={selectedEmirate}
                     onChange={(e) => { setSelectedEmirate(e.target.value); setPage(1); }}
                     className="w-full h-10 px-3 rounded bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface"
@@ -563,13 +665,17 @@ export default function SearchResultsPage() {
                 {/* Max Price */}
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between text-xs">
-                    <span className="text-outline uppercase font-label-caps">Max Price</span>
-                    <span className="text-primary font-bold">AED {maxPriceAed.toLocaleString('en-US')}</span>
+                    <label htmlFor="cars-mobile-max-price" className="text-outline uppercase font-label-caps">
+                      {isArabic ? 'أقصى سعر' : 'Max Price'}
+                    </label>
+                    <span className="text-primary font-bold">{formatMaxPrice(maxPriceAed, isArabic)}</span>
                   </div>
                   <input
+                    id="cars-mobile-max-price"
+                    aria-valuetext={formatMaxPrice(maxPriceAed, isArabic)}
                     type="range"
                     min={100000}
-                    max={3000000}
+                    max={PRICE_ANY_AED}
                     step={50000}
                     value={maxPriceAed}
                     onChange={(e) => { setMaxPriceAed(Number(e.target.value)); setPage(1); }}

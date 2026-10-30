@@ -33,9 +33,13 @@ function filterChips(filter: Record<string, unknown>): string[] {
 /** Builds a /cars URL from known filter keys so a saved search can be re-run. */
 function searchHref(filter: Record<string, unknown>): string {
   const params = new URLSearchParams();
-  for (const key of ['make', 'model', 'emirate', 'q', 'condition']) {
+  for (const key of ['make', 'model', 'emirate', 'q', 'condition', 'sort']) {
     const v = filter[key];
     if (typeof v === 'string' && v) params.set(key, v);
+  }
+  if (filter.gccSpec === true) params.set('gcc', 'true');
+  if (typeof filter.maxPriceFils === 'number' && filter.maxPriceFils > 0) {
+    params.set('maxPrice', String(Math.round(filter.maxPriceFils / 100)));
   }
   const qs = params.toString();
   return qs ? `/cars?${qs}` : '/cars';
@@ -171,10 +175,19 @@ function SavedBody({ initialSearches, initialFavorites }: Omit<BuyerSavedViewPro
           <span className="text-sm font-mono text-[#99907c]">({searches.length})</span>
         </h2>
         {searches.length === 0 ? (
-          <AccountCard className="text-center py-10">
+          <AccountCard className="text-center py-10 flex flex-col items-center gap-4">
             <p className="text-sm text-[#d0c5af]">
-              {isArabic ? 'لا توجد عمليات بحث محفوظة.' : 'No saved searches yet.'}
+              {isArabic
+                ? 'لا توجد عمليات بحث محفوظة. اختر الفلاتر في صفحة البحث ثم اضغط "حفظ هذا البحث".'
+                : 'No saved searches yet. Set your filters on the vehicle search page, then choose "Save this search".'}
             </p>
+            <Link
+              href="/cars"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#181c21] border border-[#31353b] text-[#e0e2ea] text-xs font-semibold hover:border-[#f2ca50] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f2ca50]"
+            >
+              <Search className="w-3.5 h-3.5" aria-hidden="true" />
+              {isArabic ? 'ابحث عن سيارات' : 'Search vehicles'}
+            </Link>
           </AccountCard>
         ) : (
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -17,6 +17,7 @@ import {
   X,
   Sparkles,
 } from 'lucide-react';
+import { EMAIL_DELIVERY_AVAILABLE, apiErrorMessage } from '../../lib/email-delivery';
 
 export default function UnifiedAuthPage() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function UnifiedAuthPage() {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
+  // Login was refused because the email is unverified; show a path to verify/resend (MK-12).
+  const [loginNeedsVerification, setLoginNeedsVerification] = useState(false);
 
   // Register Form State
   const [regName, setRegName] = useState('');
@@ -65,6 +68,7 @@ export default function UnifiedAuthPage() {
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
+    setLoginNeedsVerification(false);
     if (!loginEmail || !loginPassword) {
       setLoginError(isArabic ? 'يرجى إدخال البريد الإلكتروني وكلمة المرور' : 'Please provide both email and master password');
       return;
@@ -85,10 +89,19 @@ export default function UnifiedAuthPage() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data?.message || data?.error?.message || 'Authentication failed. Please check your credentials.');
+        const apiMessage = apiErrorMessage(data, 'Authentication failed. Please check your credentials.');
+        if (data?.error?.code === 'EMAIL_NOT_VERIFIED' || apiMessage.startsWith('EMAIL_NOT_VERIFIED')) {
+          setLoginNeedsVerification(true);
+          throw new Error(
+            isArabic
+              ? 'لم يتم التحقق من بريدك الإلكتروني بعد. افتح رابط التحقق أو اطلب رابطاً جديداً قبل تسجيل الدخول.'
+              : 'Your email address is not verified yet. Open your verification link or request a new one before signing in.'
+          );
+        }
+        throw new Error(apiMessage);
       }
 
       // The API sets the httpOnly `ao_session` cookie; the JWT is never persisted in
@@ -154,16 +167,20 @@ export default function UnifiedAuthPage() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data?.message || data?.error?.message || 'Registration failed. An account may already exist with this email.');
+        throw new Error(apiErrorMessage(data, 'Registration failed. An account may already exist with this email.'));
       }
 
       setRegSuccessMessage(
-        isArabic
-          ? 'تم إنشاء الحساب بنجاح! يرجى فتح رابط التحقق المرسل إلى بريدك الإلكتروني لتفعيل الحساب.'
-          : 'Account registered successfully! Please check your email to verify your account before logging in.'
+        EMAIL_DELIVERY_AVAILABLE
+          ? isArabic
+            ? 'تم إنشاء الحساب. يرجى فتح رابط التحقق المرسل إلى بريدك الإلكتروني لتفعيل الحساب.'
+            : 'Account created. Please open the verification link sent to your email before logging in.'
+          : isArabic
+            ? 'تم إنشاء الحساب، لكن رسائل التحقق عبر البريد الإلكتروني غير مفعّلة بعد. لا يمكن تفعيل الحساب حتى يتم تفعيل خدمة البريد أو يقوم فريق الدعم بتفعيله.'
+            : 'Account created, but verification emails are not being sent yet. Your account cannot be activated until email delivery is connected or support activates it.'
       );
 
       setTimeout(() => {
@@ -278,19 +295,31 @@ export default function UnifiedAuthPage() {
                 </div>
 
                 {loginError && (
-                  <div className="mb-6 p-4 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-sm flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <span>{loginError}</span>
+                  <div role="alert" className="mb-6 p-4 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-sm flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <span>
+                      {loginError}
+                      {loginNeedsVerification && (
+                        <>
+                          {' '}
+                          <Link href="/auth/verify-email" className="text-[#d4af37] underline">
+                            {isArabic ? 'التحقق من البريد أو إعادة الإرسال' : 'Verify email or resend link'}
+                          </Link>
+                        </>
+                      )}
+                    </span>
                   </div>
                 )}
 
                 <form onSubmit={handleLoginSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
+                    <label htmlFor="login-email" className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
                       {isArabic ? 'البريد الإلكتروني' : 'Email Address'}
                     </label>
                     <input
+                      id="login-email"
                       type="email"
+                      autoComplete="email"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       placeholder="user@autonexa.ae"
@@ -301,7 +330,7 @@ export default function UnifiedAuthPage() {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="block text-xs uppercase tracking-wider text-gray-400 font-mono">
+                      <label htmlFor="login-password" className="block text-xs uppercase tracking-wider text-gray-400 font-mono">
                         {isArabic ? 'كلمة المرور' : 'Master Passcode'}
                       </label>
                       <Link
@@ -313,6 +342,8 @@ export default function UnifiedAuthPage() {
                     </div>
                     <div className="relative">
                       <input
+                        id="login-password"
+                        autoComplete="current-password"
                         type={showLoginPassword ? 'text' : 'password'}
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
@@ -324,6 +355,8 @@ export default function UnifiedAuthPage() {
                         type="button"
                         onClick={() => setShowLoginPassword(!showLoginPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                        aria-label={showLoginPassword ? (isArabic ? 'إخفاء كلمة المرور' : 'Hide password') : (isArabic ? 'إظهار كلمة المرور' : 'Show password')}
+                        aria-pressed={showLoginPassword}
                       >
                         {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -389,7 +422,7 @@ export default function UnifiedAuthPage() {
                 </div>
 
                 {regError && (
-                  <div className="mb-6 p-4 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-sm flex items-start gap-3">
+                  <div role="alert" className="mb-6 p-4 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-sm flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                     <span>{regError}</span>
                   </div>
@@ -404,10 +437,12 @@ export default function UnifiedAuthPage() {
 
                 <form onSubmit={handleRegisterSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
+                    <label htmlFor="register-name" className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
                       {isArabic ? 'الاسم الكامل أو اسم الجهة' : 'Full Name / Primary Contact'} *
                     </label>
                     <input
+                      id="register-name"
+                      autoComplete="name"
                       type="text"
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
@@ -418,10 +453,12 @@ export default function UnifiedAuthPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
+                    <label htmlFor="register-email" className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
                       {isArabic ? 'البريد الإلكتروني' : 'Email Address'} *
                     </label>
                     <input
+                      id="register-email"
+                      autoComplete="email"
                       type="email"
                       value={regEmail}
                       onChange={(e) => setRegEmail(e.target.value)}
@@ -433,10 +470,12 @@ export default function UnifiedAuthPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
+                      <label htmlFor="register-phone" className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
                         {isArabic ? 'رقم الهاتف (اختياري)' : 'UAE Mobile (Optional)'}
                       </label>
                       <input
+                        id="register-phone"
+                        autoComplete="tel"
                         type="tel"
                         value={regPhone}
                         onChange={(e) => setRegPhone(e.target.value)}
@@ -445,10 +484,11 @@ export default function UnifiedAuthPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
+                      <label htmlFor="register-emirate" className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
                         {isArabic ? 'الإمارة' : 'Primary Emirate'}
                       </label>
                       <select
+                        id="register-emirate"
                         value={regEmirate}
                         onChange={(e) => setRegEmirate(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] text-white text-sm outline-none transition-all"
@@ -465,11 +505,13 @@ export default function UnifiedAuthPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
+                    <label htmlFor="register-password" className="block text-xs uppercase tracking-wider text-gray-400 font-mono mb-2">
                       {isArabic ? 'كلمة المرور' : 'Create Master Password'} *
                     </label>
                     <div className="relative">
                       <input
+                        id="register-password"
+                        autoComplete="new-password"
                         type={showRegPassword ? 'text' : 'password'}
                         value={regPassword}
                         onChange={(e) => setRegPassword(e.target.value)}
@@ -481,6 +523,8 @@ export default function UnifiedAuthPage() {
                         type="button"
                         onClick={() => setShowRegPassword(!showRegPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                        aria-label={showRegPassword ? (isArabic ? 'إخفاء كلمة المرور' : 'Hide password') : (isArabic ? 'إظهار كلمة المرور' : 'Show password')}
+                        aria-pressed={showRegPassword}
                       >
                         {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>

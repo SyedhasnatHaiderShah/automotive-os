@@ -68,9 +68,10 @@ function ProfileBody({ initialProfile }: BuyerProfileViewProps) {
     try {
       await updateBuyerProfileApi({
         preferredLanguage: language,
-        preferredEmirate: emirate || undefined,
-        budgetMinFils: minAed !== undefined ? minAed * 100 : undefined,
-        budgetMaxFils: maxAed !== undefined ? maxAed * 100 : undefined,
+        // Cleared fields are sent as null so the API removes the stored value (MK-08).
+        preferredEmirate: emirate || null,
+        budgetMinFils: minAed !== undefined ? minAed * 100 : null,
+        budgetMaxFils: maxAed !== undefined ? maxAed * 100 : null,
         preferredMakes: makes
           .split(',')
           .map((m) => m.trim())

@@ -29,7 +29,19 @@ import { AdminTenantSummaryDto } from "./dto/admin-tenant-summary.dto";
 import { UpdateTenantStatusDto } from "./dto/update-tenant-status.dto";
 import { AdminUserFilterDto, AdminUpdateUserDto } from "./dto/admin-user.dto";
 import { AdminCreateDealerDto, AdminInviteDealerStaffDto } from "./dto/admin-dealer.dto";
-import { ListingStatus, MembershipRole, TenantStatus, UserStatus } from "@automotive-os/database";
+import {
+  ListingStatus,
+  MembershipRole,
+  TenantStatus,
+  UserStatus,
+  VerificationStatus,
+} from "@automotive-os/database";
+
+export interface AdminTenantCountsResponse {
+  total: number;
+  byStatus: Record<string, number>;
+  byVerificationStatus: Record<string, number>;
+}
 
 @Injectable()
 export class AdminService {
@@ -39,20 +51,12 @@ export class AdminService {
     private readonly outboxService: OutboxService,
   ) {}
 
+  // List reads are not audited (AD-10): they flooded the ledger on every page
+  // load. Single-record reads and all mutations remain audited.
   async listAllTenants(
-    adminUserId: string,
-    correlationId?: string,
+    _adminUserId: string,
+    _correlationId?: string,
   ): Promise<AdminTenantSummaryDto[]> {
-    await this.auditService.logAction({
-      tenantId: null,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_LIST_ALL_TENANTS",
-      targetType: "tenants",
-      targetId: "ALL",
-      correlationId: correlationId || null,
-      metadata: { reason: "cross_tenant_platform_inspection" },
-    });
-
     const tenants = await this.prisma.tenant.findMany({
       // SEC-17: bounded result set until the dealer directory is paginated.
       take: 500,
@@ -81,6 +85,45 @@ export class AdminService {
       vehicleCount: t._count.vehicles,
       createdAt: t.createdAt.toISOString(),
     }));
+  }
+
+  /**
+   * AD-09: exact dealership counts by operational and KYB status, computed
+   * with COUNT/GROUP BY so the overview is not derived from the 500-row list.
+   * Aggregate counts only (no per-tenant data), so no audit row is written.
+   */
+  async getTenantCounts(): Promise<AdminTenantCountsResponse> {
+    const [total, statusGroups, verificationGroups] = await Promise.all([
+      this.prisma.tenant.count(),
+      this.prisma.tenant.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      }),
+      this.prisma.dealerVerification.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      }),
+    ]);
+
+    const byStatus: Record<string, number> = {};
+    for (const s of Object.values(TenantStatus)) byStatus[s] = 0;
+    for (const g of statusGroups as Array<{ status: string; _count: { _all: number } }>) {
+      byStatus[g.status] = g._count._all;
+    }
+
+    const byVerificationStatus: Record<string, number> = {};
+    for (const s of Object.values(VerificationStatus)) byVerificationStatus[s] = 0;
+    let withVerificationRow = 0;
+    for (const g of verificationGroups as Array<{ status: string; _count: { _all: number } }>) {
+      byVerificationStatus[g.status] = g._count._all;
+      withVerificationRow += g._count._all;
+    }
+    // Tenants without a verification row are reported as NOT_SUBMITTED, the
+    // same convention used by listAllTenants/getTenantById.
+    byVerificationStatus[VerificationStatus.NOT_SUBMITTED] +=
+      Math.max(0, total - withVerificationRow);
+
+    return { total, byStatus, byVerificationStatus };
   }
 
   async getTenantById(
@@ -164,6 +207,14 @@ export class AdminService {
 
     const previousStatus = existing.status;
     const newStatus = dto.status;
+
+    // AD-04: server-side tenant lifecycle rules. The console only offers
+    // valid transitions, but the API is the authority.
+    this.assertTenantStatusTransition(
+      previousStatus,
+      newStatus,
+      existing.verification?.status ?? VerificationStatus.NOT_SUBMITTED,
+    );
 
     const updated = await this.prisma.$transaction(async (tx) => {
       const t = await tx.tenant.update({
@@ -270,19 +321,53 @@ export class AdminService {
     };
   }
 
+  /**
+   * Allowed tenant status transitions:
+   *  - CLOSED is terminal.
+   *  - No transition back to PENDING.
+   *  - PENDING -> ACTIVE requires an APPROVED KYB verification.
+   *  - SUSPENDED -> ACTIVE is a reactivation.
+   *  - ACTIVE/PENDING/SUSPENDED -> SUSPENDED/CLOSED as enforcement actions.
+   */
+  private assertTenantStatusTransition(
+    from: TenantStatus,
+    to: TenantStatus,
+    verificationStatus: VerificationStatus | string,
+  ): void {
+    if (from === to) {
+      throw new ConflictException(
+        `TENANT_STATUS_UNCHANGED: Dealership is already ${from}.`,
+      );
+    }
+    if (from === TenantStatus.CLOSED) {
+      throw new ConflictException(
+        "TENANT_CLOSED_TERMINAL: A closed dealership cannot change status.",
+      );
+    }
+    if (to === TenantStatus.PENDING) {
+      throw new ConflictException(
+        `TENANT_STATUS_TRANSITION_INVALID: A dealership cannot be moved from ${from} back to PENDING.`,
+      );
+    }
+    if (
+      to === TenantStatus.ACTIVE &&
+      from === TenantStatus.PENDING &&
+      verificationStatus !== VerificationStatus.APPROVED
+    ) {
+      throw new ConflictException(
+        `TENANT_KYB_NOT_APPROVED: A pending dealership can only be activated after KYB verification is APPROVED (current: ${verificationStatus}).`,
+      );
+    }
+  }
+
   // ==========================================
   // Platform User Administration
   // ==========================================
 
-  async listUsers(filter: AdminUserFilterDto, adminUserId: string) {
-    await this.auditService.logAction({
-      tenantId: null,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_LIST_USERS",
-      targetType: "users",
-      targetId: "ALL",
-      metadata: { filter },
-    });
+  async listUsers(filter: AdminUserFilterDto, _adminUserId: string) {
+    // AD-10: a paged/searched list read is not audited (one row per debounced
+    // search keystroke inflated the ledger). Sensitive single-record reads
+    // (getUserById, getTenantById) and all mutations remain audited.
 
     const where: any = {};
 
@@ -469,6 +554,19 @@ export class AdminService {
       }
     }
 
+    // AD-02: an administrator may not suspend, disable or demote their own
+    // account. Checked after the last-admin rule so that error stays primary.
+    if (
+      userId === adminUserId &&
+      (dto.status === "DISABLED" ||
+        dto.status === "SUSPENDED" ||
+        dto.isPlatformAdmin === false)
+    ) {
+      throw new BadRequestException(
+        "CANNOT_MODIFY_OWN_ACCOUNT: You cannot suspend, disable or demote your own administrator account.",
+      );
+    }
+
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: {
@@ -513,6 +611,12 @@ export class AdminService {
   }
 
   async revokeUserSessions(userId: string, adminUserId: string) {
+    if (userId === adminUserId) {
+      throw new BadRequestException(
+        "CANNOT_REVOKE_OWN_SESSIONS: Use Sign out to end your own session instead of revoking it from the user console.",
+      );
+    }
+
     const result = await this.prisma.session.updateMany({
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },

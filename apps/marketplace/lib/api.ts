@@ -1176,6 +1176,18 @@ export async function fetchSavedSearches(sessionToken?: string): Promise<SavedSe
   }));
 }
 
+/** POST /api/v1/me/saved-searches — alerts stay off; no alert delivery is live. */
+export async function createSavedSearchApi(payload: {
+  name: string;
+  filterJson: Record<string, unknown>;
+}): Promise<boolean> {
+  await buyerApiFetch('/api/v1/me/saved-searches', {
+    method: 'POST',
+    body: JSON.stringify({ name: payload.name, filterJson: payload.filterJson, alertsEnabled: false }),
+  });
+  return true;
+}
+
 /** DELETE /api/v1/me/saved-searches/:id */
 export async function deleteSavedSearchApi(id: string): Promise<boolean> {
   await buyerApiFetch(`/api/v1/me/saved-searches/${encodeURIComponent(id)}`, { method: 'DELETE' });
@@ -1282,12 +1294,12 @@ export async function fetchBuyerProfileData(sessionToken?: string): Promise<Buye
   };
 }
 
-/** PATCH /api/v1/me/buyer-profile — only UpdateBuyerProfileDto fields. */
+/** PATCH /api/v1/me/buyer-profile — only UpdateBuyerProfileDto fields; null clears a field. */
 export async function updateBuyerProfileApi(payload: {
   preferredLanguage?: string;
-  preferredEmirate?: string;
-  budgetMinFils?: number;
-  budgetMaxFils?: number;
+  preferredEmirate?: string | null;
+  budgetMinFils?: number | null;
+  budgetMaxFils?: number | null;
   preferredMakes?: string[];
 }): Promise<boolean> {
   await buyerApiFetch('/api/v1/me/buyer-profile', {

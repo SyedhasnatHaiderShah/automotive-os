@@ -15,7 +15,8 @@ export default function CustodyFreezeExceptionPage() {
   const [data, setData] = useState<CustodyFreezePageData>(VERIFIED_CUSTODY_FREEZE_FIXTURE);
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
   const isRtl = locale === 'ar';
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  // Sample role for this preview page; it is not switchable (DL-05).
+  const role = 'PRINCIPAL' as 'PRINCIPAL' | 'SALES_REP';
   const [vaultFilter, setVaultFilter] = useState<'ALL' | 'SHOWROOM' | 'OFFSITE' | 'SOLD'>('ALL');
   const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
   // Preview module: feedback never claims an external action happened.
@@ -74,24 +75,23 @@ export default function CustodyFreezeExceptionPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
-                title="Click to toggle between Dealer Principal and Sales Executive RBAC mode"
-                className={`px-3 py-1 rounded-full text-[11px] font-label-caps font-bold uppercase transition-colors border ${
+              {/* Static sample role (DL-05): preview pages do not switch RBAC roles. */}
+              <span
+                className={`px-3 py-1 rounded-full text-[11px] font-label-caps font-bold uppercase border ${
                   role === 'PRINCIPAL'
                     ? 'bg-primary/10 border-primary/30 text-primary'
                     : 'bg-surface-container-highest border-outline-variant text-on-surface-variant'
                 }`}
               >
+                {isRtl ? 'دور تجريبي: ' : 'Sample role: '}
                 {role === 'PRINCIPAL'
                   ? isRtl
-                    ? 'الدور: المدير العام (صلاحية كاملة)'
-                    : 'Role: Dealer Principal (Legal Override)'
+                    ? 'المدير العام'
+                    : 'Dealer Principal'
                   : isRtl
-                    ? 'الدور: تنفيذي مبيعات (مقيد الصلاحيات)'
-                    : 'Role: Sales Executive (Restricted)'}
-              </button>
+                    ? 'تنفيذي مبيعات'
+                    : 'Sales Executive'}
+              </span>
               <button
                 type="button"
                 onClick={() => setLocale(locale === 'en' ? 'ar' : 'en')}
@@ -891,8 +891,8 @@ export default function CustodyFreezeExceptionPage() {
                             : 'Interpleader Motion (Restricted to Principal)'
                           : isRelieved
                             ? isRtl
-                              ? 'تم تقديم دعوى التنازع وإيداع الكفالة (عرض)'
-                              : 'Interpleader Motion Filed (View Order)'
+                              ? 'معاينة مكتملة — لم يتم تقديم شيء'
+                              : 'Preview completed — nothing was filed'
                             : isRtl
                               ? 'تقديم دعوى تنازع وإيداع قضائي (عاجل)'
                               : 'Submit Dealership Interpleader Motion'}
@@ -1110,14 +1110,14 @@ export default function CustodyFreezeExceptionPage() {
 
             {interpleaderFiled ? (
               <div className="py-6 text-center space-y-3">
-                <span className="material-symbols-outlined text-[48px] text-tertiary">verified</span>
+                <span className="material-symbols-outlined text-[48px] text-outline">info</span>
                 <h4 className="font-headline-sm text-on-surface font-semibold">
                   {isRtl ? 'معاينة فقط — لم يتم إرسال أي شيء.' : 'Preview only — nothing was sent.'}
                 </h4>
                 <p className="text-[12px] text-on-surface-variant max-w-sm mx-auto">
                   {isRtl
-                    ? 'تم إيداع مبلغ 1,650,000 درهم في خزينة محكمة دبي التجارية برقم #DXB-ESCROW-2025-0994. تم فك مسؤولية المعرض وإلغاء حظر العزل.'
-                    : 'AED 1,650,000 bond deposited into Dubai Commercial Court Escrow (#DXB-ESCROW-2025-0994). Dealership discharged from bailment liability; vehicle quarantine lifted.'}
+                    ? 'هذه معاينة ببيانات تجريبية. لم يتم تقديم أي دعوى أو إيداع أي كفالة لدى أي محكمة أو جهة ضمان.'
+                    : 'This is a sample-data preview. No motion was filed and no bond was deposited with any court or escrow agent.'}
                 </p>
                 <button
                   type="button"
