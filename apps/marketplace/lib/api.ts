@@ -496,7 +496,7 @@ export async function fetchPublicListings(
 
     const response = await fetch(`${apiUrl}/api/v1/public/listings?${params.toString()}`, {
       next: { revalidate: 10 },
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(10000),
     });
 
     if (response.ok) {
@@ -564,7 +564,7 @@ export async function fetchPublicListingBySlug(slug: string): Promise<PublicList
   try {
     const response = await fetch(`${apiUrl}/api/v1/public/listings/${slug}`, {
       next: { revalidate: 10 },
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(10000),
     });
 
     if (response.ok) {
@@ -872,6 +872,46 @@ export const SILBERARROWS_DEALER_FIXTURE: PublicDealerProfile = {
 /**
  * Fetch verified dealership profile and tenant-scoped live inventory
  */
+export interface PublicDealerSummary {
+  id: string;
+  slug: string;
+  displayName: string;
+  isKybVerified: boolean;
+  emirates: string[];
+  cities: string[];
+  liveGroundedStock: number;
+}
+
+export interface PublicDealerListResponse {
+  items: PublicDealerSummary[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * List active KYB-approved dealerships (GET /api/v1/public/dealers).
+ */
+export async function fetchPublicDealers(query?: {
+  emirate?: string;
+  page?: number;
+  limit?: number;
+}): Promise<PublicDealerListResponse> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const params = new URLSearchParams();
+  if (query?.emirate && query.emirate !== 'All Emirates') params.set('emirate', query.emirate);
+  if (query?.page) params.set('page', String(query.page));
+  if (query?.limit) params.set('limit', String(query.limit));
+
+  const response = await fetch(`${apiUrl}/api/v1/public/dealers?${params.toString()}`, {
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!response.ok) throw new Error(`Dealer directory API returned HTTP ${response.status}`);
+  const data = await response.json();
+  if (!Array.isArray(data.items)) throw new Error('Invalid dealer directory response: expected items array');
+  return data;
+}
+
 export async function fetchPublicDealerBySlug(slug: string): Promise<PublicDealerProfile | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 

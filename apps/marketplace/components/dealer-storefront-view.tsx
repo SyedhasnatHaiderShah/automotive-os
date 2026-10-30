@@ -122,9 +122,10 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
             <span className="text-sm text-[#f2ca50] font-semibold py-2 border-b-2 border-[#d4af37]">
               {isRtl ? 'المعارض المعتمدة' : 'Verified Dealers'}
             </span>
-            <Link href="/sell" className="text-sm text-[#d0c5af] hover:text-white transition-colors py-2">
+            <span className="text-sm text-[#d0c5af]/60 py-2 cursor-not-allowed" aria-disabled="true">
               {isRtl ? 'بيع وإيداع' : 'Sell & Consign'}
-            </Link>
+              <span className="ms-1 text-[9px] opacity-80">{isRtl ? 'قريباً' : 'Soon'}</span>
+            </span>
             <Link href="/compare" className="text-sm text-[#d0c5af] hover:text-white transition-colors py-2">
               {isRtl ? 'مقارنة السيارات' : 'Compare Vehicles'}
             </Link>

@@ -21,8 +21,6 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
   const [isVipModalOpen, setIsVipModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'options' | 'service' | 'transfer'>('options');
   const [isSaved, setIsSaved] = useState(false);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [is360Active, setIs360Active] = useState(false);
   const [showVinNotification, setShowVinNotification] = useState(false);
 
   const fallbackMedia = {
@@ -44,10 +42,6 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 
   const handleNextMedia = () => {
     setActiveMediaIndex((prev) => (prev < mediaList.length - 1 ? prev + 1 : 0));
-  };
-
-  const toggleEngineAudio = () => {
-    setIsPlayingAudio((prev) => !prev);
   };
 
   const copyDossierLink = () => {
@@ -140,13 +134,6 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                     GCC Official Spec
                   </span>
                 )}
-                <span className="px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-[11px] uppercase border border-white/[0.05]">
-                  Single Owner
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-surface-container-high text-secondary font-label-caps text-[11px] uppercase flex items-center gap-1 border border-secondary/20">
-                  <span className="material-symbols-outlined text-[13px]">shield_with_heart</span>
-                  RTA Pass Validated
-                </span>
               </div>
 
               <h1 className="font-headline-xl text-2xl sm:text-3xl md:text-4xl text-on-surface tracking-tight font-bold">
@@ -170,14 +157,14 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   <span className="material-symbols-outlined text-[15px] text-outline">
                     speed
                   </span>
-                  <span>{vehicle.mileageKm?.toLocaleString() ?? '150'} KM (Original)</span>
+                  <span>{vehicle.mileageKm?.toLocaleString() ?? '—'} KM</span>
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1 font-data-mono-num">
                   <span className="material-symbols-outlined text-[15px] text-outline">
                     calendar_month
                   </span>
-                  <span>{vehicle.deliveryDate || 'Oct 2024'}</span>
+                  <span>{vehicle.deliveryDate || '—'}</span>
                 </span>
               </div>
             </div>
@@ -229,54 +216,10 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                       {activeMediaIndex + 1} / {mediaList.length} High-Res Photos
                     </span>
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-surface-container-lowest/80 backdrop-blur-md text-tertiary text-xs flex items-center gap-1 border border-tertiary/20">
-                    <span className="material-symbols-outlined text-[14px]">lens</span>
-                    4K Studio Capture
-                  </span>
-                  {is360Active && (
-                    <span className="px-3 py-1 rounded-full bg-secondary-container/20 text-secondary text-xs flex items-center gap-1 border border-secondary/30 animate-pulse">
-                      <span className="material-symbols-outlined text-[14px]">360</span>
-                      Virtual Turntable Engaged
-                    </span>
-                  )}
                 </div>
 
                 {/* Bottom Control Strip */}
-                <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setIs360Active((prev) => !prev)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium backdrop-blur-md flex items-center gap-1.5 transition-all shadow-lg border ${
-                        is360Active
-                          ? 'bg-secondary text-on-secondary border-secondary font-bold'
-                          : 'bg-surface-container-high/90 hover:bg-surface-bright text-on-surface border-white/[0.08]'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[16px] text-secondary">360</span>
-                      <span>Interactive 360° Walkaround</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={toggleEngineAudio}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium backdrop-blur-md flex items-center gap-1.5 transition-all shadow-lg border ${
-                        isPlayingAudio
-                          ? 'bg-primary text-on-primary border-primary font-bold'
-                          : 'bg-surface-container-high/90 hover:bg-surface-bright text-on-surface border-white/[0.08]'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[16px] text-primary-container">
-                        {isPlayingAudio ? 'volume_up' : 'volume_down'}
-                      </span>
-                      <span>
-                        {isPlayingAudio
-                          ? 'Playing Boxer-6 (9,000 RPM) ...'
-                          : 'Boxer-6 Cold Start (9,000 RPM)'}
-                      </span>
-                    </button>
-                  </div>
-
+                <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-end gap-2">
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
@@ -419,7 +362,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                       {vehicle.seller.displayName}
                     </span>
                     <span className="font-body-sm text-outline text-xs truncate">
-                      {vehicle.seller.dedLicense || 'DED Commercial Lic #984210'}
+                      {vehicle.seller.dedLicense || '—'}
                     </span>
                   </div>
                 </div>
@@ -428,7 +371,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   <div className="bg-surface-container p-2.5 rounded-xl flex flex-col border border-white/[0.05]">
                     <span className="text-outline text-[10px] uppercase">Dealer Score</span>
                     <span className="font-data-mono-num text-primary font-semibold flex items-center gap-1 text-xs">
-                      {vehicle.seller.score || '4.96'}
+                      {vehicle.seller.score || '—'}
                       <span className="material-symbols-outlined text-[13px]">star</span>
                     </span>
                   </div>
@@ -443,7 +386,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                 <div className="pt-1 flex items-center justify-between text-xs text-on-surface-variant">
                   <span className="flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px] text-outline">verified</span>
-                    <span>{vehicle.seller.rtaLicense || 'RTA Lic #774912'}</span>
+                    <span>{vehicle.seller.rtaLicense || '—'}</span>
                   </span>
                   <a href={`/dealers/${vehicle.seller.slug}`} className="text-primary hover:underline font-medium">
                     View Showroom
@@ -459,25 +402,25 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                 <div className="flex justify-between py-1 text-xs border-b border-white/[0.04]">
                   <span className="text-on-surface-variant">Acceleration 0-100</span>
                   <span className="font-data-mono-num text-on-surface font-medium">
-                    {vehicle.acceleration || '3.2 Seconds'}
+                    {vehicle.acceleration || '—'}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 text-xs border-b border-white/[0.04]">
                   <span className="text-on-surface-variant">Peak Downforce</span>
                   <span className="font-data-mono-num text-on-surface font-medium">
-                    {vehicle.downforce || '860 kg @ 285 km/h'}
+                    {vehicle.downforce || '—'}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 text-xs border-b border-white/[0.04]">
                   <span className="text-on-surface-variant">Gross Curb Weight</span>
                   <span className="font-data-mono-num text-on-surface font-medium">
-                    {vehicle.curbWeight || '1,450 kg (Weissach)'}
+                    {vehicle.curbWeight || '—'}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 text-xs">
                   <span className="text-on-surface-variant">RTA Tasjeel Inspection</span>
                   <span className="font-data-mono-num text-tertiary font-medium">
-                    {vehicle.inspectionScore || 'Class 1 Passed (99/100)'}
+                    {vehicle.inspectionScore || '—'}
                   </span>
                 </div>
               </div>
@@ -567,7 +510,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                       Chassis Identification Number (VIN)
                     </span>
                     <span className="font-data-mono-num text-base sm:text-lg tracking-wider text-on-surface font-bold">
-                      {vehicle.maskedVin || 'WP0AF2A97RS••••••'}
+                      {vehicle.maskedVin || '—'}
                     </span>
                     <span className="font-body-sm text-outline text-xs mt-0.5">
                       Last 6 digits obfuscated to prevent cloned secondary export paperwork.
@@ -590,7 +533,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   <div className="p-3 rounded-lg bg-tertiary-container/15 text-tertiary text-xs flex items-center gap-2 border border-tertiary/30">
                     <span className="material-symbols-outlined text-[18px]">verified</span>
                     <span>
-                      RTA VIN Verification token dispatched to your authorized session identity for official Tasjeel lookup.
+                      Full VIN disclosure is handled by the dealer after you send an enquiry. Automated RTA VIN lookup is not available yet.
                     </span>
                   </div>
                 )}
@@ -605,56 +548,55 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Powertrain</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-on-surface">
-                      {vehicle.powertrain || '4.0L Naturally Aspirated'}
+                      {vehicle.powertrain || '—'}
                     </span>
-                    <span className="font-data-mono-num text-[11px] text-outline">Flat-6 Boxer / Dry Sump</span>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Power Output</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-primary">
-                      {vehicle.horsepower || '518 BHP @ 8,500 RPM'}
+                      {vehicle.horsepower || '—'}
                     </span>
                     <span className="font-data-mono-num text-[11px] text-outline">465 Nm @ 6,300 RPM</span>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Transmission</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-on-surface">
-                      {vehicle.transmission || '7-Speed PDK'}
+                      {vehicle.transmission || '—'}
                     </span>
                     <span className="font-data-mono-num text-[11px] text-outline">Motorsport Short Ratio</span>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Top Velocity</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-on-surface">
-                      {vehicle.topSpeed || '296 km/h'}
+                      {vehicle.topSpeed || '—'}
                     </span>
                     <span className="font-data-mono-num text-[11px] text-outline">Aero Dependent</span>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Exterior Hue</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-on-surface truncate">
-                      {vehicle.colorExterior || 'Ice Grey Metallic'}
+                      {vehicle.colorExterior || '—'}
                     </span>
                     <span className="font-data-mono-num text-[11px] text-outline">Code: M7X / Carbon</span>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Interior Spec</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-on-surface truncate">
-                      {vehicle.colorInterior || 'Race-Tex / Leather'}
+                      {vehicle.colorInterior || '—'}
                     </span>
                     <span className="font-data-mono-num text-[11px] text-outline">Guards Red Contrast</span>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Wheel Spec</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-on-surface truncate">
-                      {vehicle.wheelSpec || '20"/21" Forged Mag'}
+                      {vehicle.wheelSpec || '—'}
                     </span>
                     <span className="font-data-mono-num text-[11px] text-outline">Satin Pyro Red Finish</span>
                   </div>
                   <div className="bg-surface-container-low p-3.5 rounded-xl flex flex-col gap-1 border border-white/[0.06]">
                     <span className="font-label-caps text-[10px] text-outline uppercase font-medium">Braking Apparatus</span>
                     <span className="font-body-md text-xs sm:text-sm font-semibold text-primary-container truncate">
-                      {vehicle.brakingSpec || 'PCCB Carbon Ceramics'}
+                      {vehicle.brakingSpec || '—'}
                     </span>
                     <span className="font-data-mono-num text-[11px] text-outline">410mm Front / 390mm Rear</span>
                   </div>
@@ -669,7 +611,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                       Condition & Physical Provenance Report
                     </h3>
                     <p className="font-body-sm text-xs text-outline mt-0.5">
-                      Physical evaluation performed at Porsche Centre Dubai & certified by Tasjeel Shamil.
+                      Condition details as declared by the dealer. Third-party inspection is shown only when a verified report is attached.
                     </p>
                   </div>
                   <span className="px-3 py-1 rounded-full bg-tertiary-container/20 text-tertiary font-data-mono-num text-xs font-bold flex items-center gap-1 border border-tertiary/30">
@@ -879,7 +821,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                       <span className="font-data-mono-num">AED 860</span>
                     </div>
                     <p className="text-[11px] text-outline italic pt-1 leading-relaxed">
-                      {vehicle.seller.displayName} provides complimentary full concierge representation at Tasjeel Al Barsha. Same-day transfer completion available within 45 minutes.
+                      Government transfer charges are indicative. Confirm current RTA fees and transfer timing with {vehicle.seller.displayName}.
                     </p>
                   </div>
                 )}
@@ -902,7 +844,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   {vehicle.seller.displayName} • Al Quoz
                 </h4>
                 <p className="font-body-sm text-xs text-on-surface-variant leading-relaxed">
-                  {vehicle.seller.address || 'Showroom 12, Street 8, Al Quoz Industrial 4, behind Porsche Centre Dubai.'} Climate-controlled dehumidified facility.
+                  {vehicle.seller.address || '—'} Climate-controlled dehumidified facility.
                 </p>
 
                 {/* Map View Anchor */}
@@ -927,7 +869,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-outline">Direct Desk:</span>
-                    <span className="text-on-surface font-medium">{vehicle.seller.directPhone || '+971 4 820 9000'}</span>
+                    <span className="text-on-surface font-medium">{vehicle.seller.directPhone || '—'}</span>
                   </div>
                 </div>
               </div>

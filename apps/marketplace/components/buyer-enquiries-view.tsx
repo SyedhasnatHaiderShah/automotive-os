@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { BuyerEnquiryItem, BUYER_ENQUIRIES_FIXTURE, revokeBuyerEnquiryGrant } from '../lib/api';
+import { BuyerEnquiryItem, revokeBuyerEnquiryGrant } from '../lib/api';
 
 interface BuyerEnquiriesViewProps {
   initialEnquiries: BuyerEnquiryItem[];
@@ -67,14 +67,19 @@ export function BuyerEnquiriesView({ initialEnquiries }: BuyerEnquiriesViewProps
     setNewMessage('');
   };
 
-  const handleCancelSecondary = (id: string) => {
+  const handleCancelSecondary = async (id: string) => {
+    try {
+      await revokeBuyerEnquiryGrant(id);
+    } catch (err) {
+      window.alert(`Consent was not revoked: ${err instanceof Error ? err.message : 'Request failed'}`);
+      return;
+    }
     setEnquiries((prev) =>
       prev.map((item) =>
         item.id === id
           ? {
               ...item,
               status: 'LOST',
-              stageName: 'Data Wiped / Cancelled by Buyer',
               grant: { ...item.grant, revokedAt: new Date().toISOString() },
             }
           : item
@@ -301,7 +306,7 @@ export function BuyerEnquiriesView({ initialEnquiries }: BuyerEnquiriesViewProps
                     <div className="w-full lg:w-5/12 flex flex-col gap-4">
                       <div className="relative rounded-xl overflow-hidden bg-[#0a0e13] aspect-[16/10] shadow-md group border border-white/5">
                         <img
-                          src={activeLead?.listing.heroUrl || 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800'}
+                          src={activeLead?.listing.heroUrl || ''}
                           alt={activeLead?.listing.title || 'Vehicle'}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
@@ -317,29 +322,21 @@ export function BuyerEnquiriesView({ initialEnquiries }: BuyerEnquiriesViewProps
                               : 'ALLOCATED CUSTODY'}
                           </span>
                           <span className="px-3 py-1 rounded-full bg-[#0a0e13]/90 text-white font-mono text-[10px] border border-white/10">
-                            {activeLead?.listing.vinChassis || 'DXB-911-RS'}
+                            {activeLead?.listing.vinChassis || '—'}
                           </span>
                         </div>
 
                         <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
                           <div>
                             <span className="text-[10px] text-[#99907c] uppercase tracking-wider block">
-                              Agreed Transaction Price
+                              Listed Asking Price
                             </span>
                             <div className="flex items-baseline gap-1 text-[#d4af37] font-bold text-2xl">
                               <span className="text-xs">AED</span>
                               <span>
-                                {activeLead?.listing.priceAed?.toLocaleString('en-US') || '1,420,000'}
+                                {activeLead?.listing.priceAed?.toLocaleString('en-US') ?? '—'}
                               </span>
                             </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[10px] text-[#58e7aa] uppercase tracking-wider block">
-                              Down Payment Locked
-                            </span>
-                            <span className="font-mono text-xs text-white font-semibold">
-                              20% (AED 284,000)
-                            </span>
                           </div>
                         </div>
                       </div>
@@ -632,8 +629,7 @@ export function BuyerEnquiriesView({ initialEnquiries }: BuyerEnquiriesViewProps
                         </div>
                       </div>
                       <div className="flex-1 text-xs text-[#d0c5af]">
-                        Encrypted purchase interest dispatched through UAE PASS cryptographic auth key{' '}
-                        <code className="font-mono text-[#d4af37]">#KEY-99420-UAEP</code>. Dealership accepted escrow terms under DIFC standard conditions.
+                        Enquiry delivered to {activeLead?.listing.dealershipName || 'the dealer'} with only the contact fields you consented to share.
                         <div className="flex items-center gap-3 text-[#99907c] font-mono mt-1">
                           <span>Timestamp: May 18, 2024 - 10:14:22 GST</span>
                           <span>•</span>
@@ -734,80 +730,55 @@ export function BuyerEnquiriesView({ initialEnquiries }: BuyerEnquiriesViewProps
                         <h3 className="text-lg font-bold text-white">Concurrent Vehicle Requests</h3>
                       </div>
                       <span className="px-2.5 py-1 rounded-full bg-[#262a30] text-xs font-mono text-[#d0c5af]">
-                        2 Enquiries
+                        {Math.max(0, enquiries.length - 1)} Enquiries
                       </span>
                     </div>
 
-                    {/* Secondary 1 */}
-                    <div className="p-4 rounded-xl bg-[#1c2025] flex flex-col gap-3 shadow-md border border-white/5">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex gap-3">
-                          <div className="w-14 h-14 rounded-lg bg-[#0a0e13] overflow-hidden shrink-0">
-                            <img
-                              src={BUYER_ENQUIRIES_FIXTURE[1]?.listing?.heroUrl || ''}
-                              alt="Mercedes G 63"
-                              className="w-full h-full object-cover"
-                            />
+                    {enquiries.slice(1).length === 0 ? (
+                      <p className="text-xs text-[#99907c]">No other enquiries.</p>
+                    ) : (
+                      enquiries.slice(1).map((item) => {
+                        const revoked = !!item.grant.revokedAt;
+                        return (
+                          <div
+                            key={item.id}
+                            className={`p-4 rounded-xl bg-[#1c2025] flex flex-col gap-3 shadow-md border border-white/5 ${revoked ? 'opacity-80' : ''}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex flex-col">
+                                <span className={`text-sm font-bold ${revoked ? 'text-[#99907c] line-through' : 'text-white'}`}>
+                                  {item.listing.title}
+                                </span>
+                                <span className="text-xs text-[#99907c]">{item.listing.dealershipName}</span>
+                              </div>
+                              <span className="px-2.5 py-0.5 rounded-full bg-[#7bd0ff]/15 text-[#7bd0ff] text-[10px] uppercase font-bold shrink-0">
+                                {revoked ? 'Consent revoked' : item.status.replace(/_/g, ' ')}
+                              </span>
+                            </div>
+                            {!revoked && (
+                              <div className="flex items-center justify-end text-xs pt-2 border-t border-white/5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleCancelSecondary(item.id)}
+                                  className="text-[#ffb4ab] hover:text-[#ffdad6] font-medium transition-colors"
+                                >
+                                  Revoke Consent
+                                </button>
+                              </div>
+                            )}
                           </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-bold text-white">2023 Mercedes-AMG G 63</span>
-                            <span className="text-xs text-[#99907c]">SilberArrows Motors • Dubai</span>
-                            <span className="font-mono text-xs text-[#d4af37] font-bold mt-1">AED 890,000</span>
-                          </div>
-                        </div>
-                        <span className="px-2.5 py-0.5 rounded-full bg-[#7bd0ff]/15 text-[#7bd0ff] text-[10px] uppercase font-bold shrink-0">
-                          Awaiting Dealer SLA
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-[#99907c] pt-2 border-t border-white/5">
-                        <span className="font-mono">⏱️ SLA response &lt; 2 hrs</span>
-                        <button
-                          type="button"
-                          onClick={() => handleCancelSecondary(BUYER_ENQUIRIES_FIXTURE[1]?.id || '')}
-                          className="text-[#ffb4ab] hover:text-[#ffdad6] font-medium transition-colors"
-                        >
-                          Cancel Enquiry
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Secondary 2: Cancelled & Data Wiped */}
-                    <div className="p-4 rounded-xl bg-[#1c2025]/60 flex flex-col gap-3 shadow-sm border border-white/5 opacity-80">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex gap-3">
-                          <div className="w-14 h-14 rounded-lg bg-[#0a0e13] overflow-hidden shrink-0 grayscale">
-                            <img
-                              src={BUYER_ENQUIRIES_FIXTURE[2]?.listing?.heroUrl || ''}
-                              alt="Defender 110"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium text-[#99907c] line-through">
-                              2024 Defender 110 V8
-                            </span>
-                            <span className="text-xs text-[#99907c]">Premier Motors Abu Dhabi</span>
-                            <span className="font-mono text-xs text-[#99907c] mt-1">AED 620,000</span>
-                          </div>
-                        </div>
-                        <span className="px-2.5 py-0.5 rounded-full bg-[#31353b] text-[#99907c] text-[10px] uppercase font-bold shrink-0">
-                          Data Wiped
-                        </span>
-                      </div>
-                      <div className="p-2 rounded bg-[#181c21] text-xs text-[#99907c] flex items-center gap-2">
-                        <span className="text-[#58e7aa]">✓</span>
-                        <span>Cancelled by Buyer • Identity Purged from Premier Motors CRM</span>
-                      </div>
-                    </div>
+                        );
+                      })
+                    )}
 
                     {/* Escrow Guarantee Box */}
                     <div className="p-4 rounded-xl bg-[#181c21] border border-white/5 flex flex-col gap-1.5">
                       <div className="flex items-center gap-2 text-[#d4af37] text-xs font-bold uppercase">
                         <span>🛡️</span>
-                        <span>Zero-Obligation Escrow Guarantee</span>
+                        <span>No Deposits Collected</span>
                       </div>
                       <p className="text-xs text-[#99907c] leading-relaxed">
-                        Every prospective vehicle allocation is backed by sovereign non-custodial protection. In the event of vehicle failure at Tasjeel or buyer withdrawal before final escrow agreement, your deposit is released within 60 seconds with zero dealer retention fees.
+                        Escrow and deposits are not offered on the platform yet. No funds are collected through an enquiry.
                       </p>
                     </div>
                   </div>
@@ -936,11 +907,10 @@ export function BuyerEnquiriesView({ initialEnquiries }: BuyerEnquiriesViewProps
             </div>
             <p className="text-xs text-[#d0c5af] leading-relaxed">
               Are you sure you want to withdraw your inquiry for{' '}
-              <strong className="text-white">2024 Porsche 911 GT3 RS Clubsport</strong>?
+              <strong className="text-white">{activeLead?.listing.title || 'this vehicle'}</strong>?
             </p>
             <div className="p-3 bg-[#0a0e13] rounded-lg text-xs text-[#99907c] space-y-1">
-              <p>• Your holding escrow deposit (AED 284,000) will be released back to your bank within 60s.</p>
-              <p>• Your legal name and contact phone will be immediately purged from Apex GT Motors CRM.</p>
+              <p>• The dealer immediately loses access to the contact fields you shared for this enquiry.</p>
               <p>• An immutable revocation receipt will be recorded in your buyer privacy audit log.</p>
             </div>
             <div className="flex items-center justify-end gap-3 mt-2">

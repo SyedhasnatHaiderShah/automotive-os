@@ -56,3 +56,16 @@ Checks: `tsc --noEmit` (api) PASS. API unit specs PASS (55/55, 10 suites). API i
 Remaining fabricated UI copy (design batch): hardcoded secondary enquiry cards in `buyer-enquiries-view.tsx:743-776`, escrow and AED 284,000 text, the static `/account/settings` and `/account/profile/dossier` (S30/S31), the home page dealer cards, and the "RTA PASS VALIDATED" badge.
 
 Checks: marketplace `tsc --noEmit` PASS and `next build` PASS. Dealer `tsc --noEmit` PASS and `next build` PASS. Runtime and E2E against the API/DB NOT RUN: the local DB is unavailable and staging is not redeployed.
+
+## Fix log: design batch (local, not deployed)
+
+| ID | Status | Change |
+|---|---|---|
+| QA-07 | FIXED_LOCAL | The home page and `/dealers` now list live KYB-approved dealers from `GET /api/v1/public/dealers`, with loading, empty and error states. Removed: the 6 invented showrooms, license numbers, ratings, "64" count, "Tier-1 Institutional Partners" label and the DED registry claim. On vehicle detail, removed the "RTA Pass Validated" and "Single Owner" badges, the "4K Studio Capture" chip, the fake 360° and engine-audio controls, 19 hardcoded GT3 spec and seller fallbacks (now "—"), and the Porsche Centre, Tasjeel certification and same-day transfer claims. The RTA VIN "token dispatched" message is now honest. |
+| QA-10 | FIXED_LOCAL | Added `display=block` to the Material Symbols font link in all 3 app layouts. |
+| QA-11 | PARTIAL | Shared header spacing tightened on mobile. The staging badge now sits above sticky bottom bars on mobile (`bottom-24`). The dealer layout at about 800px (P1 fixture pages) is unchanged. |
+| QA-12 | FIXED_LOCAL | Storefront "Sell & Consign" is now a disabled "Soon" item (no `/sell` link). The shared header's favorites and profile links pointed at missing routes `/saved` and `/profile`; they now go to `/account/saved` and `/account/profile`. |
+| QA-13 | FIXED_LOCAL | The `/cars` heading uses the API `total` and shows a loading state. The listing API client timeout went from 3 s to 10 s. The "RTA & TAMM Registry Sync" claim is replaced. |
+| S08 | PARTIAL | Hardcoded secondary enquiry cards are replaced by real `enquiries.slice(1)`, with a revoke action wired to the API. Escrow, down-payment, AED 284,000 and DIFC/UAE PASS copy removed. The rest of the S08 timeline narrative still needs a rebuild against real lead events. |
+
+Checks: typecheck PASS for marketplace, dealer, admin and ui. Marketplace `next build` PASS. Visual and browser verification NOT RUN: no local stack, and staging is not redeployed.

@@ -175,16 +175,16 @@ export default function SearchResultsPage() {
               </div>
               <h1 className="font-headline-lg text-2xl lg:text-3xl font-bold text-on-surface">
                 {isArabic ? (
-                  `نتائج البحث: ${filteredVehicles.length} سيارة معتمدة`
+                  loading ? 'جارٍ البحث…' : `نتائج البحث: ${total} سيارة معتمدة`
                 ) : (
                   <>
-                    Search Results: <span className="font-data-mono-num font-semibold text-primary">{filteredVehicles.length}</span> Verified Vehicles
+                    Search Results: <span className="font-data-mono-num font-semibold text-primary">{loading ? '…' : total}</span> Verified Vehicles
                   </>
                 )}
               </h1>
               <div className="flex items-center gap-1.5 font-data-mono-num text-xs text-outline mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
-                <span>{isArabic ? 'تزامن فوري مع سجلات RTA و TAMM' : 'RTA & TAMM Registry Sync: Real-Time'}</span>
+                <span>{isArabic ? 'إعلانات منشورة من وكلاء موثقين' : 'Published listings from KYB-verified dealers'}</span>
               </div>
             </div>
 
