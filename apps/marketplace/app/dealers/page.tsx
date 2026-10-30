@@ -141,9 +141,29 @@ export default function DealersDirectoryPage() {
             <p className="text-sm text-outline">
               {isArabic ? 'لا توجد صالات عرض معتمدة مطابقة.' : 'No verified dealerships match these filters.'}
             </p>
+          ) : loading ? (
+            <p role="status" className="mb-6 text-sm text-outline">
+              {isArabic ? 'جارٍ تحميل صالات العرض المعتمدة…' : 'Loading verified dealerships…'}
+            </p>
           ) : null}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy={loading}>
-            {filteredDealers.map((dealer) => (
+            {/* Skeleton cards while the first page (or a new filter) loads (MK-20) */}
+            {loading && !loadError && Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={`dealer-skeleton-${i}`}
+                aria-hidden="true"
+                className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 animate-pulse flex flex-col gap-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-lg bg-surface-container-high" />
+                  <div className="h-5 w-20 rounded-full bg-surface-container-high" />
+                </div>
+                <div className="h-5 w-2/3 rounded bg-surface-container-highest" />
+                <div className="h-3 w-1/3 rounded bg-surface-container-high" />
+                <div className="mt-4 h-8 w-full rounded bg-surface-container-high" />
+              </div>
+            ))}
+            {!loading && filteredDealers.map((dealer) => (
               <div
                 key={dealer.id}
                 className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 shadow-md hover:border-primary/50 transition-all flex flex-col justify-between group"

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@automotive-os/ui';
 
 export default function ListingDetailError({
@@ -11,6 +12,10 @@ export default function ListingDetailError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const router = useRouter();
+  const [retrying, startTransition] = useTransition();
+  // reset() alone re-renders the client tree; refresh() re-runs the server fetch (MK-18).
+  const retry = () => startTransition(() => { router.refresh(); reset(); });
   useEffect(() => {
     console.error('Vehicle listing detail error:', error);
   }, [error]);
@@ -30,7 +35,7 @@ export default function ListingDetailError({
           The requested vehicle specifications or gallery assets could not be retrieved from the dealer catalog.
         </p>
         <div className="flex gap-3 justify-center">
-          <Button variant="primary" size="md" onClick={() => reset()}>
+          <Button variant="primary" size="md" onClick={retry} disabled={retrying}>
             Retry Dossier
           </Button>
           <Link href="/cars">

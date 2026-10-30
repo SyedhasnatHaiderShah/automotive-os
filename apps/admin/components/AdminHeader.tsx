@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { CurrentAdmin, getCurrentAdmin } from '../lib/api';
+import { CurrentAdmin, errorMessage, getCurrentAdmin, signOutAdmin } from '../lib/api';
 
 interface AdminHeaderProps {
   isRtl?: boolean;
@@ -12,6 +12,20 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [me, setMe] = useState<CurrentAdmin | null>(null);
   const [meError, setMeError] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+
+  const handleSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError(null);
+    try {
+      await signOutAdmin();
+    } catch (err) {
+      setSignOutError(errorMessage(err, isRtl ? 'تعذر تسجيل الخروج.' : 'Sign out failed.'));
+      setSigningOut(false);
+    }
+  };
   useEffect(() => {
     const closed = () => setMobileOpen(false);
     window.addEventListener('admin-nav-closed', closed);
@@ -155,6 +169,29 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
               <span className="material-symbols-outlined text-on-primary text-[18px]">person</span>
             </div>
           </div>
+
+          {/* AD-07: sign out (POST /api/v1/auth/logout) */}
+          <button
+            type="button"
+            onClick={handleSignOut}
+            disabled={signingOut}
+            aria-label={isRtl ? 'تسجيل الخروج' : 'Sign out'}
+            title={signOutError ?? (isRtl ? 'تسجيل الخروج' : 'Sign out')}
+            className="min-h-11 min-w-11 px-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center gap-1 disabled:opacity-50 disabled:cursor-wait"
+          >
+            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">logout</span>
+            <span className="hidden md:inline font-body-sm text-body-sm">
+              {signingOut ? (isRtl ? 'جارٍ الخروج…' : 'Signing out…') : isRtl ? 'خروج' : 'Sign out'}
+            </span>
+          </button>
+          {signOutError && (
+            <p
+              role="alert"
+              className={`absolute top-16 mt-1 ${isRtl ? 'left-4' : 'right-4'} max-w-xs rounded-lg border border-red-500/40 bg-red-950/90 px-3 py-2 text-xs text-red-200 shadow-xl`}
+            >
+              {signOutError}
+            </p>
+          )}
         </div>
       </div>
     </header>

@@ -201,3 +201,60 @@ Checks after fixes:
 - Browser/E2E verification of the changed flows — NOT RUN
 
 Remaining: all Medium and Low findings above are still open. MK-04 still needs an email provider decision before buyers can self-verify outside development.
+
+## Fix log — Medium findings (2026-10-30)
+
+### Marketplace
+| ID | Status | Change |
+|---|---|---|
+| MK-06 | Fixed | Home favourites use the real favourites API, 401 redirects to login, header count is the real total. |
+| MK-07 | Fixed | Detail page header count comes from the favourites API. |
+| MK-08 | Fixed | Profile sends `null` for cleared budget/emirate; `UpdateBuyerProfileDto` accepts null and `me.service` clears the column (undefined still means unchanged). |
+| MK-09 | Partial | New buyer/settings rows default WhatsApp consent to `false` and the API fallback is `false`. **Open:** existing rows created with the DB default `true` cannot be told apart from real opt-ins; needs a schema default change plus backfill/re-consent decision (migration approval required). `aecbRefreshConsent` default needs the same review. |
+| MK-10 | Fixed | Appointment thumbnails only use public EXTERIOR/INTERIOR media; broken images fall back to an icon. |
+| MK-11 | Fixed | Activate page reads the API `error.message` envelope. |
+| MK-12 | Fixed | `EMAIL_NOT_VERIFIED` login shows a bilingual message with a link to `/auth/verify-email`. |
+| MK-13 | Fixed | Neutral enquiry metadata. |
+| MK-14 | Fixed | Fabricated jurisdiction removed; support email from `NEXT_PUBLIC_SUPPORT_EMAIL` (hidden when unset). |
+| MK-15 | Fixed | Home hero shows the first real published listing instead of the static priced card. |
+| MK-16 | Fixed | Condition tabs read All / New / Used. |
+| MK-17 | Fixed | "Save this search" on `/cars` calls `POST /me/saved-searches` (alerts off); saved-search empty state explains and links to search. |
+| MK-18 | Fixed | Error retry refreshes server data; new `account/error.tsx`, `dealers/[slug]/error.tsx`, `dealers/[slug]/not-found.tsx`; neutral root error copy. |
+| MK-19 | Fixed | Labels, aria-labels, keyboard-accessible filter chips, dialog roles on auth, cars, home, compare, activate. |
+| MK-20 | Fixed | Dealers page loading skeleton with `role="status"`. |
+
+### Dealer
+| ID | Status | Change |
+|---|---|---|
+| DL-02 | Fixed | Out-of-range pages show "Page N does not exist" with links to page 1 and last page; empty copy distinguishes no stock from no match. |
+| DL-05 | Fixed | Fake role toggles replaced with a static "Sample role" label. |
+| DL-06 | Fixed | Preview invoice rows say "Preview — not filed". Seeded fixture rows in `lib/api.ts` still contain filed-style statuses (follow-up). |
+| DL-07 | Fixed | Preview module layouts return 404 unless `NEXT_PUBLIC_ENABLE_PREVIEW_MODULES=true` (set it on staging to keep them visible). |
+| DL-08 | Fixed | `ao_locale` cookie sets `<html lang dir>`; shell uses logical (RTL-aware) classes; dashboard, inventory, leads, pager, shell and error card translated. Enum values (fuel, transmission, intent) remain English. |
+| DL-09 | Fixed | Membership includes ordered by `createdAt, id` in login, OIDC validation and `/auth/me`. Tenant switcher remains a product item. |
+| DL-10 | Fixed | Error card branches by cause (sign in, no membership, account restricted, tenant suspended, API down) with sign-out and marketplace links; raw codes no longer shown. |
+
+### Admin
+| ID | Status | Change |
+|---|---|---|
+| AD-01 | Fixed | Shared `AdminDialog` (focus trap, focus return, Escape blocked while busy) used by ConfirmReasonModal. |
+| AD-02 | Fixed | User actions hidden until the admin id is known; API rejects self suspend/disable/demote/revoke with 400. |
+| AD-03 | Fixed | Create/invite errors shown inside the modal. |
+| AD-04 | Fixed | UI offers Activate only from SUSPENDED; API enforces transitions (CLOSED terminal, no return to PENDING, PENDING→ACTIVE needs approved KYB) with 409. |
+| AD-05 | Fixed | Per-status KYB badge shared with verifications. |
+| AD-06 | Fixed | 401 redirects to login; 403 shows "Your account is not a platform admin." |
+| AD-07 | Fixed | Sign out button in the header. |
+| AD-08 | Fixed | Admin listing detail returns 5-minute signed preview URLs (null when storage is not configured); moderation page renders them. Decision needed: moderators can now open private documents. |
+| AD-09 | Fixed | New `GET /api/v1/admin/tenants/summary` counts endpoint used by the home page. |
+| AD-10 | Partial | Users-list read audit removed. Tenant-list and single-record read audits kept (existing E2E requires them). |
+| AD-11 | Fixed | Expandable audit rows use a button with `aria-expanded`. |
+| AD-12 | Fixed | Dealers modals use the accessible dialog; labelled controls. |
+| AD-13 | Fixed | Locale persisted in `ao_locale` cookie via a provider; main tables, modals, toasts translated; icons mirror under RTL. |
+
+Checks after Medium fixes:
+- Typecheck: api, marketplace, dealer, admin, packages/ui — PASS
+- API jest: 26 suites, 250/250 — PASS
+- `next build`: marketplace, dealer, admin — PASS
+- Browser/E2E — NOT RUN
+
+Decisions needed: MK-09 migration and backfill; AD-08 moderator access to private documents (and whether to audit each open); AD-04 transition rules; review of all new Arabic copy; `NEXT_PUBLIC_SUPPORT_EMAIL` and `NEXT_PUBLIC_ENABLE_PREVIEW_MODULES` deploy settings.

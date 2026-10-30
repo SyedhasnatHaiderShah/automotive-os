@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@automotive-os/ui';
 
 export default function MarketplaceError({
@@ -11,6 +12,10 @@ export default function MarketplaceError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const router = useRouter();
+  const [retrying, startTransition] = useTransition();
+  // reset() alone re-renders the client tree; refresh() re-runs the server fetch (MK-18).
+  const retry = () => startTransition(() => { router.refresh(); reset(); });
   useEffect(() => {
     console.error('Marketplace route runtime error:', error);
   }, [error]);
@@ -33,13 +38,13 @@ export default function MarketplaceError({
         </div>
 
         <h2 className="font-headline-md text-2xl font-bold text-on-surface mb-2">
-          Unable to Load Marketplace Exchange
+          Something went wrong
         </h2>
         <p className="font-arabic text-sm text-outline mb-2" dir="rtl">
-          تعذر تحميل بيانات المنصة — حدث خطأ غير متوقع
+          حدث خطأ غير متوقع أثناء تحميل هذه الصفحة
         </p>
         <p className="text-sm text-outline mb-8">
-          A secure connection interruption occurred while fetching verified inventory data.
+          This page could not be loaded. Please try again.
           {error.digest && (
             <span className="block text-xs font-mono text-outline/60 mt-2">
               Reference Code: {error.digest}
@@ -48,12 +53,12 @@ export default function MarketplaceError({
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button variant="primary" size="md" onClick={() => reset()}>
+          <Button variant="primary" size="md" onClick={retry} disabled={retrying}>
             Try Again / إعادة المحاولة
           </Button>
           <Link href="/">
             <Button variant="outline" size="md">
-              Return to Showcase
+              Return to Home
             </Button>
           </Link>
         </div>

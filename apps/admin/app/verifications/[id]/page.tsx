@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { AdminSidebar } from '../../../components/AdminSidebar';
 import { AdminHeader } from '../../../components/AdminHeader';
+import { useLocale } from '../../../lib/locale';
 import { ConfirmReasonModal } from '../../../components/ConfirmReasonModal';
 import {
   AdminTenantDetail,
@@ -38,7 +39,7 @@ export default function KybVerificationPage() {
   const rawId = params?.id;
   const tenantRef = typeof rawId === 'string' ? safeDecode(rawId) : '';
 
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale } = useLocale();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [dossier, setDossier] = useState<AdminTenantDetail | null>(null);
@@ -90,7 +91,7 @@ export default function KybVerificationPage() {
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col gap-space-lg">
@@ -207,14 +208,27 @@ export default function KybVerificationPage() {
                         >
                           Suspend dealership
                         </button>
-                      ) : (
+                      ) : dossier.status === 'SUSPENDED' ? (
                         <button
                           type="button"
                           onClick={() => { setStatusError(null); setPendingStatus('ACTIVE'); }}
                           className="h-10 px-4 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm font-medium transition-colors"
                         >
-                          Reactivate dealership
+                          {isRtl ? 'إعادة تفعيل الوكالة' : 'Reactivate dealership'}
                         </button>
+                      ) : (
+                        // AD-04: activation is offered only from SUSPENDED. PENDING
+                        // dealerships need an APPROVED KYB decision first (enforced
+                        // by the API); CLOSED is terminal.
+                        <p className="font-body-sm text-body-sm text-outline">
+                          {dossier.status === 'CLOSED'
+                            ? isRtl
+                              ? 'الوكالة مغلقة؛ لا يمكن تغيير حالتها.'
+                              : 'This dealership is closed; its status cannot be changed.'
+                            : isRtl
+                            ? `الوكالة قيد الانتظار. يتطلب التفعيل اعتماد التحقق (الحالة الحالية: ${dossier.verificationStatus}).`
+                            : `This dealership is pending. Activation requires an APPROVED KYB verification (current: ${dossier.verificationStatus}).`}
+                        </p>
                       )}
                     </div>
                   </section>

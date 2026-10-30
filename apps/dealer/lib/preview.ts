@@ -20,3 +20,10 @@ export function previewSafeMessage(message: string | null): string | null {
   if (message === null) return null;
   return ARABIC_SCRIPT.test(message) ? PREVIEW_NOTHING_SENT_AR : PREVIEW_NOTHING_SENT;
 }
+
+/**
+ * Sample-data preview modules are served (and linked from the sidebar) only
+ * when a build explicitly opts in (DL-07). `NEXT_PUBLIC_` values are inlined
+ * at build time, so server layouts and the client sidebar agree.
+ */
+export const PREVIEW_MODULES_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PREVIEW_MODULES === 'true';

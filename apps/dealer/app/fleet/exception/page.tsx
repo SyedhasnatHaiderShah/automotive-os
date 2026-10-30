@@ -15,7 +15,8 @@ export default function CustodyFreezeExceptionPage() {
   const [data, setData] = useState<CustodyFreezePageData>(VERIFIED_CUSTODY_FREEZE_FIXTURE);
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
   const isRtl = locale === 'ar';
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  // Sample role for this preview page; it is not switchable (DL-05).
+  const role = 'PRINCIPAL' as 'PRINCIPAL' | 'SALES_REP';
   const [vaultFilter, setVaultFilter] = useState<'ALL' | 'SHOWROOM' | 'OFFSITE' | 'SOLD'>('ALL');
   const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
   // Preview module: feedback never claims an external action happened.
@@ -74,24 +75,23 @@ export default function CustodyFreezeExceptionPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
-                title="Click to toggle between Dealer Principal and Sales Executive RBAC mode"
-                className={`px-3 py-1 rounded-full text-[11px] font-label-caps font-bold uppercase transition-colors border ${
+              {/* Static sample role (DL-05): preview pages do not switch RBAC roles. */}
+              <span
+                className={`px-3 py-1 rounded-full text-[11px] font-label-caps font-bold uppercase border ${
                   role === 'PRINCIPAL'
                     ? 'bg-primary/10 border-primary/30 text-primary'
                     : 'bg-surface-container-highest border-outline-variant text-on-surface-variant'
                 }`}
               >
+                {isRtl ? 'دور تجريبي: ' : 'Sample role: '}
                 {role === 'PRINCIPAL'
                   ? isRtl
-                    ? 'الدور: المدير العام (صلاحية كاملة)'
-                    : 'Role: Dealer Principal (Legal Override)'
+                    ? 'المدير العام'
+                    : 'Dealer Principal'
                   : isRtl
-                    ? 'الدور: تنفيذي مبيعات (مقيد الصلاحيات)'
-                    : 'Role: Sales Executive (Restricted)'}
-              </button>
+                    ? 'تنفيذي مبيعات'
+                    : 'Sales Executive'}
+              </span>
               <button
                 type="button"
                 onClick={() => setLocale(locale === 'en' ? 'ar' : 'en')}

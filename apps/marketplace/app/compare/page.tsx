@@ -354,8 +354,9 @@ export default function VehicleComparisonPage() {
                           onClick={() => removeVehicle(vehicle.id)}
                           className="absolute -top-1 right-0 text-outline hover:text-error text-sm p-1 rounded-full bg-surface-container-high/80"
                           title={isArabic ? 'حذف من المقارنة' : 'Remove from comparison'}
+                          aria-label={isArabic ? `حذف ${vehicle.title} من المقارنة` : `Remove ${vehicle.title} from comparison`}
                         >
-                          ✕
+                          <span aria-hidden="true">✕</span>
                         </button>
 
                         {/* Vehicle Photo */}
@@ -499,7 +500,7 @@ export default function VehicleComparisonPage() {
 
       {/* Add Vehicle Selector Modal */}
       {addModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+        <div role="dialog" aria-modal="true" aria-label={isArabic ? 'اختر مركبة للمقارنة' : 'Select Vehicle to Compare'} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-xl max-h-[80vh] bg-surface-container p-6 rounded-2xl border border-outline-variant/40 shadow-2xl flex flex-col gap-4 overflow-hidden">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/30">
               <h3 className="font-headline-sm text-lg font-bold text-on-surface">
@@ -509,8 +510,9 @@ export default function VehicleComparisonPage() {
                 type="button"
                 onClick={() => setAddModalOpen(false)}
                 className="text-outline hover:text-on-surface p-1 text-sm"
+                aria-label={isArabic ? 'إغلاق' : 'Close vehicle picker'}
               >
-                ✕
+                <span aria-hidden="true">✕</span>
               </button>
             </div>
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
+import { useLocale } from '../../lib/locale';
 import {
   Search,
   RefreshCw,
@@ -18,7 +19,7 @@ const PAGE_SIZE = 50;
 type AuditItem = AuditEvent;
 
 export default function AdminAuditLogsPage() {
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale, t } = useLocale();
   const [logs, setLogs] = useState<AuditItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -44,7 +45,7 @@ export default function AdminAuditLogsPage() {
         if (!active) return;
         setLogs([]);
         setTotal(0);
-        setLoadError(errorMessage(err, 'Audit events could not be loaded.'));
+        setLoadError(errorMessage(err, t('Audit events could not be loaded.', 'تعذر تحميل أحداث التدقيق.')));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -52,9 +53,13 @@ export default function AdminAuditLogsPage() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offset, targetType, reloadKey]);
 
   const fetchLogs = () => setReloadKey((k) => k + 1);
+  const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
+  const NextIcon = isRtl ? ChevronLeft : ChevronRight;
+  const CollapsedIcon = isRtl ? ChevronLeft : ChevronRight;
 
   const filteredLogs = logs.filter(
     (l) =>
@@ -67,7 +72,7 @@ export default function AdminAuditLogsPage() {
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -91,25 +96,28 @@ export default function AdminAuditLogsPage() {
               className="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-xs text-on-surface flex items-center gap-2 transition-colors self-start"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>Refresh Ledger</span>
+              <span>{t('Refresh Ledger', 'تحديث السجل')}</span>
             </button>
           </div>
 
           {/* Search bar */}
           <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 mb-6 flex flex-col md:flex-row md:items-center gap-4">
             <div className="relative w-full md:w-96">
-              <Search className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search
+                className={`w-4 h-4 text-outline absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2`}
+                aria-hidden="true"
+              />
               <input
-                type="text"
+                type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Filter this page by action, target type, or ID..."
-                aria-label="Filter loaded audit events"
-                className="w-full pl-9 pr-4 py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none"
+                placeholder={t('Filter this page by action, target type, or ID...', 'رشّح هذه الصفحة حسب الإجراء أو نوع الهدف أو المعرّف...')}
+                aria-label={t('Filter loaded audit events', 'تصفية أحداث التدقيق المحمّلة')}
+                className={`w-full ${isRtl ? 'pr-9 pl-4' : 'pl-9 pr-4'} py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none`}
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-outline font-mono">Target type:</span>
+              <span className="text-xs text-outline font-mono" aria-hidden="true">{t('Target type:', 'نوع الهدف:')}</span>
               <input
                 type="text"
                 defaultValue={targetType}
@@ -125,8 +133,9 @@ export default function AdminAuditLogsPage() {
                     setOffset(0);
                   }
                 }}
-                placeholder="e.g. tenant (server filter)"
-                aria-label="Filter by target type on the server"
+                placeholder={t('e.g. tenant (server filter)', 'مثال: tenant (تصفية الخادم)')}
+                aria-label={t('Filter by target type on the server', 'تصفية حسب نوع الهدف على الخادم')}
+                dir="ltr"
                 className="w-48 px-3 py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none"
               />
             </div>
@@ -135,15 +144,17 @@ export default function AdminAuditLogsPage() {
           {/* Ledger Table */}
           <div className="rounded-xl border border-surface-container-high/40 bg-surface-container-low overflow-hidden shadow-xl">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
+              <table className="w-full text-start text-xs font-mono">
                 <thead className="bg-surface-container-lowest border-b border-white/10 text-outline uppercase tracking-wider text-[11px]">
                   <tr>
-                    <th className="py-3 px-4 w-10"></th>
-                    <th className="py-3 px-4">Action Event</th>
-                    <th className="py-3 px-4">Target Entity</th>
-                    <th className="py-3 px-4">Actor UUID</th>
-                    <th className="py-3 px-4">Dealership Scope</th>
-                    <th className="py-3 px-4 text-right">Timestamp (UTC)</th>
+                    <th scope="col" className="py-3 px-4 w-10">
+                      <span className="sr-only">{t('Details', 'التفاصيل')}</span>
+                    </th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Action Event', 'الإجراء')}</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Target Entity', 'الكيان المستهدف')}</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Actor UUID', 'معرّف المنفّذ')}</th>
+                    <th scope="col" className="py-3 px-4 text-start">{t('Dealership Scope', 'نطاق الوكالة')}</th>
+                    <th scope="col" className="py-3 px-4 text-end">{t('Timestamp (UTC)', 'الوقت (UTC)')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -160,7 +171,7 @@ export default function AdminAuditLogsPage() {
                             onClick={fetchLogs}
                             className="px-3 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
                           >
-                            Retry
+                            {t('Retry', 'إعادة المحاولة')}
                           </button>
                         </div>
                       </td>
@@ -168,13 +179,13 @@ export default function AdminAuditLogsPage() {
                   ) : loading && logs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-outline">
-                        Loading audit events…
+                        {t('Loading audit events…', 'جارٍ تحميل أحداث التدقيق…')}
                       </td>
                     </tr>
                   ) : filteredLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-outline">
-                        No audit events recorded yet.
+                        {t('No audit events recorded yet.', 'لا توجد أحداث تدقيق مسجلة بعد.')}
                       </td>
                     </tr>
                   ) : (
@@ -187,11 +198,25 @@ export default function AdminAuditLogsPage() {
                             className="hover:bg-surface-container-high/40 transition-colors cursor-pointer"
                           >
                             <td className="py-3 px-4 text-gray-500">
-                              {isExpanded ? (
-                                <ChevronDown className="w-4 h-4" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4" />
-                              )}
+                              {/* AD-11: the row click stays for mouse users; this button is the
+                                  keyboard/screen-reader control. */}
+                              <button
+                                type="button"
+                                aria-expanded={isExpanded}
+                                aria-controls={`audit-details-${l.id}`}
+                                aria-label={t(`Show details for ${l.action}`, `عرض تفاصيل ${l.action}`)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedId(isExpanded ? null : l.id);
+                                }}
+                                className="p-1 rounded hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                              >
+                                {isExpanded ? (
+                                  <ChevronDown className="w-4 h-4" aria-hidden="true" />
+                                ) : (
+                                  <CollapsedIcon className="w-4 h-4" aria-hidden="true" />
+                                )}
+                              </button>
                             </td>
 
                             <td className="py-3 px-4">
@@ -202,7 +227,7 @@ export default function AdminAuditLogsPage() {
                               <span className="text-gray-400">[{l.targetType}]</span> {l.targetId}
                             </td>
 
-                            <td className="py-3 px-4 text-gray-400 select-all">
+                            <td className="py-3 px-4 text-gray-400 select-all" dir="ltr">
                               {l.actorUserId ? `${l.actorUserId.substring(0, 13)}...` : 'SYSTEM'}
                             </td>
 
@@ -210,19 +235,19 @@ export default function AdminAuditLogsPage() {
                               {l.tenantId ? `${l.tenantId.substring(0, 8)}...` : 'PLATFORM_GLOBAL'}
                             </td>
 
-                            <td className="py-3 px-4 text-right text-gray-400">
+                            <td className="py-3 px-4 text-end text-gray-400" dir="ltr">
                               {new Date(l.createdAt).toISOString().replace('T', ' ').substring(0, 19)}
                             </td>
                           </tr>
 
                           {isExpanded && (
-                            <tr className="bg-black/40">
+                            <tr className="bg-black/40" id={`audit-details-${l.id}`}>
                               <td colSpan={6} className="p-4">
                                 <div className="p-3 rounded-lg bg-surface-container-lowest border border-white/10 text-xs">
                                   <span className="text-outline block mb-1 uppercase font-bold text-[10px]">
-                                    Event Payload Metadata:
+                                    {t('Event Payload Metadata:', 'بيانات الحدث:')}
                                   </span>
-                                  <pre className="text-gray-300 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap">
+                                  <pre dir="ltr" className="text-gray-300 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap">
                                     {JSON.stringify(l.metadata, null, 2)}
                                   </pre>
                                 </div>
@@ -238,7 +263,12 @@ export default function AdminAuditLogsPage() {
             </div>
             <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-white/10 text-xs font-mono text-outline">
               <span>
-                {total === 0 ? '0 events' : `Events ${offset + 1}–${Math.min(offset + PAGE_SIZE, total)} of ${total}`}
+                {total === 0
+                  ? t('0 events', '0 أحداث')
+                  : t(
+                      `Events ${offset + 1}–${Math.min(offset + PAGE_SIZE, total)} of ${total}`,
+                      `الأحداث ${offset + 1}–${Math.min(offset + PAGE_SIZE, total)} من ${total}`,
+                    )}
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -247,8 +277,8 @@ export default function AdminAuditLogsPage() {
                   onClick={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
                   className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                  <span>Prev</span>
+                  <PrevIcon className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>{t('Prev', 'السابق')}</span>
                 </button>
                 <button
                   type="button"
@@ -256,8 +286,8 @@ export default function AdminAuditLogsPage() {
                   onClick={() => setOffset((o) => o + PAGE_SIZE)}
                   className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <span>Next</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>{t('Next', 'التالي')}</span>
+                  <NextIcon className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>
             </div>

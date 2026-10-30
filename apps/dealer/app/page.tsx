@@ -7,6 +7,8 @@ import { PAGE_LIMIT_MAX } from '../lib/dealer-api';
 import { DealerServiceError } from '../components/dealer-service-error';
 import { DealerShell } from '../components/dealer-shell';
 import { DashboardCockpitView, type DashboardLeadData } from '../components/dashboard-cockpit-view';
+import { dealerStrings } from '../lib/i18n';
+import { getDealerLocale } from '../lib/locale-server';
 
 export const metadata: Metadata = {
   title: 'Dealership Overview | Automotive OS Dealer DMS',
@@ -14,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function DealerDashboardPage() {
+  const locale = await getDealerLocale();
+  const t = dealerStrings(locale);
   try {
     const session = await getDealerSession();
     const caps = capabilitiesFor(session.role);
@@ -52,22 +56,25 @@ export default async function DealerDashboardPage() {
           role: session.role,
           hasMultipleTenants: session.hasMultipleTenants,
         }}
+        locale={locale}
       >
         <DashboardCockpitView
           tenantName={session.tenantName}
           capabilities={caps}
           stock={{ total: vehicles.total, available, reserved, sold, recent: vehicles.items }}
           leads={leads}
+          locale={locale}
         />
       </DealerShell>
     );
   } catch (error: unknown) {
     return (
       <DealerServiceError
-        title="Dealership overview unavailable"
+        title={t.errDashboardTitle}
         error={error}
-        fallbackMessage="Unable to load stock and lead data from the API."
+        fallbackMessage={t.errDashboardFallback}
         retryPath="/dealer"
+        locale={locale}
       />
     );
   }

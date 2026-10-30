@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AdminSidebar } from '../components/AdminSidebar';
 import { AdminHeader } from '../components/AdminHeader';
-import { AdminTenantSummary, errorMessage, listAuditLogs, listTenants, listUsers } from '../lib/api';
+import { useLocale } from '../lib/locale';
+import { AdminTenantCounts, errorMessage, getTenantCounts, listAuditLogs, listUsers } from '../lib/api';
 
 type Metric<T> = { status: 'loading' } | { status: 'ok'; value: T } | { status: 'error'; message: string };
 
@@ -15,12 +16,12 @@ interface TenantCounts {
   kybInReview: number;
 }
 
-function summarizeTenants(tenants: AdminTenantSummary[]): TenantCounts {
+function summarizeTenants(counts: AdminTenantCounts): TenantCounts {
   return {
-    total: tenants.length,
-    active: tenants.filter((t) => t.status === 'ACTIVE').length,
-    suspended: tenants.filter((t) => t.status === 'SUSPENDED').length,
-    kybInReview: tenants.filter((t) => t.verificationStatus === 'IN_REVIEW').length,
+    total: counts.total ?? 0,
+    active: counts.byStatus?.ACTIVE ?? 0,
+    suspended: counts.byStatus?.SUSPENDED ?? 0,
+    kybInReview: counts.byVerificationStatus?.IN_REVIEW ?? 0,
   };
 }
 
@@ -43,7 +44,7 @@ function MetricValue<T>({ metric, render }: { metric: Metric<T>; render: (v: T) 
 }
 
 export default function AdminOverviewPage() {
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale } = useLocale();
   const [tenants, setTenants] = useState<Metric<TenantCounts>>({ status: 'loading' });
   const [users, setUsers] = useState<Metric<number>>({ status: 'loading' });
   const [auditEvents, setAuditEvents] = useState<Metric<number>>({ status: 'loading' });
@@ -53,7 +54,8 @@ export default function AdminOverviewPage() {
     setTenants({ status: 'loading' });
     setUsers({ status: 'loading' });
     setAuditEvents({ status: 'loading' });
-    settle(listTenants().then(summarizeTenants), setTenants);
+    // AD-09: exact COUNT/GROUP BY figures, not a client-side count of the capped list.
+    settle(getTenantCounts().then(summarizeTenants), setTenants);
     settle(listUsers({ page: 1, limit: 1 }).then((p) => p.total ?? 0), setUsers);
     settle(listAuditLogs({ limit: 1, offset: 0 }).then((p) => p.total ?? 0), setAuditEvents);
   }, [reloadKey]);
@@ -65,7 +67,7 @@ export default function AdminOverviewPage() {
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col w-full gap-space-lg">
@@ -127,7 +129,7 @@ export default function AdminOverviewPage() {
                   <MetricValue metric={tenants} render={(v) => v.total} />
                 </div>
                 <div className="mt-1 font-body-sm text-body-sm text-outline">
-                  <MetricValue metric={tenants} render={(v) => `${v.active} active · ${v.suspended} suspended`} />
+                  <MetricValue metric={tenants} render={(v) => (isRtl ? `${v.active} نشطة · ${v.suspended} معلّقة` : `${v.active} active · ${v.suspended} suspended`)} />
                 </div>
               </Link>
 
@@ -142,7 +144,7 @@ export default function AdminOverviewPage() {
                   <MetricValue metric={tenants} render={(v) => v.kybInReview} />
                 </div>
                 <div className="mt-1 font-body-sm text-body-sm text-outline">
-                  {isRtl ? 'محسوب من قائمة الوكالات' : 'Derived from the dealership list'}
+                  {isRtl ? 'عدد دقيق من خادم المنصة' : 'Exact count from the platform API'}
                 </div>
               </Link>
 

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
+import { useLocale } from '../../lib/locale';
 
 /**
  * Disputes & Sanctions.
@@ -13,13 +14,13 @@ import { AdminHeader } from '../../components/AdminHeader';
  * Nothing here simulates an escrow release, dual-control signature or sanction.
  */
 export default function DisputesAndSanctionsPage() {
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale } = useLocale();
 
   return (
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col gap-space-lg">

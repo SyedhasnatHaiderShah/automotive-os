@@ -9,6 +9,9 @@
  * Failures always throw. There is no success-on-failure path and no fixture or
  * mock merge: if the API cannot confirm an action, the UI must say so.
  *
+ * A 401 sends the browser to `/auth?tab=login&redirect=<admin path>`; a 403
+ * throws AdminForbiddenError ("Your account is not a platform admin.").
+ *
  * Endpoints that do NOT exist yet (and therefore have no client function):
  *   - moderation queue list, KYB verification queue list
  *   - KYB verification decision
@@ -26,6 +29,39 @@ export class AdminApiError extends Error {
     this.status = status;
     this.code = code;
   }
+}
+
+export const NOT_PLATFORM_ADMIN_MESSAGE = 'Your account is not a platform admin.';
+
+/**
+ * Thrown for HTTP 403 from the platform API: the session is valid but the
+ * account is not (or is no longer) a platform administrator (AD-06).
+ */
+export class AdminForbiddenError extends AdminApiError {
+  /** Raw server message, kept for diagnostics only. */
+  readonly detail?: string;
+
+  constructor(detail?: string, code?: string) {
+    super(NOT_PLATFORM_ADMIN_MESSAGE, 403, code ?? 'NOT_PLATFORM_ADMIN');
+    this.name = 'AdminForbiddenError';
+    this.detail = detail;
+  }
+}
+
+let loginRedirectStarted = false;
+
+/**
+ * AD-06: a 401 mid-session means the admin session is gone. Send the browser
+ * to the unified sign-in page (served by the gateway outside the /admin
+ * basePath) with a redirect back to the current console path.
+ */
+function redirectToLogin(): void {
+  if (typeof window === 'undefined' || loginRedirectStarted) return;
+  loginRedirectStarted = true;
+  const { pathname, search } = window.location;
+  const current = pathname.startsWith('/admin') ? `${pathname}${search}` : '/admin';
+  const params = new URLSearchParams({ tab: 'login', redirect: current });
+  window.location.assign(`/auth?${params.toString()}`);
 }
 
 function extractErrorMessage(body: unknown, status: number): { message: string; code?: string } {
@@ -84,6 +120,11 @@ export async function adminFetch<T>(path: string, options: AdminFetchOptions = {
 
   if (!res.ok) {
     const { message, code } = extractErrorMessage(body, res.status);
+    if (res.status === 401) {
+      redirectToLogin();
+    } else if (res.status === 403) {
+      throw new AdminForbiddenError(message, code);
+    }
     throw new AdminApiError(message, res.status, code);
   }
 
@@ -117,6 +158,33 @@ export function getCurrentAdmin(): Promise<CurrentAdmin> {
     });
   }
   return currentAdminPromise;
+}
+
+/**
+ * AD-07: POST /api/v1/auth/logout revokes the session row and clears the
+ * httpOnly `ao_session` cookie, then the browser goes to the sign-in page.
+ * Throws when the API cannot be reached or rejects the request (other than an
+ * already-expired session), so the UI can report that sign-out did not happen.
+ */
+export async function signOutAdmin(): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch('/api/v1/auth/logout', {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      credentials: 'include',
+      cache: 'no-store',
+    });
+  } catch {
+    throw new AdminApiError('The platform API could not be reached. You are still signed in.', 0, 'NETWORK_ERROR');
+  }
+  // 401 means the session is already gone, which is the goal of signing out.
+  if (!res.ok && res.status !== 401) {
+    throw new AdminApiError(`Sign out failed (HTTP ${res.status}). You may still be signed in.`, res.status);
+  }
+  currentAdminPromise = null;
+  loginRedirectStarted = true;
+  window.location.assign('/auth?tab=login');
 }
 
 // -----------------------------------------------------------------------------
@@ -165,6 +233,17 @@ export interface AdminTenantDetail {
 
 export function listTenants(): Promise<AdminTenantSummary[]> {
   return adminFetch<AdminTenantSummary[]>('/api/v1/admin/tenants');
+}
+
+/** Exact counts from GET /api/v1/admin/tenants/summary (COUNT/GROUP BY, not the capped list). */
+export interface AdminTenantCounts {
+  total: number;
+  byStatus: Record<string, number>;
+  byVerificationStatus: Record<string, number>;
+}
+
+export function getTenantCounts(): Promise<AdminTenantCounts> {
+  return adminFetch<AdminTenantCounts>('/api/v1/admin/tenants/summary');
 }
 
 export function getTenant(idOrSlug: string): Promise<AdminTenantDetail> {
@@ -296,6 +375,9 @@ export interface AdminListingMedia {
   sortOrder?: number;
   isPublic?: boolean;
   url?: string;
+  /** Short-lived signed GET URL for moderators; null when storage is not configured. */
+  previewUrl?: string | null;
+  previewExpiresAt?: string | null;
 }
 
 /** Compact listing returned by GET /api/v1/admin/listings/:id. */

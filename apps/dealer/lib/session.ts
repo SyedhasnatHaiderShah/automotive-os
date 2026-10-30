@@ -27,16 +27,31 @@ export interface DealerSession {
   tenantSlug: string;
   tenantName: string;
   role: string;
-  /** True when the user has more than one usable membership; the first is used. */
+  /**
+   * True when the user has more than one usable membership. The first one is
+   * used; the API returns memberships oldest first, so the choice is stable.
+   */
   hasMultipleTenants: boolean;
 }
 
+export type DealerSessionErrorCode =
+  | 'NOT_SIGNED_IN'
+  | 'SESSION_INVALID'
+  | 'ACCOUNT_RESTRICTED'
+  | 'NO_DEALER_MEMBERSHIP'
+  | 'TENANT_SUSPENDED'
+  | 'API_UNAVAILABLE';
+
+/**
+ * Session failure with a machine-readable `code`. The message is kept free of
+ * the code prefix so it can be shown to the user as-is (DL-10).
+ */
 export class DealerSessionError extends Error {
   constructor(
-    public readonly code: 'NOT_SIGNED_IN' | 'SESSION_INVALID' | 'NO_DEALER_MEMBERSHIP' | 'API_UNAVAILABLE',
+    public readonly code: DealerSessionErrorCode,
     message: string,
   ) {
-    super(`${code}: ${message}`);
+    super(message);
   }
 }
 
@@ -66,8 +81,12 @@ export async function getDealerSession(): Promise<DealerSession> {
     throw new DealerSessionError('API_UNAVAILABLE', 'Identity service is unreachable.');
   }
 
-  if (response.status === 401 || response.status === 403) {
+  if (response.status === 401) {
     throw new DealerSessionError('SESSION_INVALID', 'Your session has expired or was revoked. Sign in again.');
+  }
+  if (response.status === 403) {
+    // The API returns 403 from /auth/me for suspended or disabled accounts.
+    throw new DealerSessionError('ACCOUNT_RESTRICTED', 'This account is suspended or disabled.');
   }
   if (!response.ok) {
     throw new DealerSessionError('API_UNAVAILABLE', `Identity service returned HTTP ${response.status}.`);
@@ -79,6 +98,12 @@ export async function getDealerSession(): Promise<DealerSession> {
   );
   const membership = usable[0];
   if (!membership) {
+    const suspended = (Array.isArray(me.memberships) ? me.memberships : []).some(
+      (m: DealerMembership) => m.active && m.tenantStatus !== 'ACTIVE',
+    );
+    if (suspended) {
+      throw new DealerSessionError('TENANT_SUSPENDED', 'Your dealership account is suspended.');
+    }
     throw new DealerSessionError(
       'NO_DEALER_MEMBERSHIP',
       'This account has no active dealership membership.',

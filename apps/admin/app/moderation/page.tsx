@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
+import { useLocale } from '../../lib/locale';
 
 /**
  * Listing moderation queue.
@@ -14,7 +15,7 @@ import { AdminHeader } from '../../components/AdminHeader';
  */
 export default function ModerationQueueListPage() {
   const router = useRouter();
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale } = useLocale();
   const [listingRef, setListingRef] = useState('');
 
   const openListing = (e: React.FormEvent) => {
@@ -28,7 +29,7 @@ export default function ModerationQueueListPage() {
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col gap-space-lg">

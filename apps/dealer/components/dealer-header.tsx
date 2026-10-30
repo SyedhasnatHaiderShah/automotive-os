@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { roleLabel } from '../lib/permissions';
+import { dealerStrings, localizedRoleLabel } from '../lib/i18n';
 
 /** Non-secret identity fields from the server session (never the token). */
 export interface DealerIdentity {
@@ -24,6 +24,7 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
   onLocaleToggle,
 }) => {
   const isArabic = locale === 'ar';
+  const t = dealerStrings(locale);
   const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => {
     const closed = () => setMobileOpen(false);
@@ -32,10 +33,10 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
   }, []);
 
   return (
-    <header className="dealer-app-header fixed top-0 left-64 right-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-6 flex items-center justify-between border-b border-white/[0.06]">
+    <header className="dealer-app-header fixed top-0 start-64 end-0 h-16 bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.1)] z-40 px-6 flex items-center justify-between border-b border-white/[0.06]">
       {/* Left: active dealership */}
       <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg p-2 text-on-surface hover:bg-surface-container-high" aria-label="Toggle dealer navigation" aria-expanded={mobileOpen} onClick={() => { const next = !document.body.classList.contains("dealer-mobile-nav-open"); setMobileOpen(next); document.body.classList.toggle("dealer-mobile-nav-open", next); }}><span className="material-symbols-outlined">menu</span></button>
+        <button type="button" className="lg:hidden min-h-11 min-w-11 rounded-lg p-2 text-on-surface hover:bg-surface-container-high" aria-label={isArabic ? 'فتح أو إغلاق التنقل' : 'Toggle dealer navigation'} aria-expanded={mobileOpen} onClick={() => { const next = !document.body.classList.contains("dealer-mobile-nav-open"); setMobileOpen(next); document.body.classList.toggle("dealer-mobile-nav-open", next); }}><span className="material-symbols-outlined" aria-hidden="true">menu</span></button>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface border border-white/[0.05] min-w-0">
           <span className="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">storefront</span>
           <span className="font-body-sm text-xs sm:text-sm font-semibold truncate">
@@ -43,8 +44,8 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
           </span>
         </div>
         {identity?.hasMultipleTenants && (
-          <span className="hidden md:inline text-[11px] text-on-surface-variant" title="Dealership switching is not available yet">
-            First active dealership shown
+          <span className="hidden md:inline text-[11px] text-on-surface-variant" title={t.dealershipSwitchUnavailable}>
+            {t.firstDealershipShown}
           </span>
         )}
       </div>
@@ -54,10 +55,10 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
         {identity && (
           <span
             className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-container text-xs font-medium border border-white/[0.07]"
-            aria-label={`Your role: ${roleLabel(identity.role)}`}
+            aria-label={t.yourRole(localizedRoleLabel(t, identity.role))}
           >
             <span className="material-symbols-outlined text-[16px] text-primary" aria-hidden="true">badge</span>
-            <span className="text-on-surface font-semibold">{roleLabel(identity.role)}</span>
+            <span className="text-on-surface font-semibold">{localizedRoleLabel(t, identity.role)}</span>
           </span>
         )}
 
@@ -65,20 +66,20 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
           type="button"
           onClick={onLocaleToggle}
           className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface font-body-sm text-xs hover:bg-surface-container-highest transition-colors border border-white/[0.05]"
-          aria-label="Toggle language"
+          aria-label={t.langToggle}
         >
           <span className={!isArabic ? 'font-bold text-primary' : 'text-on-surface-variant'}>EN</span>
           <span className="text-on-surface-variant">/</span>
           <span className={isArabic ? 'font-bold text-primary' : 'text-on-surface-variant'}>عربي</span>
         </button>
 
-        <div className="flex items-center gap-2.5 pl-1">
-          <div className="text-right hidden sm:block">
+        <div className="flex items-center gap-2.5 ps-1">
+          <div className="text-end hidden sm:block">
             <div className="font-body-sm text-xs font-semibold text-on-surface leading-tight">
-              {identity ? identity.displayName : 'Preview'}
+              {identity ? identity.displayName : isArabic ? 'معاينة' : 'Preview'}
             </div>
             <div className="font-label-caps text-[10px] text-on-surface-variant uppercase font-medium">
-              {identity ? roleLabel(identity.role) : 'Sample data only'}
+              {identity ? localizedRoleLabel(t, identity.role) : isArabic ? 'بيانات تجريبية فقط' : 'Sample data only'}
             </div>
           </div>
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary text-xs shadow-md" aria-hidden="true">

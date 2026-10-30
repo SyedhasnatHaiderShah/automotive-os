@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ShieldAlert, Mail, ArrowLeft, Building2 } from 'lucide-react';
 
+/** Configured support address; the contact link is hidden when it is not set (MK-14). */
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim() || '';
+
 export default function AccessSuspendedPage() {
   const searchParams = useSearchParams();
   const isTenantSuspended = searchParams.get('reason') === 'tenant_suspended';
@@ -43,14 +46,12 @@ export default function AccessSuspendedPage() {
             <span className="text-gray-500">Status Code:</span>
             <span className="text-amber-400 font-bold">{isTenantSuspended ? 'TENANT_INACTIVE' : 'ACCOUNT_SUSPENDED'}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Jurisdiction:</span>
-            <span>UAE Federal Authority (CBUAE / MOEC)</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Support Inquiries:</span>
-            <span className="text-gray-300">compliance@syedhasnat.com</span>
-          </div>
+          {SUPPORT_EMAIL && (
+            <div className="flex justify-between gap-3">
+              <span className="text-gray-500">Support Inquiries:</span>
+              <span className="text-gray-300 break-all">{SUPPORT_EMAIL}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -61,13 +62,15 @@ export default function AccessSuspendedPage() {
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Login</span>
           </Link>
-          <a
-            href="mailto:compliance@syedhasnat.com?subject=Account%20Suspension%20Inquiry"
-            className="flex-1 py-3 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors"
-          >
-            <Mail className="w-4 h-4" />
-            <span>Contact Support</span>
-          </a>
+          {SUPPORT_EMAIL && (
+            <a
+              href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Account Suspension Inquiry')}`}
+              className="flex-1 py-3 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors"
+            >
+              <Mail className="w-4 h-4" aria-hidden="true" />
+              <span>Contact Support</span>
+            </a>
+          )}
         </div>
       </div>
     </div>

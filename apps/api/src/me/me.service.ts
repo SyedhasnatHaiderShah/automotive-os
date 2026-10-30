@@ -73,26 +73,27 @@ export class MeService {
     userId: string,
     dto: UpdateBuyerProfileDto
   ): Promise<BuyerProfileResponseDto> {
+    // undefined = leave unchanged; null = clear the stored value (MK-08).
+    const toFils = (v: number | null | undefined) =>
+      v === undefined ? undefined : v === null ? null : BigInt(v);
     const profile = await this.prisma.buyerProfile.upsert({
       where: { userId },
       update: {
         preferredLanguage: dto.preferredLanguage,
         preferredEmirate: dto.preferredEmirate,
-        budgetMinFils:
-          dto.budgetMinFils !== undefined ? BigInt(dto.budgetMinFils) : undefined,
-        budgetMaxFils:
-          dto.budgetMaxFils !== undefined ? BigInt(dto.budgetMaxFils) : undefined,
+        budgetMinFils: toFils(dto.budgetMinFils),
+        budgetMaxFils: toFils(dto.budgetMaxFils),
         preferredMakes: dto.preferredMakes,
       },
       create: {
         userId,
         preferredLanguage: dto.preferredLanguage || 'en',
-        preferredEmirate: dto.preferredEmirate,
-        budgetMinFils:
-          dto.budgetMinFils !== undefined ? BigInt(dto.budgetMinFils) : null,
-        budgetMaxFils:
-          dto.budgetMaxFils !== undefined ? BigInt(dto.budgetMaxFils) : null,
+        preferredEmirate: dto.preferredEmirate ?? null,
+        budgetMinFils: toFils(dto.budgetMinFils) ?? null,
+        budgetMaxFils: toFils(dto.budgetMaxFils) ?? null,
         preferredMakes: dto.preferredMakes || [],
+        // WhatsApp contact is opt-in; never inherit the column default (MK-09).
+        whatsappCommsConsent: false,
       },
     });
 
@@ -453,7 +454,9 @@ export class MeService {
                         make: true,
                       },
                     },
+                    // Thumbnail must be public photo media only (MK-10); never documents or private uploads.
                     media: {
+                      where: { isPublic: true, kind: { in: ['EXTERIOR', 'INTERIOR'] } },
                       orderBy: { sortOrder: 'asc' },
                       take: 1,
                     },
@@ -737,7 +740,8 @@ export class MeService {
       escrowIban: buyer?.escrowIban || null,
       garageVisibility: buyer?.garageVisibility ?? true,
       aecbRefreshConsent: buyer?.aecbRefreshConsent ?? true,
-      whatsappCommsConsent: buyer?.whatsappCommsConsent ?? true,
+      // No buyer row means the user never opted in (MK-09).
+      whatsappCommsConsent: buyer?.whatsappCommsConsent ?? false,
       updatedAt: (buyer?.updatedAt || user.updatedAt).toISOString(),
     };
   }
@@ -772,7 +776,7 @@ export class MeService {
         escrowIban: dto.escrowIban,
         garageVisibility: dto.garageVisibility ?? true,
         aecbRefreshConsent: dto.aecbRefresh ?? true,
-        whatsappCommsConsent: dto.whatsappComms ?? true,
+        whatsappCommsConsent: dto.whatsappComms ?? false,
       },
       update: {
         corporateAffiliation: dto.affiliation !== undefined ? dto.affiliation : undefined,

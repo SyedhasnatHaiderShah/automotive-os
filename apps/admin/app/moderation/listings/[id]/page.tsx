@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { AdminSidebar } from '../../../../components/AdminSidebar';
 import { AdminHeader } from '../../../../components/AdminHeader';
+import { useLocale } from '../../../../lib/locale';
 import { ConfirmReasonModal } from '../../../../components/ConfirmReasonModal';
 import {
   AdminListingDetail,
@@ -33,6 +34,8 @@ function safeDecode(value: string): string {
 }
 
 function mediaPreviewUrl(media: AdminListingMedia): string | null {
+  // AD-08: short-lived signed URL issued by GET /admin/listings/:id.
+  if (typeof media.previewUrl === 'string' && /^https?:\/\//i.test(media.previewUrl)) return media.previewUrl;
   if (typeof media.url === 'string' && /^https?:\/\//i.test(media.url)) return media.url;
   if (typeof media.objectKey === 'string' && /^https?:\/\//i.test(media.objectKey)) return media.objectKey;
   return null;
@@ -43,7 +46,7 @@ export default function ListingModerationPage() {
   const rawId = params?.id;
   const listingRef = typeof rawId === 'string' ? safeDecode(rawId) : '';
 
-  const [isRtl, setIsRtl] = useState(false);
+  const { isRtl, toggleLocale } = useLocale();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
@@ -105,7 +108,7 @@ export default function ListingModerationPage() {
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <AdminSidebar isRtl={isRtl} />
       <div className={isRtl ? 'pr-60' : 'pl-60'}>
-        <AdminHeader isRtl={isRtl} onToggleRtl={() => setIsRtl(!isRtl)} />
+        <AdminHeader isRtl={isRtl} onToggleRtl={toggleLocale} />
 
         <main className="w-full pt-16 bg-background px-gutter py-space-lg">
           <div className="flex flex-col gap-space-lg">
@@ -250,12 +253,30 @@ export default function ListingModerationPage() {
                         const url = mediaPreviewUrl(m);
                         return (
                           <li key={m.id ?? idx} className="rounded-lg bg-surface-container overflow-hidden border border-surface-container-high/40">
-                            {url ? (
+                            {url && (m.kind === 'DOCUMENT' || m.kind === 'VIDEO') ? (
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full aspect-[4/3] flex flex-col items-center justify-center gap-1 text-center p-2 text-[11px] text-primary hover:underline"
+                              >
+                                <span className="material-symbols-outlined text-[28px]" aria-hidden="true">
+                                  {m.kind === 'VIDEO' ? 'movie' : 'description'}
+                                </span>
+                                {isRtl ? 'فتح الملف (رابط مؤقت)' : 'Open file (temporary link)'}
+                              </a>
+                            ) : url ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img src={url} alt={m.altText || `${vehicleName} media ${idx + 1}`} className="w-full aspect-[4/3] object-cover" />
                             ) : (
                               <div className="w-full aspect-[4/3] flex items-center justify-center text-center p-2 text-[11px] text-outline">
-                                Preview not available (private object, no admin media URL)
+                                {m.isPublic
+                                  ? isRtl
+                                    ? 'المعاينة غير متاحة (التخزين غير مُهيأ)'
+                                    : 'Preview unavailable (object storage not configured)'
+                                  : isRtl
+                                  ? 'خاص — لا يمكن معاينته'
+                                  : 'Private — not previewable'}
                               </div>
                             )}
                             <div className="px-2 py-1 text-[11px] text-outline flex justify-between">

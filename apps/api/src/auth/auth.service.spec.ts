@@ -353,4 +353,37 @@ describe('AuthService', () => {
       );
     });
   });
+  describe('getMe', () => {
+    it('loads memberships in a deterministic order so the dealer console picks a stable tenant (DL-09)', async () => {
+      mockPrisma.user.findUnique.mockResolvedValue({
+        id: 'u1',
+        identitySubject: 'sub-1',
+        email: 'owner@dealer.ae',
+        phoneE164: null,
+        displayName: 'Owner',
+        isPlatformAdmin: false,
+        status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
+        mfaEnabled: false,
+        buyer: null,
+        memberships: [
+          { tenantId: 't-old', role: MembershipRole.OWNER, active: true, tenant: { status: 'ACTIVE', slug: 'old', displayName: 'Old' } },
+          { tenantId: 't-new', role: MembershipRole.SALES_AGENT, active: true, tenant: { status: 'ACTIVE', slug: 'new', displayName: 'New' } },
+        ],
+      });
+
+      const me = await service.getMe('u1');
+
+      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({
+            memberships: expect.objectContaining({
+              orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+            }),
+          }),
+        }),
+      );
+      expect(me.memberships.map((m: { tenantId: string }) => m.tenantId)).toEqual(['t-old', 't-new']);
+    });
+  });
 });

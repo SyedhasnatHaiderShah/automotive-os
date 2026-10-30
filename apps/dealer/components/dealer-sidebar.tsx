@@ -3,12 +3,10 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { capabilitiesFor, INTAKE_UNAVAILABLE_MESSAGE, roleLabel } from '../lib/permissions';
+import { capabilitiesFor } from '../lib/permissions';
+import { dealerStrings, localizedRoleLabel } from '../lib/i18n';
+import { PREVIEW_MODULES_ENABLED } from '../lib/preview';
 import type { DealerIdentity } from './dealer-header';
-
-
-/** Sample-data modules are only linked when explicitly enabled for a preview build. */
-const PREVIEW_MODULES_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PREVIEW_MODULES === 'true';
 
 export interface DealerSidebarProps {
   /** Omitted on preview (sample-data) pages, which have no live session. */
@@ -33,6 +31,8 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [pathname]);
   const isArabic = locale === 'ar';
+  const t = dealerStrings(locale);
+  const notYet = isArabic ? 'غير متاح بعد' : 'Not available yet';
   const caps = identity ? capabilitiesFor(identity.role) : null;
 
   const navItems: NavItem[] = [
@@ -42,16 +42,16 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
       label: isArabic ? 'إدخال مركبة' : 'Add Vehicle',
       href: '/inventory',
       icon: 'add_circle',
-      disabledReason: INTAKE_UNAVAILABLE_MESSAGE,
+      disabledReason: t.intakeUnavailable,
     },
     {
       label: isArabic ? 'العملاء المحتملون' : 'Leads',
       href: '/leads',
       icon: 'filter_alt',
-      disabledReason: caps && !caps.canReadLeads ? 'Your role cannot view leads' : undefined,
+      disabledReason: caps && !caps.canReadLeads ? (isArabic ? 'دورك لا يسمح بعرض العملاء المحتملين' : 'Your role cannot view leads') : undefined,
     },
-    { label: isArabic ? 'تجارب القيادة' : 'Test Drives', href: '/appointments', icon: 'speed', disabledReason: 'Not available yet' },
-    { label: isArabic ? 'إعدادات الوكالة' : 'Dealership Settings', href: '/settings', icon: 'tune', disabledReason: 'Not available yet' },
+    { label: isArabic ? 'تجارب القيادة' : 'Test Drives', href: '/appointments', icon: 'speed', disabledReason: notYet },
+    { label: isArabic ? 'إعدادات الوكالة' : 'Dealership Settings', href: '/settings', icon: 'tune', disabledReason: notYet },
   ];
 
   const previewItems: NavItem[] = [
@@ -75,7 +75,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
     >
       <span className="material-symbols-outlined text-[20px]" aria-hidden="true">{item.icon}</span>
       <span className="text-xs">{item.label}</span>
-      <span className="ml-auto text-[10px] font-label-caps uppercase tracking-wider">{badge}</span>
+      <span className="ms-auto text-[10px] font-label-caps uppercase tracking-wider">{badge}</span>
       <span className="sr-only">({reason})</span>
     </span>
   );
@@ -93,14 +93,14 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
     >
       <span className="material-symbols-outlined text-[20px]" aria-hidden="true">{item.icon}</span>
       <span className="font-body-md">{item.label}</span>
-      {badge && <span className="ml-auto text-[10px] font-label-caps uppercase tracking-wider text-secondary">{badge}</span>}
+      {badge && <span className="ms-auto text-[10px] font-label-caps uppercase tracking-wider text-secondary">{badge}</span>}
     </Link>
   );
 
   return (
-    <aside aria-label="Dealer navigation" className="dealer-app-sidebar fixed left-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)] border-r border-white/[0.06] overflow-y-auto">
+    <aside aria-label={isArabic ? 'التنقل في لوحة الوكالة' : 'Dealer navigation'} className="dealer-app-sidebar fixed start-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)] border-e border-white/[0.06] overflow-y-auto">
       <div className="flex flex-col">
-        <button type="button" className="lg:hidden absolute top-3 right-3 rounded-lg p-2 text-on-surface" aria-label="Close dealer navigation" onClick={() => { document.body.classList.remove("dealer-mobile-nav-open"); window.dispatchEvent(new Event("dealer-nav-closed")); }}>✕</button>
+        <button type="button" className="lg:hidden absolute top-3 end-3 rounded-lg p-2 text-on-surface" aria-label={isArabic ? 'إغلاق التنقل' : 'Close dealer navigation'} onClick={() => { document.body.classList.remove("dealer-mobile-nav-open"); window.dispatchEvent(new Event("dealer-nav-closed")); }}>✕</button>
         <div className="h-16 px-4 flex items-center bg-surface-container/60 border-b border-white/[0.05]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center shadow-md">
@@ -108,7 +108,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
             </div>
             <div>
               <div className="font-headline-sm text-sm font-semibold text-on-surface tracking-tight leading-none">Automotive OS</div>
-              <div className="font-label-caps text-[10px] uppercase text-primary mt-0.5 tracking-wider font-bold">Dealership Suite</div>
+              <div className="font-label-caps text-[10px] uppercase text-primary mt-0.5 tracking-wider font-bold">{isArabic ? 'منظومة الوكالة' : 'Dealership Suite'}</div>
             </div>
           </div>
         </div>
@@ -119,10 +119,14 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
           </div>
         </div>
 
-        <nav aria-label="Core modules" className="flex flex-col gap-1 px-2.5">
+        <nav aria-label={isArabic ? 'الوحدات الأساسية' : 'Core modules'} className="flex flex-col gap-1 px-2.5">
           {navItems.map((item) =>
             item.disabledReason
-              ? renderDisabled(item, item.disabledReason === 'Not available yet' ? 'Soon' : 'Unavailable', item.disabledReason)
+              ? renderDisabled(
+                  item,
+                  item.disabledReason === notYet ? (isArabic ? 'قريباً' : 'Soon') : isArabic ? 'غير متاح' : 'Unavailable',
+                  item.disabledReason,
+                )
               : renderLink(item),
           )}
         </nav>
@@ -132,15 +136,19 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
             {isArabic ? 'وحدات المعاينة' : 'Preview modules'}
           </span>
           <span className="px-1.5 py-0.5 rounded text-[10px] font-label-caps font-semibold uppercase bg-secondary/15 text-secondary tracking-widest">
-            Sample data
+            {isArabic ? 'بيانات تجريبية' : 'Sample data'}
           </span>
         </div>
 
-        <nav aria-label="Preview modules (sample data)" className="flex flex-col gap-1 px-2.5 pb-2">
+        <nav aria-label={isArabic ? 'وحدات المعاينة (بيانات تجريبية)' : 'Preview modules (sample data)'} className="flex flex-col gap-1 px-2.5 pb-2">
           {previewItems.map((item) =>
             PREVIEW_MODULES_ENABLED
-              ? renderLink(item, 'Preview')
-              : renderDisabled(item, 'Preview', 'Preview module with sample data — not enabled in this build'),
+              ? renderLink(item, isArabic ? 'معاينة' : 'Preview')
+              : renderDisabled(
+                  item,
+                  isArabic ? 'معاينة' : 'Preview',
+                  isArabic ? 'وحدة معاينة ببيانات تجريبية — غير مفعّلة في هذا الإصدار' : 'Preview module with sample data — not enabled in this build',
+                ),
           )}
         </nav>
       </div>
@@ -152,12 +160,12 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
             <div className="font-body-sm text-xs font-semibold text-on-surface truncate">{identity.tenantName}</div>
             <div className="font-label-caps text-[10px] text-on-surface-variant flex items-center gap-1 truncate">
               <span className="material-symbols-outlined text-[13px] text-primary" aria-hidden="true">badge</span>
-              <span>{identity.displayName} • {roleLabel(identity.role)}</span>
+              <span>{identity.displayName} • {localizedRoleLabel(t, identity.role)}</span>
             </div>
           </div>
         ) : (
           <div className="p-2 bg-surface-container/60 rounded-lg text-[11px] text-on-surface-variant border border-white/[0.04]">
-            Preview page — no dealer session is loaded here.
+            {isArabic ? 'صفحة معاينة — لا توجد جلسة وكيل محمّلة هنا.' : 'Preview page — no dealer session is loaded here.'}
           </div>
         )}
       </div>

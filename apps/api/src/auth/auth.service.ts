@@ -147,6 +147,8 @@ export class AuthService {
         where: { identitySubject: payload.sub },
         include: {
           memberships: {
+            // Deterministic order (DL-09): callers pick the first usable membership.
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
             include: {
               tenant: true,
             },
@@ -240,6 +242,8 @@ export class AuthService {
         where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
         include: {
           memberships: {
+            // Deterministic order (DL-09): callers pick the first usable membership.
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
             include: {
               tenant: true,
             },
@@ -724,6 +728,8 @@ export class AuthService {
         include: {
           buyer: true,
           memberships: {
+            // Deterministic order (DL-09): callers pick the first usable membership.
+            orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
             include: {
               tenant: true,
             },

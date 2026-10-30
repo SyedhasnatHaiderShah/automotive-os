@@ -6,6 +6,10 @@ import {
 } from "@nestjs/common";
 import { PrismaService, runWithDbContext } from "../database/prisma.service";
 import { buildPublicMediaUrl } from "../common/media-url.util";
+import {
+  ADMIN_MEDIA_PREVIEW_TTL_SECONDS,
+  signAdminMediaPreviewUrl,
+} from "./admin-media-preview.util";
 import { AuditService } from "../audit/audit.service";
 import { CreateDraftListingDto } from "./dto/create-draft-listing.dto";
 import {
@@ -495,6 +499,23 @@ export class ListingsService {
       throw new NotFoundException(`Listing ${listingId} not found`);
     }
 
+    // AD-08: moderators get a short-lived signed GET URL per media object so
+    // they can see photos (public or private) before approving. previewUrl is
+    // null when object storage is not configured (fail closed).
+    const previewExpiresAt = new Date(
+      Date.now() + ADMIN_MEDIA_PREVIEW_TTL_SECONDS * 1000,
+    ).toISOString();
+    const media = await Promise.all(
+      listing.vehicle.media.map(async (m) => {
+        const previewUrl = await signAdminMediaPreviewUrl(m.objectKey);
+        return {
+          ...m,
+          previewUrl,
+          previewExpiresAt: previewUrl ? previewExpiresAt : null,
+        };
+      }),
+    );
+
     return {
       id: listing.id,
       slug: listing.slug,
@@ -524,7 +545,7 @@ export class ListingsService {
         transmission: listing.vehicle.transmission,
         gccSpec: listing.vehicle.gccSpec,
         stockStatus: listing.vehicle.stockStatus,
-        media: listing.vehicle.media,
+        media,
       },
       createdAt: listing.createdAt.toISOString(),
       updatedAt: listing.updatedAt.toISOString(),

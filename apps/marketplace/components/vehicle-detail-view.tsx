@@ -48,6 +48,8 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const [isVipModalOpen, setIsVipModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  // Real favourites total for the header badge (MK-07); 0 hides the badge for signed-out visitors.
+  const [favoritesCount, setFavoritesCount] = useState(0);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
 
@@ -56,7 +58,9 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
     let cancelled = false;
     fetchFavorites()
       .then((favs) => {
-        if (!cancelled) setIsSaved(favs.some((f) => f.listingId === vehicle.id));
+        if (cancelled) return;
+        setIsSaved(favs.some((f) => f.listingId === vehicle.id));
+        setFavoritesCount(favs.length);
       })
       .catch(() => {
         // Not signed in or API unavailable: leave as not saved.
@@ -118,10 +122,12 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
       if (isSaved) {
         await removeFavoriteApi(vehicle.id);
         setIsSaved(false);
+        setFavoritesCount((n) => Math.max(0, n - 1));
         setNotice({ kind: 'ok', text: isArabic ? 'أزيلت من المفضلة.' : 'Removed from favorites.' });
       } else {
         await addFavoriteApi(vehicle.id);
         setIsSaved(true);
+        setFavoritesCount((n) => n + 1);
         setNotice({ kind: 'ok', text: isArabic ? 'أضيفت إلى المفضلة.' : 'Saved to favorites.' });
       }
     } catch (err) {
@@ -140,7 +146,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
       <MarketplaceHeader
         activePath="/cars"
         selectedEmirate={vehicle.emirate}
-        favoritesCount={isSaved ? 1 : 0}
+        favoritesCount={favoritesCount}
         locale={locale}
         onLocaleToggle={() => setLocale((prev) => (prev === 'en' ? 'ar' : 'en'))}
       />
