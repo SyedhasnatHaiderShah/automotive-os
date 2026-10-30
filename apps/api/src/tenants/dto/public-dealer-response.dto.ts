@@ -48,28 +48,28 @@ export class PublicDealerStatsDto {
   @ApiProperty({ description: 'Total asking price sum in integer fils' })
   inventoryValueFils: string;
 
-  @ApiProperty({ description: 'Collector satisfaction rating out of 5' })
-  collectorRating: number;
+  @ApiProperty({ description: 'Collector satisfaction rating out of 5; null until a review source exists', nullable: true, type: Number })
+  collectorRating: number | null;
 
-  @ApiProperty({ description: 'Physical facility area in square feet' })
-  facilitySqFt: number;
+  @ApiProperty({ description: 'Physical facility area in square feet; null until captured', nullable: true, type: Number })
+  facilitySqFt: number | null;
 
-  @ApiProperty({ description: 'Years established in UAE' })
-  establishedYears: number;
+  @ApiProperty({ description: 'Years established in UAE; null until captured', nullable: true, type: Number })
+  establishedYears: number | null;
 }
 
 export class PublicDealerContactDto {
-  @ApiProperty()
-  directPhone: string;
+  @ApiProperty({ nullable: true, type: String })
+  directPhone: string | null;
 
-  @ApiProperty()
-  whatsappNumber: string;
+  @ApiProperty({ nullable: true, type: String })
+  whatsappNumber: string | null;
 
-  @ApiProperty()
-  makaniNumber: string;
+  @ApiProperty({ nullable: true, type: String })
+  makaniNumber: string | null;
 
-  @ApiProperty()
-  gpsCoordinates: string;
+  @ApiProperty({ nullable: true, type: String, description: 'Primary active branch "lat, long"' })
+  gpsCoordinates: string | null;
 }
 
 export class PublicDealerDetailDto {
@@ -102,4 +102,41 @@ export class PublicDealerDetailDto {
 
   @ApiProperty({ type: PublicDealerContactDto })
   contact: PublicDealerContactDto;
+}
+
+export class PublicDealerSummaryDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  slug: string;
+
+  @ApiProperty()
+  displayName: string;
+
+  @ApiProperty()
+  isKybVerified: boolean;
+
+  @ApiProperty({ type: [String] })
+  emirates: string[];
+
+  @ApiProperty({ type: [String] })
+  cities: string[];
+
+  @ApiProperty({ description: 'Count of live grounded published vehicles' })
+  liveGroundedStock: number;
+}
+
+export class PublicDealerListResponseDto {
+  @ApiProperty({ type: [PublicDealerSummaryDto] })
+  items: PublicDealerSummaryDto[];
+
+  @ApiProperty()
+  total: number;
+
+  @ApiProperty()
+  page: number;
+
+  @ApiProperty()
+  limit: number;
 }
