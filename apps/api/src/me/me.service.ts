@@ -160,6 +160,8 @@ export class MeService {
 
   async getFavorites(userId: string): Promise<FavoriteResponseDto[]> {
     const favorites = await this.prisma.favorite.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { userId },
       include: {
         listing: {
@@ -241,6 +243,8 @@ export class MeService {
 
   async getSavedSearches(userId: string): Promise<SavedSearchResponseDto[]> {
     const searches = await this.prisma.savedSearch.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { userId },
       orderBy: { updatedAt: 'desc' },
     });
@@ -280,6 +284,8 @@ export class MeService {
 
   async getBuyerEnquiries(userId: string): Promise<BuyerEnquiryResponseDto[]> {
     const leads = await this.prisma.lead.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { buyerUserId: userId },
       include: {
         listing: {
@@ -431,6 +437,8 @@ export class MeService {
 
   async getBuyerAppointments(userId: string): Promise<any[]> {
     const appointments = await this.prisma.appointment.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { buyerUserId: userId },
       include: {
         lead: {

@@ -38,6 +38,13 @@ export class LeadsController {
   constructor(private readonly leadsService: LeadsService) {}
 
   @Get()
+  // Lead data includes consented buyer contact fields: sales roles only (SEC-11).
+  @RequireRoles(
+    MembershipRole.OWNER,
+    MembershipRole.ADMIN,
+    MembershipRole.SALES_MANAGER,
+    MembershipRole.SALES_AGENT,
+  )
   @ApiOperation({
     summary:
       'List CRM leads for dealership with privacy-preserving summary projection.',
@@ -57,6 +64,12 @@ export class LeadsController {
   }
 
   @Get(':id')
+  @RequireRoles(
+    MembershipRole.OWNER,
+    MembershipRole.ADMIN,
+    MembershipRole.SALES_MANAGER,
+    MembershipRole.SALES_AGENT,
+  )
   @ApiOperation({
     summary:
       'Get CRM lead details. Strictly projects only buyer contact fields authorized by the active data grant; returns redacted contact if grant is revoked or ungranted.',

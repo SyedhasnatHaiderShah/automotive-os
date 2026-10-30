@@ -8,18 +8,14 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
+  AlertCircle,
 } from 'lucide-react';
+import { AuditEvent, errorMessage, listAuditLogs } from '../../lib/api';
 
-interface AuditItem {
-  id: string;
-  action: string;
-  tenantId: string | null;
-  actorUserId: string | null;
-  targetType: string;
-  targetId: string;
-  metadata: any;
-  createdAt: string;
-}
+const PAGE_SIZE = 50;
+
+type AuditItem = AuditEvent;
 
 export default function AdminAuditLogsPage() {
   const [isRtl, setIsRtl] = useState(false);
@@ -28,72 +24,43 @@ export default function AdminAuditLogsPage() {
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const fetchLogs = async () => {
-    setLoading(true);
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { Accept: 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch('/api/v1/admin/audit-logs?limit=50', {
-        headers,
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setLogs(data.events || []);
-      } else {
-        // Fallback demo audit stream
-        setLogs([
-          {
-            id: 'audit-1',
-            action: 'PLATFORM_ADMIN_BOOTSTRAP_PROVISIONED',
-            tenantId: null,
-            actorUserId: 'admin-1',
-            targetType: 'User',
-            targetId: 'hasnathaider332@gmail.com',
-            metadata: { isPlatformAdmin: true, status: 'PENDING_VERIFICATION' },
-            createdAt: new Date().toISOString(),
-          },
-          {
-            id: 'audit-2',
-            action: 'PLATFORM_ADMIN_LIST_ALL_TENANTS',
-            tenantId: null,
-            actorUserId: 'admin-1',
-            targetType: 'tenants',
-            targetId: 'ALL',
-            metadata: { reason: 'cross_tenant_platform_inspection' },
-            createdAt: new Date(Date.now() - 3600000).toISOString(),
-          },
-          {
-            id: 'audit-3',
-            action: 'PLATFORM_ADMIN_CREATE_DEALER',
-            tenantId: 'd-1',
-            actorUserId: 'admin-1',
-            targetType: 'tenant',
-            targetId: 'al-futtaim-motors',
-            metadata: { slug: 'al-futtaim-motors', adminEmail: 'principal@al-futtaim.ae' },
-            createdAt: new Date(Date.now() - 7200000).toISOString(),
-          },
-        ]);
-      }
-    } catch (err) {
-      console.error('Failed to load audit logs:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [targetType, setTargetType] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    fetchLogs();
-  }, []);
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    listAuditLogs({ limit: PAGE_SIZE, offset, targetType: targetType.trim() || undefined })
+      .then((data) => {
+        if (!active) return;
+        setLogs(Array.isArray(data?.events) ? data.events : []);
+        setTotal(data?.total ?? 0);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setLogs([]);
+        setTotal(0);
+        setLoadError(errorMessage(err, 'Audit events could not be loaded.'));
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [offset, targetType, reloadKey]);
+
+  const fetchLogs = () => setReloadKey((k) => k + 1);
 
   const filteredLogs = logs.filter(
     (l) =>
       l.action.toLowerCase().includes(search.toLowerCase()) ||
       l.targetType.toLowerCase().includes(search.toLowerCase()) ||
-      l.targetId.toLowerCase().includes(search.toLowerCase())
+      (l.targetId || '').toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -119,6 +86,7 @@ export default function AdminAuditLogsPage() {
             </div>
 
             <button
+              type="button"
               onClick={fetchLogs}
               className="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-xs text-on-surface flex items-center gap-2 transition-colors self-start"
             >
@@ -128,15 +96,38 @@ export default function AdminAuditLogsPage() {
           </div>
 
           {/* Search bar */}
-          <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 mb-6">
+          <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 mb-6 flex flex-col md:flex-row md:items-center gap-4">
             <div className="relative w-full md:w-96">
               <Search className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by action, target type, or ID..."
+                placeholder="Filter this page by action, target type, or ID..."
+                aria-label="Filter loaded audit events"
                 className="w-full pl-9 pr-4 py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-outline font-mono">Target type:</span>
+              <input
+                type="text"
+                defaultValue={targetType}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setTargetType((e.target as HTMLInputElement).value);
+                    setOffset(0);
+                  }
+                }}
+                onBlur={(e) => {
+                  if (e.target.value !== targetType) {
+                    setTargetType(e.target.value);
+                    setOffset(0);
+                  }
+                }}
+                placeholder="e.g. tenant (server filter)"
+                aria-label="Filter by target type on the server"
+                className="w-48 px-3 py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none"
               />
             </div>
           </div>
@@ -156,7 +147,31 @@ export default function AdminAuditLogsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {filteredLogs.length === 0 ? (
+                  {loadError ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center">
+                        <div role="alert" className="inline-flex flex-col items-center gap-2 text-red-300">
+                          <span className="flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4" />
+                            {loadError}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={fetchLogs}
+                            className="px-3 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : loading && logs.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-outline">
+                        Loading audit events…
+                      </td>
+                    </tr>
+                  ) : filteredLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-outline">
                         No audit events recorded yet.
@@ -220,6 +235,31 @@ export default function AdminAuditLogsPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+            <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-white/10 text-xs font-mono text-outline">
+              <span>
+                {total === 0 ? '0 events' : `Events ${offset + 1}–${Math.min(offset + PAGE_SIZE, total)} of ${total}`}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={loading || offset === 0}
+                  onClick={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+                  className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Prev</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={loading || offset + PAGE_SIZE >= total}
+                  onClick={() => setOffset((o) => o + PAGE_SIZE)}
+                  className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         </main>

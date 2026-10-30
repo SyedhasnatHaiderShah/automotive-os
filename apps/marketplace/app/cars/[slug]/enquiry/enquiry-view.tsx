@@ -26,10 +26,7 @@ export const EnquiryView: React.FC<EnquiryViewProps> = ({ vehicle }) => {
         <div
           className="w-full h-full bg-cover bg-center"
           style={{
-            backgroundImage: `url('${
-              vehicle.media[0]?.url ||
-              'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1600&q=80'
-            }')`,
+            backgroundImage: vehicle.media[0]?.url ? `url('${vehicle.media[0].url}')` : undefined,
           }}
         />
         <div className="absolute inset-0 bg-surface-container-lowest/85 backdrop-blur-2xl" />
@@ -44,12 +41,8 @@ export const EnquiryView: React.FC<EnquiryViewProps> = ({ vehicle }) => {
           className="flex items-center gap-1.5 font-body-sm text-xs sm:text-sm text-on-surface-variant hover:text-primary transition-colors"
         >
           <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-          <span>Return to {vehicle.stockNumber} Dossier</span>
+          <span>Back to {vehicle.title}</span>
         </Link>
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-primary font-data-mono-num text-xs border border-primary/20">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span>Vault Reserve Live</span>
-        </span>
       </div>
 
       {/* Main VIP Flow */}

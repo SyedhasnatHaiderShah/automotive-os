@@ -52,6 +52,7 @@ describe('VehiclesService - Media Upload & R2 Pre-signing Hardening', () => {
         kind: MediaKind.EXTERIOR,
         fileName: 'car-front.jpg',
         contentType: 'image/jpeg',
+        fileSizeBytes: 1024,
       }),
     ).rejects.toThrow(NotFoundException);
 
@@ -77,6 +78,7 @@ describe('VehiclesService - Media Upload & R2 Pre-signing Hardening', () => {
         kind: MediaKind.EXTERIOR,
         fileName: 'car-front.png', // Mismatch: declared as image/jpeg but has .png extension
         contentType: 'image/jpeg',
+        fileSizeBytes: 1024,
       }),
     ).rejects.toThrow(BadRequestException);
   });

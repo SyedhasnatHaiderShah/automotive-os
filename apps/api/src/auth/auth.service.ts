@@ -20,6 +20,7 @@ import {
   CompleteActivationResponseDto,
 } from './dto/activate.dto';
 import { hashPassword, verifyPassword, validatePasswordStrength } from './password.util';
+import { isLocalOrTestEnv } from './jwt-secret';
 
 export interface OidcJwtPayload {
   sub: string;
@@ -29,6 +30,8 @@ export interface OidcJwtPayload {
   phone_number?: string;
   isPlatformAdmin?: boolean;
   sessionId?: string;
+  /** Set only on tokens minted by generateDevToken (local development / tests). */
+  dev?: boolean;
   iss?: string;
   aud?: string;
   iat?: number;
@@ -137,15 +140,17 @@ export class AuthService {
       );
     }
 
+    // Dev tokens (no session row, may auto-provision) are honoured only in
+    // local development and automated tests (SEC-09).
+    const isDevToken = payload.dev === true && isLocalOrTestEnv();
+    if (!payload.sessionId && !isDevToken) {
+      throw new UnauthorizedException('SESSION_REQUIRED: Please log in again.');
+    }
+
     return runWithDbContext({ isAdmin: true }, async () => {
-      // 1. Resolve user from database by identitySubject or id
+      // 1. Resolve user strictly by the signed subject claim
       let user = await this.prisma.user.findFirst({
-        where: {
-          OR: [
-            { identitySubject: payload.sub },
-            ...(payload.userId ? [{ id: payload.userId }] : []),
-          ],
-        },
+        where: { identitySubject: payload.sub },
         include: {
           memberships: {
             include: {
@@ -155,7 +160,10 @@ export class AuthService {
         },
       });
 
-      // 2. If user does not exist in local database, provision buyer account
+      // 2. Unknown subjects are rejected; auto-provisioning is a dev/test convenience only
+      if (!user && !isDevToken) {
+        throw new UnauthorizedException('User authentication failed: subject not authorized');
+      }
       if (!user) {
         const displayName = payload.name || payload.email?.split('@')[0] || 'User';
         user = await this.prisma.user.create({
@@ -187,7 +195,7 @@ export class AuthService {
           where: { id: payload.sessionId },
         });
 
-        if (!session || session.revokedAt || session.expiresAt < new Date()) {
+        if (!session || session.userId !== user.id || session.revokedAt || session.expiresAt < new Date()) {
           throw new UnauthorizedException(
             'SESSION_REVOKED: This session has been revoked, invalidated, or expired. Please log in again.'
           );
@@ -251,9 +259,53 @@ export class AuthService {
           dto.password,
           'scrypt$16384$8$1$0123456789abcdef0123456789abcdef$0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
         );
-        throw new UnauthorizedException('Invalid email or password');
+        throw new UnauthorizedException('Invalid email or password, or the account is temporarily locked');
       }
 
+      // SEC-05: never reveal account state before the password is proven.
+      // A locked account answers with the same generic 401 as a bad password.
+      const genericFailure = 'Invalid email or password, or the account is temporarily locked';
+      if (user.lockedUntil && user.lockedUntil > new Date()) {
+        await verifyPassword(dto.password, user.passwordHash);
+        throw new UnauthorizedException(genericFailure);
+      }
+
+      const isPasswordValid = await verifyPassword(dto.password, user.passwordHash);
+
+      if (!isPasswordValid) {
+        // Atomic increment so parallel guesses cannot exceed the threshold.
+        const updated = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { failedLoginAttempts: { increment: 1 } },
+          select: { failedLoginAttempts: true },
+        });
+        const attempts = updated.failedLoginAttempts;
+        let lockedUntil: Date | null = null;
+        if (attempts >= 5) {
+          lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes lockout
+          await this.prisma.user.update({
+            where: { id: user.id },
+            data: { lockedUntil, failedLoginAttempts: 0 },
+          });
+        }
+
+        await this.prisma.auditEvent.create({
+          data: {
+            action: lockedUntil ? 'AUTH_LOGIN_ACCOUNT_LOCKED' : 'AUTH_LOGIN_FAILED',
+            actorUserId: user.id,
+            targetType: 'User',
+            targetId: user.id,
+            metadata: {
+              failedAttempts: attempts,
+              lockedUntil: lockedUntil?.toISOString() ?? null,
+            },
+          },
+        });
+
+        throw new UnauthorizedException(genericFailure);
+      }
+
+      // Account state is disclosed only after a correct password.
       if (user.status === 'DISABLED') {
         throw new ForbiddenException(
           'ACCOUNT_DISABLED: This account has been disabled. Please contact platform administration.'
@@ -270,46 +322,6 @@ export class AuthService {
         throw new ForbiddenException(
           'EMAIL_NOT_VERIFIED: Your email address has not been verified. Please verify your email before logging in.'
         );
-      }
-
-      if (user.lockedUntil && user.lockedUntil > new Date()) {
-        const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
-        throw new UnauthorizedException(
-          `Account is temporarily locked due to excessive failed attempts. Please retry in ${minutesLeft} minute(s).`
-        );
-      }
-
-      const isPasswordValid = await verifyPassword(dto.password, user.passwordHash);
-
-      if (!isPasswordValid) {
-        const attempts = user.failedLoginAttempts + 1;
-        let lockedUntil: Date | null = null;
-        if (attempts >= 5) {
-          lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes lockout
-        }
-
-        await this.prisma.user.update({
-          where: { id: user.id },
-          data: {
-            failedLoginAttempts: attempts,
-            lockedUntil,
-          },
-        });
-
-        await this.prisma.auditEvent.create({
-          data: {
-            action: lockedUntil ? 'AUTH_LOGIN_ACCOUNT_LOCKED' : 'AUTH_LOGIN_FAILED',
-            actorUserId: user.id,
-            targetType: 'User',
-            targetId: user.id,
-            metadata: {
-              failedAttempts: attempts,
-              lockedUntil: lockedUntil?.toISOString() ?? null,
-            },
-          },
-        });
-
-        throw new UnauthorizedException('Invalid email or password');
       }
 
       // Reset lockout counter on success
@@ -462,7 +474,8 @@ export class AuthService {
         email: user.email!,
         status: user.status,
         message: 'Account registered successfully. Please verify your email to activate your account.',
-        verificationToken: process.env.NODE_ENV !== 'production' ? rawVerificationToken : undefined,
+        // Raw token is only echoed for local development and automated tests (SEC-01).
+        verificationToken: isLocalOrTestEnv() ? rawVerificationToken : undefined,
       };
     });
   }
@@ -547,7 +560,7 @@ export class AuthService {
       return {
         success: true,
         message: genericMessage,
-        verificationToken: process.env.NODE_ENV !== 'production' ? rawVerificationToken : undefined,
+        verificationToken: isLocalOrTestEnv() ? rawVerificationToken : undefined,
       };
     });
   }
@@ -798,6 +811,7 @@ export class AuthService {
         sub: user.identitySubject,
         email: user.email,
         name: user.name,
+        dev: true,
       },
       {
         issuer: process.env.JWT_ISSUER || 'https://auth.autonexa.ae',

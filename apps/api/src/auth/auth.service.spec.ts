@@ -173,15 +173,21 @@ describe('AuthService', () => {
         memberships: [],
       });
 
+      mockPrisma.user.update.mockResolvedValueOnce({ failedLoginAttempts: 3 });
+
       await expect(
         service.login({ email: 'buyer@autonexa.ae', password: 'WrongPassword123!' })
       ).rejects.toThrow(UnauthorizedException);
 
+      // Atomic increment (SEC-05) rather than read-modify-write.
       expect(mockPrisma.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
-            failedLoginAttempts: 3,
-          }),
+          data: { failedLoginAttempts: { increment: 1 } },
+        })
+      );
+      expect(mockPrisma.user.update).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ lockedUntil: expect.any(Date) }),
         })
       );
     });
@@ -200,6 +206,8 @@ describe('AuthService', () => {
         memberships: [],
       });
 
+      mockPrisma.user.update.mockResolvedValueOnce({ failedLoginAttempts: 5 });
+
       await expect(
         service.login({ email: 'buyer@autonexa.ae', password: 'WrongPassword123!' })
       ).rejects.toThrow(UnauthorizedException);
@@ -207,11 +215,28 @@ describe('AuthService', () => {
       expect(mockPrisma.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            failedLoginAttempts: 5,
             lockedUntil: expect.any(Date),
           }),
         })
       );
+    });
+
+    it('should not disclose account state before the password is verified', async () => {
+      const hash = await hashPassword('CorrectPassword123!');
+      mockPrisma.user.update.mockResolvedValueOnce({ failedLoginAttempts: 1 });
+      mockPrisma.user.findFirst.mockResolvedValue({
+        id: 'user-uuid-1',
+        email: 'disabled@autonexa.ae',
+        passwordHash: hash,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+        status: 'DISABLED',
+        memberships: [],
+      });
+
+      await expect(
+        service.login({ email: 'disabled@autonexa.ae', password: 'WrongPassword123!' })
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should reject login for permanently disabled accounts', async () => {

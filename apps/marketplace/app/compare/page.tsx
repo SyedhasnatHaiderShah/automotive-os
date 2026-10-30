@@ -12,7 +12,6 @@ import {
   fetchPublicListingBySlug,
   PublicListingItem,
   PublicListingDetail,
-  PORSCHE_GT3RS_DETAIL_FIXTURE,
 } from '../../lib/api';
 
 export default function VehicleComparisonPage() {
@@ -22,52 +21,44 @@ export default function VehicleComparisonPage() {
   const [comparedVehicles, setComparedVehicles] = useState<PublicListingDetail[]>([]);
   const [availableListings, setAvailableListings] = useState<PublicListingItem[]>([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [pickerQuery, setPickerQuery] = useState('');
 
   const isArabic = locale === 'ar';
 
   useEffect(() => {
+    let cancelled = false;
     async function initComparison() {
       setLoading(true);
-      // Fetch available listings from API
-      const searchRes = await fetchPublicListings();
-      setAvailableListings(searchRes.items);
+      setLoadError(null);
+      try {
+        // Only vehicles the buyer explicitly chose (?slugs=a,b) are compared; nothing is pre-filled.
+        let initialSlugs: string[] = [];
+        const slugsParam = new URLSearchParams(window.location.search).get('slugs');
+        if (slugsParam) initialSlugs = slugsParam.split(',').map((x) => x.trim()).filter(Boolean);
 
-      // Check query params for initial slugs to compare, e.g. ?slugs=porsche,toyota
-      let initialSlugs: string[] = [];
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const slugsParam = params.get('slugs');
-        if (slugsParam) {
-          initialSlugs = slugsParam.split(',').filter(Boolean);
+        const [searchRes, details] = await Promise.all([
+          fetchPublicListings({ limit: 50 }),
+          Promise.all(initialSlugs.slice(0, 4).map((slug) => fetchPublicListingBySlug(slug))),
+        ]);
+        if (cancelled) return;
+        setAvailableListings(searchRes.items);
+        setComparedVehicles(details.filter((d): d is PublicListingDetail => d !== null));
+      } catch (err) {
+        if (!cancelled) {
+          setLoadError(err instanceof Error ? err.message : 'Could not load vehicles.');
         }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      if (initialSlugs.length === 0 && searchRes.items.length >= 2) {
-        const first = searchRes.items[0];
-        const second = searchRes.items[1];
-        if (first?.slug && second?.slug) {
-          initialSlugs = [first.slug, second.slug];
-        }
-      }
-
-      const loadedDetails: PublicListingDetail[] = [];
-      for (const slug of initialSlugs.slice(0, 4)) {
-        const detail = await fetchPublicListingBySlug(slug);
-        if (detail) {
-          loadedDetails.push(detail);
-        }
-      }
-
-      if (loadedDetails.length === 0) {
-        loadedDetails.push(PORSCHE_GT3RS_DETAIL_FIXTURE);
-      }
-
-      setComparedVehicles(loadedDetails);
-      setLoading(false);
     }
 
     initComparison();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const removeVehicle = (id: string) => {
@@ -78,13 +69,18 @@ export default function VehicleComparisonPage() {
     if (comparedVehicles.length >= 4) return;
     if (comparedVehicles.some((v) => v.id === item.id)) return;
 
-    setLoading(true);
-    const detail = await fetchPublicListingBySlug(item.slug);
-    if (detail) {
-      setComparedVehicles((prev) => [...prev, detail]);
+    setAddError(null);
+    try {
+      const detail = await fetchPublicListingBySlug(item.slug);
+      if (detail) {
+        setComparedVehicles((prev) => [...prev, detail]);
+        setAddModalOpen(false);
+      } else {
+        setAddError(isArabic ? 'لم تعد هذه السيارة متاحة.' : 'This vehicle is no longer available.');
+      }
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : 'Could not load this vehicle.');
     }
-    setAddModalOpen(false);
-    setLoading(false);
   };
 
   // Check if a spec row differs across compared vehicles
@@ -117,19 +113,21 @@ export default function VehicleComparisonPage() {
         {
           label: isArabic ? 'القسط الشهري التقديري' : 'Monthly Est. (Indicative)',
           render: (v: PublicListingDetail) => {
-            const monthly = v.monthlyEstimateAed || Math.round((Number(v.price.amountFils) / 100) * 0.0175);
+            // Same illustrative assumption as the vehicle page: 20% down, 60 months, 2.49% flat p.a.
+            const principal = (Number(v.price.amountFils) / 100) * 0.8;
+            const monthly = Math.round((principal * (1 + 0.0249 * 5)) / 60);
             return (
               <div>
                 <span className="font-data-mono-num text-sm text-on-surface">
                   AED {monthly.toLocaleString()} / mo*
                 </span>
                 <span className="block text-[10px] text-outline/80 mt-0.5">
-                  {isArabic ? '*تقدير استرشادي بدون عرض مصرفي' : '*Indicative only, subject to lender'}
+                  {isArabic ? '*افتراض توضيحي وليس عرضًا من بنك' : '*Illustrative assumption, not a bank offer'}
                 </span>
               </div>
             );
           },
-          extractor: (v: PublicListingDetail) => v.monthlyEstimateAed,
+          extractor: (v: PublicListingDetail) => v.price.amountFils,
         },
         {
           label: isArabic ? 'المعرض والوكيل' : 'Showroom / Dealer',
@@ -172,7 +170,7 @@ export default function VehicleComparisonPage() {
           label: isArabic ? 'المسافة المقطوعة' : 'Mileage',
           render: (v: PublicListingDetail) => (
             <span className="text-sm font-data-mono-num">
-              {v.mileageKm !== null ? `${v.mileageKm.toLocaleString()} km` : 'Brand New'}
+              {v.mileageKm !== null && v.mileageKm !== undefined ? `${v.mileageKm.toLocaleString('en-US')} km` : '—'}
             </span>
           ),
           extractor: (v: PublicListingDetail) => v.mileageKm,
@@ -190,7 +188,7 @@ export default function VehicleComparisonPage() {
           label: isArabic ? 'المواصفات الإقليمية' : 'Regional Specs',
           render: (v: PublicListingDetail) => (
             <span className={`text-sm font-semibold ${v.gccSpec ? 'text-tertiary' : 'text-outline'}`}>
-              {v.gccSpec ? 'GCC Spec ✓' : 'Non-GCC / Import'}
+              {v.gccSpec === true ? 'GCC Spec ✓' : v.gccSpec === false ? 'Non-GCC' : '—'}
             </span>
           ),
           extractor: (v: PublicListingDetail) => v.gccSpec,
@@ -199,7 +197,7 @@ export default function VehicleComparisonPage() {
           label: isArabic ? 'المحرك والقوة' : 'Engine & Output',
           render: (v: PublicListingDetail) => (
             <span className="text-sm text-on-surface">
-              {v.engineSpec || v.horsepower || 'V6 / V8 Twin-Turbo'}
+              {v.engineSpec || v.horsepower || '—'}
             </span>
           ),
           extractor: (v: PublicListingDetail) => v.engineSpec || v.horsepower,
@@ -208,7 +206,7 @@ export default function VehicleComparisonPage() {
           label: isArabic ? 'ناقل الحركة' : 'Transmission',
           render: (v: PublicListingDetail) => (
             <span className="text-sm text-on-surface">
-              {v.transmission || 'Automatic / Dual-Clutch'}
+              {v.transmission || '—'}
             </span>
           ),
           extractor: (v: PublicListingDetail) => v.transmission,
@@ -222,7 +220,7 @@ export default function VehicleComparisonPage() {
           label: isArabic ? 'الضمان' : 'Warranty',
           render: (v: PublicListingDetail) => (
             <span className="text-sm text-on-surface">
-              {v.warrantyInfo || (v.condition === 'NEW' ? 'Official Dealer Warranty' : 'Dealer Inspected')}
+              {v.warrantyInfo || '—'}
             </span>
           ),
           extractor: (v: PublicListingDetail) => v.warrantyInfo,
@@ -231,7 +229,7 @@ export default function VehicleComparisonPage() {
           label: isArabic ? 'فحص رقم الهيكل' : 'Chassis Masked VIN',
           render: (v: PublicListingDetail) => (
             <span className="font-data-mono-num text-xs text-outline tracking-wider" dir="ltr">
-              {v.maskedVin || '1GNEK1337********'}
+              {v.maskedVin || '—'}
             </span>
           ),
           extractor: (v: PublicListingDetail) => v.maskedVin,
@@ -274,8 +272,8 @@ export default function VehicleComparisonPage() {
             </h1>
             <p className="text-sm text-outline mt-1 font-body-md">
               {isArabic
-                ? 'قارن حتى 4 سيارات جنباً إلى جنب مع مطابقة المواصفات الخليجية، والأسعار، وسجل الوكلاء المعتمدين.'
-                : 'Compare up to 4 vehicles side-by-side with verified GCC specs, asking prices, and showroom provenance.'}
+                ? 'قارن حتى 4 سيارات جنباً إلى جنب حسب المواصفات والأسعار والوكيل.'
+                : 'Compare up to 4 vehicles side-by-side by specification, asking price and dealer.'}
             </p>
           </div>
 
@@ -304,7 +302,20 @@ export default function VehicleComparisonPage() {
         </div>
 
         {/* Comparison Matrix Table */}
-        {comparedVehicles.length === 0 ? (
+        {loading ? (
+          <div role="status" className="p-12 text-center bg-surface-container/60 rounded-xl border border-outline-variant/30 text-sm text-outline">
+            {isArabic ? 'جارٍ التحميل…' : 'Loading vehicles…'}
+          </div>
+        ) : loadError ? (
+          <div role="alert" className="p-12 text-center bg-surface-container/60 rounded-xl border border-error/30">
+            <p className="text-error text-sm">
+              {isArabic ? 'تعذر تحميل السيارات.' : 'Vehicles could not be loaded.'} {loadError}
+            </p>
+            <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+              {isArabic ? 'إعادة المحاولة' : 'Try again'}
+            </Button>
+          </div>
+        ) : comparedVehicles.length === 0 ? (
           <div className="p-12 text-center bg-surface-container/60 rounded-xl border border-outline-variant/30">
             <p className="text-outline text-sm">
               {isArabic ? 'لم يتم اختيار سيارات للمقارنة.' : 'No vehicles currently selected for comparison.'}
@@ -341,11 +352,10 @@ export default function VehicleComparisonPage() {
 
                         {/* Vehicle Photo */}
                         <div className="w-full aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-lowest border border-outline-variant/30">
-                          <img
-                            src={vehicle.media?.[0]?.url || 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=600&q=80'}
-                            alt={vehicle.title}
-                            className="w-full h-full object-cover"
-                          />
+                          {vehicle.media?.[0]?.url && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={vehicle.media[0].url} alt={vehicle.title} className="w-full h-full object-cover" />
+                          )}
                         </div>
 
                         {/* Vehicle Title & Trim */}
@@ -475,7 +485,7 @@ export default function VehicleComparisonPage() {
               ? 'ملاحظة: كافة التقديرات المالية والضمانات هي مؤشرات استرشادية تعتمد على تقييم صالة العرض والمؤسسة التمويلية.'
               : 'Regulatory Disclosure: All specifications and vehicle estimates are non-binding dealer quotations subject to final showroom contracts.'}
           </span>
-          <span className="text-tertiary whitespace-nowrap">UAE Central Bank • AED Currency Standard</span>
+          <span className="text-tertiary whitespace-nowrap">AED</span>
         </div>
       </main>
 
@@ -496,22 +506,44 @@ export default function VehicleComparisonPage() {
               </button>
             </div>
 
+            <label htmlFor="compare-picker-q" className="sr-only">
+              {isArabic ? 'بحث' : 'Search loaded vehicles'}
+            </label>
+            <input
+              id="compare-picker-q"
+              type="search"
+              value={pickerQuery}
+              onChange={(e) => setPickerQuery(e.target.value)}
+              placeholder={isArabic ? 'ابحث بالاسم…' : 'Filter by title…'}
+              className="w-full h-10 px-3 rounded-lg bg-surface-container-lowest text-on-surface text-sm border border-outline-variant/40 focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            {addError && (
+              <p role="alert" className="text-xs text-error">
+                {addError}
+              </p>
+            )}
             <div className="overflow-y-auto flex flex-col gap-2.5 pr-1">
+              {availableListings.filter((item) => !comparedVehicles.some((v) => v.id === item.id)).length === 0 && (
+                <p className="text-sm text-outline text-center py-6">
+                  {isArabic ? 'لا توجد سيارات متاحة للإضافة.' : 'No more published vehicles to add.'}
+                </p>
+              )}
               {availableListings
                 .filter((item) => !comparedVehicles.some((v) => v.id === item.id))
+                .filter((item) => !pickerQuery.trim() || item.title.toLowerCase().includes(pickerQuery.trim().toLowerCase()))
                 .map((item) => (
-                  <div
+                  <button
+                    type="button"
                     key={item.id}
                     onClick={() => addVehicle(item)}
-                    className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 cursor-pointer transition-colors"
+                    className="w-full text-start flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/30 cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-10 rounded-lg overflow-hidden bg-surface-container-lowest flex-shrink-0">
-                        <img
-                          src={item.media?.[0]?.url || 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=200&q=80'}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
+                        {item.media?.[0]?.url && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.media[0].url} alt={item.title} className="w-full h-full object-cover" />
+                        )}
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-on-surface line-clamp-1">
@@ -531,7 +563,7 @@ export default function VehicleComparisonPage() {
                         {isArabic ? '+ اختيار' : '+ Select'}
                       </span>
                     </div>
-                  </div>
+                  </button>
                 ))}
             </div>
           </div>

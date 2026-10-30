@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { DealerSidebar } from '../../../../components/dealer-sidebar';
 import { DealerHeader } from '../../../../components/dealer-header';
+import { previewSafeMessage } from '../../../../lib/preview';
 import {
   VERIFIED_EXPORT_DISCREPANCY_FIXTURE,
   ExportDiscrepancyData,
@@ -12,14 +13,16 @@ import {
 
 export default function ExportDiscrepancyExceptionPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  const [role] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const isRtl = locale === 'ar';
 
   const [discrepancyData, setDiscrepancyData] = useState<ExportDiscrepancyData>(VERIFIED_EXPORT_DISCREPANCY_FIXTURE);
   const [demonstratorState, setDemonstratorState] = useState<'AUDIT_FLAG' | 'STANDARD' | 'TRADE_IN' | 'ZERO_RATED'>('AUDIT_FLAG');
 
   // Modals & Feedback
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
   const [uploadBayanModalOpen, setUploadBayanModalOpen] = useState(false);
   const [extensionModalOpen, setExtensionModalOpen] = useState(false);
   const [zatcaModalOpen, setZatcaModalOpen] = useState(false);
@@ -100,8 +103,6 @@ export default function ExportDiscrepancyExceptionPage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />

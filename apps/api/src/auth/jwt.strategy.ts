@@ -2,8 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService, OidcJwtPayload } from './auth.service';
-
-const DEFAULT_DEV_SECRET = 'dev-jwt-secret-replace-in-production-min-32-chars-long';
+import { resolveJwtSecret } from './jwt-secret';
 
 export const cookieExtractor = (req: any): string | null => {
   if (req && req.cookies && req.cookies['ao_session']) {
@@ -21,16 +20,6 @@ export const cookieExtractor = (req: any): string | null => {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    const isProductionOrStaging =
-      process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging';
-    const configuredSecret = process.env.JWT_SECRET;
-
-    if (isProductionOrStaging && (!configuredSecret || configuredSecret === DEFAULT_DEV_SECRET)) {
-      throw new Error(
-        'CRITICAL_SECURITY_ERROR: JWT_SECRET must be explicitly configured with a secure non-default secret in production and staging environments.'
-      );
-    }
-
     const expectedIssuer = process.env.JWT_ISSUER || 'https://auth.autonexa.ae';
     const expectedAudience = process.env.JWT_AUDIENCE || 'autonexa-api';
 
@@ -40,10 +29,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         cookieExtractor,
       ]),
       ignoreExpiration: false,
-      secretOrKey: configuredSecret || DEFAULT_DEV_SECRET,
+      secretOrKey: resolveJwtSecret(),
       issuer: expectedIssuer,
       audience: expectedAudience,
-      algorithms: ['HS256', 'RS256'],
+      // Symmetric secret: accept HS256 only.
+      algorithms: ['HS256'],
     });
   }
 
@@ -56,11 +46,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     if (payload.iss && payload.iss !== expectedIssuer) {
-      throw new UnauthorizedException(`Invalid JWT issuer: expected ${expectedIssuer}, received ${payload.iss}`);
+      throw new UnauthorizedException('Invalid JWT issuer');
     }
 
     if (payload.aud && payload.aud !== expectedAudience) {
-      throw new UnauthorizedException(`Invalid JWT audience: expected ${expectedAudience}, received ${payload.aud}`);
+      throw new UnauthorizedException('Invalid JWT audience');
     }
 
     const user = await this.authService.validateOidcPayload(payload);

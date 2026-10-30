@@ -48,7 +48,6 @@ export class VehiclesController {
     MembershipRole.ADMIN,
     MembershipRole.INVENTORY_MANAGER,
     MembershipRole.SALES_MANAGER,
-    MembershipRole.SALES_AGENT,
   )
   @ApiOperation({
     summary: "Ingest physical vehicle into dealership stock ledger",
@@ -139,6 +138,6 @@ export class VehiclesController {
     @Param("id") id: string,
     @Body() dto: CreateMediaUploadDto,
   ): Promise<MediaUploadResponseDto> {
-    return this.vehiclesService.registerMediaUpload(tenant.tenantId, id, dto);
+    return this.vehiclesService.registerMediaUpload(tenant.tenantId, id, dto, tenant.userRole);
   }
 }

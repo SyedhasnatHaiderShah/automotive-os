@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
+import { ConfirmReasonModal } from '../../components/ConfirmReasonModal';
 import {
   Search,
   Shield,
@@ -14,196 +15,137 @@ import {
   RefreshCw,
   LogOut,
   UserX,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
+import {
+  AdminUser,
+  errorMessage,
+  getCurrentAdmin,
+  listUsers,
+  revokeUserSessions,
+  updateUserStatus,
+} from '../../lib/api';
 
-interface UserItem {
-  id: string;
-  email: string | null;
-  displayName: string;
-  phoneE164: string | null;
-  isPlatformAdmin: boolean;
-  status: 'ACTIVE' | 'SUSPENDED' | 'DISABLED' | 'PENDING_VERIFICATION';
-  createdAt: string;
-  updatedAt: string;
-  emailVerifiedAt: string | null;
-  memberships: Array<{
-    tenantId: string;
-    tenantName: string;
-    tenantSlug: string;
-    role: string;
-    active: boolean;
-  }>;
-  isBuyer: boolean;
-}
+type UserItem = AdminUser;
+
+type PendingAction = { kind: 'SUSPENDED' | 'DISABLED' | 'ACTIVE' | 'REVOKE'; user: UserItem };
+
+const PAGE_SIZE = 20;
+
+const ACTION_COPY: Record<PendingAction['kind'], { title: string; confirm: string }> = {
+  SUSPENDED: { title: 'Suspend this account?', confirm: 'Suspend account' },
+  DISABLED: { title: 'Disable this account?', confirm: 'Disable account' },
+  ACTIVE: { title: 'Reactivate this account?', confirm: 'Reactivate account' },
+  REVOKE: { title: 'Revoke all active sessions?', confirm: 'Revoke sessions' },
+};
 
 export default function AdminUsersPage() {
   const [isRtl, setIsRtl] = useState(false);
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [reloadKey, setReloadKey] = useState(0);
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
+  const [currentAdminId, setCurrentAdminId] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { Accept: 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const params = new URLSearchParams();
-      if (search) params.set('search', search);
-      if (statusFilter !== 'ALL') params.set('status', statusFilter);
-      if (roleFilter !== 'ALL') params.set('role', roleFilter);
-
-      const res = await fetch(`/api/v1/admin/users?${params.toString()}`, {
-        headers,
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data.users || []);
-      } else {
-        // Fallback demo users if unauthenticated preview
-        setUsers([
-          {
-            id: 'admin-1',
-            email: 'hasnathaider332@gmail.com',
-            displayName: 'Hasnat Haider (Principal)',
-            phoneE164: '+971501234567',
-            isPlatformAdmin: true,
-            status: 'ACTIVE',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            emailVerifiedAt: new Date().toISOString(),
-            memberships: [],
-            isBuyer: false,
-          },
-          {
-            id: 'admin-2',
-            email: 'hasnatshah230@gmail.com',
-            displayName: 'Hasnat Shah (Security Admin)',
-            phoneE164: '+971509876543',
-            isPlatformAdmin: true,
-            status: 'ACTIVE',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            emailVerifiedAt: new Date().toISOString(),
-            memberships: [],
-            isBuyer: false,
-          },
-          {
-            id: 'dealer-1',
-            email: 'principal@al-futtaim.ae',
-            displayName: 'Tariq Al Futtaim',
-            phoneE164: '+97142085000',
-            isPlatformAdmin: false,
-            status: 'ACTIVE',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            emailVerifiedAt: new Date().toISOString(),
-            memberships: [
-              {
-                tenantId: 'tenant-1',
-                tenantName: 'Al-Futtaim Motors Dubai',
-                tenantSlug: 'al-futtaim-motors',
-                role: 'OWNER',
-                active: true,
-              },
-            ],
-            isBuyer: false,
-          },
-          {
-            id: 'buyer-1',
-            email: 'collector@sovereign.ae',
-            displayName: 'Sheikh Mansoor Al-Ketbi',
-            phoneE164: '+971505551234',
-            isPlatformAdmin: false,
-            status: 'ACTIVE',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            emailVerifiedAt: new Date().toISOString(),
-            memberships: [],
-            isBuyer: true,
-          },
-        ]);
+  // Debounce free-text search (~300ms); a new term restarts at page 1.
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      const next = searchInput.trim();
+      if (next !== search) {
+        setSearch(next);
+        setPage(1);
       }
-    } catch (err) {
-      console.error('Failed to fetch users:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [searchInput, search]);
 
   useEffect(() => {
-    fetchUsers();
-  }, [search, statusFilter, roleFilter]);
+    getCurrentAdmin()
+      .then((me) => setCurrentAdminId(me.id))
+      .catch(() => setCurrentAdminId(null));
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setLoadError(null);
+    listUsers(
+      {
+        page,
+        limit: PAGE_SIZE,
+        search: search || undefined,
+        status: statusFilter !== 'ALL' ? statusFilter : undefined,
+        role: roleFilter !== 'ALL' ? roleFilter : undefined,
+      },
+      controller.signal,
+    )
+      .then((data) => {
+        setUsers(Array.isArray(data?.users) ? data.users : []);
+        setTotal(data?.total ?? 0);
+        setTotalPages(data?.totalPages ?? 0);
+      })
+      .catch((err: unknown) => {
+        if (controller.signal.aborted) return;
+        setUsers([]);
+        setTotal(0);
+        setTotalPages(0);
+        setLoadError(errorMessage(err, 'Users could not be loaded.'));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [page, search, statusFilter, roleFilter, reloadKey]);
+
+  const fetchUsers = () => setReloadKey((k) => k + 1);
 
   const showToast = (type: 'success' | 'error', text: string) => {
     setToastMessage({ type, text });
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  const handleUpdateStatus = async (userId: string, newStatus: 'ACTIVE' | 'SUSPENDED' | 'DISABLED') => {
+  const openAction = (kind: PendingAction['kind'], user: UserItem) => {
+    setActionError(null);
+    setPendingAction({ kind, user });
+  };
+
+  const runPendingAction = async (reason: string) => {
+    if (!pendingAction) return;
+    const { kind, user } = pendingAction;
     setActionLoading(true);
+    setActionError(null);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch(`/api/v1/admin/users/${userId}`, {
-        method: 'PATCH',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.message || data?.error?.message || 'Failed to update user status');
+      if (kind === 'REVOKE') {
+        const data = await revokeUserSessions(user.id);
+        showToast('success', `API revoked ${data?.revokedCount ?? 0} active session(s) for ${user.displayName}.`);
+      } else {
+        await updateUserStatus(user.id, kind, reason);
+        showToast('success', `API confirmed status ${kind} for ${user.displayName}.`);
+        setSelectedUser((sel) => (sel && sel.id === user.id ? { ...sel, status: kind } : sel));
       }
-
-      showToast('success', `User status updated to ${newStatus}`);
+      setPendingAction(null);
       fetchUsers();
-      if (selectedUser && selectedUser.id === userId) {
-        setSelectedUser({ ...selectedUser, status: newStatus });
-      }
-    } catch (err: any) {
-      showToast('error', err.message || 'Operation failed');
+    } catch (err) {
+      setActionError(`Not saved: ${errorMessage(err, 'Operation failed')}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleRevokeSessions = async (userId: string) => {
-    setActionLoading(true);
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch(`/api/v1/admin/users/${userId}/revoke-sessions`, {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.message || 'Failed to revoke sessions');
-      }
-
-      showToast('success', `Terminated ${data.revokedCount ?? 0} active user session(s)`);
-    } catch (err: any) {
-      showToast('error', err.message || 'Failed to revoke sessions');
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  const isSelf = (u: UserItem | null) => Boolean(u && currentAdminId && u.id === currentAdminId);
 
   return (
     <div className={`min-h-screen bg-background font-body-md text-on-surface ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
@@ -229,6 +171,7 @@ export default function AdminUsersPage() {
             </div>
 
             <button
+              type="button"
               onClick={fetchUsers}
               className="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-xs text-on-surface flex items-center gap-2 transition-colors self-start"
             >
@@ -240,6 +183,7 @@ export default function AdminUsersPage() {
           {/* Toast Notification */}
           {toastMessage && (
             <div
+              role="status"
               className={`mb-5 p-4 rounded-xl border flex items-center gap-3 text-xs font-mono shadow-xl transition-all ${
                 toastMessage.type === 'success'
                   ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200'
@@ -261,9 +205,10 @@ export default function AdminUsersPage() {
               <Search className="w-4 h-4 text-outline absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by email, name, or phone..."
+                aria-label="Search users by email, name, or phone"
                 className="w-full pl-9 pr-4 py-2 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-gray-500 focus:border-primary focus:outline-none"
               />
             </div>
@@ -273,13 +218,18 @@ export default function AdminUsersPage() {
                 <span className="text-xs text-outline font-mono">Status:</span>
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  aria-label="Filter by status"
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value);
+                    setPage(1);
+                  }}
                   className="px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white focus:outline-none"
                 >
                   <option value="ALL">All Statuses</option>
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="SUSPENDED">SUSPENDED</option>
                   <option value="DISABLED">DISABLED</option>
+                  <option value="PENDING_VERIFICATION">PENDING_VERIFICATION</option>
                 </select>
               </div>
 
@@ -287,7 +237,11 @@ export default function AdminUsersPage() {
                 <span className="text-xs text-outline font-mono">Role:</span>
                 <select
                   value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
+                  aria-label="Filter by role"
+                  onChange={(e) => {
+                    setRoleFilter(e.target.value);
+                    setPage(1);
+                  }}
                   className="px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-white/10 text-xs text-white focus:outline-none"
                 >
                   <option value="ALL">All Roles</option>
@@ -317,7 +271,31 @@ export default function AdminUsersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {users.length === 0 ? (
+                  {loadError ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center">
+                        <div role="alert" className="inline-flex flex-col items-center gap-2 text-red-300">
+                          <span className="flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4" />
+                            {loadError}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={fetchUsers}
+                            className="px-3 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : loading && users.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-outline">
+                        Loading users…
+                      </td>
+                    </tr>
+                  ) : users.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-outline">
                         No platform users matching criteria.
@@ -339,6 +317,11 @@ export default function AdminUsersPage() {
                                   Admin
                                 </span>
                               )}
+                              {isSelf(u) && (
+                                <span className="px-1.5 py-0.5 rounded bg-surface-container-high text-outline text-[10px] uppercase font-mono">
+                                  You
+                                </span>
+                              )}
                             </span>
                             <span className="text-gray-400 text-xs">{u.email || 'No email registered'}</span>
                           </div>
@@ -351,8 +334,10 @@ export default function AdminUsersPage() {
                             <span className="text-tertiary">
                               {u.memberships.map((m) => m.role).join(', ')}
                             </span>
-                          ) : (
+                          ) : u.isBuyer ? (
                             <span className="text-gray-400">BUYER (Retail)</span>
+                          ) : (
+                            <span className="text-gray-600">—</span>
                           )}
                         </td>
 
@@ -375,7 +360,7 @@ export default function AdminUsersPage() {
                             className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               u.status === 'ACTIVE'
                                 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                : u.status === 'SUSPENDED'
+                                : u.status === 'SUSPENDED' || u.status === 'PENDING_VERIFICATION'
                                 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
                                 : 'bg-red-500/10 text-red-400 border border-red-500/30'
                             }`}
@@ -385,11 +370,12 @@ export default function AdminUsersPage() {
                         </td>
 
                         <td className="py-3 px-4 text-gray-400 text-[11px]">
-                          {new Date(u.createdAt).toLocaleDateString('en-GB')}
+                          {new Date(u.createdAt).toLocaleDateString('en-GB', { timeZone: 'Asia/Dubai' })}
                         </td>
 
                         <td className="py-3 px-4 text-right">
                           <button
+                            type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedUser(u);
@@ -405,6 +391,31 @@ export default function AdminUsersPage() {
                 </tbody>
               </table>
             </div>
+            <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-white/10 text-xs font-mono text-outline">
+              <span>
+                {total} user{total === 1 ? '' : 's'} · page {totalPages === 0 ? 0 : page} of {totalPages}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={loading || page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Prev</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={loading || page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
         </main>
       </div>
@@ -412,7 +423,12 @@ export default function AdminUsersPage() {
       {/* User Management Drawer */}
       {selectedUser && (
         <div className="fixed inset-0 z-[100] flex justify-end bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-[#121824] border-l border-white/10 h-full p-6 flex flex-col justify-between overflow-y-auto">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Identity dossier"
+            className="w-full max-w-md bg-[#121824] border-l border-white/10 h-full p-6 flex flex-col justify-between overflow-y-auto"
+          >
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
                 <div className="flex items-center gap-2">
@@ -420,6 +436,8 @@ export default function AdminUsersPage() {
                   <h2 className="text-lg font-bold font-heading text-white">Identity Dossier</h2>
                 </div>
                 <button
+                  type="button"
+                  aria-label="Close identity dossier"
                   onClick={() => setSelectedUser(null)}
                   className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white"
                 >
@@ -450,7 +468,7 @@ export default function AdminUsersPage() {
                     className={`inline-block mt-1 px-2.5 py-0.5 rounded text-xs font-bold ${
                       selectedUser.status === 'ACTIVE'
                         ? 'bg-emerald-500/20 text-emerald-400'
-                        : selectedUser.status === 'SUSPENDED'
+                        : selectedUser.status === 'SUSPENDED' || selectedUser.status === 'PENDING_VERIFICATION'
                         ? 'bg-amber-500/20 text-amber-400'
                         : 'bg-red-500/20 text-red-400'
                     }`}
@@ -482,51 +500,84 @@ export default function AdminUsersPage() {
                 Administrative Mutations
               </span>
 
-              {selectedUser.status === 'ACTIVE' ? (
-                <button
-                  type="button"
-                  disabled={actionLoading}
-                  onClick={() => handleUpdateStatus(selectedUser.id, 'SUSPENDED')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                >
-                  <ShieldAlert className="w-4 h-4" />
-                  <span>Suspend User Account</span>
-                </button>
+              {isSelf(selectedUser) ? (
+                <p className="text-xs text-outline font-mono">
+                  This is your own account. Suspend, disable and session revocation are not offered for the signed-in administrator.
+                </p>
               ) : (
-                <button
-                  type="button"
-                  disabled={actionLoading}
-                  onClick={() => handleUpdateStatus(selectedUser.id, 'ACTIVE')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Reactivate User Account</span>
-                </button>
+                <>
+                  {selectedUser.status === 'ACTIVE' ? (
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => openAction('SUSPENDED', selectedUser)}
+                      className="w-full py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                    >
+                      <ShieldAlert className="w-4 h-4" />
+                      <span>Suspend User Account</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => openAction('ACTIVE', selectedUser)}
+                      className="w-full py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>Reactivate User Account</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    disabled={actionLoading}
+                    onClick={() => openAction('REVOKE', selectedUser)}
+                    className="w-full py-2.5 px-4 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Revoke Active Sessions</span>
+                  </button>
+
+                  {selectedUser.status !== 'DISABLED' && (
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => openAction('DISABLED', selectedUser)}
+                      className="w-full py-2.5 px-4 rounded-xl bg-red-950/40 hover:bg-red-950/60 border border-red-500/30 text-red-400 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                    >
+                      <UserX className="w-4 h-4" />
+                      <span>Disable Account (Soft Delete)</span>
+                    </button>
+                  )}
+                </>
               )}
-
-              <button
-                type="button"
-                disabled={actionLoading}
-                onClick={() => handleRevokeSessions(selectedUser.id)}
-                className="w-full py-2.5 px-4 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Revoke Active Sessions</span>
-              </button>
-
-              <button
-                type="button"
-                disabled={actionLoading}
-                onClick={() => handleUpdateStatus(selectedUser.id, 'DISABLED')}
-                className="w-full py-2.5 px-4 rounded-xl bg-red-950/40 hover:bg-red-950/60 border border-red-500/30 text-red-400 font-bold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-              >
-                <UserX className="w-4 h-4" />
-                <span>Permanently Disable (Soft Delete)</span>
-              </button>
             </div>
           </div>
         </div>
       )}
+
+      <ConfirmReasonModal
+        open={pendingAction !== null}
+        title={pendingAction ? ACTION_COPY[pendingAction.kind].title : ''}
+        description={
+          pendingAction
+            ? pendingAction.kind === 'REVOKE'
+              ? `${pendingAction.user.displayName} will be signed out of every device immediately.`
+              : `${pendingAction.user.displayName} will be set to ${pendingAction.kind}.`
+            : ''
+        }
+        note={
+          pendingAction?.kind === 'REVOKE'
+            ? 'The API audit-logs session revocation but does not yet store the reason text.'
+            : undefined
+        }
+        confirmLabel={pendingAction ? ACTION_COPY[pendingAction.kind].confirm : 'Confirm'}
+        tone={pendingAction?.kind === 'ACTIVE' ? 'neutral' : pendingAction?.kind === 'SUSPENDED' ? 'warning' : 'danger'}
+        busy={actionLoading}
+        error={actionError}
+        onCancel={() => setPendingAction(null)}
+        onConfirm={runPendingAction}
+      />
     </div>
   );
 }

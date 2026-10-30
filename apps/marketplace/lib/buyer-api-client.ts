@@ -50,22 +50,14 @@ export async function buyerApiFetch<T = unknown>(
     if (!sessionToken) throw new BuyerAuthRequiredError();
     headers.set('Authorization', `Bearer ${sessionToken}`);
     url = `${serverApiBase()}${path}`;
-  } else {
-    // Login also stores the JWT for Bearer use; the httpOnly cookie remains primary.
-    try {
-      const stored = window.localStorage.getItem('ao_token');
-      if (stored && !headers.has('Authorization')) {
-        headers.set('Authorization', `Bearer ${stored}`);
-      }
-    } catch {
-      // Storage unavailable (private mode); rely on the cookie.
-    }
   }
+  // Client calls never attach a script-readable token (SEC-19); the same-origin
+  // `/api/*` rewrite forwards the httpOnly ao_session cookie.
 
   const response = await fetch(url, {
     ...init,
     headers,
-    credentials: 'include',
+    credentials: isServer ? 'omit' : 'same-origin',
     cache: 'no-store',
     signal: init.signal ?? AbortSignal.timeout(8000),
   });

@@ -74,6 +74,7 @@ export default function UnifiedAuthPage() {
     try {
       const response = await fetch('/api/v1/auth/login', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -90,10 +91,13 @@ export default function UnifiedAuthPage() {
         throw new Error(data?.message || data?.error?.message || 'Authentication failed. Please check your credentials.');
       }
 
-      // Store in localStorage as fallback for API client Bearer authorization
-      if (data.accessToken) {
-        localStorage.setItem('ao_token', data.accessToken);
-        localStorage.setItem('ao_user', JSON.stringify(data.user));
+      // The API sets the httpOnly `ao_session` cookie; the JWT is never persisted in
+      // script-readable storage (SEC-19). Clear any token left by older builds.
+      try {
+        localStorage.removeItem('ao_token');
+        localStorage.removeItem('ao_user');
+      } catch {
+        // Storage unavailable; nothing to clear.
       }
 
       // Return to the guarded page that sent the user here (same-origin paths only),

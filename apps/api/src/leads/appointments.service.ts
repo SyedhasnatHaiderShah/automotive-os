@@ -15,6 +15,8 @@ export class AppointmentsService {
     tenantId: string
   ): Promise<AppointmentResponseDto[]> {
     const appointments = await this.prisma.appointment.findMany({
+      // SEC-17: bounded result set until the dealer calendar pages by date range.
+      take: 500,
       where: { tenantId },
       orderBy: { startsAt: 'asc' },
     });

@@ -1,19 +1,20 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { fetchBuyerEnquiries } from '../../../lib/api';
+import { fetchBuyerEnquiries, fetchBuyerMe } from '../../../lib/api';
 import { withBuyerSession } from '../../../lib/server-session';
 import { BuyerEnquiriesView } from '../../../components/buyer-enquiries-view';
 
 export const metadata: Metadata = {
-  title: 'Institutional Enquiry Timeline & Allocation Tracking | Automotive OS',
-  description:
-    'Monitor live dealership responses, Tasjeel inspection booking milestones, escrow deposits, and immutable RTA title release records with shielded buyer privacy.',
+  title: 'My Enquiries | Automotive OS',
+  description: 'Track the status of your vehicle enquiries and the contact details you shared with dealers.',
 };
 
 export const dynamic = 'force-dynamic';
 
 export default async function BuyerEnquiriesPage() {
-  const enquiries = await withBuyerSession('/account/enquiries', fetchBuyerEnquiries);
+  const [enquiries, me] = await withBuyerSession('/account/enquiries', (token) =>
+    Promise.all([fetchBuyerEnquiries(token), fetchBuyerMe(token)])
+  );
 
-  return <BuyerEnquiriesView initialEnquiries={enquiries} />;
+  return <BuyerEnquiriesView initialEnquiries={enquiries} displayName={me.displayName} />;
 }

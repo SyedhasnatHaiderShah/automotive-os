@@ -10,12 +10,21 @@ import {
   Button,
   Badge,
 } from '@automotive-os/ui';
-import { fetchPublicListings, PublicListingItem } from '../../lib/api';
+import {
+  fetchPublicListings,
+  PublicListingItem,
+  fetchFavorites,
+  addFavoriteApi,
+  removeFavoriteApi,
+} from '../../lib/api';
+import { BuyerAuthRequiredError } from '../../lib/buyer-api-client';
 
 export default function SearchResultsPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
   const [selectedEmirate, setSelectedEmirate] = useState('All Emirates');
   const [searchQuery, setSearchQuery] = useState('');
+  // Debounced copy of the search box so typing does not fire one request per keystroke (PG-05).
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedMake, setSelectedMake] = useState('ALL');
   const [selectedCondition, setSelectedCondition] = useState('ALL');
   const [gccOnly, setGccOnly] = useState(true);
@@ -40,6 +49,7 @@ export default function SearchResultsPage() {
     const restoreUrl = () => {
       const params = new URLSearchParams(window.location.search);
       setSearchQuery(params.get('q') || '');
+      setDebouncedQuery(params.get('q') || '');
       setSelectedEmirate(params.get('emirate') || 'All Emirates');
       setSelectedCondition(params.get('condition') || 'ALL');
       setSelectedMake(params.get('make') || 'ALL');
@@ -56,9 +66,14 @@ export default function SearchResultsPage() {
   }, []);
 
   useEffect(() => {
+    const handle = window.setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => window.clearTimeout(handle);
+  }, [searchQuery]);
+
+  useEffect(() => {
     if (!urlReady) return;
     const params = new URLSearchParams();
-    if (searchQuery.trim()) params.set('q', searchQuery.trim());
+    if (debouncedQuery.trim()) params.set('q', debouncedQuery.trim());
     if (selectedEmirate !== 'All Emirates') params.set('emirate', selectedEmirate);
     if (selectedCondition !== 'ALL') params.set('condition', selectedCondition);
     if (selectedMake !== 'ALL') params.set('make', selectedMake);
@@ -69,7 +84,7 @@ export default function SearchResultsPage() {
     const query = params.toString();
     const nextUrl = window.location.pathname + (query ? '?' + query : '');
     window.history.replaceState(null, '', nextUrl);
-  }, [urlReady, searchQuery, selectedEmirate, selectedCondition, selectedMake, gccOnly, maxPriceAed, sortBy, page]);
+  }, [urlReady, debouncedQuery, selectedEmirate, selectedCondition, selectedMake, gccOnly, maxPriceAed, sortBy, page]);
 
   useEffect(() => {
     if (!urlReady) return;
@@ -77,7 +92,7 @@ export default function SearchResultsPage() {
     setLoading(true);
     setLoadError(null);
     fetchPublicListings({
-      q: searchQuery.trim() || undefined,
+      q: debouncedQuery.trim() || undefined,
       emirate: selectedEmirate !== 'All Emirates' ? selectedEmirate : undefined,
       make: selectedMake !== 'ALL' ? selectedMake : undefined,
       condition: selectedCondition !== 'ALL' ? selectedCondition : undefined,
@@ -99,7 +114,7 @@ export default function SearchResultsPage() {
       if (active) setLoading(false);
     });
     return () => { active = false; };
-  }, [urlReady, selectedEmirate, selectedMake, selectedCondition, gccOnly, maxPriceAed, sortBy, searchQuery, page]);
+  }, [urlReady, selectedEmirate, selectedMake, selectedCondition, gccOnly, maxPriceAed, sortBy, debouncedQuery, page]);
 
   useEffect(() => {
     if (!mobileFiltersOpen) return;
@@ -115,9 +130,42 @@ export default function SearchResultsPage() {
     };
   }, [mobileFiltersOpen]);
 
-  // Favorites remain session-only until buyer authentication is available.
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]);
+  // Real favorites for signed-in buyers; signed-out visitors start empty.
+  useEffect(() => {
+    let active = true;
+    fetchFavorites()
+      .then((favs) => {
+        if (active) setFavorites(favs.map((f) => f.listingId));
+      })
+      .catch(() => {
+        // Not signed in or API unavailable: nothing is shown as saved.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const [favoriteError, setFavoriteError] = useState<string | null>(null);
+
+  const toggleFavorite = async (id: string) => {
+    const isSaved = favorites.includes(id);
+    setFavoriteError(null);
+    try {
+      if (isSaved) {
+        await removeFavoriteApi(id);
+        setFavorites((prev) => prev.filter((item) => item !== id));
+      } else {
+        await addFavoriteApi(id);
+        setFavorites((prev) => [...prev, id]);
+      }
+    } catch (err) {
+      if (err instanceof BuyerAuthRequiredError) {
+        const back = window.location.pathname + window.location.search;
+        window.location.href = `/auth?tab=login&redirect=${encodeURIComponent(back)}`;
+        return;
+      }
+      setFavoriteError(err instanceof Error ? err.message : 'Could not update favorites.');
+    }
   };
 
   const handleResetFilters = () => {
@@ -211,7 +259,7 @@ export default function SearchResultsPage() {
                   className="h-10 px-3 rounded-lg bg-surface-container border border-outline-variant/30 text-xs text-on-surface focus:outline-none focus:border-primary cursor-pointer"
                 >
                   <option value="recent">
-                    {isArabic ? 'أحدث المعروض (مباشر الإمارات)' : 'Recently Listed (Live UAE)'}
+                    {isArabic ? 'أحدث المعروض' : 'Recently Listed'}
                   </option>
                   <option value="price-desc">
                     {isArabic ? 'السعر: من الأعلى للأقل (مؤسسي)' : 'Price: High to Low (Institutional)'}
@@ -393,6 +441,12 @@ export default function SearchResultsPage() {
                   </Badge>
                 )}
               </div>
+
+              {favoriteError && (
+                <p role="alert" className="mb-4 text-sm text-error">
+                  {favoriteError}
+                </p>
+              )}
 
               {/* Grid or Empty State */}
               {loadError && !loading ? (

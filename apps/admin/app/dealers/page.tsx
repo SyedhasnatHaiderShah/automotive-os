@@ -16,23 +16,26 @@ import {
   Copy,
   Check,
 } from 'lucide-react';
+import { ConfirmReasonModal } from '../../components/ConfirmReasonModal';
+import {
+  AdminTenantSummary,
+  TenantStatus,
+  createDealer,
+  errorMessage,
+  inviteDealerStaff,
+  listTenants,
+  updateTenantStatus,
+} from '../../lib/api';
 
-interface DealerItem {
-  id: string;
-  slug: string;
-  legalName: string;
-  displayName: string;
-  status: 'ACTIVE' | 'SUSPENDED' | 'CLOSED' | 'PENDING';
-  verificationStatus: string;
-  staffCount: number;
-  vehicleCount: number;
-  createdAt: string;
-}
+type DealerItem = AdminTenantSummary;
 
 export default function AdminDealersPage() {
   const [isRtl, setIsRtl] = useState(false);
   const [dealers, setDealers] = useState<DealerItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<{ dealer: DealerItem; nextStatus: TenantStatus } | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState<string | null>(null);
@@ -54,59 +57,13 @@ export default function AdminDealersPage() {
 
   const fetchDealers = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { Accept: 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch('/api/v1/admin/tenants', {
-        headers,
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setDealers(data || []);
-      } else {
-        // Fallback demo data if unauthenticated
-        setDealers([
-          {
-            id: 'd-1',
-            slug: 'al-futtaim-motors',
-            legalName: 'Al-Futtaim Automotive Group LLC',
-            displayName: 'Al-Futtaim Motors Dubai',
-            status: 'ACTIVE',
-            verificationStatus: 'APPROVED',
-            staffCount: 14,
-            vehicleCount: 42,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            id: 'd-2',
-            slug: 'silberarrows-luxury',
-            legalName: 'SilberArrows FZCO',
-            displayName: 'SilberArrows Classic & Prestige',
-            status: 'ACTIVE',
-            verificationStatus: 'APPROVED',
-            staffCount: 8,
-            vehicleCount: 26,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            id: 'd-3',
-            slug: 'gulf-prestige-motors',
-            legalName: 'Gulf Prestige Automotives LLC',
-            displayName: 'Gulf Prestige Motors',
-            status: 'SUSPENDED',
-            verificationStatus: 'APPROVED',
-            staffCount: 5,
-            vehicleCount: 12,
-            createdAt: new Date().toISOString(),
-          },
-        ]);
-      }
+      const data = await listTenants();
+      setDealers(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Failed to load dealerships:', err);
+      setDealers([]);
+      setLoadError(errorMessage(err, 'Dealerships could not be loaded.'));
     } finally {
       setLoading(false);
     }
@@ -125,29 +82,15 @@ export default function AdminDealersPage() {
     e.preventDefault();
     setActionLoading(true);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch('/api/v1/admin/dealers', {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({
-          slug: newSlug.trim().toLowerCase(),
-          legalName: newLegalName.trim(),
-          displayName: newDisplayName.trim(),
-          adminEmail: newAdminEmail.trim().toLowerCase(),
-          adminName: newAdminName.trim(),
-        }),
+      const data = await createDealer({
+        slug: newSlug.trim().toLowerCase(),
+        legalName: newLegalName.trim(),
+        displayName: newDisplayName.trim(),
+        adminEmail: newAdminEmail.trim().toLowerCase(),
+        adminName: newAdminName.trim(),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.message || 'Failed to provision dealership');
-      }
-
-      showToast('success', `Dealership '${data.displayName}' created successfully.`);
+      showToast('success', `API created dealership '${data?.displayName ?? newDisplayName.trim()}'.`);
       setShowCreateModal(false);
       setNewSlug('');
       setNewLegalName('');
@@ -155,37 +98,25 @@ export default function AdminDealersPage() {
       setNewAdminEmail('');
       setNewAdminName('');
       fetchDealers();
-    } catch (err: any) {
-      showToast('error', err.message || 'Dealership creation failed');
+    } catch (err) {
+      showToast('error', `Not created: ${errorMessage(err, 'Dealership creation failed')}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleToggleTenantStatus = async (dealerId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+  const handleConfirmStatusChange = async (reason: string) => {
+    if (!pendingStatus) return;
+    const { dealer, nextStatus } = pendingStatus;
     setActionLoading(true);
+    setStatusError(null);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch(`/api/v1/admin/tenants/${dealerId}/status`, {
-        method: 'PATCH',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({ status: newStatus, reason: `Platform admin action via Console` }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.message || 'Status transition failed');
-      }
-
-      showToast('success', `Dealership status updated to ${newStatus}`);
+      await updateTenantStatus(dealer.id, nextStatus, reason);
+      showToast('success', `API confirmed ${dealer.displayName} is now ${nextStatus}.`);
+      setPendingStatus(null);
       fetchDealers();
-    } catch (err: any) {
-      showToast('error', err.message || 'Status update failed');
+    } catch (err) {
+      setStatusError(`Not saved: ${errorMessage(err, 'Status update failed')}`);
     } finally {
       setActionLoading(false);
     }
@@ -196,30 +127,19 @@ export default function AdminDealersPage() {
     if (!showInviteModal) return;
     setActionLoading(true);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch(`/api/v1/admin/dealers/${showInviteModal}/invite`, {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify({
-          email: inviteEmail.trim().toLowerCase(),
-          role: inviteRole,
-        }),
+      const data = await inviteDealerStaff(showInviteModal, {
+        email: inviteEmail.trim().toLowerCase(),
+        role: inviteRole,
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.message || 'Failed to issue staff invitation');
+      if (!data?.activationToken) {
+        throw new Error('The API did not return an activation token.');
       }
-
-      const activationLink = `${window.location.origin}/auth/activate?token=${data.activationToken}`;
+      const activationLink = `${window.location.origin}/auth/activate?token=${encodeURIComponent(data.activationToken)}`;
       setGeneratedTokenUrl(activationLink);
-      showToast('success', 'Invitation token generated successfully.');
-    } catch (err: any) {
-      showToast('error', err.message || 'Invitation failed');
+      showToast('success', 'API issued the invitation token.');
+    } catch (err) {
+      showToast('error', `Invitation not issued: ${errorMessage(err, 'Invitation failed')}`);
     } finally {
       setActionLoading(false);
     }
@@ -321,7 +241,31 @@ export default function AdminDealersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {filteredDealers.length === 0 ? (
+                  {loadError ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center">
+                        <div role="alert" className="inline-flex flex-col items-center gap-2 text-red-300">
+                          <span className="flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4" />
+                            {loadError}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={fetchDealers}
+                            className="px-3 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : loading && dealers.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-outline">
+                        Loading dealerships…
+                      </td>
+                    </tr>
+                  ) : filteredDealers.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-8 text-center text-outline">
                         No dealerships found matching criteria.
@@ -378,7 +322,10 @@ export default function AdminDealersPage() {
 
                             <button
                               disabled={actionLoading}
-                              onClick={() => handleToggleTenantStatus(d.id, d.status)}
+                              onClick={() => {
+                                setStatusError(null);
+                                setPendingStatus({ dealer: d, nextStatus: d.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE' });
+                              }}
                               className={`px-2.5 py-1 rounded text-xs font-bold transition-colors ${
                                 d.status === 'ACTIVE'
                                   ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40'
@@ -395,6 +342,9 @@ export default function AdminDealersPage() {
                 </tbody>
               </table>
             </div>
+            <p className="px-4 py-3 border-t border-white/10 text-[11px] font-mono text-outline">
+              {dealers.length} dealership{dealers.length === 1 ? '' : 's'} loaded. The tenants API returns the full list without server-side pagination; search filters this page locally.
+            </p>
           </div>
         </main>
       </div>
@@ -420,7 +370,7 @@ export default function AdminDealersPage() {
                   type="text"
                   value={newSlug}
                   onChange={(e) => setNewSlug(e.target.value)}
-                  placeholder="e.g. al-futtaim-motors"
+                  placeholder="e.g. example-motors"
                   required
                   className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:border-primary focus:outline-none"
                 />
@@ -432,7 +382,7 @@ export default function AdminDealersPage() {
                   type="text"
                   value={newLegalName}
                   onChange={(e) => setNewLegalName(e.target.value)}
-                  placeholder="e.g. Al-Futtaim Automotive Group LLC"
+                  placeholder="e.g. Example Motors Trading LLC"
                   required
                   className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:border-primary focus:outline-none"
                 />
@@ -444,7 +394,7 @@ export default function AdminDealersPage() {
                   type="text"
                   value={newDisplayName}
                   onChange={(e) => setNewDisplayName(e.target.value)}
-                  placeholder="e.g. Al-Futtaim Motors Dubai"
+                  placeholder="e.g. Example Motors Dubai"
                   required
                   className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:border-primary focus:outline-none"
                 />
@@ -459,7 +409,7 @@ export default function AdminDealersPage() {
                       type="text"
                       value={newAdminName}
                       onChange={(e) => setNewAdminName(e.target.value)}
-                      placeholder="e.g. Tariq Al Futtaim"
+                      placeholder="e.g. Principal full name"
                       required
                       className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:border-primary focus:outline-none"
                     />
@@ -470,7 +420,7 @@ export default function AdminDealersPage() {
                       type="email"
                       value={newAdminEmail}
                       onChange={(e) => setNewAdminEmail(e.target.value)}
-                      placeholder="e.g. principal@al-futtaim.ae"
+                      placeholder="e.g. principal@example.com"
                       required
                       className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:border-primary focus:outline-none"
                     />
@@ -544,7 +494,7 @@ export default function AdminDealersPage() {
                     type="email"
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="agent@dealership.ae"
+                    placeholder="agent@example.com"
                     required
                     className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 text-white focus:border-primary focus:outline-none"
                   />
@@ -588,6 +538,24 @@ export default function AdminDealersPage() {
           </div>
         </div>
       )}
+
+      <ConfirmReasonModal
+        open={pendingStatus !== null}
+        title={pendingStatus?.nextStatus === 'SUSPENDED' ? 'Suspend this dealership?' : 'Reactivate this dealership?'}
+        description={
+          pendingStatus
+            ? pendingStatus.nextStatus === 'SUSPENDED'
+              ? `${pendingStatus.dealer.displayName} will be suspended. The API unpublishes its active listings.`
+              : `${pendingStatus.dealer.displayName} will be set to ACTIVE.`
+            : ''
+        }
+        confirmLabel={pendingStatus?.nextStatus === 'SUSPENDED' ? 'Suspend dealership' : 'Reactivate dealership'}
+        tone={pendingStatus?.nextStatus === 'SUSPENDED' ? 'danger' : 'neutral'}
+        busy={actionLoading}
+        error={statusError}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={handleConfirmStatusChange}
+      />
     </div>
   );
 }

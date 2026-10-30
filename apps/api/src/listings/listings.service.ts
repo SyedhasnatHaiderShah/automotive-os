@@ -344,6 +344,13 @@ export class ListingsService {
       throw new NotFoundException(`Listing ${listingId} not found`);
     }
 
+    // SEC-13: moderation decisions apply only to listings awaiting review.
+    if (listing.status !== ListingStatus.PENDING_REVIEW) {
+      throw new ConflictException(
+        `Listing ${listingId} is ${listing.status}; only PENDING_REVIEW listings can be moderated`
+      );
+    }
+
     if (dto.decision === AdminModerationDecision.APPROVE) {
       // Re-verify publish gates prior to approval
       this.validatePublishGates(listing);

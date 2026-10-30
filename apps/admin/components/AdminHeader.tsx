@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { CurrentAdmin, getCurrentAdmin } from '../lib/api';
 
 interface AdminHeaderProps {
   isRtl?: boolean;
@@ -9,11 +10,32 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [me, setMe] = useState<CurrentAdmin | null>(null);
+  const [meError, setMeError] = useState(false);
   useEffect(() => {
     const closed = () => setMobileOpen(false);
     window.addEventListener('admin-nav-closed', closed);
     return () => { document.body.classList.remove('admin-mobile-nav-open'); window.removeEventListener('admin-nav-closed', closed); };
   }, []);
+  useEffect(() => {
+    let active = true;
+    getCurrentAdmin()
+      .then((data) => { if (active) setMe(data); })
+      .catch(() => { if (active) setMeError(true); });
+    return () => { active = false; };
+  }, []);
+
+  const identityName = me
+    ? me.displayName || me.email || me.id
+    : meError
+    ? (isRtl ? 'الهوية غير متاحة' : 'Identity unavailable')
+    : '…';
+  const identityRole = me
+    ? me.isPlatformAdmin
+      ? (isRtl ? 'مشرف المنصة' : 'Platform Admin')
+      : (isRtl ? 'ليس مشرفاً للمنصة' : 'Not a platform admin')
+    : '';
+
   return (
     <header
       className={`admin-app-header fixed top-0 ${
@@ -29,14 +51,16 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
               <span className="font-label-caps text-label-caps text-primary uppercase tracking-wider font-semibold">
                 {isRtl ? 'حوكمة المنصة وعمليات الثقة' : 'Platform Governance & Trust Ops'}
               </span>
-              <span className="px-1.5 py-0.5 rounded bg-surface-container-high font-data-mono-num text-body-sm text-on-surface-variant">
-                Staging
-              </span>
+              {process.env.NEXT_PUBLIC_APP_ENV && process.env.NEXT_PUBLIC_APP_ENV !== 'production' && (
+                <span className="px-1.5 py-0.5 rounded bg-surface-container-high font-data-mono-num text-body-sm text-on-surface-variant capitalize">
+                  {process.env.NEXT_PUBLIC_APP_ENV}
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-space-xs text-outline text-body-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
               <span className="font-data-mono-num text-body-sm">
-                Synthetic staging • external gateways disconnected
+                {isRtl ? 'البوابات الخارجية غير متصلة' : 'External gateways disconnected'}
               </span>
             </div>
           </div>
@@ -53,13 +77,12 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
             <input
               className={`w-full h-9 ${
                 isRtl ? 'pr-9 pl-4' : 'pl-9 pr-4'
-              } rounded-lg bg-surface-container-high text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary-container`}
-              placeholder={
-                isRtl
-                  ? 'بحث برقم الهيكل، القضية، الوكيل، رخصة دائرة التنمية الاقتصادية...'
-                  : 'Query VIN, Case #, Dealership, DED License...'
-              }
+              } rounded-lg bg-surface-container-high text-on-surface placeholder:text-outline font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary-container disabled:opacity-60 disabled:cursor-not-allowed`}
+              placeholder={isRtl ? 'البحث الشامل غير متاح بعد' : 'Universal search — not available yet'}
+              aria-label={isRtl ? 'البحث الشامل (غير متاح بعد)' : 'Universal search (not available yet)'}
+              title="Not available yet: no universal search API"
               type="text"
+              disabled
             />
           </div>
         </div>
@@ -69,16 +92,18 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
           <div className="hidden lg:flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-surface-container">
             <span className="w-2 h-2 rounded-full bg-tertiary" />
             <span className="font-body-sm text-body-sm text-on-surface-variant">
-              {isRtl ? 'شرطة دبي • دائرة الاقتصاد نشطة' : 'External integrations disabled'}
+              {isRtl ? 'التكاملات الخارجية معطلة' : 'External integrations disabled'}
             </span>
           </div>
 
           {/* Language Switcher */}
           <div className="flex items-center bg-surface-container-high rounded p-0.5 font-label-caps text-label-caps">
             <button
+              type="button"
               onClick={() => {
                 if (isRtl && onToggleRtl) onToggleRtl();
               }}
+              aria-pressed={!isRtl}
               className={`px-2 py-0.5 rounded transition-colors ${
                 !isRtl
                   ? 'bg-surface-bright text-on-surface font-semibold'
@@ -88,9 +113,11 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
               EN
             </button>
             <button
+              type="button"
               onClick={() => {
                 if (!isRtl && onToggleRtl) onToggleRtl();
               }}
+              aria-pressed={isRtl}
               className={`px-2 py-0.5 rounded transition-colors ${
                 isRtl
                   ? 'bg-surface-bright text-on-surface font-semibold'
@@ -101,27 +128,25 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
             </button>
           </div>
 
-          {/* Notification Button */}
+          {/* Notification Button (no notifications API yet) */}
           <button
-            className="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+            className="relative p-2 rounded-lg text-on-surface-variant opacity-60 cursor-not-allowed"
             type="button"
-            title="Notifications unavailable in staging"
+            title="Not available yet: no notifications API"
+            aria-label="Notifications (not available yet)"
             disabled
           >
             <span className="material-symbols-outlined text-[20px]">notifications</span>
-            <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error text-on-error font-data-mono-num text-body-sm rounded-full flex items-center justify-center text-[10px]">
-              4
-            </span>
           </button>
 
-          {/* SuperAdmin Identity Badge */}
+          {/* Signed-in identity from GET /api/v1/auth/me */}
           <div className="flex items-center gap-space-sm pl-space-sm">
             <div className="flex flex-col text-right hidden sm:flex">
-              <span className="font-body-sm text-body-sm text-on-surface font-medium truncate max-w-[160px]">
-                {isRtl ? 'د. ميا الفلاسي' : 'Dr. Maya Al-Falasi'}
+              <span className="font-body-sm text-body-sm text-on-surface font-medium truncate max-w-[160px]" title={me?.email ?? undefined}>
+                {identityName}
               </span>
               <span className="font-label-caps text-label-caps text-primary truncate max-w-[160px]">
-                {isRtl ? 'المشرف الأعلى للمنصة' : 'Platform SuperAdmin'}
+                {identityRole}
               </span>
             </div>
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-md">

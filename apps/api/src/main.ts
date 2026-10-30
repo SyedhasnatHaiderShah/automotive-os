@@ -6,6 +6,9 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // Behind Railway/Cloudflare: trust one proxy hop so req.ip is the client IP
+  // (per-IP auth rate limiting depends on it). Override with TRUST_PROXY_HOPS.
+  app.getHttpAdapter().getInstance().set('trust proxy', Number(process.env.TRUST_PROXY_HOPS ?? 1));
 
   // Security: Configurable explicit CORS allowlist
   const isProductionOrStaging =
@@ -32,12 +35,9 @@ async function bootstrap() {
       if (isProductionOrStaging) {
         // Fail closed if CORS_ORIGINS is empty
         if (allowedOrigins.length === 0) {
-          return callback(
-            new Error(
-              `CORS_NOT_ALLOWED: Fail-closed active. No cross-origin requests permitted in ${process.env.NODE_ENV}.`,
-            ),
-            false,
-          );
+          // SEC-21: reject without throwing so the browser sees a CORS block, not a 500.
+          console.warn(`CORS_NOT_ALLOWED: Fail-closed active. No cross-origin requests permitted in ${process.env.NODE_ENV}.`);
+          return callback(null, false);
         }
 
         // Must match explicitly configured origins and MUST be HTTPS (no localhost, no wildcard suffix)
@@ -48,12 +48,9 @@ async function bootstrap() {
           return callback(null, true);
         }
 
-        return callback(
-          new Error(
-            `CORS_NOT_ALLOWED: Origin ${requestOrigin} is not in approved HTTPS allowlist`,
-          ),
-          false,
-        );
+        // SEC-21: reject without throwing so the browser sees a CORS block, not a 500.
+          console.warn(`CORS_NOT_ALLOWED: Origin ${requestOrigin} is not in approved HTTPS allowlist`);
+          return callback(null, false);
       }
 
       // Development / test fallback
@@ -65,12 +62,9 @@ async function bootstrap() {
         return callback(null, true);
       }
 
-      return callback(
-        new Error(
-          `CORS_NOT_ALLOWED: Origin ${requestOrigin} is not in approved allowlist`,
-        ),
-        false,
-      );
+      // SEC-21: reject without throwing so the browser sees a CORS block, not a 500.
+          console.warn(`CORS_NOT_ALLOWED: Origin ${requestOrigin} is not in approved allowlist`);
+          return callback(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
@@ -90,6 +84,9 @@ async function bootstrap() {
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    if (isProductionOrStaging) {
+      res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    }
     res.setHeader(
       "Cache-Control",
       "no-store, no-cache, must-revalidate, proxy-revalidate",
@@ -130,8 +127,11 @@ async function bootstrap() {
     .addTag("admin", "Audited platform administration")
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api/docs", app, document);
+  // SEC-21: API docs are not published in production unless explicitly enabled.
+  if (process.env.NODE_ENV !== "production" || process.env.ENABLE_SWAGGER === "true") {
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup("api/docs", app, document);
+  }
 
   const port = process.env.PORT || process.env.API_PORT || 4000;
   await app.listen(port, "0.0.0.0");

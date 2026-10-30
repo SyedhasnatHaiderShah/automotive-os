@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import { UserStatus } from '@automotive-os/database';
 
 export class AdminUserFilterDto {
@@ -52,6 +52,9 @@ export class AdminUpdateUserDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  // SEC-14: implicit conversion would turn the string "false" into true.
+  @Transform(({ obj }) => (obj.isPlatformAdmin === 'true' ? true : obj.isPlatformAdmin === 'false' ? false : obj.isPlatformAdmin))
+  @IsBoolean()
   isPlatformAdmin?: boolean;
 
   @ApiPropertyOptional({ description: 'Reason for administrative status update' })

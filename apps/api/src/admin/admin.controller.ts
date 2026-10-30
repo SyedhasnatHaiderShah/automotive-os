@@ -200,7 +200,11 @@ export class AdminController {
     @Query("targetType") targetType?: string,
   ): Promise<AuditLogListResponse> {
     return this.adminService.listAuditLogs(
-      { limit: limit ? Number(limit) : 50, offset: offset ? Number(offset) : 0, targetType },
+      {
+        limit: Math.min(Math.max(Number(limit) || 50, 1), 200),
+        offset: Math.max(Number(offset) || 0, 0),
+        targetType,
+      },
       adminUserId
     );
   }
@@ -222,7 +226,8 @@ export class AdminController {
   ) {
     return this.adminService.processOutbox(
       adminUserId,
-      limit ? Number(limit) : 50,
+      // SEC-17: bound the batch size an admin can trigger in one request.
+      Math.min(Math.max(Number(limit) || 50, 1), 200),
       correlationId,
     );
   }

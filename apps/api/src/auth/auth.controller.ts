@@ -34,6 +34,7 @@ import { Public } from '../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PlatformAdminGuard } from '../common/guards/platform-admin.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { AuthRateLimit, AuthRateLimitGuard } from '../common/guards/auth-rate-limit.guard';
 
 @ApiTags('auth')
 @Controller('api/v1/auth')
@@ -42,6 +43,8 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 10, windowMs: 60_000 })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Authenticate user with email and password' })
   @ApiResponse({ status: 200, type: LoginResponseDto })
@@ -72,6 +75,8 @@ export class AuthController {
 
   @Public()
   @Post('signup')
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 5, windowMs: 10 * 60_000 })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register customer account (BUYER role only)' })
   @ApiResponse({ status: 201, type: CustomerSignupResponseDto })
@@ -81,6 +86,8 @@ export class AuthController {
 
   @Public()
   @Post('verify-email')
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 20, windowMs: 10 * 60_000 })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify customer email address with cryptographic token' })
   @ApiResponse({ status: 200, type: VerifyEmailResponseDto })
@@ -90,6 +97,8 @@ export class AuthController {
 
   @Public()
   @Post('resend-verification')
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 3, windowMs: 10 * 60_000 })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Resend email verification link' })
   @ApiResponse({ status: 200, type: ResendVerificationResponseDto })
@@ -111,6 +120,8 @@ export class AuthController {
 
   @Public()
   @Post('activate/complete')
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 10, windowMs: 10 * 60_000 })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Complete activation, set password, and verify MFA' })
   @ApiResponse({ status: 200, type: CompleteActivationResponseDto })
@@ -179,6 +190,8 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 5, windowMs: 10 * 60_000 })
   @ApiOperation({ summary: 'VIP client registration and lead intake (Collector, Corporate, Dealership)' })
   @ApiResponse({ status: 201, type: RegisterVipResponseDto })
   async registerVipLead(@Body() dto: RegisterVipLeadDto): Promise<RegisterVipResponseDto> {

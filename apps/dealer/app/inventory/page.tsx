@@ -1,35 +1,64 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { fetchDealerInventory } from '../../lib/api';
 import { getDealerSession } from '../../lib/session';
+import { capabilitiesFor } from '../../lib/permissions';
+import { countVehicles, fetchVehiclesPage } from '../../lib/dealer-api-server';
+import { parsePaging, STOCK_STATUSES, type StockStatus } from '../../lib/dealer-api';
 import { DealerServiceError } from '../../components/dealer-service-error';
+import { DealerShell } from '../../components/dealer-shell';
 import { InventoryMatrixView } from '../../components/inventory-matrix-view';
 
 export const metadata: Metadata = {
-  title: 'Vehicle Inventory & Telemetry Matrix | Automotive OS Dealer DMS',
-  description: 'Tenant-isolated vehicle stock management, RTA Tasjeel compliance, and listing submission.',
+  title: 'Vehicle Inventory | Automotive OS Dealer DMS',
+  description: 'Tenant-isolated vehicle stock and listing submission.',
 };
 
-export default async function DealerInventoryPage() {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+export default async function DealerInventoryPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const params = await searchParams;
   try {
     const session = await getDealerSession();
-    const { items: vehicles, stats } = await fetchDealerInventory(session.tenantId, session.token);
+    const { page, limit } = parsePaging(params);
+    const rawStock = Array.isArray(params.stockStatus) ? params.stockStatus[0] : params.stockStatus;
+    const stockStatus = STOCK_STATUSES.includes(rawStock as StockStatus) ? (rawStock as StockStatus) : undefined;
+
+    const [vehicles, allTotal, availableTotal, reservedTotal, soldTotal] = await Promise.all([
+      fetchVehiclesPage(session.tenantId, session.token, { page, limit, stockStatus }),
+      countVehicles(session.tenantId, session.token),
+      countVehicles(session.tenantId, session.token, 'AVAILABLE'),
+      countVehicles(session.tenantId, session.token, 'RESERVED'),
+      countVehicles(session.tenantId, session.token, 'SOLD'),
+    ]);
 
     return (
-      <InventoryMatrixView
-        initialVehicles={vehicles}
-        initialStats={stats}
-        tenantId={session.tenantId}
-      />
+      <DealerShell
+        identity={{
+          tenantName: session.tenantName,
+          displayName: session.displayName,
+          role: session.role,
+          hasMultipleTenants: session.hasMultipleTenants,
+        }}
+      >
+        <InventoryMatrixView
+          tenantId={session.tenantId}
+          tenantName={session.tenantName}
+          capabilities={capabilitiesFor(session.role)}
+          vehicles={vehicles}
+          stockStatus={stockStatus}
+          totals={{ all: allTotal, available: availableTotal, reserved: reservedTotal, sold: soldTotal }}
+        />
+      </DealerShell>
     );
   } catch (error: unknown) {
     return (
       <DealerServiceError
-        title="Dealer Inventory Service Unavailable"
+        title="Dealer inventory unavailable"
         error={error}
-        fallbackMessage="Unable to load real-time dealership inventory telemetry. Backend API may be unreachable."
+        fallbackMessage="Unable to load dealership inventory from the API."
         retryPath="/dealer/inventory"
       />
     );
   }
 }
+

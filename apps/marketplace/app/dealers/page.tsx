@@ -13,24 +13,39 @@ export default function DealersDirectoryPage() {
   const [dealers, setDealers] = useState<PublicDealerSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 12;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const isArabic = locale === 'ar';
 
-  // Emirate filter is applied server-side; text search filters the loaded page.
+  const changeEmirate = (em: string) => {
+    setSelectedEmirate(em);
+    setPage(1);
+  };
+
+  // Emirate and paging are applied server-side; the API has no name search,
+  // so the text box only filters the dealerships on the current page.
   useEffect(() => {
     let active = true;
     setLoading(true);
     setLoadError(null);
-    fetchPublicDealers({ emirate: selectedEmirate, limit: 50 })
-      .then((res) => { if (active) setDealers(res.items); })
+    fetchPublicDealers({ emirate: selectedEmirate, page, limit: PAGE_SIZE })
+      .then((res) => {
+        if (!active) return;
+        setDealers(res.items);
+        setTotal(typeof res.total === 'number' ? res.total : res.items.length);
+      })
       .catch((err) => {
         if (!active) return;
         setDealers([]);
+        setTotal(0);
         setLoadError(err instanceof Error ? err.message : 'Unable to load dealerships');
       })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [selectedEmirate]);
+  }, [selectedEmirate, page]);
 
   const locationLabel = (dealer: PublicDealerSummary) =>
     [...dealer.cities, ...dealer.emirates.filter((e) => !dealer.cities.includes(e))].join(', ') || 'UAE';
@@ -49,7 +64,7 @@ export default function DealersDirectoryPage() {
       <MarketplaceHeader
         activePath="/dealers"
         selectedEmirate={selectedEmirate}
-        onEmirateChange={setSelectedEmirate}
+        onEmirateChange={changeEmirate}
         favoritesCount={0}
         locale={locale}
         onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
@@ -76,8 +91,8 @@ export default function DealersDirectoryPage() {
 
             <p className="font-body-lg text-sm sm:text-base text-outline max-w-2xl leading-relaxed">
               {isArabic
-                ? 'دليل صالات العرض والوكالات الحاصلة على فحص السجل التجاري المعتمد وتدقيق الهوية المؤسسية (KYB) مع التراخيص الصادرة من دوائر التنمية الاقتصادية في دولة الإمارات.'
-                : 'Directory of institutional dealerships operating under strict commercial KYB verification, physical vehicle grounding standards, and RTA/TAMM compliant digital escrow settlement.'}
+                ? 'دليل صالات العرض التي اجتازت مراجعة التحقق من النشاط التجاري (KYB) على المنصة.'
+                : 'Directory of dealerships that passed the platform’s business verification (KYB) review.'}
             </p>
 
             {/* Filters Row */}
@@ -87,7 +102,7 @@ export default function DealersDirectoryPage() {
                   <button
                     key={em}
                     type="button"
-                    onClick={() => setSelectedEmirate(em)}
+                    onClick={() => changeEmirate(em)}
                     className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
                       selectedEmirate === em
                         ? 'bg-primary text-on-primary shadow-sm'
@@ -100,11 +115,15 @@ export default function DealersDirectoryPage() {
               </div>
 
               <div className="w-full sm:w-72">
+                <label htmlFor="dealer-filter" className="sr-only">
+                  {isArabic ? 'تصفية هذه الصفحة' : 'Filter this page'}
+                </label>
                 <input
-                  type="text"
+                  id="dealer-filter"
+                  type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={isArabic ? 'ابحث باسم المعرض أو الموقع...' : 'Search showroom or license...'}
+                  placeholder={isArabic ? 'تصفية هذه الصفحة بالاسم أو الموقع...' : 'Filter this page by name or location...'}
                   className="w-full h-10 px-4 rounded-lg bg-surface-container border border-outline-variant/30 text-xs text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
@@ -156,7 +175,7 @@ export default function DealersDirectoryPage() {
                 <div className="mt-6 pt-4 border-t border-outline-variant/20 flex flex-col gap-3">
                   <div className="flex items-center justify-end text-xs">
                     <span className="font-data-mono-num font-semibold text-secondary">
-                      {dealer.liveGroundedStock} {isArabic ? 'سيارة متاحة' : 'Active Cars'}
+                      {dealer.liveGroundedStock} {isArabic ? 'سيارة منشورة' : 'Published listings'}
                     </span>
                   </div>
 
@@ -173,6 +192,31 @@ export default function DealersDirectoryPage() {
               </div>
             ))}
           </div>
+
+          {!loadError && total > PAGE_SIZE && (
+            <nav aria-label={isArabic ? 'ترقيم الصفحات' : 'Pagination'} className="mt-10 flex items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1 || loading}
+                className="px-4 py-2 rounded-lg bg-surface-container text-on-surface text-xs font-semibold border border-outline-variant/30 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-high focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                {isArabic ? 'السابق' : 'Previous'}
+              </button>
+              <span className="text-xs font-data-mono-num text-outline">
+                {isArabic ? `صفحة ${page} من ${totalPages}` : `Page ${page} of ${totalPages}`} · {total}{' '}
+                {isArabic ? 'معرض' : 'dealerships'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages || loading}
+                className="px-4 py-2 rounded-lg bg-surface-container text-on-surface text-xs font-semibold border border-outline-variant/30 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-high focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                {isArabic ? 'التالي' : 'Next'}
+              </button>
+            </nav>
+          )}
         </section>
       </main>
 
