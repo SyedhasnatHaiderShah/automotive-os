@@ -12,14 +12,10 @@ export default function DashboardResolverPage() {
   useEffect(() => {
     async function resolvePostAuthDestination() {
       try {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('ao_token') : null;
-
+        // Session is carried only by the httpOnly ao_session cookie (SEC-19).
         const headers: HeadersInit = {
           Accept: 'application/json',
         };
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
 
         const res = await fetch('/api/v1/auth/me', {
           method: 'GET',

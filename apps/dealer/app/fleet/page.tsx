@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
+import { previewSafeMessage } from '../../lib/preview';
 import {
   VERIFIED_FLEET_CONSIGNMENT_FIXTURE,
   FleetAndConsignmentData,
@@ -12,7 +13,7 @@ import {
 
 export default function FleetAndConsignmentPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  const [role] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const isRtl = locale === 'ar';
 
   const [fleetData, setFleetData] = useState<FleetAndConsignmentData>(VERIFIED_FLEET_CONSIGNMENT_FIXTURE);
@@ -26,7 +27,9 @@ export default function FleetAndConsignmentPage() {
   const [reconditioningDeductionInput, setReconditioningDeductionInput] = useState<number>(7200);
 
   // Modals & Feedback
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
   const [onboardModalOpen, setOnboardModalOpen] = useState(false);
   const [createFleetModalOpen, setCreateFleetModalOpen] = useState(false);
   const [bailmentPdfModalOpen, setBailmentPdfModalOpen] = useState(false);
@@ -122,8 +125,6 @@ export default function FleetAndConsignmentPage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />

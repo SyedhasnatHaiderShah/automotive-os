@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService, runWithDbContext } from "../database/prisma.service";
+import { buildPublicMediaUrl } from "../common/media-url.util";
 import { AuditService } from "../audit/audit.service";
 import { CreateDraftListingDto } from "./dto/create-draft-listing.dto";
 import {
@@ -341,6 +342,13 @@ export class ListingsService {
 
     if (!listing) {
       throw new NotFoundException(`Listing ${listingId} not found`);
+    }
+
+    // SEC-13: moderation decisions apply only to listings awaiting review.
+    if (listing.status !== ListingStatus.PENDING_REVIEW) {
+      throw new ConflictException(
+        `Listing ${listingId} is ${listing.status}; only PENDING_REVIEW listings can be moderated`
+      );
     }
 
     if (dto.decision === AdminModerationDecision.APPROVE) {
@@ -789,9 +797,6 @@ export class ListingsService {
   }
 
   private mapPublicSummary(listing: any): PublicListingSummaryDto {
-    const cdnBase =
-      process.env.S3_PUBLIC_CDN_URL || "https://cdn.automotive-os.ae";
-
     return {
       id: listing.id,
       slug: listing.slug,
@@ -816,7 +821,7 @@ export class ListingsService {
       media: (listing.vehicle.media || []).map((m: any) => ({
         id: m.id,
         kind: m.kind,
-        url: `${cdnBase}/${m.objectKey}`,
+        url: buildPublicMediaUrl(m.objectKey),
         altText: m.altText,
         sortOrder: m.sortOrder,
       })),

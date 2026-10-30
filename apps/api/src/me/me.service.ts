@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
+import { buildPublicMediaUrl } from '../common/media-url.util';
 import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/auth.service';
 import { MeResponseDto, BuyerProfileResponseDto } from './dto/me-response.dto';
@@ -148,7 +149,7 @@ export class MeService {
         askingPriceFils: listing.askingPriceFils.toString(),
         status: listing.status,
         thumbnailUrl: listing.vehicle.media[0]
-          ? `${process.env.S3_PUBLIC_CDN_URL || 'https://cdn.automotive-os.ae'}/${listing.vehicle.media[0].objectKey}`
+          ? buildPublicMediaUrl(listing.vehicle.media[0].objectKey)
           : null,
         createdAt: favorite.createdAt.toISOString(),
       };
@@ -158,9 +159,9 @@ export class MeService {
   }
 
   async getFavorites(userId: string): Promise<FavoriteResponseDto[]> {
-    const cdnBase =
-      process.env.S3_PUBLIC_CDN_URL || 'https://cdn.automotive-os.ae';
     const favorites = await this.prisma.favorite.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { userId },
       include: {
         listing: {
@@ -188,7 +189,7 @@ export class MeService {
       askingPriceFils: fav.listing.askingPriceFils.toString(),
       status: fav.listing.status,
       thumbnailUrl: fav.listing.vehicle.media[0]
-        ? `${cdnBase}/${fav.listing.vehicle.media[0].objectKey}`
+        ? buildPublicMediaUrl(fav.listing.vehicle.media[0].objectKey)
         : null,
       createdAt: fav.createdAt.toISOString(),
     }));
@@ -242,6 +243,8 @@ export class MeService {
 
   async getSavedSearches(userId: string): Promise<SavedSearchResponseDto[]> {
     const searches = await this.prisma.savedSearch.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { userId },
       orderBy: { updatedAt: 'desc' },
     });
@@ -281,6 +284,8 @@ export class MeService {
 
   async getBuyerEnquiries(userId: string): Promise<BuyerEnquiryResponseDto[]> {
     const leads = await this.prisma.lead.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { buyerUserId: userId },
       include: {
         listing: {
@@ -432,6 +437,8 @@ export class MeService {
 
   async getBuyerAppointments(userId: string): Promise<any[]> {
     const appointments = await this.prisma.appointment.findMany({
+      // SEC-17: bounded result set; buyer-facing paging is a follow-up.
+      take: 200,
       where: { buyerUserId: userId },
       include: {
         lead: {
@@ -479,9 +486,7 @@ export class MeService {
               ? `${a.lead.listing.vehicle.vin.slice(0, 3)}•••••${a.lead.listing.vehicle.vin.slice(-4)}`
               : null,
             imageUrl: a.lead.listing.vehicle?.media?.[0]?.objectKey
-              ? (a.lead.listing.vehicle.media[0].objectKey.startsWith('http')
-                  ? a.lead.listing.vehicle.media[0].objectKey
-                  : `https://cdn.automotive-os.ae/${a.lead.listing.vehicle.media[0].objectKey}`)
+              ? buildPublicMediaUrl(a.lead.listing.vehicle.media[0].objectKey)
               : null,
             dealershipName: a.lead.listing.tenant?.displayName || 'Verified Dealership',
           }

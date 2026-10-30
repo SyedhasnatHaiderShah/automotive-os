@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
+import { previewSafeMessage } from '../../lib/preview';
 import {
   VERIFIED_SALES_ORDER_FIXTURE,
   SalesOrderStudioData,
@@ -12,7 +13,7 @@ import {
 
 export default function SalesOrdersStudioPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  const [role] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const isRtl = locale === 'ar';
 
   const [orderData, setOrderData] = useState<SalesOrderStudioData>(VERIFIED_SALES_ORDER_FIXTURE);
@@ -21,7 +22,9 @@ export default function SalesOrdersStudioPage() {
 
   // Interactive state
   const [copiedVin, setCopiedVin] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
   const [step2State, setStep2State] = useState<'WAITING' | 'OVERRIDDEN' | 'PROMPTED'>('WAITING');
 
   // Modals
@@ -116,8 +119,6 @@ export default function SalesOrdersStudioPage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />

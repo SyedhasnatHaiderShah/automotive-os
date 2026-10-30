@@ -1,124 +1,59 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MarketplaceHeader, MarketplaceFooter } from '@automotive-os/ui';
-
-interface ShowroomItem {
-  id: string;
-  slug: string;
-  name: string;
-  location: string;
-  licenseNumber: string;
-  rating: number;
-  reviewCount: number;
-  activeCars: number;
-  status: string;
-  emirate: string;
-  tagline: string;
-}
-
-const ACCREDITED_DEALERS: ShowroomItem[] = [
-  {
-    id: 'silberarrows',
-    slug: 'silberarrows',
-    name: 'SilberArrows Luxury & Classic Cars',
-    location: 'Street 4B, Al Quoz Industrial 1, Dubai',
-    licenseNumber: 'DED #612048',
-    rating: 4.98,
-    reviewCount: 342,
-    activeCars: 28,
-    status: 'Active License',
-    emirate: 'Dubai',
-    tagline: 'Official Mercedes-Benz Classic & Modern Specialist',
-  },
-  {
-    id: 'al-quoz',
-    slug: 'al-quoz',
-    name: 'Al Quoz Showroom 4',
-    location: 'Al Quoz Industrial 3, Dubai',
-    licenseNumber: 'DED #894102',
-    rating: 4.96,
-    reviewCount: 128,
-    activeCars: 42,
-    status: 'Active License',
-    emirate: 'Dubai',
-    tagline: 'Tier-1 Institutional Partner | Hypercar Vault',
-  },
-  {
-    id: 'yas-marina',
-    slug: 'yas-marina',
-    name: 'Yas Marina Luxury Motors',
-    location: 'Yas Marina Circuit, Abu Dhabi',
-    licenseNumber: 'AD-DED #44109',
-    rating: 4.98,
-    reviewCount: 94,
-    activeCars: 31,
-    status: 'Active License',
-    emirate: 'Abu Dhabi',
-    tagline: 'Trackside Performance & Trackday Allocations',
-  },
-  {
-    id: 'sheikh-zayed',
-    slug: 'sheikh-zayed',
-    name: 'Sheikh Zayed Rd Gallery',
-    location: 'Between 3rd & 4th Interchange, Dubai',
-    licenseNumber: 'DED #772910',
-    rating: 4.92,
-    reviewCount: 210,
-    activeCars: 68,
-    status: 'Active License',
-    emirate: 'Dubai',
-    tagline: 'Premier Collector Showroom on SZR Corridor',
-  },
-  {
-    id: 'sharjah-oasis',
-    slug: 'sharjah-oasis',
-    name: 'Sharjah Auto Oasis Hub',
-    location: 'Al Souq Al Haraj, Sector 1, Sharjah',
-    licenseNumber: 'SHJ-LIC #30198',
-    rating: 4.89,
-    reviewCount: 88,
-    activeCars: 26,
-    status: 'Active License',
-    emirate: 'Sharjah',
-    tagline: 'Northern Emirates Premier Automotive Exchange',
-  },
-  {
-    id: 'al-futtaim-prestige',
-    slug: 'al-futtaim-prestige',
-    name: 'Al Futtaim Prestige Motors',
-    location: 'Sheikh Zayed Rd, Exit 45, Dubai',
-    licenseNumber: 'DED #987654',
-    rating: 4.95,
-    reviewCount: 176,
-    activeCars: 54,
-    status: 'Active License',
-    emirate: 'Dubai',
-    tagline: 'Exotic Vehicles & Sovereign Delivery Suite',
-  },
-];
+import { fetchPublicDealers, PublicDealerSummary } from '../../lib/api';
 
 export default function DealersDirectoryPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
   const [selectedEmirate, setSelectedEmirate] = useState('All Emirates');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [dealers, setDealers] = useState<PublicDealerSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 12;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
   const isArabic = locale === 'ar';
 
-  const filteredDealers = ACCREDITED_DEALERS.filter((dealer) => {
-    if (selectedEmirate !== 'All Emirates' && dealer.emirate !== selectedEmirate) {
-      return false;
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      return (
-        dealer.name.toLowerCase().includes(q) ||
-        dealer.location.toLowerCase().includes(q) ||
-        dealer.licenseNumber.toLowerCase().includes(q)
-      );
-    }
-    return true;
+  const changeEmirate = (em: string) => {
+    setSelectedEmirate(em);
+    setPage(1);
+  };
+
+  // Emirate and paging are applied server-side; the API has no name search,
+  // so the text box only filters the dealerships on the current page.
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    fetchPublicDealers({ emirate: selectedEmirate, page, limit: PAGE_SIZE })
+      .then((res) => {
+        if (!active) return;
+        setDealers(res.items);
+        setTotal(typeof res.total === 'number' ? res.total : res.items.length);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setDealers([]);
+        setTotal(0);
+        setLoadError(err instanceof Error ? err.message : 'Unable to load dealerships');
+      })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [selectedEmirate, page]);
+
+  const locationLabel = (dealer: PublicDealerSummary) =>
+    [...dealer.cities, ...dealer.emirates.filter((e) => !dealer.cities.includes(e))].join(', ') || 'UAE';
+
+  const filteredDealers = dealers.filter((dealer) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return dealer.displayName.toLowerCase().includes(q) || locationLabel(dealer).toLowerCase().includes(q);
   });
 
   return (
@@ -129,7 +64,7 @@ export default function DealersDirectoryPage() {
       <MarketplaceHeader
         activePath="/dealers"
         selectedEmirate={selectedEmirate}
-        onEmirateChange={setSelectedEmirate}
+        onEmirateChange={changeEmirate}
         favoritesCount={0}
         locale={locale}
         onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
@@ -146,7 +81,7 @@ export default function DealersDirectoryPage() {
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               <span className="font-label-caps text-xs text-outline uppercase tracking-wider">
-                {isArabic ? 'شركاء مؤسسيون فئة أولى' : 'Tier-1 Institutional Partners'}
+                {isArabic ? 'تحقق KYB يدوي' : 'Manual KYB Review'}
               </span>
             </div>
 
@@ -156,8 +91,8 @@ export default function DealersDirectoryPage() {
 
             <p className="font-body-lg text-sm sm:text-base text-outline max-w-2xl leading-relaxed">
               {isArabic
-                ? 'دليل صالات العرض والوكالات الحاصلة على فحص السجل التجاري المعتمد وتدقيق الهوية المؤسسية (KYB) مع التراخيص الصادرة من دوائر التنمية الاقتصادية في دولة الإمارات.'
-                : 'Directory of institutional dealerships operating under strict commercial KYB verification, physical vehicle grounding standards, and RTA/TAMM compliant digital escrow settlement.'}
+                ? 'دليل صالات العرض التي اجتازت مراجعة التحقق من النشاط التجاري (KYB) على المنصة.'
+                : 'Directory of dealerships that passed the platform’s business verification (KYB) review.'}
             </p>
 
             {/* Filters Row */}
@@ -167,7 +102,7 @@ export default function DealersDirectoryPage() {
                   <button
                     key={em}
                     type="button"
-                    onClick={() => setSelectedEmirate(em)}
+                    onClick={() => changeEmirate(em)}
                     className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
                       selectedEmirate === em
                         ? 'bg-primary text-on-primary shadow-sm'
@@ -180,11 +115,15 @@ export default function DealersDirectoryPage() {
               </div>
 
               <div className="w-full sm:w-72">
+                <label htmlFor="dealer-filter" className="sr-only">
+                  {isArabic ? 'تصفية هذه الصفحة' : 'Filter this page'}
+                </label>
                 <input
-                  type="text"
+                  id="dealer-filter"
+                  type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={isArabic ? 'ابحث باسم المعرض أو الموقع...' : 'Search showroom or license...'}
+                  placeholder={isArabic ? 'تصفية هذه الصفحة بالاسم أو الموقع...' : 'Filter this page by name or location...'}
                   className="w-full h-10 px-4 rounded-lg bg-surface-container border border-outline-variant/30 text-xs text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
                 />
               </div>
@@ -194,7 +133,16 @@ export default function DealersDirectoryPage() {
 
         {/* Dealership Grid */}
         <section className="max-w-[1440px] mx-auto px-4 md:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loadError ? (
+            <p role="alert" className="text-sm text-error">
+              {isArabic ? 'تعذر تحميل دليل صالات العرض.' : 'The dealership directory could not be loaded.'} {loadError}
+            </p>
+          ) : !loading && filteredDealers.length === 0 ? (
+            <p className="text-sm text-outline">
+              {isArabic ? 'لا توجد صالات عرض معتمدة مطابقة.' : 'No verified dealerships match these filters.'}
+            </p>
+          ) : null}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy={loading}>
             {filteredDealers.map((dealer) => (
               <div
                 key={dealer.id}
@@ -214,28 +162,20 @@ export default function DealersDirectoryPage() {
                     </div>
                     <span className="px-2.5 py-1 rounded-full bg-tertiary/15 text-tertiary font-label-caps text-[10px] uppercase font-bold flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-tertiary" />
-                      {dealer.status}
+                      {isArabic ? 'موثق KYB' : 'KYB Verified'}
                     </span>
                   </div>
 
                   <h3 className="font-headline-sm text-lg font-bold text-on-surface group-hover:text-primary transition-colors">
-                    {dealer.name}
+                    {dealer.displayName}
                   </h3>
-                  <p className="font-body-sm text-xs text-outline mt-1">{dealer.location} • {dealer.licenseNumber}</p>
-                  <p className="font-body-sm text-xs text-on-surface-variant mt-2 line-clamp-2">{dealer.tagline}</p>
+                  <p className="font-body-sm text-xs text-outline mt-1">{locationLabel(dealer)}</p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-outline-variant/20 flex flex-col gap-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1 text-primary">
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="font-bold text-on-surface font-data-mono-num">{dealer.rating.toFixed(2)}</span>
-                      <span className="text-outline">({dealer.reviewCount})</span>
-                    </div>
+                  <div className="flex items-center justify-end text-xs">
                     <span className="font-data-mono-num font-semibold text-secondary">
-                      {dealer.activeCars} {isArabic ? 'سيارة متاحة' : 'Active Cars'}
+                      {dealer.liveGroundedStock} {isArabic ? 'سيارة منشورة' : 'Published listings'}
                     </span>
                   </div>
 
@@ -252,6 +192,31 @@ export default function DealersDirectoryPage() {
               </div>
             ))}
           </div>
+
+          {!loadError && total > PAGE_SIZE && (
+            <nav aria-label={isArabic ? 'ترقيم الصفحات' : 'Pagination'} className="mt-10 flex items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1 || loading}
+                className="px-4 py-2 rounded-lg bg-surface-container text-on-surface text-xs font-semibold border border-outline-variant/30 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-high focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                {isArabic ? 'السابق' : 'Previous'}
+              </button>
+              <span className="text-xs font-data-mono-num text-outline">
+                {isArabic ? `صفحة ${page} من ${totalPages}` : `Page ${page} of ${totalPages}`} · {total}{' '}
+                {isArabic ? 'معرض' : 'dealerships'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages || loading}
+                className="px-4 py-2 rounded-lg bg-surface-container text-on-surface text-xs font-semibold border border-outline-variant/30 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-surface-container-high focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                {isArabic ? 'التالي' : 'Next'}
+              </button>
+            </nav>
+          )}
         </section>
       </main>
 

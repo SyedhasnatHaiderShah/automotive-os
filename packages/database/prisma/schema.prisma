@@ -352,6 +352,9 @@ model Vehicle {
   @@unique([tenantId, stockNumber])
   @@unique([tenantId, vin])
   @@index([tenantId, stockStatus, updatedAt])
+  @@index([makeId])
+  @@index([modelId])
+  @@index([tenantId, branchId])
   @@map("vehicles")
 }
 
@@ -403,6 +406,7 @@ model Listing {
   @@unique([tenantId, vehicleId])
   @@index([status, publishedAt])
   @@index([tenantId, status])
+  @@index([status, askingPriceFils])
   @@map("listings")
 }
 

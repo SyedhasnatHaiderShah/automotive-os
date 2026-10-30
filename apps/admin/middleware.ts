@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * Platform admin gate.
+ *
+ * Paths seen here are relative to the `/admin` basePath (request.nextUrl.pathname
+ * has the basePath stripped). Static assets are excluded by the matcher so the
+ * authoritative session check does not run for every chunk, image or font.
+ *
+ * The API stays the authority: every /api/v1/admin route re-validates the JWT,
+ * the session row and `isPlatformAdmin`. This gate only keeps the console shell
+ * away from non-admins.
+ */
 export const config = {
   matcher: [
-    /*
-     * Match root and all request paths except:
-     * 1. /api/health (health check)
-     * 2. /_next/static (static files)
-     * 3. /_next/image (image optimization files)
-     * 4. /favicon.ico (favicon file)
-     */
     '/',
-    '/((?!api/health|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/health|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|map|txt|woff2?)$).*)',
   ],
 };
 
@@ -107,51 +111,82 @@ async function verifyHs256Session(token: string, secret: string): Promise<any | 
   }
 }
 
+function isPrefetchRequest(request: NextRequest): boolean {
+  if (request.headers.has('next-router-prefetch')) return true;
+  const purpose = `${request.headers.get('purpose') || ''} ${request.headers.get('sec-purpose') || ''}`;
+  return purpose.toLowerCase().includes('prefetch');
+}
+
+function resolveApiBaseUrl(isDevelopment: boolean): string | null {
+  const configured = (process.env.API_SERVICE_URL || process.env.NEXT_PUBLIC_API_URL || '').trim();
+  if (configured) return configured.replace(/\/+$/, '');
+  return isDevelopment ? 'http://localhost:4000' : null;
+}
+
 export async function middleware(request: NextRequest) {
   // Allow health checks unconditionally
   if (request.nextUrl.pathname.startsWith('/api/health')) {
     return NextResponse.next();
   }
 
-  // Development bypass
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  // Development bypass: explicit opt-in only, never on a non-local host.
   const isLocalhost =
     request.nextUrl.hostname === 'localhost' ||
     request.nextUrl.hostname === '127.0.0.1' ||
-    request.nextUrl.hostname === '::1';
-  if (
-    process.env.NODE_ENV === 'development' &&
-    isLocalhost &&
-    process.env.ADMIN_AUTH_ENFORCED !== 'true'
-  ) {
+    request.nextUrl.hostname === '::1' ||
+    request.nextUrl.hostname === '[::1]';
+  if (isDevelopment && isLocalhost && process.env.ADMIN_DEV_BYPASS === 'true') {
     return NextResponse.next();
+  }
+
+  // Fail closed: there is no default signing secret outside local development.
+  const jwtSecret = process.env.JWT_SECRET?.trim() || '';
+  if (!jwtSecret && !isDevelopment) {
+    console.error('[SECURITY_ADMIN_GATE] JWT_SECRET is not configured; refusing admin access.');
+    return new NextResponse('Admin console unavailable: authentication is not configured.', {
+      status: 503,
+      headers: { 'Cache-Control': 'no-store' },
+    });
   }
 
   // 1. Unified Auth Session Cookie Verification with Authoritative State Validation (S3 Security Gate)
   const sessionCookie = request.cookies.get('ao_session')?.value;
-  const jwtSecret = process.env.JWT_SECRET || 'dev-jwt-secret-replace-in-production-min-32-chars-long';
+  let sessionTokenInvalid = false;
 
-  if (sessionCookie) {
+  if (sessionCookie && jwtSecret) {
     const payload = await verifyHs256Session(sessionCookie, jwtSecret);
-    if (payload && payload.isPlatformAdmin === true) {
-      // Authoritative validation against PostgreSQL/API: prevents stale JWT claims from authorizing demoted or revoked admins
-      try {
-        const apiBaseUrl = process.env.API_SERVICE_URL || 'http://localhost:4000';
-        const verifyRes = await fetch(`${apiBaseUrl}/api/v1/auth/verify-admin-session`, {
-          headers: {
-            Authorization: `Bearer ${sessionCookie}`,
-            Cookie: `ao_session=${sessionCookie}`,
-          },
-          signal: AbortSignal.timeout(4000),
-        });
+    if (!payload) {
+      sessionTokenInvalid = true;
+    } else if (payload.isPlatformAdmin === true) {
+      // Prefetches still need a valid admin cookie, but skip the authoritative
+      // network round trip; the real navigation and every API call re-check it.
+      if (isPrefetchRequest(request)) {
+        return NextResponse.next();
+      }
 
-        if (verifyRes.ok) {
-          const data = await verifyRes.json();
-          if (data && data.valid === true) {
-            return NextResponse.next();
+      // Authoritative validation against PostgreSQL/API: prevents stale JWT claims from authorizing demoted or revoked admins
+      const apiBaseUrl = resolveApiBaseUrl(isDevelopment);
+      if (apiBaseUrl) {
+        try {
+          const verifyRes = await fetch(`${apiBaseUrl}/api/v1/auth/verify-admin-session`, {
+            headers: {
+              Authorization: `Bearer ${sessionCookie}`,
+              Cookie: `ao_session=${sessionCookie}`,
+            },
+            signal: AbortSignal.timeout(4000),
+          });
+
+          if (verifyRes.ok) {
+            const data = await verifyRes.json();
+            if (data && data.valid === true) {
+              return NextResponse.next();
+            }
           }
+        } catch {
+          // Fall through to authentication challenge if authoritative validation fails
         }
-      } catch {
-        // Fall through to authentication challenge if authoritative validation fails
       }
     }
   }
@@ -181,6 +216,7 @@ export async function middleware(request: NextRequest) {
   // 3. Staging Basic Authentication Fallback
   const configuredUser = process.env.ADMIN_AUTH_USER;
   const configuredPass = process.env.ADMIN_AUTH_PASSWORD;
+  const basicAuthConfigured = Boolean(configuredUser && configuredPass);
 
   if (configuredUser && configuredPass) {
     const authHeader = request.headers.get('authorization');
@@ -204,22 +240,35 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 4. If neither valid session nor basic auth, redirect browser requests to /auth
+  // 4. No valid admin session: send browsers to the unified sign-in page.
   const acceptHeader = request.headers.get('accept') || '';
   if (acceptHeader.includes('text/html')) {
-    const authUrl = new URL('/auth?tab=login', request.url);
-    authUrl.searchParams.set('redirect', request.nextUrl.pathname);
-    const redirectRes = NextResponse.redirect(authUrl);
-    if (sessionCookie) {
-      redirectRes.cookies.delete('ao_session');
+    // `/auth` lives on the marketplace gateway origin, outside the /admin basePath.
+    const basePath = request.nextUrl.basePath || '/admin';
+    const subPath = request.nextUrl.pathname === '/' ? '' : request.nextUrl.pathname;
+    const originalPath = `${basePath}${subPath}${request.nextUrl.search}` || '/admin';
+    const params = new URLSearchParams({ tab: 'login', redirect: originalPath });
+    // Behind the gateway rewrite request.url carries the admin service host, so
+    // an absolute redirect would leave the gateway. A relative Location resolves
+    // against the origin the browser is actually on.
+    const redirectRes = new NextResponse(null, {
+      status: 307,
+      headers: { Location: `/auth?${params.toString()}`, 'Cache-Control': 'no-store' },
+    });
+    // Only clear a cookie that is cryptographically invalid or expired. A valid
+    // non-admin session (buyer/dealer) must not be logged out by visiting /admin.
+    if (sessionCookie && sessionTokenInvalid) {
+      redirectRes.cookies.set('ao_session', '', { path: '/', maxAge: 0 });
     }
     return redirectRes;
   }
 
-  return new NextResponse('Access Denied: Platform Administrator Authentication Required', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="Automotive OS Admin Protected Gate"',
-    },
-  });
+  const headers: Record<string, string> = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
+  if (basicAuthConfigured) {
+    headers['WWW-Authenticate'] = 'Basic realm="Automotive OS Admin Protected Gate"';
+  }
+  return new NextResponse(
+    JSON.stringify({ error: { code: 'Unauthorized', message: 'Platform administrator authentication required' } }),
+    { status: 401, headers },
+  );
 }

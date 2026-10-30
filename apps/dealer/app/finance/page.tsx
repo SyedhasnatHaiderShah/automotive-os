@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
+import { previewSafeMessage } from '../../lib/preview';
 import {
   VERIFIED_FINANCE_DESK_FIXTURE,
   FinanceDeskData,
@@ -13,7 +14,7 @@ import {
 
 export default function FinanceAndInsurancePage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  const [role] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const isRtl = locale === 'ar';
 
   const [financeData, setFinanceData] = useState<FinanceDeskData>(VERIFIED_FINANCE_DESK_FIXTURE);
@@ -24,7 +25,9 @@ export default function FinanceAndInsurancePage() {
   const [demonstratorState, setDemonstratorState] = useState<'DEFAULT' | 'HIGH_DBR' | 'MURABAHA' | 'CLAIM'>('DEFAULT');
 
   // Modals & User Feedback
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
   const [submitDossierModalOpen, setSubmitDossierModalOpen] = useState(false);
   const [simulateTermsModalOpen, setSimulateTermsModalOpen] = useState(false);
   const [complianceLogModalOpen, setComplianceLogModalOpen] = useState(false);
@@ -138,8 +141,6 @@ export default function FinanceAndInsurancePage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />

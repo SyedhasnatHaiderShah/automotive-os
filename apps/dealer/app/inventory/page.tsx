@@ -1,40 +1,64 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { fetchDealerInventory } from '../../lib/api';
+import { getDealerSession } from '../../lib/session';
+import { capabilitiesFor } from '../../lib/permissions';
+import { countVehicles, fetchVehiclesPage } from '../../lib/dealer-api-server';
+import { parsePaging, STOCK_STATUSES, type StockStatus } from '../../lib/dealer-api';
+import { DealerServiceError } from '../../components/dealer-service-error';
+import { DealerShell } from '../../components/dealer-shell';
 import { InventoryMatrixView } from '../../components/inventory-matrix-view';
 
 export const metadata: Metadata = {
-  title: 'Vehicle Inventory & Telemetry Matrix | Automotive OS Dealer DMS',
-  description: 'Tenant-isolated vehicle stock management, RTA Tasjeel compliance, and listing submission.',
+  title: 'Vehicle Inventory | Automotive OS Dealer DMS',
+  description: 'Tenant-isolated vehicle stock and listing submission.',
 };
 
-export default async function DealerInventoryPage() {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+export default async function DealerInventoryPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const params = await searchParams;
   try {
-    const { items: vehicles, stats } = await fetchDealerInventory();
+    const session = await getDealerSession();
+    const { page, limit } = parsePaging(params);
+    const rawStock = Array.isArray(params.stockStatus) ? params.stockStatus[0] : params.stockStatus;
+    const stockStatus = STOCK_STATUSES.includes(rawStock as StockStatus) ? (rawStock as StockStatus) : undefined;
+
+    const [vehicles, allTotal, availableTotal, reservedTotal, soldTotal] = await Promise.all([
+      fetchVehiclesPage(session.tenantId, session.token, { page, limit, stockStatus }),
+      countVehicles(session.tenantId, session.token),
+      countVehicles(session.tenantId, session.token, 'AVAILABLE'),
+      countVehicles(session.tenantId, session.token, 'RESERVED'),
+      countVehicles(session.tenantId, session.token, 'SOLD'),
+    ]);
 
     return (
-      <InventoryMatrixView
-        initialVehicles={vehicles}
-        initialStats={stats}
-      />
+      <DealerShell
+        identity={{
+          tenantName: session.tenantName,
+          displayName: session.displayName,
+          role: session.role,
+          hasMultipleTenants: session.hasMultipleTenants,
+        }}
+      >
+        <InventoryMatrixView
+          tenantId={session.tenantId}
+          tenantName={session.tenantName}
+          capabilities={capabilitiesFor(session.role)}
+          vehicles={vehicles}
+          stockStatus={stockStatus}
+          totals={{ all: allTotal, available: availableTotal, reserved: reservedTotal, sold: soldTotal }}
+        />
+      </DealerShell>
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     return (
-      <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-6 text-on-surface">
-        <div className="bg-surface-container-high border border-error/30 rounded-2xl p-8 max-w-lg text-center flex flex-col items-center gap-4 shadow-2xl">
-          <span className="material-symbols-outlined text-5xl text-error">cloud_off</span>
-          <h2 className="text-xl font-bold font-headline">Dealer Inventory Service Unavailable</h2>
-          <p className="text-sm text-on-surface-variant font-body-md">
-            {error?.message || 'Unable to load real-time dealership inventory telemetry. Backend API may be unreachable.'}
-          </p>
-          <a
-            href="/inventory"
-            className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md font-semibold hover:opacity-90 transition-opacity"
-          >
-            Retry Connection
-          </a>
-        </div>
-      </div>
+      <DealerServiceError
+        title="Dealer inventory unavailable"
+        error={error}
+        fallbackMessage="Unable to load dealership inventory from the API."
+        retryPath="/dealer/inventory"
+      />
     );
   }
 }
+

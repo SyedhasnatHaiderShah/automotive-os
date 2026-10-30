@@ -30,10 +30,10 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-outline-variant/30 shadow-2xl shadow-black/60">
-      <div className="h-20 max-w-[1440px] mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
+      <div className="h-20 max-w-[1440px] mx-auto px-4 md:px-8 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Brand Identity & Location Dropdown */}
-        <div className="flex items-center gap-6">
-          <a href="/" className="flex items-center gap-3 focus:outline-none">
+        <div className="flex items-center gap-3 lg:gap-6 min-w-0">
+          <a href="/" className="flex items-center gap-2 sm:gap-3 focus:outline-none min-w-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center font-bold text-on-primary text-sm shadow-md">
               AO
             </div>
@@ -125,12 +125,12 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
         </nav>
 
         {/* Right: Language Toggle, Favorites Counter & Profile */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Language Toggle */}
           <button
             type="button"
             onClick={onLocaleToggle}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all text-xs font-label-caps"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all text-xs font-label-caps"
             aria-label="Toggle Arabic / English language"
           >
             <span className={isArabic ? 'text-primary font-bold' : ''}>العربية</span>
@@ -140,7 +140,7 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
 
           {/* Favorites Counter */}
           <a
-            href="/saved"
+            href="/account/saved"
             className="relative p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary"
             aria-label={`View ${favoritesCount} saved vehicles`}
           >
@@ -168,7 +168,7 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
 
           {/* Profile / Account */}
           <a
-            href="/profile"
+            href="/account/profile"
             className="flex items-center gap-2 p-1.5 rounded-full hover:bg-surface-container transition-all text-on-surface"
             aria-label="User profile and garage"
           >

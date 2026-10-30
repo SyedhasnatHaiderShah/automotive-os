@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-staging_secure_postgres_pass}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: ${POSTGRES_DB:-automotive_os}
     ports:
       - "5432:5432"
@@ -50,10 +50,10 @@ services:
       NODE_ENV: staging
       API_PORT: 4000
       API_HOST: https://api-staging.syedhasnat.com
-      DATABASE_URL: postgresql://automotive_app:${APP_DB_PASSWORD:-app_staging_pass}@postgres:5432/automotive_os?schema=public
-      DIRECT_URL: postgresql://postgres:${POSTGRES_PASSWORD:-staging_secure_postgres_pass}@postgres:5432/automotive_os?schema=public
+      DATABASE_URL: postgresql://automotive_app:${APP_DB_PASSWORD:?APP_DB_PASSWORD is required}@postgres:5432/automotive_os?schema=public
+      DIRECT_URL: postgresql://postgres:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/automotive_os?schema=public
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-staging-jwt-secret-min-32-chars-strictly-secure}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required (32+ random characters)}
       JWT_EXPIRATION: "24h"
       CORS_ORIGINS: "https://cars-staging.syedhasnat.com,https://dealer-staging.syedhasnat.com,https://admin-staging.syedhasnat.com"
       FEATURE_FLAG_UAE_PASS_LIVE: "false"

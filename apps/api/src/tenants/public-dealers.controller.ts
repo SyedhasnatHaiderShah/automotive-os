@@ -1,14 +1,29 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TenantsService } from './tenants.service';
 import { Public } from '../common/decorators/public.decorator';
-import { PublicDealerDetailDto } from './dto/public-dealer-response.dto';
+import {
+  PublicDealerDetailDto,
+  PublicDealerListResponseDto,
+} from './dto/public-dealer-response.dto';
+import { PublicDealerQueryDto } from './dto/public-dealer-query.dto';
 
 @ApiTags('public')
 @Public()
 @Controller('api/v1/public/dealers')
 export class PublicDealersController {
   constructor(private readonly tenantsService: TenantsService) {}
+
+  @Get()
+  @ApiOperation({
+    summary: 'List active KYB-approved dealerships with live published stock counts.',
+  })
+  @ApiResponse({ status: 200, type: PublicDealerListResponseDto })
+  async listPublicDealers(
+    @Query() query: PublicDealerQueryDto
+  ): Promise<PublicDealerListResponseDto> {
+    return this.tenantsService.listPublicDealers(query);
+  }
 
   @Get(':slug')
   @ApiOperation({

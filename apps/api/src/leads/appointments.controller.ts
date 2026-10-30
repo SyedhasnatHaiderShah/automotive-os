@@ -33,6 +33,12 @@ export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Get()
+  @RequireRoles(
+    MembershipRole.OWNER,
+    MembershipRole.ADMIN,
+    MembershipRole.SALES_MANAGER,
+    MembershipRole.SALES_AGENT,
+  )
   @ApiOperation({ summary: 'List test-drive and showroom appointments for dealership' })
   @ApiResponse({ status: 200, type: [AppointmentResponseDto] })
   async listAppointments(

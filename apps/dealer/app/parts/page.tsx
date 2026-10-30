@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
+import { previewSafeMessage } from '../../lib/preview';
 import {
   VERIFIED_PARTS_FIXTURE,
   PartsProcurementData,
@@ -12,7 +13,7 @@ import {
 
 export default function PartsAndProcurementPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  const [role] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const isRtl = locale === 'ar';
 
   const [partsData, setPartsData] = useState<PartsProcurementData>(VERIFIED_PARTS_FIXTURE);
@@ -23,7 +24,9 @@ export default function PartsAndProcurementPage() {
   const [demonstratorState, setDemonstratorState] = useState<'ALL' | 'LOW_STOCK' | 'INBOUND' | 'AUDIT'>('ALL');
 
   // Modals & User Feedback
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
   const [poModalOpen, setPoModalOpen] = useState(false);
   const [binIntakeModalOpen, setBinIntakeModalOpen] = useState(false);
   const [epcModalOpen, setEpcModalOpen] = useState(false);
@@ -176,8 +179,6 @@ export default function PartsAndProcurementPage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />

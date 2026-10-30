@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService, runWithDbContext } from '../database/prisma.service';
+import { buildPublicMediaUrl } from '../common/media-url.util';
 import {
   ListingStatus,
   StockStatus,
@@ -136,7 +137,6 @@ export class ListingSearchSyncService {
         return false;
       }
 
-      const cdnBase = process.env.S3_PUBLIC_CDN_URL || 'https://cdn.automotive-os.ae';
       const emirate = listing.vehicle.branch?.emirate || 'UAE';
       const city = listing.vehicle.branch?.city || 'UAE';
 
@@ -191,7 +191,7 @@ export class ListingSearchSyncService {
         media: listing.vehicle.media.map((m) => ({
           id: m.id,
           kind: m.kind,
-          url: `${cdnBase}/${m.objectKey}`,
+          url: buildPublicMediaUrl(m.objectKey),
           altText: m.altText,
           sortOrder: m.sortOrder,
         })),

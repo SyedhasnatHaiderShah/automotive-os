@@ -89,9 +89,6 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                     {isRtl ? 'اعتماد الوكلاء (KYB)' : 'KYB Verification'}
                   </span>
                 </div>
-                <span className="bg-surface-container-highest text-primary font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">
-                  6
-                </span>
               </Link>
 
               <Link
@@ -108,9 +105,6 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                     {isRtl ? 'مراجعة وتدقيق الإعلانات' : 'Listing Moderation'}
                   </span>
                 </div>
-                <span className="bg-surface-container-highest text-secondary font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">
-                  14
-                </span>
               </Link>
 
               <Link
@@ -127,9 +121,6 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                     {isRtl ? 'النزاعات والعقوبات' : 'Disputes & Sanctions'}
                   </span>
                 </div>
-                <span className="bg-error-container text-on-error-container font-data-mono-num text-body-sm px-1.5 py-0.5 rounded-full">
-                  2
-                </span>
               </Link>
             </nav>
           </div>
@@ -184,7 +175,7 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
 
               <a
                 aria-disabled="true"
-                title="Not available on staging: server-side integration required"
+                title="Not available yet: server-side integration required"
                 tabIndex={-1}
                 className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant opacity-50 cursor-not-allowed"
               >
@@ -196,7 +187,7 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
 
               <a
                 aria-disabled="true"
-                title="Not available on staging: server-side integration required"
+                title="Not available yet: server-side integration required"
                 tabIndex={-1}
                 className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant opacity-50 cursor-not-allowed"
               >
@@ -210,39 +201,17 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
         </div>
       </div>
 
-      {/* Bottom Keystore Security Card */}
+      {/* Emergency controls: no enforcement API exists yet */}
       <div className="p-space-md bg-surface-container-lowest flex flex-col gap-space-sm">
-        <div className="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs">
-          <div className="flex items-center gap-space-xs text-tertiary">
-            <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
-            <span className="font-label-caps text-label-caps tracking-wider uppercase">
-              {isRtl ? 'مستودع مفاتيح HSM المعزول' : 'Air-Gapped HSM Keystore'}
-            </span>
-          </div>
-          <span className="font-data-mono-num text-body-sm text-on-surface-variant">
-            #DXB-ADM-9941
-          </span>
-          <span className="font-body-sm text-body-sm text-outline">
-            {isRtl ? 'قفل تلقائي خلال 12 دقيقة' : 'Auto-lock in 12m'}
-          </span>
-        </div>
         <button
           disabled
-          title="Emergency freeze is not available in staging"
-          className="w-full h-8 px-space-sm rounded bg-error-container text-on-error-container hover:bg-error hover:text-on-error font-body-sm text-body-sm flex items-center justify-center gap-space-xs transition-colors"
+          aria-disabled="true"
+          title="Not available yet: no emergency freeze API"
+          className="w-full h-8 px-space-sm rounded bg-error-container text-on-error-container opacity-50 cursor-not-allowed font-body-sm text-body-sm flex items-center justify-center gap-space-xs"
           type="button"
-          onClick={() => {
-            if (
-              window.confirm(
-                'EMERGENCY FREEZE PROTOCOL:\nAre you sure you want to trigger emergency freeze across all broker nodes?'
-              )
-            ) {
-              alert('Emergency freeze is not connected in staging. No action was performed.');
-            }
-          }}
         >
           <span className="material-symbols-outlined text-[16px]">lock_reset</span>
-          <span>{isRtl ? 'تجميد طارئ' : 'Emergency Freeze'}</span>
+          <span>{isRtl ? 'تجميد طارئ (غير متاح بعد)' : 'Emergency Freeze (not available yet)'}</span>
         </button>
       </div>
     </aside>

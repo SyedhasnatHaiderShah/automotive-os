@@ -23,6 +23,7 @@ import {
 import { VehicleResponseDto } from "./dto/vehicle-response.dto";
 import {
   ListingStatus,
+  MediaKind,
   MembershipRole,
   StockStatus,
 } from "@automotive-os/database";
@@ -371,6 +372,7 @@ export class VehiclesService {
     tenantId: string,
     vehicleId: string,
     dto: CreateMediaUploadDto,
+    userRole?: MembershipRole,
   ): Promise<MediaUploadResponseDto> {
     // 1. Verify vehicle belongs to tenant
     const vehicle = await this.prisma.vehicle.findUnique({
@@ -470,7 +472,11 @@ export class VehiclesService {
         objectKey,
         altText: dto.altText || null,
         sortOrder: dto.sortOrder || 0,
-        isPublic: dto.isPublic !== undefined ? dto.isPublic : false,
+        // SEC-12: documents are never public; sales agents cannot publish media.
+        isPublic:
+          dto.kind !== MediaKind.DOCUMENT &&
+          userRole !== MembershipRole.SALES_AGENT &&
+          dto.isPublic === true,
       },
     });
 

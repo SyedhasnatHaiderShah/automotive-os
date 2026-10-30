@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DealerSidebar } from '../../../components/dealer-sidebar';
 import { DealerHeader } from '../../../components/dealer-header';
+import { previewSafeMessage } from '../../../lib/preview';
 import {
   fetchSubprimeDbrExceptionData,
   SubprimeDbrExceptionData,
@@ -16,7 +17,9 @@ export default function SubprimeDbrExceptionPage() {
   const isRtl = locale === 'ar';
   const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const [pipelineFilter, setPipelineFilter] = useState<'ALL' | 'APPROVED' | 'COMMITTEE' | 'SETTLED'>('ALL');
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
 
   // Exception State Cures
   const [isCured, setIsCured] = useState(false);
@@ -76,8 +79,6 @@ export default function SubprimeDbrExceptionPage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />
@@ -1288,7 +1289,7 @@ export default function SubprimeDbrExceptionPage() {
               <div className="py-6 text-center space-y-3">
                 <span className="material-symbols-outlined text-[48px] text-tertiary">check_circle</span>
                 <h4 className="font-headline-sm text-on-surface font-semibold">
-                  {isRtl ? 'تم تسجيل الاستثناء واعتماده من CRO' : 'CRO Exception Granted & Logged'}
+                  {isRtl ? 'معاينة فقط — لم يتم إرسال أي شيء.' : 'Preview only — nothing was sent.'}
                 </h4>
                 <p className="text-[12px] text-on-surface-variant max-w-sm mx-auto">
                   {isRtl

@@ -49,14 +49,13 @@ export class CreateMediaUploadDto {
   @ApiProperty({
     description: 'File size in bytes (max 15MB for images, 50MB for PDFs)',
     example: 2048000,
-    required: false,
   })
+  // SEC-16: required so the presigned PUT is always bound to a Content-Length.
   @IsInt()
   @Min(1, { message: 'fileSizeBytes must be at least 1 byte' })
   @Max(MAX_DOCUMENT_SIZE_BYTES, { message: 'fileSizeBytes cannot exceed 50MB' })
-  @IsOptional()
   @Type(() => Number)
-  fileSizeBytes?: number;
+  fileSizeBytes!: number;
 
   @ApiProperty({ description: 'Whether this image/document is visible on public listings', example: true, default: false })
   @IsBoolean()

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
+import { previewSafeMessage } from '../../lib/preview';
 import {
   VERIFIED_ACCOUNTING_DESK_FIXTURE,
   AccountingDeskData,
@@ -10,14 +11,16 @@ import {
 
 export default function TaxInvoicesAndAccountingPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
+  const [role] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const isRtl = locale === 'ar';
 
   const [accountingData, setAccountingData] = useState<AccountingDeskData>(VERIFIED_ACCOUNTING_DESK_FIXTURE);
   const [demonstratorState, setDemonstratorState] = useState<'STANDARD' | 'TRADE_IN' | 'ZERO_RATED' | 'AUDIT_FLAG'>('STANDARD');
 
   // Modals & Feedback
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
   const [generateInvoiceModalOpen, setGenerateInvoiceModalOpen] = useState(false);
   const [exportFafModalOpen, setExportFafModalOpen] = useState(false);
   const [reconcileModalOpen, setReconcileModalOpen] = useState(false);
@@ -87,8 +90,6 @@ export default function TaxInvoicesAndAccountingPage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />

@@ -1,23 +1,20 @@
 import React from 'react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { BuyerGarageView } from '../../../components/buyer-garage-view';
-import { fetchBuyerAppointments, DEFAULT_BUYER_GARAGE_VEHICLES } from '../../../lib/api';
+import { fetchBuyerAppointments, fetchBuyerMe } from '../../../lib/api';
+import { withBuyerSession } from '../../../lib/server-session';
 
 export const metadata: Metadata = {
-  title: 'Appointments, Test Drives & Virtual Garage | Automotive OS',
-  description:
-    'Coordinate private showroom viewings, Dubai Autodrome track runs, and manage your authenticated digital collection under direct RTA title synchronization.',
+  title: 'Appointments & Test Drives | Automotive OS',
+  description: 'View, reschedule or cancel your showroom appointments and test drives.',
 };
 
 export const dynamic = 'force-dynamic';
 
 export default async function BuyerGaragePage() {
-  const appointments = await fetchBuyerAppointments();
-
-  return (
-    <BuyerGarageView
-      initialAppointments={appointments}
-      initialGarageVehicles={DEFAULT_BUYER_GARAGE_VEHICLES}
-    />
+  const [appointments, me] = await withBuyerSession('/account/garage', (token) =>
+    Promise.all([fetchBuyerAppointments(token), fetchBuyerMe(token)])
   );
+
+  return <BuyerGarageView initialAppointments={appointments} displayName={me.displayName} />;
 }

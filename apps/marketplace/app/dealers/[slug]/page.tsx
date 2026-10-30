@@ -1,7 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import { fetchPublicDealerBySlug } from '../../../lib/api';
+
+// PF-04: generateMetadata and the page share one fetch per request.
+const load = cache(fetchPublicDealerBySlug);
 import { DealerStorefrontView } from '../../../components/dealer-storefront-view';
 
 interface PageProps {
@@ -12,12 +16,12 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const dealer = await fetchPublicDealerBySlug(slug);
+  const dealer = await load(slug);
 
   if (!dealer) {
     return {
-      title: 'Dealership Storefront | Automotive OS',
-      description: 'Verified UAE luxury automotive dealership exchange.',
+      title: 'Dealership not found | Automotive OS',
+      description: 'This dealership storefront is not available.',
     };
   }
 
@@ -25,20 +29,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const emirate = dealer.branches[0]?.emirate || 'Dubai';
 
   return {
-    title: `${dealer.displayName} — Verified Dealership Storefront (${emirate}, UAE) | Automotive OS`,
+    title: `${dealer.displayName} — Dealership Storefront (${emirate}, UAE) | Automotive OS`,
     description:
       dealer.description ||
-      `Official verified dealership profile for ${dealer.displayName}. Browse ${liveStock} grounded luxury and collector vehicles with RTA Tasjeel and Escrow protection.`,
+      `Dealership profile for ${dealer.displayName} in ${emirate}. Browse ${liveStock} published vehicle listings.`,
     openGraph: {
       title: `${dealer.displayName} | Automotive OS`,
-      description: `Verified showroom in ${emirate}, UAE. ${dealer.tagline || ''}`,
+      description: `Showroom in ${emirate}, UAE. ${dealer.tagline || ''}`.trim(),
     },
   };
 }
 
 export default async function DealerStorefrontPage({ params }: PageProps) {
   const { slug } = await params;
-  const dealer = await fetchPublicDealerBySlug(slug);
+  const dealer = await load(slug);
 
   if (!dealer) {
     notFound();

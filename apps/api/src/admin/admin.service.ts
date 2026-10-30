@@ -54,6 +54,8 @@ export class AdminService {
     });
 
     const tenants = await this.prisma.tenant.findMany({
+      // SEC-17: bounded result set until the dealer directory is paginated.
+      take: 500,
       include: {
         verification: true,
         _count: {

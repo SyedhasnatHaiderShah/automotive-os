@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { TenantContext } from '../common/guards/tenant-access.guard';
 import { TenantContextResponseDto } from './dto/tenant-context-response.dto';
-import { PublicDealerDetailDto } from './dto/public-dealer-response.dto';
+import {
+  PublicDealerDetailDto,
+  PublicDealerListResponseDto,
+} from './dto/public-dealer-response.dto';
 import {
   ListingStatus,
   StockStatus,
@@ -14,27 +17,102 @@ import {
 export class TenantsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getPublicDealerBySlug(slug: string): Promise<PublicDealerDetailDto> {
-    const tenant = await this.prisma.tenant.findUnique({
-      where: { slug },
-      include: {
-        verification: true,
-        branches: {
-          where: { isActive: true },
-        },
-        listings: {
-          where: {
-            status: ListingStatus.PUBLISHED,
-            vehicle: {
-              stockStatus: StockStatus.AVAILABLE,
+  async listPublicDealers(query: {
+    emirate?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<PublicDealerListResponseDto> {
+    const page = Math.max(1, Math.floor(query.page || 1));
+    const limit = Math.min(50, Math.max(1, Math.floor(query.limit || 20)));
+    const where = {
+      status: TenantStatus.ACTIVE,
+      verification: { status: VerificationStatus.APPROVED },
+      ...(query.emirate
+        ? {
+            branches: {
+              some: {
+                isActive: true,
+                emirate: { equals: query.emirate, mode: 'insensitive' as const },
+              },
+            },
+          }
+        : {}),
+    };
+
+    // Public read: tenant-scoped tables are hidden by RLS without an elevated
+    // context, so read under admin context and project only public fields.
+    const [total, tenants] = await runWithDbContext({ isAdmin: true }, () =>
+      Promise.all([
+        this.prisma.tenant.count({ where }),
+        this.prisma.tenant.findMany({
+          where,
+          orderBy: { displayName: 'asc' },
+          skip: (page - 1) * limit,
+          take: limit,
+          select: {
+            id: true,
+            slug: true,
+            displayName: true,
+            branches: {
+              where: { isActive: true },
+              select: { emirate: true, city: true },
+            },
+            _count: {
+              select: {
+                listings: {
+                  where: {
+                    status: ListingStatus.PUBLISHED,
+                    vehicle: { stockStatus: StockStatus.AVAILABLE },
+                  },
+                },
+              },
             },
           },
-          select: {
-            askingPriceFils: true,
+        }),
+      ])
+    );
+
+    return {
+      items: tenants.map((t) => ({
+        id: t.id,
+        slug: t.slug,
+        displayName: t.displayName,
+        isKybVerified: true,
+        emirates: [...new Set(t.branches.map((b) => b.emirate))],
+        cities: [...new Set(t.branches.map((b) => b.city))],
+        liveGroundedStock: t._count.listings,
+      })),
+      total,
+      page,
+      limit,
+    };
+  }
+
+  async getPublicDealerBySlug(slug: string): Promise<PublicDealerDetailDto> {
+    // Public read: without an elevated context RLS hides verification,
+    // branches and listings, which made every storefront look empty.
+    const tenant = await runWithDbContext({ isAdmin: true }, () =>
+      this.prisma.tenant.findUnique({
+        where: { slug },
+        include: {
+          verification: true,
+          branches: {
+            where: { isActive: true },
+          },
+          listings: {
+            where: {
+              status: ListingStatus.PUBLISHED,
+              vehicle: {
+                stockStatus: StockStatus.AVAILABLE,
+              },
+            },
+            select: {
+              askingPriceFils: true,
+            },
           },
         },
-      },
-    });
+      })
+    );
 
     if (!tenant || tenant.status !== TenantStatus.ACTIVE) {
       throw new NotFoundException(`Dealership '${slug}' not found or inactive`);
@@ -47,6 +125,11 @@ export class TenantsService {
 
     const isKybVerified =
       tenant.verification?.status === VerificationStatus.APPROVED;
+
+    const gpsBranch = tenant.branches.find((b) => b.latitude && b.longitude);
+    const primaryBranchGps = gpsBranch
+      ? `${gpsBranch.latitude!.toString()}, ${gpsBranch.longitude!.toString()}`
+      : null;
 
     return {
       id: tenant.id,
@@ -75,18 +158,20 @@ export class TenantsService {
         latitude: b.latitude ? b.latitude.toString() : undefined,
         longitude: b.longitude ? b.longitude.toString() : undefined,
       })),
+      // Rating, facility, tenure and contact data have no source of record in
+      // the schema yet; return null rather than fabricated values.
       stats: {
         liveGroundedStock,
         inventoryValueFils,
-        collectorRating: 4.98,
-        facilitySqFt: 18500,
-        establishedYears: 12,
+        collectorRating: null,
+        facilitySqFt: null,
+        establishedYears: null,
       },
       contact: {
-        directPhone: '+971 4 380 5515',
-        whatsappNumber: '+971 50 123 4567',
-        makaniNumber: '21948 83120',
-        gpsCoordinates: '25.1412° N, 55.2281° E',
+        directPhone: null,
+        whatsappNumber: null,
+        makaniNumber: null,
+        gpsCoordinates: primaryBranchGps,
       },
     };
   }

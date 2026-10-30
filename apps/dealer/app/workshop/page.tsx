@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { DealerSidebar } from '../../components/dealer-sidebar';
 import { DealerHeader } from '../../components/dealer-header';
+import { previewSafeMessage } from '../../lib/preview';
 import {
   VERIFIED_WORKSHOP_FIXTURE,
   WorkshopJobCardData,
@@ -10,7 +11,6 @@ import {
 
 export default function WorkshopAndBaysPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
-  const [role, setRole] = useState<'PRINCIPAL' | 'SALES_REP'>('PRINCIPAL');
   const isRtl = locale === 'ar';
 
   const [workshopData] = useState<WorkshopJobCardData>(VERIFIED_WORKSHOP_FIXTURE);
@@ -18,7 +18,9 @@ export default function WorkshopAndBaysPage() {
   const [demonstratorState, setDemonstratorState] = useState<'DEFAULT' | 'CONGESTION' | 'MORNING' | 'TECHS'>('DEFAULT');
 
   // Modals & User Feedback
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackMessage, setFeedbackMessageState] = useState<string | null>(null);
+  // Preview module: feedback never claims an external action happened.
+  const setFeedbackMessage = (message: string | null) => setFeedbackMessageState(previewSafeMessage(message));
   const [newRoModalOpen, setNewRoModalOpen] = useState(false);
   const [orderPartsModalOpen, setOrderPartsModalOpen] = useState(false);
   const [tasjeelModalOpen, setTasjeelModalOpen] = useState(false);
@@ -59,8 +61,6 @@ export default function WorkshopAndBaysPage() {
 
       <div className={isRtl ? 'pr-64 min-h-screen flex flex-col' : 'pl-64 min-h-screen flex flex-col'}>
         <DealerHeader
-          currentRole={role}
-          onRoleToggle={() => setRole(role === 'PRINCIPAL' ? 'SALES_REP' : 'PRINCIPAL')}
           locale={locale}
           onLocaleToggle={() => setLocale(locale === 'en' ? 'ar' : 'en')}
         />
