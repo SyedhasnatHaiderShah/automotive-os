@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ShieldAlert, Mail, ArrowLeft, Building2 } from 'lucide-react';
@@ -8,7 +8,7 @@ import { ShieldAlert, Mail, ArrowLeft, Building2 } from 'lucide-react';
 /** Configured support address; the contact link is hidden when it is not set (MK-14). */
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim() || '';
 
-export default function AccessSuspendedPage() {
+function AccessSuspendedPageContent() {
   const searchParams = useSearchParams();
   const isTenantSuspended = searchParams.get('reason') === 'tenant_suspended';
 
@@ -74,5 +74,14 @@ export default function AccessSuspendedPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary now that the route has no loading.tsx.
+export default function AccessSuspendedPage() {
+  return (
+    <Suspense fallback={null}>
+      <AccessSuspendedPageContent />
+    </Suspense>
   );
 }

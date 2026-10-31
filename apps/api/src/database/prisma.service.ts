@@ -11,7 +11,10 @@ export interface DatabaseContext {
 export const dbContextStorage = new AsyncLocalStorage<DatabaseContext>();
 
 export function runWithDbContext<T>(context: DatabaseContext, fn: () => Promise<T>): Promise<T> {
-  return dbContextStorage.run(context, fn);
+  // Prisma query promises are lazy: the query only runs when `.then` is called.
+  // Awaiting inside the scope makes that call happen while the context is set;
+  // returning the bare promise ran the query with no RLS context.
+  return dbContextStorage.run(context, async () => await fn());
 }
 
 /**

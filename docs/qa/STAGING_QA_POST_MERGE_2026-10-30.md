@@ -42,3 +42,16 @@ Main at `468abb8` (PR #35). Checked in the built-in browser and with HTTP probes
 - The PR #34 and PR #35 deploys both **failed at the Network › Healthcheck step**. The active deployment is still PR #31, which has the pre-audit dealer code.
 - Why: since PR #34 the dealer middleware gates `/dealer` behind `ao_session`. Railway's healthcheck sends no cookie and no `Accept: text/html`, so it gets 401 JSON and the deploy fails. Admin (PR #35) and marketplace deployed fine.
 - Fix: set the dealer healthcheck path to `/dealer/api/health` (route `apps/dealer/app/api/health`, excluded from the middleware matcher), then redeploy the latest `main` commit.
+
+## Closure — 2026-10-31
+
+| ID | Status | Resolution |
+|---|---|---|
+| QA-POST-01 | **Closed** | Railway dealer healthcheck path changed from `/dealer` to `/dealer/api/health`, so the PR #35 build deployed. That exposed a middleware 500 (relative `Location` rejected by Next.js), fixed in PR #37. Staging now: signed-out `/dealer`, `/dealer/inventory`, `/dealer/leads` and `/dealer/finance` return 307 to `/auth?tab=login&redirect=…` on the marketplace origin; non-HTML requests get 401; a stale cookie shows the "session expired" card. |
+| QA-POST-02 | **Closed** (this PR) | The root, `/cars` and `/cars/[slug]` `loading.tsx` boundaries flushed a 200 before `notFound()`. They were removed. `generateMetadata` now throws `notFound()` for unknown slugs, and the pages that read `useSearchParams` (`/auth`, `/access-denied`, `/access-suspended`) have their own `<Suspense>`. Local production build against the staging API: unknown car and dealer slugs return **404** for browsers and Googlebot; valid pages return 200. |
+| QA-POST-03 | **Closed** (this PR) | Root cause was not the fallback. `runWithDbContext` returned a lazy Prisma promise that was awaited outside the AsyncLocalStorage scope, so the public dealer detail ran without RLS context: `branches: []`, `liveGroundedStock: 0`, no verification block. `runWithDbContext` now awaits inside the scope (regression test `src/database/run-with-db-context.spec.ts` fails without the fix). The metadata no longer invents "Dubai" when a dealer has no branch. |
+| Vehicle images 404 | **Closed as data, not code** | `/api/v1/public/media/...` resolves the DB row and then returns "Object key does not exist in storage bucket". The seeded media rows point at objects that were never uploaded to the staging R2 bucket. The UI shows its "Vehicle image not available" fallback. Uploading staging images is an external-asset action that needs explicit approval. |
+| Consent migration | **Open (owner action)** | Cannot be verified from outside. Run `npx prisma migrate status` against the staging database, or check a signed-in buyer's settings. |
+| Signed-in flows | **Open (needs credentials)** | Buyer, dealer and admin signed-in QA need a person to sign in in the browser pane. |
+
+Checks for this PR: API typecheck PASS; API jest 28 suites, 254/254 PASS (one earlier run had 2 timing-related outbox failures that pass alone and on rerun); marketplace typecheck and `next build` PASS; local `next start` status checks as above.
