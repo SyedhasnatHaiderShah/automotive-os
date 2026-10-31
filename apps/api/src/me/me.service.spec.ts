@@ -2,6 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { MeService } from './me.service';
 import { UpdateBuyerProfileDto } from './dto/update-buyer-profile.dto';
+import { dbContextStorage } from '../database/prisma.service';
 
 describe('MeService buyer data (MK-08, MK-09, MK-10)', () => {
   const profileRow = {
@@ -21,6 +22,8 @@ describe('MeService buyer data (MK-08, MK-09, MK-10)', () => {
     buyerProfile: { upsert: jest.fn().mockResolvedValue(profileRow) },
     user: { findUnique: jest.fn() },
     appointment: { findMany: jest.fn().mockResolvedValue([]) },
+    listing: { findMany: jest.fn().mockResolvedValue([]) },
+    favorite: { findMany: jest.fn().mockResolvedValue([]), upsert: jest.fn() },
   };
   const service = new MeService(prisma, {} as any);
 
@@ -64,8 +67,54 @@ describe('MeService buyer data (MK-08, MK-09, MK-10)', () => {
   });
 
   it('only picks public photo media for appointment thumbnails', async () => {
+    prisma.appointment.findMany.mockResolvedValueOnce([
+      {
+        id: 'a1', tenantId: 't1', leadId: 'l1', status: 'REQUESTED', note: null,
+        startsAt: new Date(), endsAt: new Date(), createdAt: new Date(), updatedAt: new Date(),
+        lead: { listingId: 'listing-1' },
+      },
+    ]);
     await service.getBuyerAppointments('user-1');
-    const media = prisma.appointment.findMany.mock.calls[0][0].include.lead.include.listing.include.vehicle.include.media;
+    const media = prisma.listing.findMany.mock.calls[0][0].select.vehicle.select.media;
     expect(media.where).toEqual({ isPublic: true, kind: { in: ['EXTERIOR', 'INTERIOR'] } });
+  });
+
+  it('loads listing cards under an elevated read context, by id, with public fields only', async () => {
+    prisma.favorite.findMany.mockResolvedValueOnce([
+      { id: 'f1', userId: 'user-1', listingId: 'listing-1', createdAt: new Date() },
+    ]);
+    let seenContext: unknown;
+    prisma.listing.findMany.mockImplementationOnce((args: any) => {
+      seenContext = dbContextStorage.getStore();
+      return Promise.resolve([
+        {
+          id: 'listing-1', slug: 's', title: 'T', askingPriceFils: BigInt(100), status: 'PUBLISHED',
+          tenant: { displayName: 'Dealer' }, vehicle: { vin: 'WP1AA2AY5PS00003', media: [] },
+        },
+      ]);
+    });
+
+    const result = await service.getFavorites('user-1');
+
+    expect(seenContext).toEqual({ isAdmin: true });
+    const args = prisma.listing.findMany.mock.calls[0][0];
+    expect(args.where).toEqual({ id: { in: ['listing-1'] } });
+    expect(Object.keys(args.select).sort()).toEqual(
+      ['askingPriceFils', 'id', 'slug', 'status', 'tenant', 'title', 'vehicle'].sort()
+    );
+    expect(result).toEqual([
+      expect.objectContaining({ listingId: 'listing-1', askingPriceFils: '100', status: 'PUBLISHED' }),
+    ]);
+  });
+
+  it('rejects favouriting a listing that is not published', async () => {
+    prisma.listing.findMany.mockResolvedValueOnce([
+      {
+        id: 'listing-2', slug: 's', title: 'T', askingPriceFils: BigInt(1), status: 'DRAFT',
+        tenant: { displayName: 'Dealer' }, vehicle: { vin: null, media: [] },
+      },
+    ]);
+    await expect(service.addFavorite('user-1', { listingId: 'listing-2' } as any)).rejects.toThrow('not found');
+    expect(prisma.favorite.upsert).not.toHaveBeenCalled();
   });
 });

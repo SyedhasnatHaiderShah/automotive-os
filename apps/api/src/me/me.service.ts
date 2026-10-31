@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { buildPublicMediaUrl } from '../common/media-url.util';
 import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/auth.service';
@@ -32,6 +32,59 @@ export class MeService {
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService
   ) {}
+
+  /**
+   * Public listing cards for listings the buyer is linked to (favourites,
+   * enquiries, appointments). Vehicles, media and non-published listings are
+   * tenant rows that RLS hides from a buyer context, so they are read under a
+   * read-only elevated context, filtered to the given ids, and projected to
+   * public fields only (no cost, full VIN, notes or private media).
+   */
+  private async loadListingCards(listingIds: string[]): Promise<Map<string, ListingCard>> {
+    const ids = [...new Set(listingIds)].filter(Boolean);
+    if (ids.length === 0) return new Map();
+    const listings = await runWithDbContext({ isAdmin: true }, () =>
+      this.prisma.listing.findMany({
+        where: { id: { in: ids } },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          askingPriceFils: true,
+          status: true,
+          tenant: { select: { displayName: true } },
+          vehicle: {
+            select: {
+              vin: true,
+              media: {
+                where: { isPublic: true, kind: { in: ['EXTERIOR', 'INTERIOR'] } },
+                orderBy: { sortOrder: 'asc' },
+                take: 1,
+                select: { objectKey: true },
+              },
+            },
+          },
+        },
+      })
+    );
+    return new Map(
+      listings.map((l) => [
+        l.id,
+        {
+          id: l.id,
+          slug: l.slug,
+          title: l.title,
+          askingPriceFils: l.askingPriceFils.toString(),
+          status: l.status,
+          dealershipName: l.tenant?.displayName ?? null,
+          vinMasked: l.vehicle?.vin ? `${l.vehicle.vin.slice(0, 3)}•••••${l.vehicle.vin.slice(-4)}` : null,
+          thumbnailUrl: l.vehicle?.media?.[0]?.objectKey
+            ? buildPublicMediaUrl(l.vehicle.media[0].objectKey)
+            : null,
+        },
+      ])
+    );
+  }
 
   async getMe(user: AuthenticatedUser): Promise<MeResponseDto> {
     const buyerProfile = await this.prisma.buyerProfile.findUnique({
@@ -108,22 +161,9 @@ export class MeService {
     userId: string,
     dto: AddFavoriteDto
   ): Promise<FavoriteResponseDto> {
-    const listing = await this.prisma.listing.findUnique({
-      where: { id: dto.listingId },
-      include: {
-        vehicle: {
-          include: {
-            media: {
-              where: { isPublic: true },
-              orderBy: { sortOrder: 'asc' },
-              take: 1,
-            },
-          },
-        },
-      },
-    });
+    const listing = (await this.loadListingCards([dto.listingId])).get(dto.listingId);
 
-    if (!listing) {
+    if (!listing || listing.status !== ListingStatus.PUBLISHED) {
       throw new NotFoundException(`Listing ${dto.listingId} not found`);
     }
 
@@ -147,11 +187,9 @@ export class MeService {
         listingId: listing.id,
         slug: listing.slug,
         title: listing.title,
-        askingPriceFils: listing.askingPriceFils.toString(),
+        askingPriceFils: listing.askingPriceFils,
         status: listing.status,
-        thumbnailUrl: listing.vehicle.media[0]
-          ? buildPublicMediaUrl(listing.vehicle.media[0].objectKey)
-          : null,
+        thumbnailUrl: listing.thumbnailUrl,
         createdAt: favorite.createdAt.toISOString(),
       };
     } catch (err: any) {
@@ -164,36 +202,26 @@ export class MeService {
       // SEC-17: bounded result set; buyer-facing paging is a follow-up.
       take: 200,
       where: { userId },
-      include: {
-        listing: {
-          include: {
-            vehicle: {
-              include: {
-                media: {
-                  where: { isPublic: true },
-                  orderBy: { sortOrder: 'asc' },
-                  take: 1,
-                },
-              },
-            },
-          },
-        },
-      },
       orderBy: { createdAt: 'desc' },
     });
+    const cards = await this.loadListingCards(favorites.map((fav) => fav.listingId));
 
-    return favorites.map((fav) => ({
-      id: fav.id,
-      listingId: fav.listing.id,
-      slug: fav.listing.slug,
-      title: fav.listing.title,
-      askingPriceFils: fav.listing.askingPriceFils.toString(),
-      status: fav.listing.status,
-      thumbnailUrl: fav.listing.vehicle.media[0]
-        ? buildPublicMediaUrl(fav.listing.vehicle.media[0].objectKey)
-        : null,
-      createdAt: fav.createdAt.toISOString(),
-    }));
+    return favorites.flatMap((fav) => {
+      const card = cards.get(fav.listingId);
+      if (!card) return [];
+      return [
+        {
+          id: fav.id,
+          listingId: card.id,
+          slug: card.slug,
+          title: card.title,
+          askingPriceFils: card.askingPriceFils,
+          status: card.status,
+          thumbnailUrl: card.thumbnailUrl,
+          createdAt: fav.createdAt.toISOString(),
+        },
+      ];
+    });
   }
 
   async removeFavorite(userId: string, listingId: string): Promise<{ success: boolean }> {
@@ -289,11 +317,6 @@ export class MeService {
       take: 200,
       where: { buyerUserId: userId },
       include: {
-        listing: {
-          include: {
-            tenant: true,
-          },
-        },
         grant: true,
         appointments: {
           orderBy: { startsAt: 'asc' },
@@ -301,15 +324,16 @@ export class MeService {
       },
       orderBy: { createdAt: 'desc' },
     });
+    const cards = await this.loadListingCards(leads.map((lead) => lead.listingId));
 
     return leads.map((lead) => ({
       id: lead.id,
       tenantId: lead.tenantId,
       listing: {
-        id: lead.listing.id,
-        slug: lead.listing.slug,
-        title: lead.listing.title,
-        dealershipName: lead.listing.tenant.displayName,
+        id: lead.listingId,
+        slug: cards.get(lead.listingId)?.slug ?? '',
+        title: cards.get(lead.listingId)?.title ?? 'Listing no longer available',
+        dealershipName: cards.get(lead.listingId)?.dealershipName ?? 'Verified Dealership',
       },
       status: lead.status,
       intent: lead.intent,
@@ -442,33 +466,14 @@ export class MeService {
       take: 200,
       where: { buyerUserId: userId },
       include: {
-        lead: {
-          include: {
-            listing: {
-              include: {
-                tenant: true,
-                vehicle: {
-                  include: {
-                    model: {
-                      include: {
-                        make: true,
-                      },
-                    },
-                    // Thumbnail must be public photo media only (MK-10); never documents or private uploads.
-                    media: {
-                      where: { isPublic: true, kind: { in: ['EXTERIOR', 'INTERIOR'] } },
-                      orderBy: { sortOrder: 'asc' },
-                      take: 1,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        lead: { select: { listingId: true } },
       },
       orderBy: { startsAt: 'asc' },
     });
+    // Thumbnail must be public photo media only (MK-10); never documents or private uploads.
+    const cards = await this.loadListingCards(
+      appointments.map((a) => a.lead?.listingId).filter((id): id is string => Boolean(id))
+    );
 
     return appointments.map((a) => ({
       id: a.id,
@@ -480,20 +485,19 @@ export class MeService {
       note: a.note,
       createdAt: a.createdAt.toISOString(),
       updatedAt: a.updatedAt.toISOString(),
-      listing: a.lead?.listing
-        ? {
-            id: a.lead.listing.id,
-            slug: a.lead.listing.slug,
-            title: a.lead.listing.title,
-            vinMasked: a.lead.listing.vehicle?.vin
-              ? `${a.lead.listing.vehicle.vin.slice(0, 3)}•••••${a.lead.listing.vehicle.vin.slice(-4)}`
-              : null,
-            imageUrl: a.lead.listing.vehicle?.media?.[0]?.objectKey
-              ? buildPublicMediaUrl(a.lead.listing.vehicle.media[0].objectKey)
-              : null,
-            dealershipName: a.lead.listing.tenant?.displayName || 'Verified Dealership',
-          }
-        : null,
+      listing: (() => {
+        const card = a.lead?.listingId ? cards.get(a.lead.listingId) : undefined;
+        return card
+          ? {
+              id: card.id,
+              slug: card.slug,
+              title: card.title,
+              vinMasked: card.vinMasked,
+              imageUrl: card.thumbnailUrl,
+              dealershipName: card.dealershipName || 'Verified Dealership',
+            }
+          : null;
+      })(),
     }));
   }
 
@@ -826,4 +830,15 @@ export class MeService {
         : null,
     };
   }
+}
+
+interface ListingCard {
+  id: string;
+  slug: string;
+  title: string;
+  askingPriceFils: string;
+  status: ListingStatus;
+  dealershipName: string | null;
+  vinMasked: string | null;
+  thumbnailUrl: string | null;
 }
