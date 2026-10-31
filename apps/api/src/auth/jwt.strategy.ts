@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService, OidcJwtPayload } from './auth.service';
 import { resolveJwtSecret } from './jwt-secret';
+import { dbContextStorage } from '../database/prisma.service';
 
 export const cookieExtractor = (req: any): string | null => {
   if (req && req.cookies && req.cookies['ao_session']) {
@@ -56,6 +57,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.authService.validateOidcPayload(payload);
     if (!user) {
       throw new UnauthorizedException('User authentication failed: subject not authorized');
+    }
+
+    // Bind the verified user to the request's DB context so RLS policies that
+    // check app.user_id (buyer_profiles, favorites, saved_searches, leads,
+    // appointments, sessions) can see the caller's own rows.
+    const store = dbContextStorage.getStore();
+    if (store && !store.userId) {
+      store.userId = user.id;
     }
 
     return user;

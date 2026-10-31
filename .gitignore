@@ -35,3 +35,7 @@ Thumbs.db
 coverage/
 test-results/
 playwright-report/
+
+# Temporary staging QA account credentials
+.qa-credentials*.json
+!.env.staging-qa.example
