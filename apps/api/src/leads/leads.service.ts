@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
+import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { EnquiryRateLimiterService } from './enquiry-rate-limiter.service';
 import {
@@ -46,15 +46,19 @@ export class LeadsService {
 
     // 2. Validate listing and active stock
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(listingId);
-    const listing = await this.prisma.listing.findFirst({
-      where: isUuid
-        ? { OR: [{ id: listingId }, { slug: listingId }] }
-        : { slug: listingId },
-      include: {
-        vehicle: true,
-        tenant: true,
-      },
-    });
+    // Vehicles and tenants are not visible to a buyer context; read the
+    // listing for validation under a read-only elevated context.
+    const listing = await runWithDbContext({ isAdmin: true }, () =>
+      this.prisma.listing.findFirst({
+        where: isUuid
+          ? { OR: [{ id: listingId }, { slug: listingId }] }
+          : { slug: listingId },
+        include: {
+          vehicle: true,
+          tenant: true,
+        },
+      })
+    );
 
     if (!listing) {
       throw new NotFoundException(`Listing ${listingId} not found`);
@@ -73,7 +77,8 @@ export class LeadsService {
     }
 
     // 3. Atomically create Lead, Grant, Outbox, and Audit
-    const lead = await this.prisma.$transaction(async (tx) => {
+    const lead = await runWithDbContext({ tenantId: listing.tenantId, userId: buyerUserId }, () =>
+      this.prisma.$transaction(async (tx) => {
       const createdLead = await tx.lead.create({
         data: {
           tenantId: listing.tenantId,
@@ -132,7 +137,8 @@ export class LeadsService {
       });
 
       return createdLead;
-    });
+    })
+    );
 
     return {
       id: lead.id,

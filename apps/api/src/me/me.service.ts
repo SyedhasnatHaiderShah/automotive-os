@@ -34,6 +34,31 @@ export class MeService {
   ) {}
 
   /**
+   * Consent grants for the buyer's own leads (ids come from a buyer-scoped
+   * query). Grants are tenant rows, so they are read by lead id under a
+   * read-only elevated context.
+   */
+  private async loadLeadGrants(leadIds: string[]) {
+    const ids = [...new Set(leadIds)].filter(Boolean);
+    if (ids.length === 0) return new Map<string, LeadGrantRow>();
+    const rows = await runWithDbContext({ isAdmin: true }, () =>
+      this.prisma.leadDataGrant.findMany({
+        where: { leadId: { in: ids } },
+        select: {
+          id: true,
+          leadId: true,
+          fieldsGranted: true,
+          purpose: true,
+          consentTextVer: true,
+          grantedAt: true,
+          revokedAt: true,
+        },
+      })
+    );
+    return new Map<string, LeadGrantRow>(rows.map((g) => [g.leadId, g]));
+  }
+
+  /**
    * Public listing cards for listings the buyer is linked to (favourites,
    * enquiries, appointments). Vehicles, media and non-published listings are
    * tenant rows that RLS hides from a buyer context, so they are read under a
@@ -317,7 +342,6 @@ export class MeService {
       take: 200,
       where: { buyerUserId: userId },
       include: {
-        grant: true,
         appointments: {
           orderBy: { startsAt: 'asc' },
         },
@@ -325,6 +349,7 @@ export class MeService {
       orderBy: { createdAt: 'desc' },
     });
     const cards = await this.loadListingCards(leads.map((lead) => lead.listingId));
+    const grants = await this.loadLeadGrants(leads.map((lead) => lead.id));
 
     return leads.map((lead) => ({
       id: lead.id,
@@ -339,18 +364,19 @@ export class MeService {
       intent: lead.intent,
       preferredContact: lead.preferredContact,
       buyerMessage: lead.buyerMessage,
-      grant: lead.grant
-        ? {
-            id: lead.grant.id,
-            fieldsGranted: lead.grant.fieldsGranted,
-            purpose: lead.grant.purpose,
-            consentTextVer: lead.grant.consentTextVer,
-            grantedAt: lead.grant.grantedAt.toISOString(),
-            revokedAt: lead.grant.revokedAt
-              ? lead.grant.revokedAt.toISOString()
-              : null,
-          }
-        : null,
+      grant: (() => {
+        const grant = grants.get(lead.id);
+        return grant
+          ? {
+              id: grant.id,
+              fieldsGranted: grant.fieldsGranted,
+              purpose: grant.purpose,
+              consentTextVer: grant.consentTextVer,
+              grantedAt: grant.grantedAt.toISOString(),
+              revokedAt: grant.revokedAt ? grant.revokedAt.toISOString() : null,
+            }
+          : null;
+      })(),
       appointments: lead.appointments.map((a) => ({
         id: a.id,
         tenantId: a.tenantId,
@@ -395,7 +421,8 @@ export class MeService {
       throw new BadRequestException('Appointment end time must be after start time');
     }
 
-    const appointment = await this.prisma.$transaction(async (tx) => {
+    const appointment = await runWithDbContext({ tenantId: lead.tenantId, userId }, () =>
+      this.prisma.$transaction(async (tx) => {
       const appt = await tx.appointment.create({
         data: {
           tenantId: lead.tenantId,
@@ -441,7 +468,8 @@ export class MeService {
       });
 
       return appt;
-    });
+    })
+    );
 
     return {
       id: appointment.id,
@@ -514,7 +542,8 @@ export class MeService {
       throw new NotFoundException('Appointment not found for this buyer');
     }
 
-    const updated = await this.prisma.$transaction(async (tx) => {
+    const updated = await runWithDbContext({ tenantId: existing.tenantId, userId }, () =>
+      this.prisma.$transaction(async (tx) => {
       const appt = await tx.appointment.update({
         where: { id: appointmentId },
         data: { status: AppointmentStatus.CANCELLED },
@@ -550,7 +579,8 @@ export class MeService {
       });
 
       return appt;
-    });
+    })
+    );
 
     return {
       id: updated.id,
@@ -590,7 +620,8 @@ export class MeService {
       throw new BadRequestException('Appointment end time must be after start time');
     }
 
-    const updated = await this.prisma.$transaction(async (tx) => {
+    const updated = await runWithDbContext({ tenantId: existing.tenantId, userId }, () =>
+      this.prisma.$transaction(async (tx) => {
       const appt = await tx.appointment.update({
         where: { id: appointmentId },
         data: {
@@ -632,7 +663,8 @@ export class MeService {
       });
 
       return appt;
-    });
+    })
+    );
 
     return {
       id: updated.id,
@@ -655,12 +687,20 @@ export class MeService {
     userId: string,
     leadId: string
   ): Promise<{ success: boolean; revokedAt: string }> {
-    const lead = await this.prisma.lead.findUnique({
+    const ownedLead = await this.prisma.lead.findUnique({
       where: { id: leadId },
-      include: { grant: true },
     });
 
-    if (!lead || lead.buyerUserId !== userId) {
+    if (!ownedLead || ownedLead.buyerUserId !== userId) {
+      throw new NotFoundException('Lead inquiry not found for this buyer');
+    }
+
+    // Grants are tenant rows; read and update them in the lead's tenant context.
+    const tenantCtx = { tenantId: ownedLead.tenantId, userId };
+    const lead = await runWithDbContext(tenantCtx, () =>
+      this.prisma.lead.findUnique({ where: { id: leadId }, include: { grant: true } })
+    );
+    if (!lead) {
       throw new NotFoundException('Lead inquiry not found for this buyer');
     }
 
@@ -677,7 +717,8 @@ export class MeService {
 
     const now = new Date();
 
-    await this.prisma.$transaction(async (tx) => {
+    await runWithDbContext(tenantCtx, () =>
+      this.prisma.$transaction(async (tx) => {
       await tx.leadDataGrant.update({
         where: { id: lead.grant!.id },
         data: { revokedAt: now },
@@ -711,7 +752,8 @@ export class MeService {
           },
         },
       });
-    });
+    })
+    );
 
     return {
       success: true,
@@ -841,4 +883,14 @@ interface ListingCard {
   dealershipName: string | null;
   vinMasked: string | null;
   thumbnailUrl: string | null;
+}
+
+interface LeadGrantRow {
+  id: string;
+  leadId: string;
+  fieldsGranted: string[];
+  purpose: string;
+  consentTextVer: string;
+  grantedAt: Date;
+  revokedAt: Date | null;
 }
