@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { publicOrigin } from './lib/public-origin';
 
 /**
  * Platform admin gate.
@@ -248,13 +249,13 @@ export async function middleware(request: NextRequest) {
     const subPath = request.nextUrl.pathname === '/' ? '' : request.nextUrl.pathname;
     const originalPath = `${basePath}${subPath}${request.nextUrl.search}` || '/admin';
     const params = new URLSearchParams({ tab: 'login', redirect: originalPath });
-    // Behind the gateway rewrite request.url carries the admin service host, so
-    // an absolute redirect would leave the gateway. A relative Location resolves
-    // against the origin the browser is actually on.
-    const redirectRes = new NextResponse(null, {
-      status: 307,
-      headers: { Location: `/auth?${params.toString()}`, 'Cache-Control': 'no-store' },
-    });
+    // Middleware requires an absolute Location; build it on the origin the
+    // browser is on, not this service's internal host (see lib/public-origin.ts).
+    const redirectRes = NextResponse.redirect(
+      new URL(`/auth?${params.toString()}`, publicOrigin(request)),
+      307,
+    );
+    redirectRes.headers.set('Cache-Control', 'no-store');
     // Only clear a cookie that is cryptographically invalid or expired. A valid
     // non-admin session (buyer/dealer) must not be logged out by visiting /admin.
     if (sessionCookie && sessionTokenInvalid) {

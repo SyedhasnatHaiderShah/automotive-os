@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { publicOrigin } from './lib/public-origin';
 
 /**
  * Dealer console gate. This is a presence check for the unified `ao_session`
@@ -44,12 +45,8 @@ export function middleware(request: NextRequest) {
 
   // `/auth` lives on the marketplace gateway origin, outside the /dealer basePath.
   const originalPath = `${request.nextUrl.basePath}${request.nextUrl.pathname === '/' ? '' : request.nextUrl.pathname}${request.nextUrl.search}`;
-  // Behind the gateway rewrite request.url carries the dealer service host, so
-  // an absolute redirect would leave the gateway. A relative Location resolves
-  // against the origin the browser is actually on.
+  // Middleware requires an absolute Location; build it on the origin the
+  // browser is on, not this service's internal host (see lib/public-origin.ts).
   const params = new URLSearchParams({ tab: 'login', redirect: originalPath || '/dealer' });
-  return new NextResponse(null, {
-    status: 307,
-    headers: { Location: `/auth?${params.toString()}` },
-  });
+  return NextResponse.redirect(new URL(`/auth?${params.toString()}`, publicOrigin(request)), 307);
 }
