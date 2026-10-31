@@ -18,12 +18,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const vehicle = await load(slug);
 
-  if (!vehicle) {
-    return {
-      title: 'Vehicle not found | Automotive OS',
-      description: 'This vehicle listing is not available.',
-    };
-  }
+  // Throwing here (before the page streams) lets Next send a real 404 status
+  // instead of a 200 with not-found UI (QA-POST-02).
+  if (!vehicle) notFound();
 
   const priceAed = (Number(vehicle.price.amountFils) / 100).toLocaleString('en-US');
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { EMAIL_DELIVERY_AVAILABLE, apiErrorMessage } from '../../lib/email-delivery';
 
-export default function UnifiedAuthPage() {
+function UnifiedAuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') === 'register' ? 'register' : 'login';
@@ -620,5 +620,14 @@ export default function UnifiedAuthPage() {
         <p>© 2026 Automotive OS — UAE Dealership SaaS & Verified Marketplace. All rights reserved.</p>
       </footer>
     </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary now that the route has no loading.tsx.
+export default function UnifiedAuthPage() {
+  return (
+    <Suspense fallback={null}>
+      <UnifiedAuthPageContent />
+    </Suspense>
   );
 }

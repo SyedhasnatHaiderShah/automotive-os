@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ShieldX, ArrowLeft } from 'lucide-react';
 
-export default function AccessDeniedPage() {
+function AccessDeniedPageContent() {
   const searchParams = useSearchParams();
   const reason = searchParams.get('reason');
 
@@ -64,5 +64,14 @@ export default function AccessDeniedPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary now that the route has no loading.tsx.
+export default function AccessDeniedPage() {
+  return (
+    <Suspense fallback={null}>
+      <AccessDeniedPageContent />
+    </Suspense>
   );
 }

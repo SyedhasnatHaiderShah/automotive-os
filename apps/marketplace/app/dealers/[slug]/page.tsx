@@ -18,24 +18,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const dealer = await load(slug);
 
-  if (!dealer) {
-    return {
-      title: 'Dealership not found | Automotive OS',
-      description: 'This dealership storefront is not available.',
-    };
-  }
+  // Throwing here (before the page streams) lets Next send a real 404 status
+  // instead of a 200 with not-found UI (QA-POST-02).
+  if (!dealer) notFound();
 
   const liveStock = dealer.stats.liveGroundedStock;
-  const emirate = dealer.branches[0]?.emirate || 'Dubai';
+  // No branch on file means no known location; never guess one (QA-POST-03).
+  const emirate = dealer.branches[0]?.emirate;
+  const location = emirate ? `${emirate}, UAE` : 'UAE';
 
   return {
-    title: `${dealer.displayName} — Dealership Storefront (${emirate}, UAE) | Automotive OS`,
+    title: `${dealer.displayName} — Dealership Storefront (${location}) | Automotive OS`,
     description:
       dealer.description ||
-      `Dealership profile for ${dealer.displayName} in ${emirate}. Browse ${liveStock} published vehicle listings.`,
+      `Dealership profile for ${dealer.displayName} in ${location}. Browse ${liveStock} published vehicle listings.`,
     openGraph: {
       title: `${dealer.displayName} | Automotive OS`,
-      description: `Showroom in ${emirate}, UAE. ${dealer.tagline || ''}`.trim(),
+      description: `Showroom in ${location}. ${dealer.tagline || ''}`.trim(),
     },
   };
 }
