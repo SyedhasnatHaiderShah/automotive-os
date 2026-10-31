@@ -54,12 +54,19 @@ export class PublicMediaController {
       throw new BadRequestException('Invalid object key path');
     }
 
-    // Confidentiality gate: Verify media is marked as public in database
+    // SEC-22: Defense-in-depth confidentiality gate:
+    // Only serve public media if:
+    // 1. isPublic is true and kind is not a private document
+    // 2. The tenant is currently ACTIVE (prevent leaking media from suspended/closed dealers)
+    // 3. The vehicle stockStatus is AVAILABLE (suspended/sold/archived stock media unpublishes)
     const mediaItem = await runWithDbContext({ isAdmin: true }, async () => {
       return this.prisma.vehicleMedia.findFirst({
         where: {
           objectKey,
           isPublic: true,
+          kind: { not: 'DOCUMENT' },
+          tenant: { status: 'ACTIVE' },
+          vehicle: { stockStatus: 'AVAILABLE' },
         },
       });
     });

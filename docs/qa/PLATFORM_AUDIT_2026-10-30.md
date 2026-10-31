@@ -42,7 +42,7 @@ Status words: OPEN, FIXED_LOCAL, DEFERRED (needs a backend feature or a product 
 | SEC-19 | Medium | JWT stored in `localStorage.ao_token` and sent ahead of the httpOnly cookie, so XSS can exfiltrate it. | marketplace auth page, buyer client, admin pages |
 | SEC-20 | Medium | Consent checkbox is pre-ticked in the enquiry modal (PDPL). | `vip-enquiry-modal.tsx:46` |
 | SEC-21 | Low | No helmet/HSTS/CSP. Swagger is public. CORS rejections return 500. Raw XFF is trusted. | `main.ts` |
-| SEC-22 | Low | Public media is served for any `isPublic` row, whatever the listing or tenant status. | `public-media.controller.ts:58` |
+| SEC-22 | FIXED_LOCAL | Public media is served only when `isPublic: true`, `kind !== 'DOCUMENT'`, tenant is `ACTIVE`, and vehicle stockStatus is `AVAILABLE`. | `public-media.controller.ts:58` |
 
 ## P1: fake success and dead controls (any click lies)
 | ID | App | Finding |
@@ -126,7 +126,8 @@ Fix progress is logged at the end of this file.
 | SEC-17 | FIXED_LOCAL (partial) | `take` caps added: `/me` lists 200, tenant appointments 500, admin tenants 500. The audit-log and outbox `limit` is clamped to 1..200. |
 | SEC-21 | FIXED_LOCAL (partial) | CORS rejections no longer return 500. HSTS is sent on staging/production. Swagger is off in production unless `ENABLE_SWAGGER=true`. Helmet and CSP are not added (no new dependency). |
 | PF-07 | FIXED_LOCAL (partial) | Migration `20261030120000_add_public_search_indexes` (additive only) adds make, model, tenant+branch and status+price indexes. **Applying it needs approval.** |
-| SEC-04, 07, 08, 15, 22 | OPEN | SEC-04 needs a product decision on admin MFA. SEC-07 and SEC-08 need DB-role testing against a live database. SEC-15 and SEC-22 are next. |
+| SEC-04, 07, 08, 15 | OPEN | SEC-04 needs a product decision on admin MFA. SEC-07 and SEC-08 need DB-role testing against a live database. SEC-15 is next. |
+| SEC-22 | FIXED_LOCAL | Public media is gated on `isPublic`, `kind !== 'DOCUMENT'`, `tenant.status === 'ACTIVE'`, and `vehicle.stockStatus === 'AVAILABLE'`. |
 
 Checks: API `tsc --noEmit` PASS. API unit tests 56/56 PASS (10 suites). Prisma `validate` PASS. NOT RUN: API integration specs in `apps/api/test` (need a DB) and the migration (needs a DB).
 
