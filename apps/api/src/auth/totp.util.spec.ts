@@ -19,11 +19,20 @@ describe('RFC 6238 TOTP Utility', () => {
 
   it('rejects an invalid TOTP code', () => {
     const secret = generateBase32Secret(20);
-    const isValid = verifyTotpCode('000000', secret);
-    // Unless 000000 happens to be the code, it should fail
     const validCode = generateTotpCode(secret);
     const fakeCode = validCode === '123456' ? '654321' : '123456';
     expect(verifyTotpCode(fakeCode, secret)).toBe(false);
+  });
+
+  it('rejects non-digit or malformed length inputs securely', () => {
+    const secret = generateBase32Secret(20);
+    expect(verifyTotpCode('', secret)).toBe(false);
+    expect(verifyTotpCode('12345', secret)).toBe(false);
+    expect(verifyTotpCode('1234567', secret)).toBe(false);
+    expect(verifyTotpCode('abcdef', secret)).toBe(false);
+    expect(verifyTotpCode('12 456', secret)).toBe(false);
+    expect(verifyTotpCode(null as any, secret)).toBe(false);
+    expect(verifyTotpCode(undefined as any, secret)).toBe(false);
   });
 
   it('accepts codes within +/- 1 step time drift (30 seconds)', () => {
