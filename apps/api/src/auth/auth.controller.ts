@@ -110,6 +110,9 @@ export class AuthController {
 
   @Public()
   @Get('activate/verify')
+  // SEC-06: Rate limit token verification to mitigate token brute-forcing and staff email enumeration
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 20, windowMs: 10 * 60_000 })
   @ApiOperation({ summary: 'Verify activation token and retrieve invitation metadata' })
   @ApiResponse({ status: 200, type: VerifyActivationTokenResponseDto })
   async verifyActivationToken(
