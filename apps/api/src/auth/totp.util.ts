@@ -1,4 +1,4 @@
-import { createHmac, randomBytes } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
@@ -67,6 +67,11 @@ export function generateTotpCode(secretBase32: string, timeStepWindow: number = 
   return otp.toString().padStart(6, '0');
 }
 
+/**
+ * Verifies a 6-digit TOTP code against a base32 secret.
+ * Evaluates all allowed time steps using timingSafeEqual to protect against
+ * timing side channels and premature exit enumeration.
+ */
 export function verifyTotpCode(
   code: string,
   secretBase32: string,
@@ -74,17 +79,23 @@ export function verifyTotpCode(
   timeStepWindow: number = 30,
   timeMs: number = Date.now()
 ): boolean {
-  if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+  if (!code || typeof code !== 'string' || code.length !== 6 || !/^\d{6}$/.test(code)) {
     return false;
   }
+
+  const codeBuffer = Buffer.from(code, 'utf8');
+  let matched = false;
 
   for (let step = -windowSteps; step <= windowSteps; step++) {
     const targetTime = timeMs + step * timeStepWindow * 1000;
     const generated = generateTotpCode(secretBase32, timeStepWindow, targetTime);
-    if (generated === code) {
-      return true;
+    const generatedBuffer = Buffer.from(generated, 'utf8');
+
+    // Constant-time buffer comparison; avoid short-circuiting to prevent timing side channels
+    if (timingSafeEqual(generatedBuffer, codeBuffer)) {
+      matched = true;
     }
   }
 
-  return false;
+  return matched;
 }
