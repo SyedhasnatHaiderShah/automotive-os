@@ -110,6 +110,8 @@ export class AuthController {
 
   @Public()
   @Get('activate/verify')
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 10, windowMs: 10 * 60_000 })
   @ApiOperation({ summary: 'Verify activation token and retrieve invitation metadata' })
   @ApiResponse({ status: 200, type: VerifyActivationTokenResponseDto })
   async verifyActivationToken(
