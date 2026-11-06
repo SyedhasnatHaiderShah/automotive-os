@@ -16,7 +16,7 @@ describe('LeadsService.createLeadEnquiry DB context', () => {
           seen.read = dbContextStorage.getStore();
           return Promise.resolve({
             id: 'listing-1', tenantId: 'tenant-1', status: 'PUBLISHED',
-            vehicle: { stockStatus: 'AVAILABLE' }, tenant: { status: 'ACTIVE' },
+            vehicle: { stockStatus: 'AVAILABLE' }, tenant: { status: 'ACTIVE', verification: { status: 'APPROVED' } },
           });
         }),
       },

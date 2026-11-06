@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class AddFavoriteDto {
   @ApiProperty({ description: 'Listing UUID to bookmark', example: '11111111-1111-1111-1111-cccc00000001' })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, { message: 'listingId must be a UUID' })
   listingId!: string;
 }
 

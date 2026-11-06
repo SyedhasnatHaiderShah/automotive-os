@@ -3,7 +3,9 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  Matches,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateAccountSettingsDto {
   @ApiProperty({ description: 'First name', example: 'Tariq', required: false })
@@ -37,8 +39,10 @@ export class UpdateAccountSettingsDto {
   settlementCurrency?: string;
 
   @ApiProperty({ description: 'FAB Escrow Custody IBAN', example: 'AE02 0300 0019 2838 4810 992', required: false })
-  @IsString()
   @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.replace(/\s+/g, '').toUpperCase() : value))
+  @IsString()
+  @Matches(/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/, { message: 'escrowIban must be a valid IBAN (e.g. AE07 0331 2345 6789 0123 456)' })
   escrowIban?: string;
 
   @ApiProperty({ description: 'Virtual garage portfolio visibility', example: true, required: false })

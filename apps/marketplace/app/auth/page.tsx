@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import { useMarketplaceLocale } from '../../lib/locale';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -25,7 +26,7 @@ function UnifiedAuthPageContent() {
   const initialTab = searchParams.get('tab') === 'register' ? 'register' : 'login';
 
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(initialTab);
-  const [locale, setLocale] = useState<'en' | 'ar'>('en');
+  const [locale, setLocale] = useMarketplaceLocale();
 
   // Login Form State
   const [loginEmail, setLoginEmail] = useState('');
@@ -121,6 +122,13 @@ function UnifiedAuthPageContent() {
           ? requested
           : null;
       const targetUrl = safeRequested || data.user?.redirectUrl || '/dashboard';
+      // The dealer and admin consoles are separate Next.js apps behind the gateway
+      // rewrite; a soft (client-router) navigation into them loads a foreign RSC
+      // payload and crashes the marketplace router (QA-LOCAL-16). Full load instead.
+      if (targetUrl.startsWith('/dealer') || targetUrl.startsWith('/admin')) {
+        window.location.assign(targetUrl);
+        return;
+      }
       router.push(targetUrl);
     } catch (err: any) {
       setLoginError(err.message || 'Authentication failed');

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, MinLength, ValidateIf } from 'class-validator';
 import { TenantStatus } from '@automotive-os/database';
 
 export class UpdateTenantStatusDto {
@@ -17,7 +17,9 @@ export class UpdateTenantStatusDto {
     example: 'DED license expired without renewal bond provided within grace period',
     required: false,
   })
+  // QA-LOCAL-10: suspending or closing a dealership requires a recorded reason.
+  @ValidateIf((o) => o.status === TenantStatus.SUSPENDED || o.status === TenantStatus.CLOSED)
   @IsString()
-  @IsOptional()
+  @MinLength(5, { message: 'reason (at least 5 characters) is required when suspending or closing a dealership' })
   reason?: string;
 }

@@ -14,6 +14,13 @@ export class PlatformAdminGuard implements CanActivate {
       );
     }
 
+    // QA-LOCAL-06: a suspended, disabled or not-yet-activated admin keeps no API access.
+    if (user.status !== 'ACTIVE') {
+      throw new ForbiddenException(
+        `PLATFORM_ADMIN_INACTIVE: Administrator account status is ${user.status}`
+      );
+    }
+
     // Set platform admin database context strictly after verified authentication & role authorization
     const store = dbContextStorage.getStore();
     if (store) {

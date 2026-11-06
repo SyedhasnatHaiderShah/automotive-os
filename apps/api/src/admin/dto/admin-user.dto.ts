@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, Min, MinLength, ValidateIf } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { UserStatus } from '@automotive-os/database';
+import { MembershipRole, UserStatus } from '@automotive-os/database';
 
 export class AdminUserFilterDto {
   @ApiPropertyOptional({ description: 'Search query for email or name' })
@@ -14,9 +14,9 @@ export class AdminUserFilterDto {
   @IsEnum(['ACTIVE', 'SUSPENDED', 'DISABLED', 'PENDING_VERIFICATION'])
   status?: UserStatus;
 
-  @ApiPropertyOptional({ description: 'Filter by role key or membership role' })
+  @ApiPropertyOptional({ description: 'Filter by role key or membership role', enum: [...Object.values(MembershipRole), 'PLATFORM_ADMIN', 'BUYER'] })
   @IsOptional()
-  @IsString()
+  @IsIn([...Object.values(MembershipRole), 'PLATFORM_ADMIN', 'BUYER'])
   role?: string;
 
   @ApiPropertyOptional({ description: 'Filter by tenant UUID' })
@@ -58,7 +58,9 @@ export class AdminUpdateUserDto {
   isPlatformAdmin?: boolean;
 
   @ApiPropertyOptional({ description: 'Reason for administrative status update' })
-  @IsOptional()
+  // QA-LOCAL-10: suspending, disabling or demoting an account requires a recorded reason.
+  @ValidateIf((o) => o.status === 'SUSPENDED' || o.status === 'DISABLED' || o.isPlatformAdmin === false)
   @IsString()
+  @MinLength(5, { message: 'reason (at least 5 characters) is required when suspending, disabling or demoting an account' })
   reason?: string;
 }

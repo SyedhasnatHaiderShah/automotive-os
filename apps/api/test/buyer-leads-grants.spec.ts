@@ -14,6 +14,12 @@ import {
 } from '@automotive-os/database';
 
 describe('Buyer Profile, Favorites, CRM Leads & Data Grants (E2E Integration Tests)', () => {
+  // Appointments must be in the future (QA-LOCAL-13); compute a slot relative to now.
+  const futureSlot = (() => {
+    const start = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    start.setUTCHours(6, 0, 0, 0);
+    return { startsAt: start.toISOString(), endsAt: new Date(start.getTime() + 60 * 60 * 1000).toISOString() };
+  })();
   let app: INestApplication;
   let authService: AuthService;
   let prisma: PrismaService;
@@ -431,8 +437,8 @@ describe('Buyer Profile, Favorites, CRM Leads & Data Grants (E2E Integration Tes
         .post(`/api/v1/me/leads/${createdLeadId}/appointments`)
         .set('Authorization', `Bearer ${buyerAToken}`)
         .send({
-          startsAt: '2026-10-25T10:00:00Z',
-          endsAt: '2026-10-25T11:00:00Z',
+          startsAt: futureSlot.startsAt,
+          endsAt: futureSlot.endsAt,
           note: 'VIP test-drive request from buyer portal.',
         })
         .expect(201);

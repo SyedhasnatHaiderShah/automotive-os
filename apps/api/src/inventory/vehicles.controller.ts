@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
+import { UuidParamPipe } from "../common/pipes/uuid-param.pipe";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -85,7 +86,7 @@ export class VehiclesController {
   @ApiResponse({ status: 200, type: VehicleResponseDto })
   async getVehicle(
     @CurrentTenant() tenant: TenantContext,
-    @Param("id") id: string,
+    @Param("id", new UuidParamPipe()) id: string,
   ): Promise<VehicleResponseDto> {
     return this.vehiclesService.getVehicleById(
       tenant.tenantId,
@@ -107,7 +108,7 @@ export class VehiclesController {
   @ApiResponse({ status: 200, type: VehicleResponseDto })
   async updateVehicle(
     @CurrentTenant() tenant: TenantContext,
-    @Param("id") id: string,
+    @Param("id", new UuidParamPipe()) id: string,
     @Body() dto: UpdateVehicleDto,
     @CurrentUser("id") actorUserId: string,
   ): Promise<VehicleResponseDto> {
@@ -135,7 +136,7 @@ export class VehiclesController {
   @ApiResponse({ status: 201, type: MediaUploadResponseDto })
   async registerMedia(
     @CurrentTenant() tenant: TenantContext,
-    @Param("id") id: string,
+    @Param("id", new UuidParamPipe()) id: string,
     @Body() dto: CreateMediaUploadDto,
   ): Promise<MediaUploadResponseDto> {
     return this.vehiclesService.registerMediaUpload(tenant.tenantId, id, dto, tenant.userRole);

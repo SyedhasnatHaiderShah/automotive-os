@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useMarketplaceLocale } from '../../lib/locale';
 import {
   MarketplaceHeader,
   MarketplaceFooter,
@@ -29,7 +30,7 @@ function formatMaxPrice(aed: number, isArabic: boolean): string {
 }
 
 export default function SearchResultsPage() {
-  const [locale, setLocale] = useState<'en' | 'ar'>('en');
+  const [locale, setLocale] = useMarketplaceLocale();
   const [selectedEmirate, setSelectedEmirate] = useState('All Emirates');
   const [searchQuery, setSearchQuery] = useState('');
   // Debounced copy of the search box so typing does not fire one request per keystroke (PG-05).
@@ -115,6 +116,16 @@ export default function SearchResultsPage() {
       if (!active) return;
       setVehicles(result.items);
       setTotal(result.total);
+      // MK-21: a deep link past the last page lands on the last page instead of an empty grid.
+      const lastPage = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
+      if (page > lastPage) {
+        const params = new URLSearchParams(window.location.search);
+        if (lastPage === 1) params.delete('page');
+        else params.set('page', String(lastPage));
+        const suffix = params.toString();
+        window.history.replaceState(null, '', window.location.pathname + (suffix ? '?' + suffix : ''));
+        setPage(lastPage);
+      }
     }).catch((err) => {
       if (!active) return;
       setVehicles([]);

@@ -18,8 +18,15 @@ describe('PlatformAdminGuard', () => {
   };
 
   it('should allow access to platform admin user', () => {
-    const context = createMockContext({ id: 'admin-uuid', isPlatformAdmin: true });
+    const context = createMockContext({ id: 'admin-uuid', isPlatformAdmin: true, status: 'ACTIVE' });
     expect(guard.canActivate(context)).toBe(true);
+  });
+
+  it('should deny a platform admin whose account is not ACTIVE (QA-LOCAL-06)', () => {
+    for (const status of ['SUSPENDED', 'DISABLED', 'PENDING_VERIFICATION']) {
+      const context = createMockContext({ id: 'admin-uuid', isPlatformAdmin: true, status });
+      expect(() => guard.canActivate(context)).toThrow(/PLATFORM_ADMIN_INACTIVE/);
+    }
   });
 
   it('should deny access to regular user', () => {

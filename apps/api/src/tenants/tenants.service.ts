@@ -114,7 +114,12 @@ export class TenantsService {
       })
     );
 
-    if (!tenant || tenant.status !== TenantStatus.ACTIVE) {
+    // Verified-dealer marketplace: storefronts exist only for ACTIVE, KYB-approved dealers (QA-LOCAL-01).
+    if (
+      !tenant ||
+      tenant.status !== TenantStatus.ACTIVE ||
+      tenant.verification?.status !== VerificationStatus.APPROVED
+    ) {
       throw new NotFoundException(`Dealership '${slug}' not found or inactive`);
     }
 

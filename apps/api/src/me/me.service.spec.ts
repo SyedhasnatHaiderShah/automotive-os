@@ -19,7 +19,7 @@ describe('MeService buyer data (MK-08, MK-09, MK-10)', () => {
   };
 
   const prisma: any = {
-    buyerProfile: { upsert: jest.fn().mockResolvedValue(profileRow) },
+    buyerProfile: { upsert: jest.fn().mockResolvedValue(profileRow), findUnique: jest.fn().mockResolvedValue(null) },
     user: { findUnique: jest.fn() },
     appointment: { findMany: jest.fn().mockResolvedValue([]) },
     listing: { findMany: jest.fn().mockResolvedValue([]) },

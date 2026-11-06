@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useMarketplaceLocale } from '../../../lib/locale';
 import Link from 'next/link';
 import { Car, Globe, KeyRound, Mail, ArrowLeft, Info } from 'lucide-react';
 
@@ -10,7 +11,7 @@ import { Car, Globe, KeyRound, Mail, ArrowLeft, Info } from 'lucide-react';
  * simulating a reset flow.
  */
 export default function ForgotPasswordPage() {
-  const [locale, setLocale] = useState<'en' | 'ar'>('en');
+  const [locale, setLocale] = useMarketplaceLocale();
   const isArabic = locale === 'ar';
 
   return (

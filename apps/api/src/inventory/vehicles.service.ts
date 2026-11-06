@@ -83,50 +83,54 @@ export class VehiclesService {
       throw new BadRequestException("Invalid make or car model reference");
     }
 
-    // 3. Create canonical vehicle record
+    // 3. Create canonical vehicle record (audit row in the same transaction)
     try {
-      const vehicle = await this.prisma.vehicle.create({
-        data: {
-          tenantId,
-          branchId: dto.branchId,
-          makeId: dto.makeId,
-          modelId: dto.modelId,
-          vin: dto.vin || null,
-          stockNumber: dto.stockNumber,
-          trim: dto.trim || null,
-          modelYear: dto.modelYear,
-          condition: dto.condition,
-          mileageKm: dto.mileageKm !== undefined ? dto.mileageKm : null,
-          colorExterior: dto.colorExterior || null,
-          fuel: dto.fuel || null,
-          transmission: dto.transmission || null,
-          gccSpec: dto.gccSpec !== undefined ? dto.gccSpec : null,
-          purchaseCostFils:
-            dto.purchaseCostFils !== undefined
-              ? BigInt(dto.purchaseCostFils)
-              : null,
-          askingPriceFils: BigInt(dto.askingPriceFils),
-          stockStatus: dto.stockStatus || StockStatus.INTAKE,
-        },
-        include: {
-          make: true,
-          model: true,
-          media: true,
-          listing: true,
-        },
-      });
+      const vehicle = await this.prisma.$transaction(async (tx) => {
+        const created = await tx.vehicle.create({
+          data: {
+            tenantId,
+            branchId: dto.branchId,
+            makeId: dto.makeId,
+            modelId: dto.modelId,
+            vin: dto.vin || null,
+            stockNumber: dto.stockNumber,
+            trim: dto.trim || null,
+            modelYear: dto.modelYear,
+            condition: dto.condition,
+            mileageKm: dto.mileageKm !== undefined ? dto.mileageKm : null,
+            colorExterior: dto.colorExterior || null,
+            fuel: dto.fuel || null,
+            transmission: dto.transmission || null,
+            gccSpec: dto.gccSpec !== undefined ? dto.gccSpec : null,
+            purchaseCostFils:
+              dto.purchaseCostFils !== undefined
+                ? BigInt(dto.purchaseCostFils)
+                : null,
+            askingPriceFils: BigInt(dto.askingPriceFils),
+            stockStatus: dto.stockStatus || StockStatus.INTAKE,
+          },
+          include: {
+            make: true,
+            model: true,
+            media: true,
+            listing: true,
+          },
+        });
 
-      // Audit vehicle ingestion
-      await this.auditService.logAction({
-        tenantId,
-        actorUserId: actorUserId || null,
-        action: "VEHICLE_CREATED",
-        targetType: "vehicle",
-        targetId: vehicle.id,
-        metadata: {
-          stockNumber: vehicle.stockNumber,
-          stockStatus: vehicle.stockStatus,
-        },
+        // Audit vehicle ingestion
+        await this.auditService.logAction({
+          tenantId,
+          actorUserId: actorUserId || null,
+          action: "VEHICLE_CREATED",
+          targetType: "vehicle",
+          targetId: created.id,
+          metadata: {
+            stockNumber: created.stockNumber,
+            stockStatus: created.stockStatus,
+          },
+        });
+
+        return created;
       });
 
       return this.mapVehicleResponse(vehicle, callerRole);
@@ -329,20 +333,19 @@ export class VehiclesService {
         });
       }
 
-      return vehicle;
-    });
 
-    // 3. Log audit action
-    await this.auditService.logAction({
-      tenantId,
-      actorUserId: actorUserId || null,
-      action: "VEHICLE_UPDATED",
-      targetType: "vehicle",
-      targetId: id,
-      metadata: {
-        stockStatus: dto.stockStatus,
-        askingPriceFils: dto.askingPriceFils,
-      },
+      await this.auditService.logAction({
+        tenantId,
+        actorUserId: actorUserId || null,
+        action: "VEHICLE_UPDATED",
+        targetType: "vehicle",
+        targetId: id,
+        metadata: {
+          stockStatus: dto.stockStatus,
+          askingPriceFils: dto.askingPriceFils,
+        },
+      });
+      return vehicle;
     });
 
     return this.mapVehicleResponse(updated, callerRole);
