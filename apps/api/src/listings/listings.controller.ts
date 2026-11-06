@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { UuidParamPipe } from '../common/pipes/uuid-param.pipe';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -47,7 +48,7 @@ export class ListingsController {
   @ApiResponse({ status: 201, type: ListingResponseDto })
   async createDraftListing(
     @CurrentTenant() tenant: TenantContext,
-    @Param('id') vehicleId: string,
+    @Param('id', new UuidParamPipe()) vehicleId: string,
     @Body() dto: CreateDraftListingDto,
     @CurrentUser('id') actorUserId: string
   ): Promise<ListingResponseDto> {
@@ -71,7 +72,7 @@ export class ListingsController {
   @ApiResponse({ status: 200, type: ListingResponseDto })
   async unpublishListing(
     @CurrentTenant() tenant: TenantContext,
-    @Param('id') listingId: string,
+    @Param('id', new UuidParamPipe()) listingId: string,
     @CurrentUser('id') actorUserId: string
   ): Promise<ListingResponseDto> {
     return this.listingsService.unpublishListing(tenant.tenantId, listingId, actorUserId);
@@ -92,7 +93,7 @@ export class ListingsController {
   @ApiResponse({ status: 200, type: ListingResponseDto })
   async submitForReview(
     @CurrentTenant() tenant: TenantContext,
-    @Param('id') listingId: string,
+    @Param('id', new UuidParamPipe()) listingId: string,
     @CurrentUser('id') actorUserId: string
   ): Promise<ListingResponseDto> {
     return this.listingsService.submitForReview(

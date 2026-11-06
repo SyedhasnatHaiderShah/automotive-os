@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { UuidParamPipe } from '../common/pipes/uuid-param.pipe';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -37,7 +38,7 @@ export class PublicLeadsController {
   @ApiResponse({ status: 201, type: LeadEnquiryCreatedResponseDto })
   async createLeadEnquiry(
     @CurrentUser('id') buyerUserId: string,
-    @Param('listingId') listingId: string,
+    @Param('listingId', new UuidParamPipe()) listingId: string,
     @Body() dto: CreateLeadEnquiryDto
   ): Promise<LeadEnquiryCreatedResponseDto> {
     return this.leadsService.createLeadEnquiry(buyerUserId, listingId, dto);

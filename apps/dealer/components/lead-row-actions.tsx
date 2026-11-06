@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { dealerClientRequest, humanizeEnum, LEAD_STATUSES } from '../lib/dealer-api';
+import { dealerClientRequest, humanizeEnum, nextLeadStatuses } from '../lib/dealer-api';
 
 export interface StaffOption {
   membershipId: string;
@@ -59,12 +59,13 @@ export function LeadRowActions({
           <select
             className={selectClass}
             value={status}
-            disabled={pending !== null}
+            disabled={pending !== null || nextLeadStatuses(status).length === 1}
+            title={nextLeadStatuses(status).length === 1 ? 'No further status changes are allowed' : undefined}
             onChange={(event) => {
               if (event.target.value !== status) void patch('status', { status: event.target.value });
             }}
           >
-            {LEAD_STATUSES.map((value) => (
+            {nextLeadStatuses(status).map((value) => (
               <option key={value} value={value}>
                 {humanizeEnum(value)}
               </option>

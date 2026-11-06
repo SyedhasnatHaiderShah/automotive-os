@@ -7,6 +7,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { UuidParamPipe } from '../common/pipes/uuid-param.pipe';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -77,7 +78,7 @@ export class LeadsController {
   @ApiResponse({ status: 200, type: DealerLeadDetailDto })
   async getLead(
     @CurrentTenant() tenant: TenantContext,
-    @Param('id') leadId: string
+    @Param('id', new UuidParamPipe()) leadId: string
   ): Promise<DealerLeadDetailDto> {
     return this.leadsService.getTenantLeadById(tenant.tenantId, leadId);
   }
@@ -93,7 +94,7 @@ export class LeadsController {
   @ApiResponse({ status: 200, type: DealerLeadDetailDto })
   async updateStatus(
     @CurrentTenant() tenant: TenantContext,
-    @Param('id') leadId: string,
+    @Param('id', new UuidParamPipe()) leadId: string,
     @Body() dto: UpdateLeadStatusDto,
     @CurrentUser('id') actorUserId: string
   ): Promise<DealerLeadDetailDto> {
@@ -115,7 +116,7 @@ export class LeadsController {
   @ApiResponse({ status: 200, type: DealerLeadDetailDto })
   async assignLead(
     @CurrentTenant() tenant: TenantContext,
-    @Param('id') leadId: string,
+    @Param('id', new UuidParamPipe()) leadId: string,
     @Body() dto: AssignLeadDto,
     @CurrentUser('id') actorUserId: string
   ): Promise<DealerLeadDetailDto> {

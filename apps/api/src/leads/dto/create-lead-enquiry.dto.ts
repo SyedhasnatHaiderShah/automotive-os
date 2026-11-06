@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   ArrayNotEmpty,
+  ArrayUnique,
   IsArray,
+  IsIn,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -44,7 +46,9 @@ export class CreateLeadEnquiryDto {
   })
   @IsArray()
   @ArrayNotEmpty()
+  @ArrayUnique()
   @IsString({ each: true })
+  @IsIn(['name', 'phone', 'email'], { each: true, message: 'fieldsToShare may only contain name, phone or email' })
   fieldsToShare!: string[];
 
   @ApiProperty({

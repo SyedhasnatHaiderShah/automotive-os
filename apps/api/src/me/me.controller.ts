@@ -10,6 +10,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { UuidParamPipe } from '../common/pipes/uuid-param.pipe';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -132,7 +133,7 @@ export class MeController {
   @ApiResponse({ status: 200, description: 'Favorite removed successfully' })
   async removeFavorite(
     @CurrentUser('id') userId: string,
-    @Param('listingId') listingId: string
+    @Param('listingId', new UuidParamPipe()) listingId: string
   ): Promise<{ success: boolean }> {
     return this.meService.removeFavorite(userId, listingId);
   }
@@ -167,7 +168,7 @@ export class MeController {
   @ApiResponse({ status: 200, description: 'Saved search deleted successfully' })
   async deleteSavedSearch(
     @CurrentUser('id') userId: string,
-    @Param('id') id: string
+    @Param('id', new UuidParamPipe()) id: string
   ): Promise<{ success: boolean }> {
     return this.meService.deleteSavedSearch(userId, id);
   }
@@ -191,7 +192,7 @@ export class MeController {
   @ApiResponse({ status: 201, type: AppointmentResponseDto })
   async requestAppointment(
     @CurrentUser('id') userId: string,
-    @Param('leadId') leadId: string,
+    @Param('leadId', new UuidParamPipe()) leadId: string,
     @Body() dto: CreateAppointmentDto
   ): Promise<AppointmentResponseDto> {
     return this.meService.requestAppointment(userId, leadId, dto);
@@ -206,7 +207,7 @@ export class MeController {
   @ApiResponse({ status: 200, description: 'Data grant revoked successfully' })
   async revokeGrant(
     @CurrentUser('id') userId: string,
-    @Param('leadId') leadId: string
+    @Param('leadId', new UuidParamPipe()) leadId: string
   ): Promise<{ success: boolean; revokedAt: string }> {
     return this.meService.revokeLeadGrant(userId, leadId);
   }
@@ -230,7 +231,7 @@ export class MeController {
   @ApiResponse({ status: 200, type: AppointmentResponseDto })
   async cancelAppointment(
     @CurrentUser('id') userId: string,
-    @Param('appointmentId') appointmentId: string,
+    @Param('appointmentId', new UuidParamPipe()) appointmentId: string,
     @Body() dto: CancelAppointmentDto
   ): Promise<AppointmentResponseDto> {
     return this.meService.cancelAppointment(userId, appointmentId, dto?.reason);
@@ -242,7 +243,7 @@ export class MeController {
   @ApiResponse({ status: 200, type: AppointmentResponseDto })
   async rescheduleAppointment(
     @CurrentUser('id') userId: string,
-    @Param('appointmentId') appointmentId: string,
+    @Param('appointmentId', new UuidParamPipe()) appointmentId: string,
     @Body() dto: RescheduleAppointmentDto
   ): Promise<AppointmentResponseDto> {
     return this.meService.rescheduleAppointment(

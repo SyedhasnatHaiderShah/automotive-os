@@ -289,22 +289,23 @@ export class AdminService {
         },
       });
 
+
+      await this.auditService.logAction({
+        tenantId,
+        actorUserId: adminUserId,
+        action: "PLATFORM_ADMIN_UPDATE_TENANT_STATUS",
+        targetType: "tenant",
+        targetId: tenantId,
+        correlationId: correlationId || null,
+        metadata: {
+          previousStatus,
+          newStatus,
+          reason: dto.reason || null,
+        },
+      });
       return t;
     });
 
-    await this.auditService.logAction({
-      tenantId,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_UPDATE_TENANT_STATUS",
-      targetType: "tenant",
-      targetId: tenantId,
-      correlationId: correlationId || null,
-      metadata: {
-        previousStatus,
-        newStatus,
-        reason: dto.reason || null,
-      },
-    });
 
     return {
       id: updated.id,
@@ -514,7 +515,22 @@ export class AdminService {
         role: m.role,
         active: m.active,
       })),
-      buyer: user.buyer,
+      // QA-LOCAL-07: financial identifiers (TRN, escrow IBAN) are not an admin support concern.
+      buyer: user.buyer
+        ? {
+            preferredLanguage: user.buyer.preferredLanguage,
+            preferredEmirate: user.buyer.preferredEmirate,
+            budgetMinFils: user.buyer.budgetMinFils?.toString() ?? null,
+            budgetMaxFils: user.buyer.budgetMaxFils?.toString() ?? null,
+            preferredMakes: user.buyer.preferredMakes,
+            pdplConsentAt: user.buyer.pdplConsentAt?.toISOString() ?? null,
+            marketingConsentAt: user.buyer.marketingConsentAt?.toISOString() ?? null,
+            whatsappCommsConsent: user.buyer.whatsappCommsConsent,
+            aecbRefreshConsent: user.buyer.aecbRefreshConsent,
+            garageVisibility: user.buyer.garageVisibility,
+            settlementCurrency: user.buyer.settlementCurrency,
+          }
+        : null,
       activeSessionCount: user.sessions.length,
       recentSessions: user.sessions.map((s) => ({
         id: s.id,
@@ -567,37 +583,42 @@ export class AdminService {
       );
     }
 
-    const updated = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        ...(dto.displayName ? { displayName: dto.displayName.trim() } : {}),
-        ...(dto.status ? { status: dto.status } : {}),
-        ...(typeof dto.isPlatformAdmin === "boolean"
-          ? { isPlatformAdmin: dto.isPlatformAdmin }
-          : {}),
-      },
-    });
-
-    // If disabled or suspended, immediately revoke sessions
-    if (dto.status === "DISABLED" || dto.status === "SUSPENDED") {
-      await this.prisma.session.updateMany({
-        where: { userId, revokedAt: null },
-        data: { revokedAt: new Date() },
+    // One transaction: status change, session revocation and audit row (QA-LOCAL-08).
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const next = await tx.user.update({
+        where: { id: userId },
+        data: {
+          ...(dto.displayName ? { displayName: dto.displayName.trim() } : {}),
+          ...(dto.status ? { status: dto.status } : {}),
+          ...(typeof dto.isPlatformAdmin === "boolean"
+            ? { isPlatformAdmin: dto.isPlatformAdmin }
+            : {}),
+        },
       });
-    }
 
-    await this.auditService.logAction({
-      tenantId: null,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_UPDATE_USER",
-      targetType: "user",
-      targetId: userId,
-      metadata: {
-        previousStatus: user.status,
-        newStatus: updated.status,
-        isPlatformAdmin: updated.isPlatformAdmin,
-        reason: dto.reason || "Platform administration update",
-      },
+      // If disabled or suspended, immediately revoke sessions
+      if (dto.status === "DISABLED" || dto.status === "SUSPENDED") {
+        await tx.session.updateMany({
+          where: { userId, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+      }
+
+      await this.auditService.logAction({
+        tenantId: null,
+        actorUserId: adminUserId,
+        action: "PLATFORM_ADMIN_UPDATE_USER",
+        targetType: "user",
+        targetId: userId,
+        metadata: {
+          previousStatus: user.status,
+          newStatus: next.status,
+          isPlatformAdmin: next.isPlatformAdmin,
+          reason: dto.reason || "Platform administration update",
+        },
+      });
+
+      return next;
     });
 
     return {
@@ -617,18 +638,27 @@ export class AdminService {
       );
     }
 
-    const result = await this.prisma.session.updateMany({
-      where: { userId, revokedAt: null },
-      data: { revokedAt: new Date() },
-    });
+    const target = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!target) {
+      throw new NotFoundException(`User ${userId} not found`);
+    }
 
-    await this.auditService.logAction({
-      tenantId: null,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_REVOKE_SESSIONS",
-      targetType: "user",
-      targetId: userId,
-      metadata: { revokedCount: result.count },
+    const result = await this.prisma.$transaction(async (tx) => {
+      const revoked = await tx.session.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+
+      await this.auditService.logAction({
+        tenantId: null,
+        actorUserId: adminUserId,
+        action: "PLATFORM_ADMIN_REVOKE_SESSIONS",
+        targetType: "user",
+        targetId: userId,
+        metadata: { revokedCount: revoked.count },
+      });
+
+      return revoked;
     });
 
     return { revokedCount: result.count, success: true };
@@ -732,21 +762,22 @@ export class AdminService {
         },
       });
 
+
+      await this.auditService.logAction({
+        tenantId: tenant.id,
+        actorUserId: adminUserId,
+        action: "PLATFORM_ADMIN_CREATE_DEALER",
+        targetType: "tenant",
+        targetId: tenant.id,
+        metadata: {
+          slug: tenant.slug,
+          displayName: tenant.displayName,
+          adminEmail: normalizedAdminEmail,
+        },
+      });
       return { tenant, dealerUser };
     });
 
-    await this.auditService.logAction({
-      tenantId: result.tenant.id,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_CREATE_DEALER",
-      targetType: "tenant",
-      targetId: result.tenant.id,
-      metadata: {
-        slug: result.tenant.slug,
-        displayName: result.tenant.displayName,
-        adminEmail: normalizedAdminEmail,
-      },
-    });
 
     return {
       id: result.tenant.id,
@@ -774,29 +805,33 @@ export class AdminService {
     const tokenHash = createHash("sha256").update(rawToken).digest("hex");
     const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48-hour expiration
 
-    const invitation = await this.prisma.userInvitation.create({
-      data: {
-        email: normalizedEmail,
-        tokenHash,
-        tenantId,
-        role: dto.role,
-        isPlatformAdmin: false,
-        invitedById: adminUserId,
-        expiresAt,
-      },
-    });
+    const invitation = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.userInvitation.create({
+        data: {
+          email: normalizedEmail,
+          tokenHash,
+          tenantId,
+          role: dto.role,
+          isPlatformAdmin: false,
+          invitedById: adminUserId,
+          expiresAt,
+        },
+      });
 
-    await this.auditService.logAction({
-      tenantId,
-      actorUserId: adminUserId,
-      action: "PLATFORM_ADMIN_INVITE_DEALER_STAFF",
-      targetType: "invitation",
-      targetId: invitation.id,
-      metadata: {
-        email: normalizedEmail,
-        role: dto.role,
+      await this.auditService.logAction({
         tenantId,
-      },
+        actorUserId: adminUserId,
+        action: "PLATFORM_ADMIN_INVITE_DEALER_STAFF",
+        targetType: "invitation",
+        targetId: created.id,
+        metadata: {
+          email: normalizedEmail,
+          role: dto.role,
+          tenantId,
+        },
+      });
+
+      return created;
     });
 
     return {
@@ -817,7 +852,7 @@ export class AdminService {
     query: { limit?: number; offset?: number; targetType?: string },
     adminUserId: string
   ): Promise<AuditLogListResponse> {
-    const limit = Math.max(1, Math.min(100, query.limit || 50));
+    const limit = Math.max(1, Math.min(200, query.limit || 50));
     const offset = Math.max(0, query.offset || 0);
 
     const where: any = {};

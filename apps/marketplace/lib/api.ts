@@ -574,8 +574,9 @@ export async function fetchPublicListingBySlug(slug: string): Promise<PublicList
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
   try {
+    // Detail pages are never cached: a sold or unpublished car must 404 at once (QA-LOCAL-15).
     const response = await fetch(`${apiUrl}/api/v1/public/listings/${slug}`, {
-      next: { revalidate: 10 },
+      cache: 'no-store',
       signal: AbortSignal.timeout(10000),
     });
 
@@ -933,13 +934,14 @@ export async function fetchPublicDealerBySlug(slug: string): Promise<PublicDeale
   try {
     // PF-04: dealer profile and its published inventory load in parallel.
     const [dealerRes, inventoryRes] = await Promise.all([
+      // Storefront status (suspension, KYB) must apply immediately (QA-LOCAL-15).
       fetch(`${apiUrl}/api/v1/public/dealers/${encodeURIComponent(slug)}`, {
-        next: { revalidate: 10 },
+        cache: 'no-store',
         signal: AbortSignal.timeout(5000),
       }),
       // Tenant-scoped published listings; an empty stock list stays empty.
       fetch(`${apiUrl}/api/v1/public/listings?dealerSlug=${encodeURIComponent(slug)}&limit=20`, {
-        next: { revalidate: 10 },
+        cache: 'no-store',
         signal: AbortSignal.timeout(5000),
       }),
     ]);

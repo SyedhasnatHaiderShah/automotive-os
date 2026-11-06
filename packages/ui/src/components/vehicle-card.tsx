@@ -113,8 +113,9 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
                 e.stopPropagation();
                 onFavoriteToggle(id);
               }}
-              aria-label={isFavorite ? 'Remove session favorite' : 'Save for this session'}
-              title="Favorites are saved for this browser session until buyer sign-in is connected"
+              aria-label={isFavorite ? 'Remove from your favourites' : 'Save to your favourites'}
+              aria-pressed={isFavorite}
+              title={isFavorite ? 'Saved to your account favourites' : 'Save to your account favourites'}
               className="pointer-events-auto w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant/30 flex items-center justify-center text-on-surface hover:text-primary transition-colors focus-visible:ring-2 focus-visible:ring-primary"
             >
               <svg

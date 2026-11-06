@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useMarketplaceLocale } from '../../lib/locale';
 import Link from 'next/link';
 import { MarketplaceHeader, MarketplaceFooter } from '@automotive-os/ui';
 import { fetchPublicDealers, PublicDealerSummary } from '../../lib/api';
 
 export default function DealersDirectoryPage() {
-  const [locale, setLocale] = useState<'en' | 'ar'>('en');
+  const [locale, setLocale] = useMarketplaceLocale();
   const [selectedEmirate, setSelectedEmirate] = useState('All Emirates');
   const [searchQuery, setSearchQuery] = useState('');
 

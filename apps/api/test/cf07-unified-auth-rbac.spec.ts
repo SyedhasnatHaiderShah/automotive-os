@@ -455,7 +455,8 @@ describe('CF-07 Unified Authentication, RBAC & Security Remediation (S1-S4) E2E 
         const res = await request(app.getHttpServer())
           .patch(`/api/v1/admin/users/${platformAdminId}`)
           .set('Authorization', `Bearer ${platformAdminToken}`)
-          .send({ status: 'DISABLED' });
+          // A reason is mandatory for disable/suspend/demote since QA-LOCAL-10.
+          .send({ status: 'DISABLED', reason: 'Last-admin protection regression check' });
 
         expect(res.status).toBe(400);
         expect(res.body.error?.message).toContain('CANNOT_DISABLE_LAST_PLATFORM_ADMIN');

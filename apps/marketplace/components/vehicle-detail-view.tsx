@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useMarketplaceLocale } from '../lib/locale';
 import { usePathname, useRouter } from 'next/navigation';
 import { MarketplaceHeader, MarketplaceFooter } from '@automotive-os/ui';
 import { PublicListingDetail, addFavoriteApi, fetchFavorites, removeFavoriteApi } from '../lib/api';
@@ -42,7 +43,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const [locale, setLocale] = useState<'en' | 'ar'>(initialLocale);
+  const [locale, setLocale] = useMarketplaceLocale(initialLocale);
   const isArabic = locale === 'ar';
 
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);

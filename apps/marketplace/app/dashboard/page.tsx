@@ -26,8 +26,13 @@ export default function DashboardResolverPage() {
         if (res.status === 401 || res.status === 403) {
           // Check if disabled
           const data = await res.json().catch(() => ({}));
-          if (data?.message?.includes('ACCOUNT_DISABLED') || data?.error?.message?.includes('ACCOUNT_DISABLED')) {
+          const apiMessage = `${data?.message ?? ''} ${data?.error?.message ?? ''}`;
+          if (apiMessage.includes('ACCOUNT_DISABLED')) {
             router.replace('/access-denied?reason=disabled');
+            return;
+          }
+          if (apiMessage.includes('ACCOUNT_SUSPENDED')) {
+            router.replace('/access-suspended');
             return;
           }
           // Not logged in
@@ -67,6 +72,11 @@ export default function DashboardResolverPage() {
             setStatusText('Loading Private Garage & Dossier...');
           }
 
+          // Dealer/admin consoles are separate apps behind the gateway: full load (QA-LOCAL-16).
+          if (destination.startsWith('/dealer') || destination.startsWith('/admin')) {
+            window.location.replace(destination);
+            return;
+          }
           router.replace(destination);
           return;
         }
