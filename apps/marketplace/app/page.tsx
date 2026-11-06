@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useMarketplaceLocale } from '../lib/locale';
 import {
   MarketplaceHeader,
   MarketplaceFooter,
@@ -20,7 +21,7 @@ import {
 import { BuyerAuthRequiredError } from '../lib/buyer-api-client';
 
 export default function MarketplaceHomePage() {
-  const [locale, setLocale] = useState<'en' | 'ar'>('en');
+  const [locale, setLocale] = useMarketplaceLocale();
   const [selectedEmirate, setSelectedEmirate] = useState('All Emirates');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCondition, setSelectedCondition] = useState('ALL');

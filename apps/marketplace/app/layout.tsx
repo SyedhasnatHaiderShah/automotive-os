@@ -1,6 +1,9 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
+import { cookies } from 'next/headers';
 import './globals.css';
+
+const LOCALE_COOKIE = 'ao_locale';
 
 export const metadata: Metadata = {
   title: 'Automotive OS — UAE Verified Dealer Marketplace & Collector Exchange',
@@ -14,13 +17,17 @@ export const viewport: Viewport = {
   themeColor: '#101419',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // MK-20: the persisted locale drives the root lang/dir so RTL applies to the
+  // whole document, not only to page wrappers.
+  const cookieStore = await cookies();
+  const locale = cookieStore.get(LOCALE_COOKIE)?.value === 'ar' ? 'ar' : 'en';
   return (
-    <html lang="en" className="dark">
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

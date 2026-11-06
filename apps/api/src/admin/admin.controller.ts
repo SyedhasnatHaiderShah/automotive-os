@@ -12,6 +12,7 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
+import { UuidParamPipe } from "../common/pipes/uuid-param.pipe";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -79,7 +80,7 @@ export class AdminController {
   @ApiOperation({ summary: "Issue cryptographic invitation for new dealership employee" })
   async inviteDealerStaff(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") tenantId: string,
+    @Param("id", new UuidParamPipe()) tenantId: string,
     @Body() dto: AdminInviteDealerStaffDto,
   ) {
     return this.adminService.inviteDealerStaff(tenantId, dto, adminUserId);
@@ -104,7 +105,7 @@ export class AdminController {
   @ApiResponse({ status: 200 })
   async getTenant(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") tenantId: string,
+    @Param("id", new UuidParamPipe()) tenantId: string,
     @Headers("x-correlation-id") correlationId?: string,
   ) {
     return this.adminService.getTenantById(
@@ -121,7 +122,7 @@ export class AdminController {
   @ApiResponse({ status: 200 })
   async getVerificationDossier(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") tenantId: string,
+    @Param("id", new UuidParamPipe()) tenantId: string,
     @Headers("x-correlation-id") correlationId?: string,
   ) {
     return this.adminService.getTenantById(
@@ -139,7 +140,7 @@ export class AdminController {
   @ApiResponse({ status: 200, type: AdminTenantSummaryDto })
   async updateTenantStatus(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") tenantId: string,
+    @Param("id", new UuidParamPipe()) tenantId: string,
     @Body() dto: UpdateTenantStatusDto,
     @Headers("x-correlation-id") correlationId?: string,
   ): Promise<AdminTenantSummaryDto> {
@@ -168,7 +169,7 @@ export class AdminController {
   @ApiOperation({ summary: "Get detailed user identity, memberships, and session activity" })
   async getUser(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") userId: string,
+    @Param("id", new UuidParamPipe()) userId: string,
   ) {
     return this.adminService.getUserById(userId, adminUserId);
   }
@@ -177,7 +178,7 @@ export class AdminController {
   @ApiOperation({ summary: "Update user status (ACTIVE, SUSPENDED, DISABLED) or role elevation" })
   async updateUser(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") userId: string,
+    @Param("id", new UuidParamPipe()) userId: string,
     @Body() dto: AdminUpdateUserDto,
   ) {
     return this.adminService.updateUser(userId, dto, adminUserId);
@@ -188,7 +189,7 @@ export class AdminController {
   @ApiOperation({ summary: "Immediately terminate all active sessions for a user" })
   async revokeSessions(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") userId: string,
+    @Param("id", new UuidParamPipe()) userId: string,
   ) {
     return this.adminService.revokeUserSessions(userId, adminUserId);
   }
@@ -197,7 +198,7 @@ export class AdminController {
   @ApiOperation({ summary: "Soft delete user (sets status to DISABLED and revokes sessions)" })
   async deleteUser(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") userId: string,
+    @Param("id", new UuidParamPipe()) userId: string,
   ) {
     return this.adminService.deleteUser(userId, adminUserId);
   }

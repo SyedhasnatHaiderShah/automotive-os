@@ -25,6 +25,11 @@ export function runWithDbContext<T>(context: DatabaseContext, fn: () => Promise<
  */
 const activeTxStorage = new AsyncLocalStorage<Prisma.TransactionClient>();
 
+/** True while the current async chain runs inside `prisma.$transaction(async (tx) => ...)`. */
+export function hasActiveTransaction(): boolean {
+  return activeTxStorage.getStore() !== undefined;
+}
+
 async function applyDbContext(tx: Prisma.TransactionClient, ctx: DatabaseContext): Promise<void> {
   if (ctx.tenantId) {
     // Defense-in-depth: Validate tenant UUID strictly before parameterization

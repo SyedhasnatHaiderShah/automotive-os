@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useMarketplaceLocale } from '../../lib/locale';
 import {
   MarketplaceHeader,
   MarketplaceFooter,
@@ -15,7 +16,7 @@ import {
 } from '../../lib/api';
 
 export default function VehicleComparisonPage() {
-  const [locale, setLocale] = useState<'en' | 'ar'>('en');
+  const [locale, setLocale] = useMarketplaceLocale();
   const [selectedEmirate, setSelectedEmirate] = useState('All Emirates');
   const [highlightDifferences, setHighlightDifferences] = useState(false);
   const [comparedVehicles, setComparedVehicles] = useState<PublicListingDetail[]>([]);

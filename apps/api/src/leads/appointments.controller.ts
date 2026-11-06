@@ -6,6 +6,7 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
+import { UuidParamPipe } from '../common/pipes/uuid-param.pipe';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -58,7 +59,7 @@ export class AppointmentsController {
   @ApiResponse({ status: 200, type: AppointmentResponseDto })
   async updateStatus(
     @CurrentTenant() tenant: TenantContext,
-    @Param('id') appointmentId: string,
+    @Param('id', new UuidParamPipe()) appointmentId: string,
     @Body() dto: UpdateAppointmentStatusDto,
     @CurrentUser('id') actorUserId: string
   ): Promise<AppointmentResponseDto> {

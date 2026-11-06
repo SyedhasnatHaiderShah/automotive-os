@@ -26,6 +26,12 @@ import {
 } from './dto/create-appointment.dto';
 import { AppointmentStatus, ListingStatus } from '@automotive-os/database';
 
+const FINAL_APPOINTMENT_STATUSES: AppointmentStatus[] = [
+  AppointmentStatus.CANCELLED,
+  AppointmentStatus.COMPLETED,
+  AppointmentStatus.NO_SHOW,
+];
+
 @Injectable()
 export class MeService {
   constructor(
@@ -154,6 +160,13 @@ export class MeService {
     // undefined = leave unchanged; null = clear the stored value (MK-08).
     const toFils = (v: number | null | undefined) =>
       v === undefined ? undefined : v === null ? null : BigInt(v);
+    // QA-LOCAL-04: the effective range (request merged with stored values) must satisfy min <= max.
+    const current = await this.prisma.buyerProfile.findUnique({ where: { userId } });
+    const effectiveMin = dto.budgetMinFils === undefined ? current?.budgetMinFils ?? null : toFils(dto.budgetMinFils) ?? null;
+    const effectiveMax = dto.budgetMaxFils === undefined ? current?.budgetMaxFils ?? null : toFils(dto.budgetMaxFils) ?? null;
+    if (effectiveMin !== null && effectiveMax !== null && effectiveMin > effectiveMax) {
+      throw new BadRequestException('BUDGET_RANGE_INVALID: budgetMinFils must not exceed budgetMaxFils');
+    }
     const profile = await this.prisma.buyerProfile.upsert({
       where: { userId },
       update: {
@@ -421,6 +434,10 @@ export class MeService {
       throw new BadRequestException('Appointment end time must be after start time');
     }
 
+    if (startsAt.getTime() < Date.now()) {
+      throw new BadRequestException('APPOINTMENT_IN_PAST: appointment must start in the future');
+    }
+
     const appointment = await runWithDbContext({ tenantId: lead.tenantId, userId }, () =>
       this.prisma.$transaction(async (tx) => {
       const appt = await tx.appointment.create({
@@ -542,6 +559,11 @@ export class MeService {
       throw new NotFoundException('Appointment not found for this buyer');
     }
 
+    // QA-LOCAL-14: cancelled, completed or no-show appointments are final.
+    if (FINAL_APPOINTMENT_STATUSES.includes(existing.status)) {
+      throw new ConflictException(`APPOINTMENT_FINAL: appointment is already ${existing.status}`);
+    }
+
     const updated = await runWithDbContext({ tenantId: existing.tenantId, userId }, () =>
       this.prisma.$transaction(async (tx) => {
       const appt = await tx.appointment.update({
@@ -609,6 +631,11 @@ export class MeService {
       throw new NotFoundException('Appointment not found for this buyer');
     }
 
+    // QA-LOCAL-14: cancelled, completed or no-show appointments are final.
+    if (FINAL_APPOINTMENT_STATUSES.includes(existing.status)) {
+      throw new ConflictException(`APPOINTMENT_FINAL: appointment is already ${existing.status}`);
+    }
+
     const startsAt = new Date(startsAtStr);
     const endsAt = new Date(endsAtStr);
 
@@ -618,6 +645,10 @@ export class MeService {
 
     if (endsAt <= startsAt) {
       throw new BadRequestException('Appointment end time must be after start time');
+    }
+
+    if (startsAt.getTime() < Date.now()) {
+      throw new BadRequestException('APPOINTMENT_IN_PAST: appointment must start in the future');
     }
 
     const updated = await runWithDbContext({ tenantId: existing.tenantId, userId }, () =>

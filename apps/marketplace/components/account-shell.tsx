@@ -1,10 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Car, User } from 'lucide-react';
 import { MarketplaceFooter } from '@automotive-os/ui';
+import { useMarketplaceLocale } from '../lib/locale';
 
 type Locale = 'en' | 'ar';
 
@@ -47,7 +48,7 @@ export function AccountShell({
   subtitleAr,
   children,
 }: AccountShellProps) {
-  const [locale, setLocale] = useState<Locale>('en');
+  const [locale, setLocale] = useMarketplaceLocale();
   const isArabic = locale === 'ar';
   const pathname = usePathname();
 

@@ -36,6 +36,22 @@ export const LEAD_STATUSES = [
 ] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 
+/** Mirror of apps/api/src/leads/lead-transitions.ts; the API rejects anything else with 409. */
+export const LEAD_TRANSITIONS: Readonly<Record<LeadStatus, readonly LeadStatus[]>> = {
+  NEW: ['CONTACTED', 'QUALIFIED', 'LOST', 'SPAM'],
+  CONTACTED: ['QUALIFIED', 'TEST_DRIVE_NEGOTIATION', 'LOST', 'SPAM'],
+  QUALIFIED: ['TEST_DRIVE_NEGOTIATION', 'WON', 'LOST'],
+  TEST_DRIVE_NEGOTIATION: ['QUALIFIED', 'WON', 'LOST'],
+  WON: [],
+  LOST: ['CONTACTED'],
+  SPAM: ['NEW'],
+};
+
+export function nextLeadStatuses(current: string): LeadStatus[] {
+  const allowed = LEAD_TRANSITIONS[current as LeadStatus] ?? [];
+  return [current as LeadStatus, ...allowed];
+}
+
 /** Listing statuses from which the API accepts a submit-for-review. */
 export const SUBMITTABLE_LISTING_STATUSES: readonly ListingStatus[] = ['DRAFT', 'PAUSED', 'REJECTED'];
 

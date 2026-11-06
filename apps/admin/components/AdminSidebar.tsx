@@ -25,6 +25,7 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
   const isUsersActive = pathname?.includes('/users') ?? false;
   const isDealersActive = pathname?.includes('/dealers') ?? false;
   const isAuditActive = pathname?.includes('/audit-logs') ?? false;
+  const isDataActive = pathname?.startsWith('/data') ?? false;
 
   return (
     <aside
@@ -170,6 +171,20 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
                 <span className="material-symbols-outlined text-[18px]">lock_clock</span>
                 <span className="font-body-sm text-body-sm">
                   {isRtl ? 'سجل التدقيق غير القابل للتغيير' : 'Audit Activity Ledger'}
+                </span>
+              </Link>
+
+              <Link
+                href="/data"
+                className={`flex items-center gap-space-sm px-space-sm py-2 rounded-lg transition-colors ${
+                  isDataActive
+                    ? 'bg-surface-container-high text-primary font-medium'
+                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[18px]">database</span>
+                <span className="font-body-sm text-body-sm">
+                  {isRtl ? 'وحدة البيانات' : 'Data Console'}
                 </span>
               </Link>
 

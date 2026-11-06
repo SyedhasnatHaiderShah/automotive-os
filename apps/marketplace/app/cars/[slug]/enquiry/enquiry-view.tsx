@@ -40,7 +40,7 @@ export const EnquiryView: React.FC<EnquiryViewProps> = ({ vehicle }) => {
           href={`/cars/${vehicle.slug}`}
           className="flex items-center gap-1.5 font-body-sm text-xs sm:text-sm text-on-surface-variant hover:text-primary transition-colors"
         >
-          <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span className="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_back</span>
           <span>Back to {vehicle.title}</span>
         </Link>
       </div>

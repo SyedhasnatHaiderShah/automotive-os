@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { assertLeadTransition } from './lead-transitions';
 import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { EnquiryRateLimiterService } from './enquiry-rate-limiter.service';
@@ -22,7 +23,13 @@ import {
   ListingStatus,
   StockStatus,
   TenantStatus,
+  VerificationStatus,
 } from '@automotive-os/database';
+
+interface LeadPeople {
+  buyers: Map<string, { id: string; displayName: string; phoneE164: string | null; email: string | null }>;
+  staff: Map<string, string>;
+}
 
 @Injectable()
 export class LeadsService {
@@ -55,13 +62,17 @@ export class LeadsService {
           : { slug: listingId },
         include: {
           vehicle: true,
-          tenant: true,
+          tenant: { include: { verification: true } },
         },
       })
     );
 
     if (!listing) {
       throw new NotFoundException(`Listing ${listingId} not found`);
+    }
+
+    if (listing.tenant.verification?.status !== VerificationStatus.APPROVED) {
+      throw new BadRequestException('Dealership is not verified for marketplace enquiries');
     }
 
     if (listing.status !== ListingStatus.PUBLISHED) {
@@ -171,15 +182,7 @@ export class LeadsService {
         where,
         include: {
           listing: true,
-          buyer: true,
           grant: true,
-          tenant: {
-            include: {
-              memberships: {
-                include: { user: true },
-              },
-            },
-          },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -187,6 +190,8 @@ export class LeadsService {
       }),
       this.prisma.lead.count({ where }),
     ]);
+
+    const people = await this.loadLeadPeople(leads);
 
     const items: DealerLeadSummaryDto[] = leads.map((lead) => {
       let buyerDisplayName = 'Prospective Buyer';
@@ -196,18 +201,12 @@ export class LeadsService {
         lead.grant.fieldsGranted.includes('name');
 
       if (isGranted) {
-        buyerDisplayName = lead.buyer.displayName;
+        buyerDisplayName = people.buyers.get(lead.buyerUserId)?.displayName ?? buyerDisplayName;
       }
 
-      let assignedStaffName: string | null = null;
-      if (lead.assignedMembershipId) {
-        const staff = lead.tenant.memberships.find(
-          (m) => m.id === lead.assignedMembershipId
-        );
-        if (staff) {
-          assignedStaffName = staff.user.displayName;
-        }
-      }
+      const assignedStaffName: string | null = lead.assignedMembershipId
+        ? people.staff.get(lead.assignedMembershipId) ?? null
+        : null;
 
       return {
         id: lead.id,
@@ -244,17 +243,9 @@ export class LeadsService {
       },
       include: {
         listing: true,
-        buyer: true,
         grant: true,
         appointments: {
           orderBy: { startsAt: 'asc' },
-        },
-        tenant: {
-          include: {
-            memberships: {
-              include: { user: true },
-            },
-          },
         },
       },
     });
@@ -263,7 +254,7 @@ export class LeadsService {
       throw new NotFoundException(`Lead ${leadId} not found in this dealership`);
     }
 
-    return this.mapDealerLeadDetail(lead);
+    return this.mapDealerLeadDetail(lead, await this.loadLeadPeople([lead]));
   }
 
   /**
@@ -289,6 +280,7 @@ export class LeadsService {
     }
 
     const previousStatus = existing.status;
+    assertLeadTransition(previousStatus, dto.status);
 
     const updated = await this.prisma.$transaction(async (tx) => {
       const result = await tx.lead.update({
@@ -303,17 +295,9 @@ export class LeadsService {
         },
         include: {
           listing: true,
-          buyer: true,
           grant: true,
           appointments: {
             orderBy: { startsAt: 'asc' },
-          },
-          tenant: {
-            include: {
-              memberships: {
-                include: { user: true },
-              },
-            },
           },
         },
       });
@@ -352,7 +336,7 @@ export class LeadsService {
       return result;
     });
 
-    return this.mapDealerLeadDetail(updated);
+    return this.mapDealerLeadDetail(updated, await this.loadLeadPeople([updated]));
   }
 
   /**
@@ -402,17 +386,9 @@ export class LeadsService {
         },
         include: {
           listing: true,
-          buyer: true,
           grant: true,
           appointments: {
             orderBy: { startsAt: 'asc' },
-          },
-          tenant: {
-            include: {
-              memberships: {
-                include: { user: true },
-              },
-            },
           },
         },
       });
@@ -449,7 +425,7 @@ export class LeadsService {
       return result;
     });
 
-    return this.mapDealerLeadDetail(updated);
+    return this.mapDealerLeadDetail(updated, await this.loadLeadPeople([updated]));
   }
 
   /**
@@ -457,8 +433,45 @@ export class LeadsService {
    * If grant is revoked or nonexistent: ZERO contact details returned.
    * If active: returns ONLY fields explicitly granted in `fieldsGranted`.
    */
-  private mapDealerLeadDetail(lead: any): DealerLeadDetailDto {
+  /**
+   * Buyer identities and colleague names are hidden from a dealer session by
+   * RLS (`users_self_isolation`), so including `buyer`/`memberships.user` in a
+   * lead query failed for every tenant that has leads (QA-LOCAL-02). Only the
+   * referenced ids are resolved, under a read-only elevated context; the grant
+   * filter below remains the authority for what a dealer may see.
+   */
+  private async loadLeadPeople(
+    leads: Array<{ buyerUserId: string; assignedMembershipId: string | null }>,
+  ): Promise<LeadPeople> {
+    const buyerIds = [...new Set(leads.map((l) => l.buyerUserId))];
+    const membershipIds = [
+      ...new Set(leads.map((l) => l.assignedMembershipId).filter((v): v is string => Boolean(v))),
+    ];
+    const [buyers, staff] = await runWithDbContext({ isAdmin: true }, async () =>
+      Promise.all([
+        buyerIds.length
+          ? this.prisma.user.findMany({
+              where: { id: { in: buyerIds } },
+              select: { id: true, displayName: true, phoneE164: true, email: true },
+            })
+          : Promise.resolve([]),
+        membershipIds.length
+          ? this.prisma.membership.findMany({
+              where: { id: { in: membershipIds } },
+              select: { id: true, user: { select: { displayName: true } } },
+            })
+          : Promise.resolve([]),
+      ]),
+    );
+    return {
+      buyers: new Map(buyers.map((b) => [b.id, b])),
+      staff: new Map(staff.map((m) => [m.id, m.user.displayName])),
+    };
+  }
+
+  private mapDealerLeadDetail(lead: any, people: LeadPeople): DealerLeadDetailDto {
     const grant = lead.grant;
+    const buyer = people.buyers.get(lead.buyerUserId);
     let buyerContact: DealerBuyerContactDto;
 
     if (!grant) {
@@ -478,22 +491,16 @@ export class LeadsService {
     } else {
       const fields = grant.fieldsGranted || [];
       buyerContact = {
-        name: fields.includes('name') ? lead.buyer.displayName : null,
-        phone: fields.includes('phone') ? lead.buyer.phoneE164 : null,
-        email: fields.includes('email') ? lead.buyer.email : null,
+        name: fields.includes('name') ? buyer?.displayName ?? null : null,
+        phone: fields.includes('phone') ? buyer?.phoneE164 ?? null : null,
+        email: fields.includes('email') ? buyer?.email ?? null : null,
         grantStatus: 'ACTIVE',
       };
     }
 
-    let assignedStaffName: string | null = null;
-    if (lead.assignedMembershipId && lead.tenant?.memberships) {
-      const staff = lead.tenant.memberships.find(
-        (m: any) => m.id === lead.assignedMembershipId
-      );
-      if (staff) {
-        assignedStaffName = staff.user.displayName;
-      }
-    }
+    const assignedStaffName: string | null = lead.assignedMembershipId
+      ? people.staff.get(lead.assignedMembershipId) ?? null
+      : null;
 
     return {
       id: lead.id,

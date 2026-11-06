@@ -291,6 +291,7 @@ describe('AdminService - User & Dealer Management', () => {
 
   describe('revokeUserSessions', () => {
     it('should revoke all active sessions for a target user', async () => {
+      mockPrisma.user.findUnique.mockResolvedValue({ id: 'target-user' });
       mockPrisma.session.updateMany.mockResolvedValue({ count: 3 });
 
       const res = await service.revokeUserSessions('user-123', 'admin-caller');

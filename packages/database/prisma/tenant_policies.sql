@@ -181,6 +181,19 @@ CREATE POLICY public_catalog_models ON public.car_models FOR SELECT USING (true)
 DROP POLICY IF EXISTS public_plans_read ON public.subscription_plans;
 CREATE POLICY public_plans_read ON public.subscription_plans FOR SELECT USING (true);
 
+-- Platform administrators maintain the catalogue (AD-20); dealers and buyers stay read-only.
+DROP POLICY IF EXISTS admin_catalog_makes_write ON public.makes;
+CREATE POLICY admin_catalog_makes_write ON public.makes
+  FOR ALL USING (app.is_platform_admin()) WITH CHECK (app.is_platform_admin());
+
+DROP POLICY IF EXISTS admin_catalog_models_write ON public.car_models;
+CREATE POLICY admin_catalog_models_write ON public.car_models
+  FOR ALL USING (app.is_platform_admin()) WITH CHECK (app.is_platform_admin());
+
+DROP POLICY IF EXISTS admin_plans_write ON public.subscription_plans;
+CREATE POLICY admin_plans_write ON public.subscription_plans
+  FOR ALL USING (app.is_platform_admin()) WITH CHECK (app.is_platform_admin());
+
 -- ------------------------------------------------------------------------------
 -- 5. Audit & Outbox Events Security
 -- ------------------------------------------------------------------------------

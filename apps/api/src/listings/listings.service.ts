@@ -138,29 +138,33 @@ export class ListingsService {
 
     const qualityScore = this.calculateQualityScore(vehicle, dto.description);
 
-    const listing = await this.prisma.listing.create({
-      data: {
-        tenantId,
-        vehicleId,
-        slug,
-        title,
-        description: dto.description || null,
-        askingPriceFils,
-        status: ListingStatus.DRAFT,
-        qualityScore,
-      },
-    });
+    const listing = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.listing.create({
+        data: {
+          tenantId,
+          vehicleId,
+          slug,
+          title,
+          description: dto.description || null,
+          askingPriceFils,
+          status: ListingStatus.DRAFT,
+          qualityScore,
+        },
+      });
 
-    await this.auditService.logAction({
-      tenantId,
-      actorUserId: actorUserId || null,
-      action: "LISTING_DRAFT_CREATED",
-      targetType: "listing",
-      targetId: listing.id,
-      metadata: {
-        vehicleId,
-        slug: listing.slug,
-      },
+      await this.auditService.logAction({
+        tenantId,
+        actorUserId: actorUserId || null,
+        action: "LISTING_DRAFT_CREATED",
+        targetType: "listing",
+        targetId: created.id,
+        metadata: {
+          vehicleId,
+          slug: created.slug,
+        },
+      });
+
+      return created;
     });
 
     return this.mapListingResponse(listing);
@@ -248,19 +252,20 @@ export class ListingsService {
         },
       });
 
+
+      await this.auditService.logAction({
+        tenantId,
+        actorUserId: actorUserId || null,
+        action: "LISTING_SUBMITTED_FOR_REVIEW",
+        targetType: "listing",
+        targetId: listingId,
+        metadata: {
+          vehicleId: listing.vehicleId,
+        },
+      });
       return result;
     });
 
-    await this.auditService.logAction({
-      tenantId,
-      actorUserId: actorUserId || null,
-      action: "LISTING_SUBMITTED_FOR_REVIEW",
-      targetType: "listing",
-      targetId: listingId,
-      metadata: {
-        vehicleId: listing.vehicleId,
-      },
-    });
 
     return this.mapListingResponse(updated);
   }
@@ -590,6 +595,8 @@ export class ListingsService {
       },
       tenant: {
         status: TenantStatus.ACTIVE,
+        // Verified-dealer marketplace: only KYB-approved dealers are public (QA-LOCAL-01).
+        verification: { status: VerificationStatus.APPROVED },
       },
     };
 
@@ -742,7 +749,8 @@ export class ListingsService {
         !listing ||
         listing.status !== ListingStatus.PUBLISHED ||
         listing.vehicle.stockStatus !== StockStatus.AVAILABLE ||
-        listing.tenant.status !== TenantStatus.ACTIVE
+        listing.tenant.status !== TenantStatus.ACTIVE ||
+        listing.tenant.verification?.status !== VerificationStatus.APPROVED
       ) {
         throw new NotFoundException("Listing not found or no longer available");
       }

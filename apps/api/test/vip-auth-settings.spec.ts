@@ -173,7 +173,8 @@ describe('VIP Registration & Account Settings Suite (E2E Integration Tests)', ()
       expect(res.body.displayName).toBe('Mansoor.Collector.DXB');
       expect(res.body.affiliation).toBe('Emirates Sovereign Holdings Ltd');
       expect(res.body.trn).toBe('100-2490-5829-0003');
-      expect(res.body.escrowIban).toBe('AE02 0300 0019 2838 4810 992');
+      // IBANs are stored normalised (no spaces, upper case) since QA-LOCAL-05.
+      expect(res.body.escrowIban).toBe('AE020300001928384810992');
       expect(res.body.garageVisibility).toBe(true);
 
       // Verify persistence via subsequent GET
@@ -183,7 +184,7 @@ describe('VIP Registration & Account Settings Suite (E2E Integration Tests)', ()
         .expect(200);
 
       expect(getRes.body.trn).toBe('100-2490-5829-0003');
-      expect(getRes.body.escrowIban).toBe('AE02 0300 0019 2838 4810 992');
+      expect(getRes.body.escrowIban).toBe('AE020300001928384810992');
       expect(getRes.body.affiliation).toBe('Emirates Sovereign Holdings Ltd');
     });
   });

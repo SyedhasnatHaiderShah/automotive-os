@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
+import { UuidParamPipe } from "../common/pipes/uuid-param.pipe";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -34,7 +35,7 @@ export class AdminListingsController {
   })
   @ApiResponse({ status: 200 })
   async getListing(
-    @Param("id") listingId: string,
+    @Param("id", new UuidParamPipe()) listingId: string,
     @CurrentUser("id") adminUserId: string,
   ) {
     return this.listingsService.getAdminListingById(listingId, adminUserId);
@@ -49,7 +50,7 @@ export class AdminListingsController {
   @ApiResponse({ status: 200, type: ListingResponseDto })
   async adminDecision(
     @CurrentUser("id") adminUserId: string,
-    @Param("id") listingId: string,
+    @Param("id", new UuidParamPipe()) listingId: string,
     @Body() dto: AdminListingDecisionDto,
   ): Promise<ListingResponseDto> {
     return this.listingsService.adminDecision(adminUserId, listingId, dto);

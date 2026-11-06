@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "echo \"database lint passed\"",
     "test": "tsx test/rls-isolation.test.ts && tsx test/backup-and-rls-verification.test.ts",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "seed:scale": "tsx prisma/seed-scale.ts"
   },
   "dependencies": {
     "@aws-sdk/client-rds": "^3.758.0",
