@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useId, useRef } from 'react';
+import React, { useState, useEffect, useId, useRef, useMemo } from 'react';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
 import { useLocale } from '../../lib/locale';
@@ -211,12 +211,20 @@ export default function AdminDealersPage() {
     }
   };
 
-  const filteredDealers = dealers.filter(
-    (d) =>
-      d.displayName.toLowerCase().includes(search.toLowerCase()) ||
-      d.slug.toLowerCase().includes(search.toLowerCase()) ||
-      d.legalName.toLowerCase().includes(search.toLowerCase())
-  );
+  // Optimization (⚡ Bolt): Memoize filteredDealers to prevent re-filtering on unrelated state updates
+  // (modal toggles, action loadings, copy-to-clipboard, toast messages).
+  // Also pre-computes search.trim().toLowerCase() once outside the loop instead of recomputing
+  // search.toLowerCase() 3 times for every dealership on every iteration.
+  const filteredDealers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return dealers;
+    return dealers.filter(
+      (d) =>
+        d.displayName.toLowerCase().includes(q) ||
+        d.slug.toLowerCase().includes(q) ||
+        d.legalName.toLowerCase().includes(q)
+    );
+  }, [dealers, search]);
 
   const statusLabel = (status: string) => {
     const entry = TENANT_STATUS_LABELS[status];
