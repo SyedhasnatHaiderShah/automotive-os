@@ -21,3 +21,11 @@
 **Learning:** Any public endpoint that accepts and validates sensitive security tokens or invitations must be protected by the same per-IP fixed-window rate limiting (`AuthRateLimitGuard`) as token consumption endpoints, preventing brute-force token enumeration and email address harvesting.
 
 **Prevention:** Always pair `@Public()` activation and verification endpoints with `@UseGuards(AuthRateLimitGuard)` and appropriate `@AuthRateLimit(...)` policies.
+
+## 2026-11-08 - Public Media Streaming Gateway Throttling & Explicit Public Contract
+
+**Vulnerability:** `PublicMediaController` (`/api/v1/public/media/*`) streamed media files directly from object storage via elevated DB queries without rate limiting, exposing the Railway backend and S3/R2 storage to denial-of-service, automated scraping, and unbounded egress bandwidth exhaustion. It also omitted explicit `@Public()` controller annotation.
+
+**Learning:** Public proxy gateways that stream binary assets from external cloud storage must be protected with per-IP rate limiting (`AuthRateLimitGuard`) and explicit `@Public()` metadata annotations to bound upstream storage queries, prevent connection exhaustion, and guard against high-bandwidth egress abuse.
+
+**Prevention:** Always apply `@Public()` along with `@UseGuards(AuthRateLimitGuard)` and a defined `@AuthRateLimit` window policy on public asset streaming routes.
