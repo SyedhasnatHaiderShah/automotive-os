@@ -7,6 +7,7 @@ import {
   MarketplaceFooter,
   Button,
   Badge,
+  useModalFocus,
 } from '@automotive-os/ui';
 import {
   fetchPublicListings,
@@ -28,20 +29,8 @@ export default function VehicleComparisonPage() {
   const [pickerQuery, setPickerQuery] = useState('');
 
   const isArabic = locale === 'ar';
-
-  useEffect(() => {
-    if (!addModalOpen) return;
-    const oldOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setAddModalOpen(false);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.body.style.overflow = oldOverflow;
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [addModalOpen]);
+  // Picker dialog: initial focus, Tab containment, Escape, scroll lock and focus return.
+  const pickerRef = useModalFocus<HTMLDivElement>(addModalOpen, { onClose: () => setAddModalOpen(false) });
 
   useEffect(() => {
     let cancelled = false;
@@ -516,8 +505,10 @@ export default function VehicleComparisonPage() {
       {/* Add Vehicle Selector Modal */}
       {addModalOpen && (
         <div
+          ref={pickerRef}
           role="dialog"
           aria-modal="true"
+          tabIndex={-1}
           aria-label={isArabic ? 'اختر مركبة للمقارنة' : 'Select Vehicle to Compare'}
           onClick={() => setAddModalOpen(false)}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"

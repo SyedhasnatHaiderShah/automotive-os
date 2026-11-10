@@ -8,6 +8,7 @@ import {
   VERIFIED_ACCOUNTING_DESK_FIXTURE,
   AccountingDeskData,
 } from '../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function TaxInvoicesAndAccountingPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -1239,7 +1240,7 @@ export default function TaxInvoicesAndAccountingPage() {
 
       {/* Modal 1: Generate FTA Tax Invoice */}
       {generateInvoiceModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setGenerateInvoiceModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1346,12 +1347,12 @@ export default function TaxInvoicesAndAccountingPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 2: Export FAF (XML) */}
       {exportFafModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setExportFafModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1406,12 +1407,12 @@ export default function TaxInvoicesAndAccountingPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 3: Reconcile Escrow */}
       {reconcileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setReconcileModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1474,12 +1475,12 @@ export default function TaxInvoicesAndAccountingPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 4: Inspect UBL 2.1 XML */}
       {inspectXmlModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setInspectXmlModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1523,7 +1524,7 @@ export default function TaxInvoicesAndAccountingPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );

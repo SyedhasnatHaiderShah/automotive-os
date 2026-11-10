@@ -1,15 +1,24 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useOffCanvasNav } from '@automotive-os/ui';
 
 interface AdminSidebarProps {
   isRtl?: boolean;
 }
 
+const closeMobileNav = () => {
+  document.body.classList.remove('admin-mobile-nav-open');
+  window.dispatchEvent(new Event('admin-nav-closed'));
+};
+
 export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
   const pathname = usePathname();
+  const asideRef = useRef<HTMLElement>(null);
+  // Below lg the sidebar is a modal drawer: focus moves in and back, Tab stays inside, backdrop tap closes.
+  useOffCanvasNav(asideRef, { bodyClass: 'admin-mobile-nav-open', onClose: closeMobileNav });
   useEffect(() => {
     const close = () => { document.body.classList.remove('admin-mobile-nav-open'); window.dispatchEvent(new Event('admin-nav-closed')); };
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') close(); };
@@ -29,6 +38,9 @@ export function AdminSidebar({ isRtl = false }: AdminSidebarProps) {
 
   return (
     <aside
+      ref={asideRef}
+      id="admin-app-sidebar"
+      aria-label={isRtl ? 'التنقل في لوحة الإدارة' : 'Admin navigation'}
       className={`admin-app-sidebar fixed ${
         isRtl ? 'right-0' : 'left-0'
       } top-0 h-full w-60 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.60)] z-50 flex flex-col justify-between`}

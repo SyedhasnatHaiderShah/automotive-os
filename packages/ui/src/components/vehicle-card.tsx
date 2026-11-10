@@ -71,7 +71,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
     >
       {/* Image Container with Badge Overlays */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-container-low">
-        <a href={linkHref} className="block w-full h-full focus:outline-none">
+        <a href={linkHref} className="block w-full h-full focus-visible:-outline-offset-2">
           {imageFailed ? (
             <div role="img" aria-label={`Image unavailable for ${title}`} className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-surface-container-high to-surface-container-lowest text-on-surface-variant">
               <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">

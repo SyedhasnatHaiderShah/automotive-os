@@ -26,3 +26,15 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/*
+ * Keyboard focus is always visible (WCAG 2.4.7). Applies to every control that
+ * does not already draw its own ring, including ones that reset the outline with
+ * `focus:outline-none`. Programmatic focus targets (tabindex="-1") are excluded.
+ * `:where()` keeps specificity low so an `outline-offset` utility can still move it
+ * (for example inside a clipped card).
+ */
+:focus-visible:where(:not([tabindex='-1'], [class*='focus:ring-'], [class*='focus-visible:ring-'])) {
+  outline: 2px solid theme('colors.primary') !important;
+  outline-offset: 2px;
+}

@@ -8,6 +8,7 @@ import {
   VERIFIED_WORKSHOP_FIXTURE,
   WorkshopJobCardData,
 } from '../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function WorkshopAndBaysPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -942,7 +943,7 @@ export default function WorkshopAndBaysPage() {
 
       {/* Create Repair Order Modal */}
       {newRoModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <ModalOverlay onClose={() => setNewRoModalOpen(false)} className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl bg-surface-container p-space-lg shadow-2xl border border-white/[0.08] flex flex-col gap-space-md">
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
               <div className="flex items-center gap-space-xs">
@@ -1033,12 +1034,12 @@ export default function WorkshopAndBaysPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Order Parts Modal */}
       {orderPartsModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <ModalOverlay onClose={() => setOrderPartsModalOpen(false)} className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl bg-surface-container p-space-lg shadow-2xl border border-white/[0.08] flex flex-col gap-space-md">
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
               <div className="flex items-center gap-space-xs text-secondary">
@@ -1086,12 +1087,12 @@ export default function WorkshopAndBaysPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Tasjeel Pass Sheet Modal */}
       {tasjeelModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <ModalOverlay onClose={() => setTasjeelModalOpen(false)} className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl bg-surface-container p-space-lg shadow-2xl border border-white/[0.08] flex flex-col gap-space-md">
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
               <div className="flex items-center gap-space-xs text-primary">
@@ -1139,12 +1140,12 @@ export default function WorkshopAndBaysPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Clock Out & Complete Modal */}
       {clockOutModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <ModalOverlay onClose={() => setClockOutModalOpen(false)} className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl bg-surface-container p-space-lg shadow-2xl border border-tertiary/40 flex flex-col gap-space-md">
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
               <div className="flex items-center gap-space-xs text-tertiary">
@@ -1189,7 +1190,7 @@ export default function WorkshopAndBaysPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );

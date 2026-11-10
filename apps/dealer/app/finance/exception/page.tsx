@@ -10,6 +10,7 @@ import {
   SubprimeDbrExceptionData,
   VERIFIED_SUBPRIME_DBR_EXCEPTION_FIXTURE,
 } from '../../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function SubprimeDbrExceptionPage() {
   const [data, setData] = useState<SubprimeDbrExceptionData>(VERIFIED_SUBPRIME_DBR_EXCEPTION_FIXTURE);
@@ -1272,7 +1273,7 @@ export default function SubprimeDbrExceptionPage() {
 
       {/* 1. CRO ESCALATION MODAL */}
       {croModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setCroModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1384,12 +1385,12 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             )}
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 2. ATTACH CO-SIGNER / SOVEREIGN WEALTH GUARANTOR MODAL */}
       {guarantorModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setGuarantorModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1480,12 +1481,12 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 3. STRUCTURE 30% DOWN CONFIRMATION MODAL */}
       {structureModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setStructureModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1557,12 +1558,12 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 4. SIMULATE FINANCING TERMS MODAL */}
       {simulateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setSimModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1667,12 +1668,12 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 5. RATE SHEET MATRIX MODAL */}
       {rateSheetModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setRateSheetModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1752,12 +1753,12 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 6. EXPORT COMPLIANCE LOG MODAL */}
       {exportLogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setExportLogModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1823,12 +1824,12 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 7. SUBMIT DOSSIER MODAL */}
       {submitDossierModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setSubmitDossierModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1894,12 +1895,12 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 8. DECLINE / BOUNDS DETAIL MODAL */}
       {selectedOfferModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setSelectedOfferModal(null)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <h3 className="font-headline-sm text-headline-sm font-bold text-on-surface">
@@ -1950,7 +1951,7 @@ export default function SubprimeDbrExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );

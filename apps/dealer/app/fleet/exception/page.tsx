@@ -10,6 +10,7 @@ import {
   CustodyFreezePageData,
   VERIFIED_CUSTODY_FREEZE_FIXTURE,
 } from '../../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function CustodyFreezeExceptionPage() {
   const [data, setData] = useState<CustodyFreezePageData>(VERIFIED_CUSTODY_FREEZE_FIXTURE);
@@ -1090,7 +1091,7 @@ export default function CustodyFreezeExceptionPage() {
 
       {/* 1. INTERPLEADER MOTION MODAL */}
       {interpleaderModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setInterpleaderModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1187,12 +1188,12 @@ export default function CustodyFreezeExceptionPage() {
               </div>
             )}
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 2. COURT INJUNCTION ORDER MODAL */}
       {courtOrderModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setCourtOrderModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1263,12 +1264,12 @@ export default function CustodyFreezeExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 3. QUARANTINE BAILMENT LOG MODAL */}
       {quarantineLogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setQuarantineLogModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1323,12 +1324,12 @@ export default function CustodyFreezeExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 4. CONTACT CONSIGNOR LEGAL COUNSEL MODAL */}
       {counselModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setCounselModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1389,12 +1390,12 @@ export default function CustodyFreezeExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 5. RTA IMPOUND IMMUNITY PETITION MODAL */}
       {immunityModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setImmunityModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
@@ -1446,12 +1447,12 @@ export default function CustodyFreezeExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* 6. ESCROW BOND CERTIFICATE MODAL */}
       {escrowCertModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setEscrowCertModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-surface-container-high border border-outline-variant rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <h3 className="font-headline-sm text-headline-sm font-bold text-on-surface">
@@ -1497,7 +1498,7 @@ export default function CustodyFreezeExceptionPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );

@@ -33,7 +33,7 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
       <div className="h-20 max-w-[1440px] mx-auto px-4 md:px-8 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Brand Identity & Location Dropdown */}
         <div className="flex items-center gap-3 lg:gap-6 min-w-0">
-          <a href="/" className="flex items-center gap-2 sm:gap-3 focus:outline-none min-w-0">
+          <a href="/" className="flex items-center gap-2 sm:gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary min-w-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center font-bold text-on-primary text-sm shadow-md">
               AO
             </div>
@@ -73,7 +73,7 @@ export const MarketplaceHeader: React.FC<MarketplaceHeaderProps> = ({
             <select
               value={selectedEmirate}
               onChange={(e) => onEmirateChange?.(e.target.value)}
-              className="bg-transparent text-xs text-on-surface font-body-sm focus:outline-none cursor-pointer pr-2"
+              className="bg-transparent text-xs text-on-surface font-body-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer pr-2"
               aria-label="Filter by UAE Emirate"
             >
               <option value="All Emirates" className="bg-surface-container-low text-on-surface">
