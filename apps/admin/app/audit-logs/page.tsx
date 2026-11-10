@@ -197,7 +197,7 @@ export default function AdminAuditLogsPage() {
                             onClick={() => setExpandedId(isExpanded ? null : l.id)}
                             className="hover:bg-surface-container-high/40 transition-colors cursor-pointer"
                           >
-                            <td className="py-3 px-4 text-gray-500">
+                            <td className="py-3 px-4 text-gray-400">
                               {/* AD-11: the row click stays for mouse users; this button is the
                                   keyboard/screen-reader control. */}
                               <button

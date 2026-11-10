@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMarketplaceLocale } from '../lib/locale';
 import { usePathname, useRouter } from 'next/navigation';
-import { MarketplaceHeader, MarketplaceFooter } from '@automotive-os/ui';
+import { MarketplaceHeader, MarketplaceFooter, MediaImage } from '@automotive-os/ui';
 import { PublicListingDetail, addFavoriteApi, fetchFavorites, removeFavoriteApi } from '../lib/api';
 import { BuyerAuthRequiredError } from '../lib/buyer-api-client';
 import dynamic from 'next/dynamic';
@@ -157,15 +157,15 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
         <div className="w-full bg-surface-container-lowest/80 backdrop-blur-md border-b border-white/[0.05]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
             <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-body-sm text-outline flex-wrap">
-              <a href="/cars" className="hover:text-primary transition-colors">
+              <a href="/cars" className="inline-flex min-h-6 items-center hover:text-primary transition-colors">
                 {isArabic ? 'المعرض' : 'Marketplace'}
               </a>
               <span className="text-outline-variant">/</span>
-              <a href={`/cars?emirate=${encodeURIComponent(vehicle.emirate)}`} className="hover:text-primary transition-colors">
+              <a href={`/cars?emirate=${encodeURIComponent(vehicle.emirate)}`} className="inline-flex min-h-6 items-center hover:text-primary transition-colors">
                 {vehicle.emirate}
               </a>
               <span className="text-outline-variant">/</span>
-              <a href={`/cars?make=${encodeURIComponent(vehicle.makeName)}`} className="hover:text-primary transition-colors">
+              <a href={`/cars?make=${encodeURIComponent(vehicle.makeName)}`} className="inline-flex min-h-6 items-center hover:text-primary transition-colors">
                 {vehicle.makeName}
               </a>
               <span className="text-outline-variant">/</span>
@@ -276,8 +276,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
             <div className="lg:col-span-9 flex flex-col gap-2.5">
               <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-surface-container-lowest group shadow-2xl border border-white/[0.06] flex items-center justify-center">
                 {currentMedia ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <MediaImage
                     src={currentMedia.url}
                     alt={currentMedia.altText || vehicle.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
@@ -329,8 +328,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                       }`}
                       aria-label={`View photo ${idx + 1}`}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={item.url} alt={item.altText || `Photo ${idx + 1}`} className="w-full h-full object-cover" />
+                      <MediaImage src={item.url} alt={item.altText || `Photo ${idx + 1}`} className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -417,7 +415,7 @@ export const VehicleDetailView: React.FC<VehicleDetailViewProps> = ({
                     </span>
                   </div>
                 </div>
-                <a href={`/dealers/${vehicle.seller.slug}`} className="text-primary hover:underline font-medium text-xs self-end">
+                <a href={`/dealers/${vehicle.seller.slug}`} className="inline-flex min-h-6 items-center text-primary hover:underline font-medium text-xs self-end">
                   {isArabic ? 'عرض المعرض' : 'View showroom'}
                 </a>
               </div>

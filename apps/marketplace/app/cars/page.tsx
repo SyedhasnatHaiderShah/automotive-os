@@ -296,7 +296,7 @@ export default function SearchResultsPage() {
             </div>
 
             {/* Sorting & Mobile Filter Toggle */}
-            <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(true)}

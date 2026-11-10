@@ -16,6 +16,7 @@ import {
   getAdminListing,
   submitListingDecision,
 } from '../../../../lib/api';
+import { MediaImage } from '@automotive-os/ui';
 
 /**
  * Listing moderation review.
@@ -266,8 +267,7 @@ export default function ListingModerationPage() {
                                 {isRtl ? 'فتح الملف (رابط مؤقت)' : 'Open file (temporary link)'}
                               </a>
                             ) : url ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={url} alt={m.altText || `${vehicleName} media ${idx + 1}`} className="w-full aspect-[4/3] object-cover" />
+                              <MediaImage src={url} alt={m.altText || `${vehicleName} media ${idx + 1}`} className="w-full aspect-[4/3] object-cover" />
                             ) : (
                               <div className="w-full aspect-[4/3] flex items-center justify-center text-center p-2 text-[11px] text-outline">
                                 {m.isPublic

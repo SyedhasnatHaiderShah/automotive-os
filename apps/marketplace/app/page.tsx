@@ -395,7 +395,7 @@ export default function MarketplaceHomePage() {
                 </h2>
               </div>
               <a
-                className="inline-flex items-center gap-2 text-primary hover:text-primary-container transition-colors font-body-md text-sm font-semibold"
+                className="inline-flex min-h-6 items-center gap-2 text-primary hover:text-primary-container transition-colors font-body-md text-sm font-semibold"
                 href="/dealers"
               >
                 <span>{isArabic ? `عرض كافة الصالات المعتمدة (${dealersTotal})` : `View All ${dealersTotal} Verified Showrooms`}</span>
@@ -472,7 +472,7 @@ export default function MarketplaceHomePage() {
 
             <a
               href="/cars"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-container transition-colors"
+              className="inline-flex min-h-6 items-center gap-2 text-sm font-semibold text-primary hover:text-primary-container transition-colors"
             >
               <span>{isArabic ? 'عرض كافة السيارات' : 'View All Available Stock'} ({totalCount.toLocaleString('en-US')})</span>
               <span>→</span>

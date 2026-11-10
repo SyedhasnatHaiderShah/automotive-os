@@ -7,6 +7,7 @@ import { CalendarClock, CalendarX, Car, Loader2 } from 'lucide-react';
 import { BuyerAppointmentItem, cancelBuyerAppointment, rescheduleBuyerAppointment } from '../lib/api';
 import { BuyerAuthRequiredError } from '../lib/buyer-api-client';
 import { AccountShell, AccountCard, StatusMessage, formatDubai, useAccountLocale } from './account-shell';
+import { MediaImage } from '@automotive-os/ui';
 
 interface BuyerGarageViewProps {
   initialAppointments: BuyerAppointmentItem[];
@@ -161,8 +162,7 @@ function GarageBody({ initialAppointments }: { initialAppointments: BuyerAppoint
                   <div className="flex gap-4">
                     <div className="w-28 h-20 rounded-lg bg-[#0a0e13] overflow-hidden shrink-0 flex items-center justify-center">
                       {appt.listing?.imageUrl && !brokenImages.has(appt.id) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <MediaImage
                           src={appt.listing.imageUrl}
                           alt={appt.listing.title}
                           className="w-full h-full object-cover"

@@ -12,7 +12,7 @@ function AccessDeniedPageContent() {
   const isDisabled = reason === 'disabled';
 
   return (
-    <div className="min-h-screen bg-[#0b0f17] flex flex-col items-center justify-center p-4 text-white">
+    <main className="min-h-screen bg-[#0b0f17] flex flex-col items-center justify-center p-4 text-white">
       <div className="w-full max-w-lg bg-[#121824] border border-red-500/30 rounded-3xl p-8 sm:p-10 text-center shadow-2xl relative overflow-hidden">
         <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6 text-red-400 shadow-lg shadow-red-500/10">
           <ShieldX className="w-8 h-8" />
@@ -38,11 +38,11 @@ function AccessDeniedPageContent() {
 
         <div className="p-4 rounded-xl bg-black/40 border border-white/5 text-xs font-mono text-gray-300 text-left mb-8 space-y-2">
           <div className="flex justify-between">
-            <span className="text-gray-500">Error:</span>
+            <span className="text-gray-400">Error:</span>
             <span className="text-red-400 font-bold">{isDisabled ? 'ACCOUNT_DISABLED' : 'INSUFFICIENT_ROLE_PERMISSIONS'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-500">Security Gate:</span>
+            <span className="text-gray-400">Security Gate:</span>
             <span>Defense-in-Depth RLS & RBAC</span>
           </div>
         </div>
@@ -63,7 +63,7 @@ function AccessDeniedPageContent() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

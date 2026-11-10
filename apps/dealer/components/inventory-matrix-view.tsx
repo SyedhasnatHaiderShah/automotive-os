@@ -15,6 +15,7 @@ import { ListingActions } from './listing-actions';
 import { VehicleIntakeButton } from './vehicle-intake-button';
 import { dealerStrings, statusLabel, type DealerLocale } from '../lib/i18n';
 import { isPageOutOfRange, PageOutOfRange, Pager, StatCard, StatusPill, listingTone } from './dealer-ui';
+import { MediaImage } from '@automotive-os/ui';
 
 export interface InventoryMatrixViewProps {
   tenantId: string;
@@ -145,8 +146,7 @@ export function InventoryMatrixView({ tenantId, tenantName, capabilities, vehicl
                       <div className="flex items-center gap-3">
                         <div className="relative w-16 h-11 rounded-lg overflow-hidden shrink-0 bg-surface-container-high border border-white/[0.06] flex items-center justify-center">
                           {image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={image} alt={`${vehicle.makeName} ${vehicle.modelName}`} className="w-full h-full object-cover" />
+                            <MediaImage src={image} alt={`${vehicle.makeName} ${vehicle.modelName}`} className="w-full h-full object-cover" />
                           ) : (
                             <span className="material-symbols-outlined text-[20px] text-outline" aria-hidden="true">directions_car</span>
                           )}

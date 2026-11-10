@@ -152,7 +152,7 @@ export function DashboardCockpitView({ tenantName, capabilities, stock, leads, l
           <div className="flex items-center justify-between mb-4">
             <h2 id="recent-leads-heading" className="font-headline-md text-base text-on-surface font-semibold">{t.recentLeads}</h2>
             {leads && (
-              <Link href="/leads" className="text-xs text-primary hover:underline">
+              <Link href="/leads" className="inline-flex min-h-6 items-center text-xs text-primary hover:underline">
                 {t.viewAll}
               </Link>
             )}

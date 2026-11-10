@@ -7,6 +7,7 @@ import { Bookmark, Car, Heart, Loader2, Search, Trash2 } from 'lucide-react';
 import { FavoriteItem, SavedSearchItem, deleteSavedSearchApi, removeFavoriteApi } from '../lib/api';
 import { BuyerAuthRequiredError } from '../lib/buyer-api-client';
 import { AccountShell, AccountCard, StatusMessage, formatDubai, useAccountLocale } from './account-shell';
+import { MediaImage } from '@automotive-os/ui';
 
 interface BuyerSavedViewProps {
   initialSearches: SavedSearchItem[];
@@ -113,8 +114,7 @@ function SavedBody({ initialSearches, initialFavorites }: Omit<BuyerSavedViewPro
                   <AccountCard className="p-0 overflow-hidden flex flex-col h-full">
                     <div className="aspect-[16/10] bg-[#0a0e13] flex items-center justify-center">
                       {fav.thumbnailUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={fav.thumbnailUrl} alt={fav.title} className="w-full h-full object-cover" />
+                        <MediaImage src={fav.thumbnailUrl} alt={fav.title} className="w-full h-full object-cover" />
                       ) : (
                         <Car className="w-10 h-10 text-[#4d4635]" aria-hidden="true" />
                       )}

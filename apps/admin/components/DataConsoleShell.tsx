@@ -40,7 +40,7 @@ export function DataConsoleShell({
               <React.Fragment key={`${c.label}-${i}`}>
                 {i > 0 && <span aria-hidden="true">/</span>}
                 {c.href ? (
-                  <Link href={c.href} className="hover:text-primary">
+                  <Link href={c.href} className="inline-flex min-h-6 items-center hover:text-primary">
                     {c.label}
                   </Link>
                 ) : (

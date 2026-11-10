@@ -13,7 +13,7 @@ function AccessSuspendedPageContent() {
   const isTenantSuspended = searchParams.get('reason') === 'tenant_suspended';
 
   return (
-    <div className="min-h-screen bg-[#0b0f17] flex flex-col items-center justify-center p-4 text-white">
+    <main className="min-h-screen bg-[#0b0f17] flex flex-col items-center justify-center p-4 text-white">
       <div className="w-full max-w-lg bg-[#121824] border border-amber-500/30 rounded-3xl p-8 sm:p-10 text-center shadow-2xl relative overflow-hidden">
         <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto mb-6 text-amber-400 shadow-lg shadow-amber-500/10">
           {isTenantSuspended ? (
@@ -43,12 +43,12 @@ function AccessSuspendedPageContent() {
 
         <div className="p-4 rounded-xl bg-black/40 border border-white/5 text-xs font-mono text-gray-300 text-left mb-8 space-y-2">
           <div className="flex justify-between">
-            <span className="text-gray-500">Status Code:</span>
+            <span className="text-gray-400">Status Code:</span>
             <span className="text-amber-400 font-bold">{isTenantSuspended ? 'TENANT_INACTIVE' : 'ACCOUNT_SUSPENDED'}</span>
           </div>
           {SUPPORT_EMAIL && (
             <div className="flex justify-between gap-3">
-              <span className="text-gray-500">Support Inquiries:</span>
+              <span className="text-gray-400">Support Inquiries:</span>
               <span className="text-gray-300 break-all">{SUPPORT_EMAIL}</span>
             </div>
           )}
@@ -73,7 +73,7 @@ function AccessSuspendedPageContent() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

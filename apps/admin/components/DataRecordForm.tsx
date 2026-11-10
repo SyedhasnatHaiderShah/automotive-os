@@ -144,7 +144,7 @@ function FieldInput({
       <div className="flex flex-col gap-1.5">
         {label}
         <label className="inline-flex items-center gap-2 text-sm">
-          <input id={id} type="checkbox" checked={value === true} disabled={disabled} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 accent-[#d4af37]" />
+          <input id={id} type="checkbox" checked={value === true} disabled={disabled} onChange={(e) => onChange(e.target.checked)} className="h-6 w-6 accent-[#d4af37]" />
           <span>{value === true ? 'true' : 'false'}</span>
         </label>
       </div>

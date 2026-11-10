@@ -210,32 +210,33 @@ function UnifiedAuthPageContent() {
     >
       {/* Top Navigation */}
       <header className="fixed top-0 w-full z-50 bg-[#0b0f17]/90 backdrop-blur-xl border-b border-white/10 shadow-2xl">
-        <div className="h-20 max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#d4af37] to-[#997d25] flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-[#d4af37]/20 group-hover:scale-105 transition-transform">
+        <div className="h-20 max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+          <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3 group">
+            <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-[#d4af37] to-[#997d25] flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-[#d4af37]/20 group-hover:scale-105 transition-transform">
               <Shield className="w-5 h-5 text-black fill-current" />
             </div>
-            <div>
-              <span className="font-heading font-extrabold text-lg lg:text-xl tracking-tight text-white block">
+            <div className="min-w-0">
+              <span className="font-heading font-extrabold text-base sm:text-lg lg:text-xl tracking-tight text-white block whitespace-nowrap">
                 AUTOMOTIVE<span className="text-[#d4af37]">OS</span>
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-gray-400 block -mt-1 font-mono">
+              {/* The tagline is dropped on phones, where the header has no room for it. */}
+              <span className="hidden sm:block text-[10px] uppercase tracking-widest text-gray-400 -mt-1 font-mono whitespace-nowrap">
                 UAE Unified Gateway
               </span>
             </div>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <button
               onClick={() => setLocale(isArabic ? 'en' : 'ar')}
-              className="px-3 py-1.5 rounded-lg border border-white/10 hover:border-[#d4af37]/40 text-xs font-mono text-gray-300 flex items-center gap-1.5 transition-colors"
+              className="px-2 sm:px-3 py-1.5 rounded-lg border border-white/10 hover:border-[#d4af37]/40 text-xs font-mono text-gray-300 flex items-center gap-1.5 whitespace-nowrap transition-colors"
             >
               <Globe className="w-3.5 h-3.5 text-[#d4af37]" />
               <span>{isArabic ? 'English' : 'العربية'}</span>
             </button>
             <Link
               href="/"
-              className="px-4 py-2 text-xs font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+              className="px-2 sm:px-4 py-2 text-xs font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 whitespace-nowrap transition-colors"
             >
               {isArabic ? 'العودة للسوق' : 'Browse Cars'}
             </Link>
@@ -344,7 +345,7 @@ function UnifiedAuthPageContent() {
                       </label>
                       <Link
                         href="/auth/forgot-password"
-                        className="text-xs text-[#d4af37] hover:underline"
+                        className="inline-flex min-h-6 items-center text-xs text-[#d4af37] hover:underline"
                       >
                         {isArabic ? 'نسيت الرمز؟' : 'Forgot passcode?'}
                       </Link>
@@ -363,7 +364,7 @@ function UnifiedAuthPageContent() {
                       <button
                         type="button"
                         onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                        className="absolute end-1 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-white"
                         aria-label={showLoginPassword ? (isArabic ? 'إخفاء كلمة المرور' : 'Hide password') : (isArabic ? 'إظهار كلمة المرور' : 'Show password')}
                         aria-pressed={showLoginPassword}
                       >
@@ -531,7 +532,7 @@ function UnifiedAuthPageContent() {
                       <button
                         type="button"
                         onClick={() => setShowRegPassword(!showRegPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                        className="absolute end-1 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-white"
                         aria-label={showRegPassword ? (isArabic ? 'إخفاء كلمة المرور' : 'Hide password') : (isArabic ? 'إظهار كلمة المرور' : 'Show password')}
                         aria-pressed={showRegPassword}
                       >
@@ -541,19 +542,19 @@ function UnifiedAuthPageContent() {
 
                     {/* Password Strength Checklist */}
                     <div className="mt-2.5 p-3 rounded-xl bg-black/30 border border-white/5 text-[11px] grid grid-cols-2 gap-1.5 font-mono">
-                      <div className={`flex items-center gap-1.5 ${hasMinLength ? 'text-emerald-400' : 'text-gray-500'}`}>
+                      <div className={`flex items-center gap-1.5 ${hasMinLength ? 'text-emerald-400' : 'text-gray-400'}`}>
                         {hasMinLength ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
                         <span>10+ Characters</span>
                       </div>
-                      <div className={`flex items-center gap-1.5 ${hasUpper ? 'text-emerald-400' : 'text-gray-500'}`}>
+                      <div className={`flex items-center gap-1.5 ${hasUpper ? 'text-emerald-400' : 'text-gray-400'}`}>
                         {hasUpper ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
                         <span>Uppercase Letter</span>
                       </div>
-                      <div className={`flex items-center gap-1.5 ${hasLower ? 'text-emerald-400' : 'text-gray-500'}`}>
+                      <div className={`flex items-center gap-1.5 ${hasLower ? 'text-emerald-400' : 'text-gray-400'}`}>
                         {hasLower ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
                         <span>Lowercase Letter</span>
                       </div>
-                      <div className={`flex items-center gap-1.5 ${hasNumber && hasSpecial ? 'text-emerald-400' : 'text-gray-500'}`}>
+                      <div className={`flex items-center gap-1.5 ${hasNumber && hasSpecial ? 'text-emerald-400' : 'text-gray-400'}`}>
                         {hasNumber && hasSpecial ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
                         <span>Number & Special Symbol</span>
                       </div>
@@ -613,7 +614,7 @@ function UnifiedAuthPageContent() {
                   <button
                     type="button"
                     onClick={() => setActiveTab('login')}
-                    className="text-[#d4af37] hover:underline font-semibold"
+                    className="inline-flex min-h-6 items-center text-[#d4af37] hover:underline font-semibold"
                   >
                     {isArabic ? 'سجل الدخول هنا' : 'Sign In here'}
                   </button>
@@ -625,7 +626,7 @@ function UnifiedAuthPageContent() {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 border-t border-white/5 bg-[#0b0f17] text-center text-xs text-gray-500 font-mono">
+      <footer className="py-6 border-t border-white/5 bg-[#0b0f17] text-center text-xs text-gray-400 font-mono">
         <p>© 2026 Automotive OS — UAE Dealership SaaS & Verified Marketplace. All rights reserved.</p>
       </footer>
     </div>

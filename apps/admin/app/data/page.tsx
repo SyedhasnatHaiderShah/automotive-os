@@ -54,7 +54,7 @@ export default function DataConsoleIndexPage() {
           {error}
         </div>
       )}
-      <div className="rounded-xl border border-white/10 bg-surface-container-low overflow-hidden">
+      <div className="relative rounded-xl border border-white/10 bg-surface-container-low overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-surface-container-lowest text-[11px] uppercase tracking-wider text-outline">
             <tr>
@@ -78,7 +78,7 @@ export default function DataConsoleIndexPage() {
               models.map((m) => (
                 <tr key={m.name} className="border-t border-white/[0.06] hover:bg-surface-container-high/60">
                   <td className="py-2.5 px-4 font-semibold text-white">
-                    <Link href={`/data/${m.name}`} className="hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
+                    <Link href={`/data/${m.name}`} className="inline-flex min-h-6 items-center hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
                       {m.name}
                     </Link>
                   </td>
@@ -88,7 +88,7 @@ export default function DataConsoleIndexPage() {
                   <td className="py-2.5 px-4 text-end">
                     <Link
                       href={`/data/${m.name}`}
-                      className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
+                      className="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs"
                     >
                       {t('Browse', 'استعراض')}
                     </Link>

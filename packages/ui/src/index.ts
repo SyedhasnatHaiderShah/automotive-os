@@ -4,6 +4,7 @@ export * from './components/button';
 export * from './components/badge';
 export * from './components/card';
 export * from './components/vehicle-card';
+export * from './components/media-image';
 export * from './components/header';
 export * from './components/footer';
 export * from './components/empty-state';

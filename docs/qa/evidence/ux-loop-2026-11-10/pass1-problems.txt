@@ -1,0 +1,63 @@
+anon /cars/2026-chevrolet-tahoe-dubai-frm43 | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken cles/falcon-ridge-motors/frm-2026-0043/photo-1.jpg | broken cles/falcon-ridge-motors/frm-2026-0043/photo-1.jpg | broken cles/falcon-ridge-motors/frm-2026-0043/photo-2.jpg
+anon /cars/2026-chevrolet-tahoe-dubai-frm43/enquire | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+anon /cars/2026-chevrolet-tahoe-dubai-frm43/enquire | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken cles/falcon-ridge-motors/frm-2026-0043/photo-1.jpg
+anon /cars/2026-chevrolet-tahoe-dubai-frm43/enquiry | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+anon /cars/2026-chevrolet-tahoe-dubai-frm43/enquiry | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken cles/falcon-ridge-motors/frm-2026-0043/photo-1.jpg
+anon /dealers/al-futtaim-prestige | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken 1/public/media/vehicles/dealer_a/lc_exterior_1.jpg
+anon /auth | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.97:1 rgb(107, 114, 128) on rgb(11,15,23) p "© 2026 Automotive OS — UAE Dealership Sa"
+anon /auth/login | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.97:1 rgb(107, 114, 128) on rgb(11,15,23) p "© 2026 Automotive OS — UAE Dealership Sa"
+anon /auth/register | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.97:1 rgb(107, 114, 128) on rgb(11,15,23) p "© 2026 Automotive OS — UAE Dealership Sa"
+anon /auth/verify-email | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=1
+anon /auth/activate | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=1
+anon /access-denied | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=1
+anon /access-denied | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.98:1 rgb(107, 114, 128) on rgb(11,14,22) span.text-gray-500 "Error:"
+anon /access-suspended | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=1
+anon /access-suspended | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.98:1 rgb(107, 114, 128) on rgb(11,14,22) span.text-gray-500 "Status Code:"
+anon /account/garage | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.97:1 rgb(107, 114, 128) on rgb(11,15,23) p "© 2026 Automotive OS — UAE Dealership Sa"
+anon /dashboard | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.97:1 rgb(107, 114, 128) on rgb(11,15,23) p "© 2026 Automotive OS — UAE Dealership Sa"
+anon /dealer | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.97:1 rgb(107, 114, 128) on rgb(11,15,23) p "© 2026 Automotive OS — UAE Dealership Sa"
+anon /admin | contrast | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 3.97:1 rgb(107, 114, 128) on rgb(11,15,23) p "© 2026 Automotive OS — UAE Dealership Sa"
+buyer /account/garage | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken es/fujairah-harbour-cars/fhc-2025-0003/photo-1.jpg | broken cles/falcon-ridge-motors/frm-2016-0109/photo-1.jpg | broken cles/falcon-ridge-motors/frm-2016-0109/photo-1.jpg
+buyer /account/saved | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken cles/falcon-ridge-motors/frm-2025-0160/photo-1.jpg | broken /corniche-prestige-autos/cpa-2024-0052/photo-1.jpg | broken cles/falcon-ridge-motors/frm-2024-0049/photo-1.jpg
+dealer /dealer/inventory | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken cles/falcon-ridge-motors/frm-2018-0114/photo-1.jpg | broken cles/falcon-ridge-motors/frm-2020-0062/photo-1.jpg
+dealer /dealer/inventory?intake=1 | imagesAlt | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | broken cles/falcon-ridge-motors/frm-2018-0114/photo-1.jpg | broken cles/falcon-ridge-motors/frm-2020-0062/photo-1.jpg
+dealer /dealer/sales | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/workshop | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/parts | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/finance | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/finance/exception | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/accounting | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/accounting/exception/export | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/fleet | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+dealer /dealer/fleet/exception | landmarks | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | main=0 h1=0
+admin /admin/data/User | noOverflow | 6x (desktop/en tablet/en mobile/en desktop/ar tablet/ar mobile/ar) | 240px
+anon / | tapTargets | 2x (mobile/en mobile/ar) | a.inline-flex.items-center.gap-2 "View All 17 Verified Showrooms" 237x20 | a.inline-flex.items-center.gap-2 "View All Available Stock (245) →" 343x20
+anon /cars | noOverflow | 2x (mobile/en mobile/ar) | 45px
+anon /compare | tapTargets | 2x (mobile/en mobile/ar) | a.hover:text-primary.transition-colors "Home" 29x16 | a.hover:text-primary.transition-colors "Inventory" 65x16
+anon /cars/2026-chevrolet-tahoe-dubai-frm43 | tapTargets | 2x (mobile/en mobile/ar) | a.hover:text-primary.transition-colors "Marketplace" 70x16 | a.hover:text-primary.transition-colors "Dubai" 33x16 | a.hover:text-primary.transition-colors "Chevrolet" 55x16 | a.text-primary.hover:underline.font-medium "View showroom" 92x16
+anon /dealers/al-futtaim-prestige | tapTargets | 2x (mobile/en mobile/ar) | a.hover:text-white.transition-colors "Dealers" 39x16
+anon /auth | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-[#d4af37].hover:underline "Forgot passcode?" 101x16 | button.absolute.right-3.top-1/2 "Show password" 16x16
+anon /auth/login | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-[#d4af37].hover:underline "Forgot passcode?" 101x16 | button.absolute.right-3.top-1/2 "Show password" 16x16
+anon /auth/register | tapTargets | 2x (mobile/en mobile/ar) | button.absolute.right-3.top-1/2 "Show password" 16x16 | button.text-[#d4af37].hover:underline.font-semibold "Sign In here" 69x16
+anon /auth/verify-email | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-[#d4af37].hover:underline "Return to Login" 86x15
+anon /account/garage | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-[#d4af37].hover:underline "Forgot passcode?" 101x16 | button.absolute.right-3.top-1/2 "Show password" 16x16
+anon /dashboard | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-[#d4af37].hover:underline "Forgot passcode?" 101x16 | button.absolute.right-3.top-1/2 "Show password" 16x16
+anon /dealer | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-[#d4af37].hover:underline "Forgot passcode?" 101x16 | button.absolute.right-3.top-1/2 "Show password" 16x16
+anon /admin | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-[#d4af37].hover:underline "Forgot passcode?" 101x16 | button.absolute.right-3.top-1/2 "Show password" 16x16
+buyer /account/enquiries | tapTargets | 2x (mobile/en mobile/ar) | a.inline-block.mt-4.text-xs "Manage appointments" 126x16
+dealer /dealer | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-primary.hover:underline "View all" 44x16
+dealer /dealer/dashboard | tapTargets | 2x (mobile/en mobile/ar) | a.text-xs.text-primary.hover:underline "View all" 44x16
+admin /admin | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/users | noOverflow | 2x (mobile/en mobile/ar) | 84px
+admin /admin/users | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/dealers | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/verifications | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/moderation | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/disputes | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/audit-logs | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/data | noOverflow | 2x (mobile/en mobile/ar) | 192px
+admin /admin/data | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18 | a.hover:text-primary.focus:outline-none.focus-visible:ring-2 "User" 32x17 | a.px-2.5.py-1.rounded "Browse" 62x23
+admin /admin/verifications/dfa9c31d-b9e3-4f8c-a349-27dcc2d8adf0 | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18
+admin /admin/data/User | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18 | a.hover:text-primary "Data" 29x16 | button.hover:text-primary.focus:outline-none.focus-visible:ring-2 "id" 11x20
+admin /admin/data/User/new | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18 | a.hover:text-primary "Data" 29x16 | a.hover:text-primary "User" 29x16
+admin /admin/data/User/f8464c93-088b-4b94-8714-77164538b221 | tapTargets | 2x (mobile/en mobile/ar) | button.px-2.py-0.5.rounded "EN" 33x18 | button.px-2.py-0.5.rounded "عربي" 36x18 | a.hover:text-primary "Data" 29x16 | a.hover:text-primary "User" 29x16

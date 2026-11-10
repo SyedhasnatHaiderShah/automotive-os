@@ -209,7 +209,7 @@ function VerifyEmailContent() {
           </form>
 
           <div className="mt-4 text-center">
-            <Link href="/auth?tab=login" className="text-xs text-[#d4af37] hover:underline">
+            <Link href="/auth?tab=login" className="inline-flex min-h-6 items-center text-xs text-[#d4af37] hover:underline">
               Return to Login
             </Link>
           </div>
@@ -221,7 +221,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <div className="min-h-screen bg-[#070707] flex flex-col justify-center items-center p-4">
+    <main className="min-h-screen bg-[#070707] flex flex-col justify-center items-center p-4">
       <Suspense
         fallback={
           <div className="w-full max-w-md bg-stone-900/80 backdrop-blur-xl border border-stone-800 rounded-2xl p-8 text-center text-stone-400">
@@ -231,6 +231,6 @@ export default function VerifyEmailPage() {
       >
         <VerifyEmailContent />
       </Suspense>
-    </div>
+    </main>
   );
 }
