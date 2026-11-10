@@ -8,3 +8,7 @@ export * from './components/header';
 export * from './components/footer';
 export * from './components/empty-state';
 export * from './components/loading-skeleton';
+export * from './components/modal-overlay';
+export * from './a11y/focus-trap';
+export * from './a11y/use-modal-focus';
+export * from './a11y/use-off-canvas-nav';

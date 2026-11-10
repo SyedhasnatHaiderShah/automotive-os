@@ -5,6 +5,7 @@ import { AdminSidebar } from '../../components/AdminSidebar';
 import { AdminHeader } from '../../components/AdminHeader';
 import { useLocale } from '../../lib/locale';
 import { ConfirmReasonModal } from '../../components/ConfirmReasonModal';
+import { useModalFocus } from '@automotive-os/ui';
 import {
   Search,
   Shield,
@@ -58,6 +59,8 @@ export default function AdminUsersPage() {
   const [total, setTotal] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
+  // Identity drawer: initial focus, Tab containment, Escape, scroll lock and focus return.
+  const drawerRef = useModalFocus<HTMLDivElement>(selectedUser !== null, { onClose: () => setSelectedUser(null) });
   const [currentAdminId, setCurrentAdminId] = useState<string | null>(null);
   // AD-02: mutations stay hidden until the signed-in admin id is known, so the
   // self-action guard cannot fail open when /auth/me errors.
@@ -462,8 +465,10 @@ export default function AdminUsersPage() {
       {selectedUser && (
         <div className="fixed inset-0 z-[100] flex justify-end bg-black/60 backdrop-blur-sm">
           <div
+            ref={drawerRef}
             role="dialog"
             aria-modal="true"
+            tabIndex={-1}
             aria-label={t('Identity dossier', 'ملف الهوية')}
             dir={isRtl ? 'rtl' : 'ltr'}
             className="w-full max-w-md bg-[#121824] border-l border-white/10 h-full p-6 flex flex-col justify-between overflow-y-auto"

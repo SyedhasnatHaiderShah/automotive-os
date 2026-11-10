@@ -7,6 +7,7 @@ import {
   MarketplaceFooter,
   Button,
   Badge,
+  useModalFocus,
 } from '@automotive-os/ui';
 import {
   fetchPublicListings,
@@ -28,6 +29,8 @@ export default function VehicleComparisonPage() {
   const [pickerQuery, setPickerQuery] = useState('');
 
   const isArabic = locale === 'ar';
+  // Picker dialog: initial focus, Tab containment, Escape, scroll lock and focus return.
+  const pickerRef = useModalFocus<HTMLDivElement>(addModalOpen, { onClose: () => setAddModalOpen(false) });
 
   useEffect(() => {
     let cancelled = false;
@@ -501,7 +504,7 @@ export default function VehicleComparisonPage() {
 
       {/* Add Vehicle Selector Modal */}
       {addModalOpen && (
-        <div role="dialog" aria-modal="true" aria-label={isArabic ? 'اختر مركبة للمقارنة' : 'Select Vehicle to Compare'} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+        <div ref={pickerRef} role="dialog" aria-modal="true" tabIndex={-1} aria-label={isArabic ? 'اختر مركبة للمقارنة' : 'Select Vehicle to Compare'} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-xl max-h-[80vh] bg-surface-container p-6 rounded-2xl border border-outline-variant/40 shadow-2xl flex flex-col gap-4 overflow-hidden">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/30">
               <h3 className="font-headline-sm text-lg font-bold text-on-surface">

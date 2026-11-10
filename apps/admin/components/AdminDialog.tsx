@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+import React from 'react';
+import { useModalFocus } from '@automotive-os/ui';
 
 export interface AdminDialogProps {
   open: boolean;
@@ -23,10 +21,11 @@ export interface AdminDialogProps {
 
 /**
  * Accessible modal dialog shell: role="dialog" + aria-modal, Escape to close,
- * Tab/Shift+Tab focus trap, and focus returned to the opener on close.
+ * Tab/Shift+Tab focus trap, scroll lock, and focus returned to the opener on close.
  *
- * Latest `onClose`/`dismissible` are read through refs so the key handler is
- * never stale (AD-01: Escape must not close while a request is busy).
+ * Keyboard behaviour comes from the shared `useModalFocus` hook, which reads the
+ * latest `onClose`/`dismissible` through refs so the key handler is never
+ * stale (AD-01: Escape must not close while a request is busy).
  */
 export function AdminDialog({
   open,
@@ -39,62 +38,7 @@ export function AdminDialog({
   zIndexClass = 'z-[120]',
   children,
 }: AdminDialogProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
-  const onCloseRef = useRef(onClose);
-  const dismissibleRef = useRef(dismissible);
-  onCloseRef.current = onClose;
-  dismissibleRef.current = dismissible;
-
-  useEffect(() => {
-    if (!open) return;
-    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-    const focusTimer = window.setTimeout(() => {
-      const target =
-        initialFocusRef?.current ??
-        panelRef.current?.querySelector<HTMLElement>(FOCUSABLE) ??
-        panelRef.current;
-      target?.focus();
-    }, 0);
-
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (dismissibleRef.current) {
-          event.stopPropagation();
-          onCloseRef.current();
-        }
-        return;
-      }
-      if (event.key !== 'Tab' || !panelRef.current) return;
-      const nodes = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-        (el) => el.offsetParent !== null || el === document.activeElement,
-      );
-      if (nodes.length === 0) {
-        event.preventDefault();
-        panelRef.current.focus();
-        return;
-      }
-      const first = nodes[0];
-      const last = nodes[nodes.length - 1];
-      const active = document.activeElement;
-      if (event.shiftKey && (active === first || !panelRef.current.contains(active))) {
-        event.preventDefault();
-        last?.focus();
-      } else if (!event.shiftKey && (active === last || !panelRef.current.contains(active))) {
-        event.preventDefault();
-        first?.focus();
-      }
-    };
-
-    document.addEventListener('keydown', onKey);
-    return () => {
-      window.clearTimeout(focusTimer);
-      document.removeEventListener('keydown', onKey);
-      if (opener && document.contains(opener)) opener.focus();
-    };
-    // initialFocusRef is a stable ref object.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  const panelRef = useModalFocus<HTMLDivElement>(open, { onClose, dismissible, initialFocusRef });
 
   if (!open) return null;
 

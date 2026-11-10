@@ -11,6 +11,7 @@ import {
   FinanceDeskData,
   LenderOfferItem,
 } from '../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function FinanceAndInsurancePage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -1336,7 +1337,7 @@ export default function FinanceAndInsurancePage() {
 
       {/* Modal 1: Submit Bank Dossier */}
       {submitDossierModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setSubmitDossierModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1407,12 +1408,12 @@ export default function FinanceAndInsurancePage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 2: Simulate Financing Terms */}
       {simulateTermsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setSimulateTermsModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1528,12 +1529,12 @@ export default function FinanceAndInsurancePage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 3: Rate Sheet Matrix (Q4) */}
       {rateSheetModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setRateSheetModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1582,12 +1583,12 @@ export default function FinanceAndInsurancePage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 4: Export Compliance Log */}
       {complianceLogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setComplianceLogModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1638,7 +1639,7 @@ export default function FinanceAndInsurancePage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );

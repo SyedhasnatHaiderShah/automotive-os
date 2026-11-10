@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useOffCanvasNav } from '@automotive-os/ui';
 import { capabilitiesFor } from '../lib/permissions';
 import { dealerStrings, localizedRoleLabel } from '../lib/i18n';
 import { PREVIEW_MODULES_ENABLED } from '../lib/preview';
@@ -21,8 +22,16 @@ interface NavItem {
   disabledReason?: string;
 }
 
+const closeMobileNav = () => {
+  document.body.classList.remove('dealer-mobile-nav-open');
+  window.dispatchEvent(new Event('dealer-nav-closed'));
+};
+
 export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale = 'en' }) => {
   const pathname = usePathname();
+  const asideRef = useRef<HTMLElement>(null);
+  // Below lg the sidebar is a modal drawer: focus moves in and back, Tab stays inside, backdrop tap closes.
+  useOffCanvasNav(asideRef, { bodyClass: 'dealer-mobile-nav-open', onClose: closeMobileNav });
   useEffect(() => {
     const close = () => { document.body.classList.remove('dealer-mobile-nav-open'); window.dispatchEvent(new Event('dealer-nav-closed')); };
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') close(); };
@@ -98,7 +107,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
   );
 
   return (
-    <aside aria-label={isArabic ? 'التنقل في لوحة الوكالة' : 'Dealer navigation'} className="dealer-app-sidebar fixed start-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)] border-e border-white/[0.06] overflow-y-auto">
+    <aside ref={asideRef} id="dealer-app-sidebar" aria-label={isArabic ? 'التنقل في لوحة الوكالة' : 'Dealer navigation'} className="dealer-app-sidebar fixed start-0 top-0 h-screen w-64 bg-surface-container-low/95 backdrop-blur-xl z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.2)] border-e border-white/[0.06] overflow-y-auto">
       <div className="flex flex-col">
         <button type="button" className="lg:hidden absolute top-3 end-3 rounded-lg p-2 text-on-surface" aria-label={isArabic ? 'إغلاق التنقل' : 'Close dealer navigation'} onClick={() => { document.body.classList.remove("dealer-mobile-nav-open"); window.dispatchEvent(new Event("dealer-nav-closed")); }}>✕</button>
         <div className="h-16 px-4 flex items-center bg-surface-container/60 border-b border-white/[0.05]">

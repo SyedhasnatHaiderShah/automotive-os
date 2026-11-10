@@ -28,12 +28,25 @@
 }
 
 @media (max-width: 1023px) {
-  .dealer-app-sidebar { transform: translateX(-100%); transition: transform 200ms ease; width: min(18rem, 86vw); }
+  /* Closed: off-screen and `visibility: hidden`, so its links leave the tab order and the accessibility tree. */
+  .dealer-app-sidebar { transform: translateX(-100%); visibility: hidden; transition: transform 200ms ease, visibility 0s linear 200ms; width: min(18rem, 86vw); }
   [dir='rtl'] .dealer-app-sidebar { transform: translateX(100%); }
-  body.dealer-mobile-nav-open .dealer-app-sidebar { transform: translateX(0); }
+  body.dealer-mobile-nav-open .dealer-app-sidebar { transform: translateX(0); visibility: visible; transition: transform 200ms ease, visibility 0s; }
   .dealer-app-header { left: 0 !important; right: 0 !important; inset-inline: 0 !important; padding-inline: 1rem !important; }
   .dealer-app-sidebar ~ div { padding-left: 0 !important; padding-right: 0 !important; padding-inline: 0 !important; width: 100%; min-width: 0; }
   .dealer-app-sidebar ~ div main { padding-inline: 1rem !important; max-width: 100%; min-width: 0; }
   body.dealer-mobile-nav-open::before { content: ''; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 45; pointer-events: none; }
   body { overflow-x: hidden; }
+}
+
+/*
+ * Keyboard focus is always visible (WCAG 2.4.7). Applies to every control that
+ * does not already draw its own ring, including ones that reset the outline with
+ * `focus:outline-none`. Programmatic focus targets (tabindex="-1") are excluded.
+ * `:where()` keeps specificity low so an `outline-offset` utility can still move it
+ * (for example inside a clipped card).
+ */
+:focus-visible:where(:not([tabindex='-1'], [class*='focus:ring-'], [class*='focus-visible:ring-'])) {
+  outline: 2px solid theme('colors.primary') !important;
+  outline-offset: 2px;
 }

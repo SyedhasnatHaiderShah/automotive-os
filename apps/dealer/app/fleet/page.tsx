@@ -10,6 +10,7 @@ import {
   FleetAndConsignmentData,
   ConsignmentPipelineRow,
 } from '../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function FleetAndConsignmentPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -1248,7 +1249,7 @@ export default function FleetAndConsignmentPage() {
 
       {/* Modal 1: Onboard Consignment */}
       {onboardModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setOnboardModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1373,12 +1374,12 @@ export default function FleetAndConsignmentPage() {
               </div>
             </form>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 2: Create Corporate Fleet */}
       {createFleetModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setCreateFleetModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1471,12 +1472,12 @@ export default function FleetAndConsignmentPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 3: View Bailment PDF */}
       {bailmentPdfModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setBailmentPdfModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-xl rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1527,12 +1528,12 @@ export default function FleetAndConsignmentPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 4: Execute Buyer Offer */}
       {executeOfferModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setExecuteOfferModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1599,7 +1600,7 @@ export default function FleetAndConsignmentPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );

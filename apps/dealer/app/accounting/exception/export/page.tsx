@@ -10,6 +10,7 @@ import {
   ExportDiscrepancyData,
   VERIFIED_ACCOUNTING_DESK_FIXTURE,
 } from '../../../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function ExportDiscrepancyExceptionPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -1316,7 +1317,7 @@ export default function ExportDiscrepancyExceptionPage() {
 
       {/* Modal 1: Upload Certified Port of Exit Bayan */}
       {uploadBayanModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setUploadBayanModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1388,12 +1389,12 @@ export default function ExportDiscrepancyExceptionPage() {
               </div>
             </form>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 2: File FTA Article 45 Extension */}
       {extensionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setExtensionModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1449,12 +1450,12 @@ export default function ExportDiscrepancyExceptionPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 3: View ZATCA Audit Dossier */}
       {zatcaModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setZatcaModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1496,12 +1497,12 @@ export default function ExportDiscrepancyExceptionPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 4: Inspect UBL 2.1 XML */}
       {inspectXmlModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setInspectXmlModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1544,12 +1545,12 @@ export default function ExportDiscrepancyExceptionPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal 5: View Escrow Deed */}
       {escrowDeedModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <ModalOverlay onClose={() => setEscrowDeedModalOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-surface-container-low border border-white/[0.08] shadow-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
@@ -1585,7 +1586,7 @@ export default function ExportDiscrepancyExceptionPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );

@@ -10,6 +10,7 @@ import {
   BuyerMe,
 } from '../lib/api';
 import { BuyerAuthRequiredError } from '../lib/buyer-api-client';
+import { useModalFocus } from '@automotive-os/ui';
 
 export interface VipEnquiryModalProps {
   vehicle: PublicListingDetail;
@@ -73,14 +74,8 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+  // Initial focus, Tab containment, Escape, scroll lock and focus return to the opener.
+  const dialogRef = useModalFocus<HTMLDivElement>(isOpen, { onClose });
 
   if (!isOpen) return null;
 
@@ -157,9 +152,11 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-vip-title"
+      tabIndex={-1}
       dir={isArabic ? 'rtl' : 'ltr'}
       className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-xl flex items-center justify-center p-3 sm:p-4 md:p-6"
     >

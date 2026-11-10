@@ -10,6 +10,7 @@ import {
   EmptyState,
   Button,
   Badge,
+  useModalFocus,
 } from '@automotive-os/ui';
 import {
   fetchPublicListings,
@@ -137,18 +138,19 @@ export default function SearchResultsPage() {
     return () => { active = false; };
   }, [urlReady, selectedEmirate, selectedMake, selectedCondition, gccOnly, maxPriceAed, sortBy, debouncedQuery, page]);
 
+  // Filter sheet: initial focus, Tab containment, Escape, scroll lock and focus return.
+  const filterSheetRef = useModalFocus<HTMLDivElement>(mobileFiltersOpen, {
+    onClose: () => setMobileFiltersOpen(false),
+  });
   useEffect(() => {
     if (!mobileFiltersOpen) return;
-    const oldOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMobileFiltersOpen(false);
+    // The sheet only exists below the lg breakpoint; close it if the viewport grows past that.
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => {
+      if (desktop.matches) setMobileFiltersOpen(false);
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.body.style.overflow = oldOverflow;
-      window.removeEventListener('keydown', onKeyDown);
-    };
+    desktop.addEventListener('change', onChange);
+    return () => desktop.removeEventListener('change', onChange);
   }, [mobileFiltersOpen]);
 
   // Real favorites for signed-in buyers; signed-out visitors start empty.
@@ -618,7 +620,7 @@ export default function SearchResultsPage() {
 
         {/* Mobile Filter Overlay Drawer (Screen 28fac34d59ea40ed8e273e74e7dbe2a0) */}
         {mobileFiltersOpen && (
-          <div role="dialog" aria-modal="true" aria-label={isArabic ? 'تصفية السيارات' : 'Filters & Sort'} className="fixed inset-0 z-50 flex lg:hidden bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div ref={filterSheetRef} role="dialog" aria-modal="true" tabIndex={-1} aria-label={isArabic ? 'تصفية السيارات' : 'Filters & Sort'} className="fixed inset-0 z-50 flex lg:hidden bg-black/80 backdrop-blur-sm animate-fade-in">
             <div className="w-full max-w-sm h-full bg-surface-container p-6 overflow-y-auto flex flex-col justify-between shadow-2xl ml-auto border-l border-outline-variant/40">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between pb-4 border-b border-outline-variant/30">

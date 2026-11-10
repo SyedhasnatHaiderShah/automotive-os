@@ -145,7 +145,8 @@ test.describe('Admin data console', () => {
 
   test('Arabic layout mirrors the console', async ({ page }) => {
     await signInAsAdmin(page);
-    await page.goto('/admin/data', { waitUntil: 'domcontentloaded' });
+    // Wait for hydration: the language toggle is a client button.
+    await page.goto('/admin/data', { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: 'التحويل إلى اللغة العربية' }).click();
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
     await expect(page.getByRole('heading', { name: /وحدة البيانات/ })).toBeVisible();

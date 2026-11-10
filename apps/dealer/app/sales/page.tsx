@@ -10,6 +10,7 @@ import {
   SalesOrderStudioData,
   QuoteLineItem,
 } from '../../lib/api';
+import { ModalOverlay } from '@automotive-os/ui';
 
 export default function SalesOrdersStudioPage() {
   const [locale, setLocale] = useState<'en' | 'ar'>('en');
@@ -1144,7 +1145,7 @@ export default function SalesOrdersStudioPage() {
 
       {/* Create New Quotation Modal */}
       {newOrderModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <ModalOverlay onClose={() => setNewOrderModalOpen(false)} className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl bg-surface-container p-space-lg shadow-2xl border border-white/[0.08] flex flex-col gap-space-md">
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
               <div className="flex items-center gap-space-xs">
@@ -1217,12 +1218,12 @@ export default function SalesOrdersStudioPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Export FTA Tax Schema Modal */}
       {exportTaxModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <ModalOverlay onClose={() => setExportTaxModalOpen(false)} className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl bg-surface-container p-space-lg shadow-2xl border border-white/[0.08] flex flex-col gap-space-md">
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
               <div className="flex items-center gap-space-xs text-tertiary">
@@ -1270,12 +1271,12 @@ export default function SalesOrdersStudioPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Schedule Handover Modal */}
       {scheduleHandoverModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <ModalOverlay onClose={() => setScheduleHandoverModalOpen(false)} className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-lg rounded-xl bg-surface-container p-space-lg shadow-2xl border border-white/[0.08] flex flex-col gap-space-md">
             <div className="flex items-center justify-between pb-space-xs border-b border-surface-container-high">
               <div className="flex items-center gap-space-xs text-primary">
@@ -1323,7 +1324,7 @@ export default function SalesOrdersStudioPage() {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   );
