@@ -12,6 +12,7 @@ import {
   type StockStatus,
 } from '../lib/dealer-api';
 import { ListingActions } from './listing-actions';
+import { VehicleIntakeButton } from './vehicle-intake-button';
 import { dealerStrings, statusLabel, type DealerLocale } from '../lib/i18n';
 import { isPageOutOfRange, PageOutOfRange, Pager, StatCard, StatusPill, listingTone } from './dealer-ui';
 
@@ -24,10 +25,12 @@ export interface InventoryMatrixViewProps {
   /** Exact counts from the API `total` for each stock status filter. */
   totals: { all: number; available: number; reserved: number; sold: number };
   locale: DealerLocale;
+  /** Open the intake form on load (`/inventory?intake=1`). */
+  openIntake: boolean;
 }
 
 /** Server-rendered inventory table. Listing actions are the only client island. */
-export function InventoryMatrixView({ tenantId, tenantName, capabilities, vehicles, stockStatus, totals, locale }: InventoryMatrixViewProps) {
+export function InventoryMatrixView({ tenantId, tenantName, capabilities, vehicles, stockStatus, totals, locale, openIntake }: InventoryMatrixViewProps) {
   const t = dealerStrings(locale);
   const { items, page, limit, total } = vehicles;
   const outOfRange = isPageOutOfRange(page, limit, total);
@@ -60,18 +63,7 @@ export function InventoryMatrixView({ tenantId, tenantName, capabilities, vehicl
             <h1 className="font-headline-lg text-xl sm:text-2xl font-bold text-on-surface tracking-tight">{t.inventoryTitle}</h1>
           </div>
           {capabilities.canCreateVehicle && (
-            <div className="flex flex-col items-start xl:items-end gap-1">
-              <button
-                type="button"
-                disabled
-                aria-describedby="intake-unavailable"
-                className="bg-primary/40 text-on-primary px-4 py-2 rounded-xl font-body-sm text-xs font-bold flex items-center gap-1.5 cursor-not-allowed"
-              >
-                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">add_box</span>
-                <span>{t.intakeVehicle}</span>
-              </button>
-              <span id="intake-unavailable" className="text-[11px] text-on-surface-variant">{t.intakeUnavailable}</span>
-            </div>
+            <VehicleIntakeButton tenantId={tenantId} canSetCost={capabilities.canSeeCost} locale={locale} openOnLoad={openIntake} />
           )}
         </div>
 
@@ -102,7 +94,8 @@ export function InventoryMatrixView({ tenantId, tenantName, capabilities, vehicl
       </nav>
 
       <div className="bg-surface-container-low rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-white/[0.07]">
-        <div className="overflow-x-auto w-full">
+        {/* `relative` keeps the row's sr-only labels inside the scroll area; otherwise they widen the page. */}
+        <div className="relative overflow-x-auto w-full">
           <table className="w-full text-start border-collapse">
             <caption className="sr-only">{t.vehiclesCaption}</caption>
             <thead>

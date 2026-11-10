@@ -102,7 +102,8 @@ function UnifiedAuthPageContent() {
               : 'Your email address is not verified yet. Open your verification link or request a new one before signing in.'
           );
         }
-        throw new Error(apiMessage);
+        // Account errors carry a machine code prefix (ACCOUNT_LOCKED: ...); show only the sentence.
+        throw new Error(apiMessage.replace(/^[A-Z_]+:s*/, ''));
       }
 
       // The API sets the httpOnly `ao_session` cookie; the JWT is never persisted in

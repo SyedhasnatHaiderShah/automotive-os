@@ -236,6 +236,8 @@ export class AuthService {
     meta?: { userAgent?: string; ipAddress?: string }
   ): Promise<LoginResponseDto> {
     const normalizedEmail = dto.email.trim().toLowerCase();
+    const invalidCredentials = 'Invalid email or password';
+    const accountLocked = 'ACCOUNT_LOCKED: This account is temporarily locked. Please try again later.';
 
     return runWithDbContext({ isAdmin: true }, async () => {
       const user = await this.prisma.user.findFirst({
@@ -257,15 +259,13 @@ export class AuthService {
           dto.password,
           'scrypt$16384$8$1$0123456789abcdef0123456789abcdef$0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
         );
-        throw new UnauthorizedException('Invalid email or password, or the account is temporarily locked');
+        throw new UnauthorizedException(invalidCredentials);
       }
 
-      // SEC-05: never reveal account state before the password is proven.
-      // A locked account answers with the same generic 401 as a bad password.
-      const genericFailure = 'Invalid email or password, or the account is temporarily locked';
+      // A lock is reported before the password is tested. Answering by password
+      // here would let guesses continue during the lockout (SEC-05).
       if (user.lockedUntil && user.lockedUntil > new Date()) {
-        await verifyPassword(dto.password, user.passwordHash);
-        throw new UnauthorizedException(genericFailure);
+        throw new ForbiddenException(accountLocked);
       }
 
       const isPasswordValid = await verifyPassword(dto.password, user.passwordHash);
@@ -300,10 +300,13 @@ export class AuthService {
           },
         });
 
-        throw new UnauthorizedException(genericFailure);
+        if (lockedUntil) {
+          throw new ForbiddenException(accountLocked);
+        }
+        throw new UnauthorizedException(invalidCredentials);
       }
 
-      // Account state is disclosed only after a correct password.
+      // Suspended, disabled and unverified state is disclosed only after a correct password.
       if (user.status === 'DISABLED') {
         throw new ForbiddenException(
           'ACCOUNT_DISABLED: This account has been disabled. Please contact platform administration.'

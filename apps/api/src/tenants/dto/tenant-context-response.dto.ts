@@ -17,6 +17,20 @@ export class BranchSummaryDto {
   address!: string | null;
 }
 
+export class TenantVerificationSummaryDto {
+  @ApiProperty({ description: 'Dealer verification status', example: 'APPROVED' })
+  status!: string;
+
+  @ApiProperty({ description: 'Trade licence reference', nullable: true })
+  tradeLicenseRef!: string | null;
+
+  @ApiProperty({ description: 'Trade licence expiry date in UTC', nullable: true })
+  licenseExpiry!: string | null;
+
+  @ApiProperty({ description: 'Licensing jurisdiction', nullable: true })
+  jurisdiction!: string | null;
+}
+
 export class TenantContextResponseDto {
   @ApiProperty({ description: 'Verified Tenant ID' })
   tenantId!: string;
@@ -32,6 +46,15 @@ export class TenantContextResponseDto {
 
   @ApiProperty({ description: 'Dealership status' })
   status!: string;
+
+  @ApiProperty({ description: 'Dealership country code', example: 'AE' })
+  country!: string;
+
+  @ApiProperty({ description: 'Dealership currency code', example: 'AED' })
+  currency!: string;
+
+  @ApiProperty({ description: 'Dealer verification', type: TenantVerificationSummaryDto, nullable: true })
+  verification!: TenantVerificationSummaryDto | null;
 
   @ApiProperty({ description: 'Caller assigned role within this dealership' })
   callerRole!: string;

@@ -6,7 +6,10 @@
 import { serverApiBaseUrl } from './session';
 import {
   DealerApiError,
+  type AppointmentStatus,
+  type DealerAppointment,
   type DealerLeadSummary,
+  type DealerTenantContext,
   type DealerVehicle,
   type LeadStatus,
   type Paged,
@@ -64,6 +67,29 @@ export async function fetchLeadsPage(
     'Dealer leads',
   );
   return toPaged<DealerLeadSummary>(data, options.page, options.limit);
+}
+
+export async function fetchAppointmentsPage(
+  tenantId: string,
+  token: string,
+  options: { page: number; limit: number; status?: AppointmentStatus },
+): Promise<Paged<DealerAppointment>> {
+  const query = new URLSearchParams({ page: String(options.page), limit: String(options.limit) });
+  if (options.status) query.set('status', options.status);
+  const data = await serverGet<{ items?: unknown; total?: unknown }>(
+    `/api/v1/tenants/${encodeURIComponent(tenantId)}/appointments?${query.toString()}`,
+    token,
+    'Dealer appointments',
+  );
+  return toPaged<DealerAppointment>(data, options.page, options.limit);
+}
+
+export async function fetchTenantContext(tenantId: string, token: string): Promise<DealerTenantContext> {
+  return serverGet<DealerTenantContext>(
+    `/api/v1/tenants/${encodeURIComponent(tenantId)}/context`,
+    token,
+    'Dealership settings',
+  );
 }
 
 /** Exact count of vehicles in a stock status (uses the API `total`). */

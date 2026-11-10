@@ -185,6 +185,7 @@ export class TenantsService {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: tenantContext.tenantId },
       include: {
+        verification: true,
         branches: {
           where: { isActive: true },
         },
@@ -201,6 +202,16 @@ export class TenantsService {
       legalName: tenant.legalName,
       displayName: tenant.displayName,
       status: tenant.status,
+      country: tenant.country,
+      currency: tenant.currency,
+      verification: tenant.verification
+        ? {
+            status: tenant.verification.status,
+            tradeLicenseRef: tenant.verification.tradeLicenseRef,
+            licenseExpiry: tenant.verification.licenseExpiry?.toISOString() ?? null,
+            jurisdiction: tenant.verification.jurisdiction,
+          }
+        : null,
       callerRole: tenantContext.userRole ? tenantContext.userRole.toString() : 'NONE',
       isPlatformAdminBypass: tenantContext.isPlatformAdminBypass,
       branches: tenant.branches.map((b) => ({

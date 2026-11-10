@@ -29,6 +29,8 @@ export interface DealerCapabilities {
   canSeeCost: boolean;
   /** GET leads and appointments. */
   canReadLeads: boolean;
+  /** GET /appointments and PATCH /appointments/:id/status */
+  canManageAppointments: boolean;
   /** PATCH /leads/:id/status */
   canChangeLeadStatus: boolean;
   /** PATCH /leads/:id/assignment */
@@ -50,6 +52,7 @@ const VEHICLE_CREATE: readonly MembershipRole[] = ['OWNER', 'ADMIN', 'INVENTORY_
 const LISTING_MANAGE: readonly MembershipRole[] = ['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'SALES_MANAGER'];
 const COST_ACCESS: readonly MembershipRole[] = ['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'FINANCE_MANAGER'];
 const LEAD_READ: readonly MembershipRole[] = ['OWNER', 'ADMIN', 'SALES_MANAGER', 'SALES_AGENT'];
+const APPOINTMENT_MANAGE: readonly MembershipRole[] = ['OWNER', 'ADMIN', 'SALES_MANAGER', 'SALES_AGENT'];
 const LEAD_STATUS: readonly MembershipRole[] = ['OWNER', 'ADMIN', 'SALES_MANAGER', 'SALES_AGENT'];
 const LEAD_ASSIGN: readonly MembershipRole[] = ['OWNER', 'ADMIN', 'SALES_MANAGER'];
 
@@ -68,6 +71,7 @@ export function capabilitiesFor(role: string | null | undefined): DealerCapabili
       canManageListings: false,
       canSeeCost: false,
       canReadLeads: false,
+      canManageAppointments: false,
       canChangeLeadStatus: false,
       canAssignLeads: false,
     };
@@ -77,10 +81,9 @@ export function capabilitiesFor(role: string | null | undefined): DealerCapabili
     canManageListings: LISTING_MANAGE.includes(role),
     canSeeCost: COST_ACCESS.includes(role),
     canReadLeads: LEAD_READ.includes(role),
+    canManageAppointments: APPOINTMENT_MANAGE.includes(role),
     canChangeLeadStatus: LEAD_STATUS.includes(role),
     canAssignLeads: LEAD_ASSIGN.includes(role),
   };
 }
 
-/** Shown wherever vehicle intake would start: the create API needs catalogue IDs the UI cannot obtain yet. */
-export const INTAKE_UNAVAILABLE_MESSAGE = 'Vehicle intake needs the catalogue API — not available yet';

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Patch,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UuidParamPipe } from '../common/pipes/uuid-param.pipe';
@@ -24,7 +25,8 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequireRoles } from '../common/decorators/require-roles.decorator';
 import { MembershipRole } from '@automotive-os/database';
 import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';
-import { AppointmentResponseDto } from '../me/dto/create-appointment.dto';
+import { AppointmentResponseDto, DealerAppointmentDto } from '../me/dto/create-appointment.dto';
+import { ListAppointmentsQueryDto } from './dto/list-appointments-query.dto';
 
 @ApiTags('appointments')
 @ApiBearerAuth()
@@ -41,11 +43,12 @@ export class AppointmentsController {
     MembershipRole.SALES_AGENT,
   )
   @ApiOperation({ summary: 'List test-drive and showroom appointments for dealership' })
-  @ApiResponse({ status: 200, type: [AppointmentResponseDto] })
+  @ApiResponse({ status: 200, description: 'Paginated appointments with consent-scoped buyer name' })
   async listAppointments(
-    @CurrentTenant() tenant: TenantContext
-  ): Promise<AppointmentResponseDto[]> {
-    return this.appointmentsService.listTenantAppointments(tenant.tenantId);
+    @CurrentTenant() tenant: TenantContext,
+    @Query() query: ListAppointmentsQueryDto
+  ): Promise<{ items: DealerAppointmentDto[]; total: number }> {
+    return this.appointmentsService.listTenantAppointments(tenant.tenantId, query);
   }
 
   @Patch(':id/status')

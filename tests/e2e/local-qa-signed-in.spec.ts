@@ -101,6 +101,8 @@ test.describe('Local QA — signed-in journeys', () => {
     await expect(page.locator('main').last().getByText('Status', { exact: true }).first()).toBeVisible({ timeout: 20000 });
     await page.screenshot({ path: 'test-results/e2e/local-qa/dealer-owner-leads.png', fullPage: true });
 
+    await page.locator('.dealer-app-header button[aria-expanded]').last().click();
+    await expect(page.getByRole('link', { name: /Dealership Settings|إعدادات الوكالة/ }).last()).toBeVisible();
     await expect(page.getByRole('button', { name: /Sign out|تسجيل الخروج/ }).first()).toBeVisible();
   });
 

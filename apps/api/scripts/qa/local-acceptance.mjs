@@ -225,7 +225,7 @@ await runSection('Auth', async () => {
   // The seeded lock is relative to seed time; re-arm it so the check is deterministic.
   await q(`update users set locked_until = now() + interval '1 day' where email = $1`, ['locked.buyer@buyers.example']);
   const locked = await loginRaw('locked.buyer@buyers.example');
-  record('locked account -> 401 generic', 401, locked.status, errCode(locked));
+  record('locked account -> 403 ACCOUNT_LOCKED', 403, locked.status, errCode(locked));
   const susp = await loginRaw('suspended.buyer@buyers.example');
   record('suspended buyer -> 403 ACCOUNT_SUSPENDED', 403, susp.status, errCode(susp));
   const dis = await loginRaw('disabled.viewer@gulf-crescent-cars.example');

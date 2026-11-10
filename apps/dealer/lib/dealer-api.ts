@@ -36,6 +36,18 @@ export const LEAD_STATUSES = [
 ] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 
+export const APPOINTMENT_STATUSES = ['REQUESTED', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'] as const;
+export type AppointmentStatus = (typeof APPOINTMENT_STATUSES)[number];
+
+/** Mirror of apps/api/src/leads/appointment-transitions.ts; the API rejects anything else with 409. */
+export const APPOINTMENT_TRANSITIONS: Readonly<Record<AppointmentStatus, readonly AppointmentStatus[]>> = {
+  REQUESTED: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['COMPLETED', 'NO_SHOW', 'CANCELLED'],
+  CANCELLED: [],
+  COMPLETED: [],
+  NO_SHOW: [],
+};
+
 /** Mirror of apps/api/src/leads/lead-transitions.ts; the API rejects anything else with 409. */
 export const LEAD_TRANSITIONS: Readonly<Record<LeadStatus, readonly LeadStatus[]>> = {
   NEW: ['CONTACTED', 'QUALIFIED', 'LOST', 'SPAM'],
@@ -109,6 +121,40 @@ export interface DealerLeadSummary {
   updatedAt: string;
 }
 
+export interface DealerAppointment {
+  id: string;
+  leadId: string;
+  startsAt: string;
+  endsAt: string;
+  status: string;
+  note: string | null;
+  listingTitle: string;
+  /** Masked unless the buyer granted the name field. */
+  buyerDisplayName: string;
+}
+
+export interface DealerCatalogOption {
+  id: string;
+  name: string;
+}
+
+export interface DealerTenantContext {
+  tenantId: string;
+  slug: string;
+  legalName: string;
+  displayName: string;
+  status: string;
+  country?: string;
+  currency?: string;
+  verification?: {
+    status: string;
+    tradeLicenseRef: string | null;
+    licenseExpiry: string | null;
+    jurisdiction: string | null;
+  } | null;
+  branches: Array<{ id: string; name: string; emirate: string; city: string; address: string | null }>;
+}
+
 export interface Paged<T> {
   items: T[];
   total: number;
@@ -142,7 +188,7 @@ export function parsePaging(
 /** Browser-side call to the same-origin API with the session cookie. */
 export async function dealerClientRequest<T>(
   path: string,
-  init: { method: 'POST' | 'PATCH'; body?: unknown },
+  init: { method: 'GET' | 'POST' | 'PATCH'; body?: unknown },
 ): Promise<T> {
   let response: Response;
   try {
@@ -171,7 +217,7 @@ export async function dealerClientRequest<T>(
         : response.status === 403
           ? 'Your role is not allowed to do this.'
           : detail || 'The API rejected the request.';
-    throw new DealerApiError(response.status, `HTTP ${response.status}: ${reason} Nothing was changed.`);
+    throw new DealerApiError(response.status, `${reason.endsWith('.') ? reason : `${reason}.`} Nothing was changed.`);
   }
   return (await response.json()) as T;
 }
@@ -200,6 +246,13 @@ export function formatDubaiDateTime(iso: string): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+/** Calendar dates (such as a licence expiry) are stored without a time; show them as stored. */
+export function formatUtcDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleDateString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 export function humanizeEnum(value: string | null | undefined): string {

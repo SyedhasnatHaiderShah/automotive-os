@@ -41,7 +41,6 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
   }, [pathname]);
   const isArabic = locale === 'ar';
   const t = dealerStrings(locale);
-  const notYet = isArabic ? 'غير متاح بعد' : 'Not available yet';
   const caps = identity ? capabilitiesFor(identity.role) : null;
 
   const navItems: NavItem[] = [
@@ -49,9 +48,9 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
     { label: isArabic ? 'إدارة المخزون' : 'Inventory', href: '/inventory', icon: 'garage' },
     {
       label: isArabic ? 'إدخال مركبة' : 'Add Vehicle',
-      href: '/inventory',
+      href: '/inventory?intake=1',
       icon: 'add_circle',
-      disabledReason: t.intakeUnavailable,
+      disabledReason: caps && !caps.canCreateVehicle ? (isArabic ? 'دورك لا يسمح بإضافة المركبات' : 'Your role cannot add vehicles') : undefined,
     },
     {
       label: isArabic ? 'العملاء المحتملون' : 'Leads',
@@ -59,8 +58,13 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
       icon: 'filter_alt',
       disabledReason: caps && !caps.canReadLeads ? (isArabic ? 'دورك لا يسمح بعرض العملاء المحتملين' : 'Your role cannot view leads') : undefined,
     },
-    { label: isArabic ? 'تجارب القيادة' : 'Test Drives', href: '/appointments', icon: 'speed', disabledReason: notYet },
-    { label: isArabic ? 'إعدادات الوكالة' : 'Dealership Settings', href: '/settings', icon: 'tune', disabledReason: notYet },
+    {
+      label: isArabic ? 'تجارب القيادة' : 'Test Drives',
+      href: '/appointments',
+      icon: 'speed',
+      disabledReason: caps && !caps.canManageAppointments ? (isArabic ? 'دورك لا يسمح بعرض تجارب القيادة' : 'Your role cannot view test drives') : undefined,
+    },
+    { label: t.navSettings, href: '/settings', icon: 'tune' },
   ];
 
   const previewItems: NavItem[] = [
@@ -131,11 +135,7 @@ export const DealerSidebar: React.FC<DealerSidebarProps> = ({ identity, locale =
         <nav aria-label={isArabic ? 'الوحدات الأساسية' : 'Core modules'} className="flex flex-col gap-1 px-2.5">
           {navItems.map((item) =>
             item.disabledReason
-              ? renderDisabled(
-                  item,
-                  item.disabledReason === notYet ? (isArabic ? 'قريباً' : 'Soon') : isArabic ? 'غير متاح' : 'Unavailable',
-                  item.disabledReason,
-                )
+              ? renderDisabled(item, isArabic ? 'غير متاح' : 'Unavailable', item.disabledReason)
               : renderLink(item),
           )}
         </nav>

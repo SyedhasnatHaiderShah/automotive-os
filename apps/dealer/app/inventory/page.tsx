@@ -53,6 +53,7 @@ export default async function DealerInventoryPage({ searchParams }: { searchPara
           stockStatus={stockStatus}
           totals={{ all: allTotal, available: availableTotal, reserved: reservedTotal, sold: soldTotal }}
           locale={locale}
+          openIntake={params.intake === '1'}
         />
       </DealerShell>
     );

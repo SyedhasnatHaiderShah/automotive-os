@@ -456,8 +456,8 @@ describe('Buyer Profile, Favorites, CRM Leads & Data Grants (E2E Integration Tes
         .set('Authorization', `Bearer ${dealerAToken}`)
         .expect(200);
 
-      expect(res.body).toBeInstanceOf(Array);
-      const appt = res.body.find((a: any) => a.id === createdAppointmentId);
+      expect(res.body.items).toBeInstanceOf(Array);
+      const appt = res.body.items.find((a: any) => a.id === createdAppointmentId);
       expect(appt).toBeDefined();
       expect(appt.status).toBe(AppointmentStatus.REQUESTED);
     });

@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -35,6 +36,7 @@ export class CreateVehicleDto {
 
   @ApiProperty({ description: '17-character VIN (chassis number)', example: '1GNEK1337PREST01', required: false })
   @IsString()
+  @MaxLength(17)
   @IsOptional()
   vin?: string;
 

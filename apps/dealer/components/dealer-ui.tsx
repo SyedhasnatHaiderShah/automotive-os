@@ -178,6 +178,22 @@ export function listingTone(status: string | null): 'good' | 'warn' | 'info' | '
   }
 }
 
+export function appointmentTone(status: string): 'good' | 'warn' | 'info' | 'neutral' | 'bad' {
+  switch (status) {
+    case 'REQUESTED':
+      return 'warn';
+    case 'CONFIRMED':
+      return 'info';
+    case 'COMPLETED':
+      return 'good';
+    case 'CANCELLED':
+    case 'NO_SHOW':
+      return 'bad';
+    default:
+      return 'neutral';
+  }
+}
+
 export function leadTone(status: string): 'good' | 'warn' | 'info' | 'neutral' | 'bad' {
   switch (status) {
     case 'NEW':

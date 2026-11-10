@@ -429,7 +429,7 @@ async function main() {
   }
   // Buyer edge cases
   users.push({ id: uuid('user', 'buyer-unverified'), email: 'unverified.buyer@buyers.example', displayName: 'Layla Farouk', status: UserStatus.PENDING_VERIFICATION, emailVerified: false, buyer: { preferredLanguage: 'en' }, note: 'Email not verified -> login 403 EMAIL_NOT_VERIFIED' });
-  users.push({ id: uuid('user', 'buyer-locked'), email: 'locked.buyer@buyers.example', displayName: 'Nasser Rahman', lockedUntil: new Date(Date.now() + 86_400_000), failedLoginAttempts: 0, buyer: { preferredLanguage: 'ar' }, note: 'Locked until tomorrow -> login 401 generic' });
+  users.push({ id: uuid('user', 'buyer-locked'), email: 'locked.buyer@buyers.example', displayName: 'Nasser Rahman', lockedUntil: new Date(Date.now() + 86_400_000), failedLoginAttempts: 0, buyer: { preferredLanguage: 'ar' }, note: 'Locked until tomorrow -> login 403 ACCOUNT_LOCKED' });
   users.push({ id: uuid('user', 'buyer-suspended'), email: 'suspended.buyer@buyers.example', displayName: 'Huda Mahmoud', status: UserStatus.SUSPENDED, buyer: { preferredLanguage: 'en' }, note: 'Suspended buyer -> login 403 ACCOUNT_SUSPENDED; /access-suspended' });
   users.push({ id: uuid('user', 'buyer-no-profile'), email: 'no.profile@buyers.example', displayName: 'Daniel Hughes', note: 'Buyer without BuyerProfile row (profile page must create/handle)' });
 

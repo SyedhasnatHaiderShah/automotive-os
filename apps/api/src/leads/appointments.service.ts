@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
+import { AppointmentStatus } from '@automotive-os/database';
+import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';
-import { AppointmentResponseDto } from '../me/dto/create-appointment.dto';
+import { AppointmentResponseDto, DealerAppointmentDto } from '../me/dto/create-appointment.dto';
+import { assertAppointmentTransition } from './appointment-transitions';
 
 @Injectable()
 export class AppointmentsService {
@@ -12,26 +14,62 @@ export class AppointmentsService {
   ) {}
 
   async listTenantAppointments(
-    tenantId: string
-  ): Promise<AppointmentResponseDto[]> {
-    const appointments = await this.prisma.appointment.findMany({
-      // SEC-17: bounded result set until the dealer calendar pages by date range.
-      take: 500,
-      where: { tenantId },
-      orderBy: { startsAt: 'asc' },
+    tenantId: string,
+    filters: { status?: AppointmentStatus; page?: number; limit?: number }
+  ): Promise<{ items: DealerAppointmentDto[]; total: number }> {
+    const page = Math.max(1, filters.page || 1);
+    // SEC-17: bounded result set.
+    const limit = Math.min(50, Math.max(1, filters.limit || 20));
+    const where = { tenantId, ...(filters.status ? { status: filters.status } : {}) };
+
+    const [appointments, total] = await Promise.all([
+      this.prisma.appointment.findMany({
+        where,
+        include: { lead: { include: { listing: { select: { title: true } }, grant: true } } },
+        orderBy: { startsAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.appointment.count({ where }),
+    ]);
+
+    // Buyer rows are global, so names are read elevated and only for granted leads.
+    const grantedBuyerIds = [
+      ...new Set(
+        appointments
+          .filter((a) => a.lead.grant && !a.lead.grant.revokedAt && a.lead.grant.fieldsGranted.includes('name'))
+          .map((a) => a.buyerUserId)
+      ),
+    ];
+    const buyers = grantedBuyerIds.length
+      ? await runWithDbContext({ isAdmin: true }, () =>
+          this.prisma.user.findMany({
+            where: { id: { in: grantedBuyerIds } },
+            select: { id: true, displayName: true },
+          })
+        )
+      : [];
+    const buyerNames = new Map(buyers.map((b) => [b.id, b.displayName]));
+
+    const items = appointments.map((a) => {
+      const grant = a.lead.grant;
+      const isGranted = grant && !grant.revokedAt && grant.fieldsGranted.includes('name');
+      return {
+        id: a.id,
+        tenantId: a.tenantId,
+        leadId: a.leadId,
+        startsAt: a.startsAt.toISOString(),
+        endsAt: a.endsAt.toISOString(),
+        status: a.status,
+        note: a.note,
+        createdAt: a.createdAt.toISOString(),
+        updatedAt: a.updatedAt.toISOString(),
+        listingTitle: a.lead.listing.title,
+        buyerDisplayName: (isGranted && buyerNames.get(a.buyerUserId)) || 'Prospective Buyer',
+      };
     });
 
-    return appointments.map((a) => ({
-      id: a.id,
-      tenantId: a.tenantId,
-      leadId: a.leadId,
-      startsAt: a.startsAt.toISOString(),
-      endsAt: a.endsAt.toISOString(),
-      status: a.status,
-      note: a.note,
-      createdAt: a.createdAt.toISOString(),
-      updatedAt: a.updatedAt.toISOString(),
-    }));
+    return { items, total };
   }
 
   async updateAppointmentStatus(
@@ -56,6 +94,7 @@ export class AppointmentsService {
     }
 
     const previousStatus = existing.status;
+    assertAppointmentTransition(previousStatus, dto.status);
 
     const updated = await this.prisma.$transaction(async (tx) => {
       const result = await tx.appointment.update({
