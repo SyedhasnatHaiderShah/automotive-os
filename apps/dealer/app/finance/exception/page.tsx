@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { DealerSidebar } from '../../../components/dealer-sidebar';
 import { DealerHeader } from '../../../components/dealer-header';
@@ -61,14 +61,19 @@ export default function SubprimeDbrExceptionPage() {
   const currentNetPrincipal = isCured ? 1323000 : 1606500;
   const currentMonthlyPayment = isCured ? 24980 : 30240;
 
-  // Filter pipeline files
-  const filteredPipeline = data.pipelineFiles.filter((file) => {
-    if (pipelineFilter === 'ALL') return true;
-    if (pipelineFilter === 'APPROVED') return file.underwritingStatus.toLowerCase().includes('sanction');
-    if (pipelineFilter === 'COMMITTEE') return file.underwritingStatus.toLowerCase().includes('pending') || file.underwritingStatus.toLowerCase().includes('committee');
-    if (pipelineFilter === 'SETTLED') return file.underwritingStatus.toLowerCase().includes('disbursed') || file.underwritingStatus.toLowerCase().includes('settle');
-    return true;
-  });
+  // Optimization (⚡ Bolt): Memoize filtered pipeline files to avoid re-running array filtering
+  // and repeated string lowercasing operations on every render (e.g. during slider adjustments,
+  // modal open/close toggles, text input changes, or cure state transitions).
+  const filteredPipeline = useMemo(() => {
+    return data.pipelineFiles.filter((file) => {
+      if (pipelineFilter === 'ALL') return true;
+      const status = file.underwritingStatus.toLowerCase();
+      if (pipelineFilter === 'APPROVED') return status.includes('sanction');
+      if (pipelineFilter === 'COMMITTEE') return status.includes('pending') || status.includes('committee');
+      if (pipelineFilter === 'SETTLED') return status.includes('disbursed') || status.includes('settle');
+      return true;
+    });
+  }, [data.pipelineFiles, pipelineFilter]);
 
   return (
     <div

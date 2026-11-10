@@ -5,14 +5,18 @@ import {
   Res,
   NotFoundException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { PrismaService, runWithDbContext } from '../database/prisma.service';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'node:stream';
+import { Public } from '../common/decorators/public.decorator';
+import { AuthRateLimit, AuthRateLimitGuard } from '../common/guards/auth-rate-limit.guard';
 
 @ApiTags('media')
+@Public()
 @Controller('api/v1/public/media')
 export class PublicMediaController {
   private s3Client: S3Client | null = null;
@@ -36,6 +40,9 @@ export class PublicMediaController {
   }
 
   @Get('*')
+  // SEC-22: Rate limit public media gateway to mitigate DoS, scraping, and storage egress exhaustion
+  @UseGuards(AuthRateLimitGuard)
+  @AuthRateLimit({ limit: 120, windowMs: 60_000 })
   @ApiOperation({ summary: 'Stream verified public vehicle media through Railway API gateway' })
   @ApiResponse({ status: 200, description: 'Media stream' })
   @ApiResponse({ status: 404, description: 'Media not found or private' })
