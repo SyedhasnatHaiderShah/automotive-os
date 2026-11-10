@@ -77,16 +77,13 @@ export function DashboardCockpitView({ tenantName, capabilities, stock, leads, l
             </Link>
           )}
           {capabilities.canCreateVehicle && (
-            <button
-              type="button"
-              disabled
-              title={t.intakeUnavailable}
-              aria-label={t.addVehicleAria(t.intakeUnavailable)}
-              className="min-h-11 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-surface-container-high/50 text-on-surface-variant text-sm cursor-not-allowed"
+            <Link
+              href="/inventory?intake=1"
+              className="min-h-11 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-on-primary font-semibold text-sm transition-all shadow-sm hover:brightness-110"
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">add_box</span>
-              <span>{t.addVehicleUnavailable}</span>
-            </button>
+              <span>{t.intakeVehicle}</span>
+            </Link>
           )}
         </div>
       </div>

@@ -210,7 +210,7 @@ describe('AuthService', () => {
 
       await expect(
         service.login({ email: 'buyer@autonexa.ae', password: 'WrongPassword123!' })
-      ).rejects.toThrow(UnauthorizedException);
+      ).rejects.toThrow(/ACCOUNT_LOCKED/);
 
       expect(mockPrisma.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -219,6 +219,49 @@ describe('AuthService', () => {
           }),
         })
       );
+    });
+
+    it('should answer wrong password and unknown email with the same message', async () => {
+      const hash = await hashPassword('CorrectPassword123!');
+      mockPrisma.user.findFirst.mockResolvedValueOnce({
+        id: 'user-uuid-1',
+        email: 'buyer@autonexa.ae',
+        passwordHash: hash,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+        status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
+        memberships: [],
+      });
+      mockPrisma.user.update.mockResolvedValueOnce({ failedLoginAttempts: 1 });
+      const wrongPassword = service.login({ email: 'buyer@autonexa.ae', password: 'WrongPassword123!' });
+      await expect(wrongPassword).rejects.toThrow(new UnauthorizedException('Invalid email or password'));
+
+      mockPrisma.user.findFirst.mockResolvedValueOnce(null);
+      const unknownEmail = service.login({ email: 'nobody@autonexa.ae', password: 'WrongPassword123!' });
+      await expect(unknownEmail).rejects.toThrow(new UnauthorizedException('Invalid email or password'));
+    });
+
+    it('should report a lock whichever password is sent, without testing it', async () => {
+      const hash = await hashPassword('CorrectPassword123!');
+      mockPrisma.user.findFirst.mockResolvedValue({
+        id: 'user-uuid-1',
+        email: 'buyer@autonexa.ae',
+        passwordHash: hash,
+        failedLoginAttempts: 0,
+        lockedUntil: new Date(Date.now() + 60_000),
+        status: 'ACTIVE',
+        emailVerifiedAt: new Date(),
+        memberships: [],
+      });
+
+      for (const password of ['WrongPassword123!', 'CorrectPassword123!']) {
+        const attempt = service.login({ email: 'buyer@autonexa.ae', password });
+        await expect(attempt).rejects.toThrow(ForbiddenException);
+        await expect(attempt).rejects.toThrow(/ACCOUNT_LOCKED: .*temporarily locked/);
+      }
+      expect(mockPrisma.session.create).not.toHaveBeenCalled();
+      expect(mockPrisma.user.update).not.toHaveBeenCalled();
     });
 
     it('should not disclose account state before the password is verified', async () => {
@@ -236,7 +279,7 @@ describe('AuthService', () => {
 
       await expect(
         service.login({ email: 'disabled@autonexa.ae', password: 'WrongPassword123!' })
-      ).rejects.toThrow(UnauthorizedException);
+      ).rejects.toThrow(new UnauthorizedException('Invalid email or password'));
     });
 
     it('should reject login for permanently disabled accounts', async () => {

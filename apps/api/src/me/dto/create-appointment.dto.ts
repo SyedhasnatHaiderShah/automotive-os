@@ -86,3 +86,11 @@ export class RescheduleAppointmentDto {
   @IsNotEmpty()
   endsAt!: string;
 }
+
+export class DealerAppointmentDto extends AppointmentResponseDto {
+  @ApiProperty({ description: 'Title of the listing the appointment is for' })
+  listingTitle!: string;
+
+  @ApiProperty({ description: 'Buyer name when the name grant is active, otherwise a generic label' })
+  buyerDisplayName!: string;
+}

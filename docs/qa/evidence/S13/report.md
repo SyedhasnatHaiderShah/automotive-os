@@ -40,3 +40,18 @@ S13 implements the Vehicle Inventory Management Grid in `apps/dealer/app/invento
 - Tablet 1024px: `docs/qa/evidence/S13/s13-tablet-1024.png`
 - Mobile 390px: `docs/qa/evidence/S13/s13-mobile-390.png`
 - Arabic RTL: `docs/qa/evidence/S13/s13-arabic-rtl.png`
+
+
+## Local QA 2026-11-06: vehicle intake
+
+Run against local `automotive_os_qa` with the API as `automotive_app_user` (RLS enforced).
+
+- PASS: the intake form creates a vehicle (POST 201, status INTAKE, price stored in fils); the new row appears in the inventory table and the page shows a confirmation.
+- PASS: duplicate stock number returns 409 and shows the API reason in the form.
+- PASS: `?intake=1` is cleared after create and after Escape.
+- PASS: every dialog control is the top element at its own position in English, Arabic (RTL) and at 375px. Layering defect found and fixed in this run: page cards covered the top of the dialog.
+- PASS: VIEWER sees neither the intake button nor the dialog.
+- FIXED 2026-11-10: `/dealer/inventory` overflowed the page horizontally by 551px at 375px (171px at 768px). Cause: screen-reader-only labels in table rows were positioned against the page, not the table scroll area. After the fix overflow is 0 at 375, 768 and 1440px and in Arabic at 375px (`inventory-375-2026-11-10.png`).
+- Still unmet for this screen: no vehicle edit, repricing or stock-transition UI.
+
+Screenshots: `intake-2026-11-06-en.png`, `intake-2026-11-06-ar.png`, `intake-2026-11-06-mobile.png`, `inventory-after-intake-2026-11-06.png`.

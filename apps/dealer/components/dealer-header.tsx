@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { dealerStrings, localizedRoleLabel } from '../lib/i18n';
-import { DealerSignOutButton } from './dealer-sign-out-button';
+import { DealerProfileMenu } from './dealer-profile-menu';
 
 /** Non-secret identity fields from the server session (never the token). */
 export interface DealerIdentity {
@@ -74,27 +74,19 @@ export const DealerHeader: React.FC<DealerHeaderProps> = ({
           <span className={isArabic ? 'font-bold text-primary' : 'text-on-surface-variant'}>عربي</span>
         </button>
 
-        {identity && (
-          <DealerSignOutButton
-            label={t.signOut}
-            pendingLabel={t.signingOut}
-            className="min-h-9 rounded-md border border-white/[0.07] bg-surface-container-high px-2.5 py-1 font-body-sm text-xs text-on-surface transition-colors hover:bg-surface-container-highest disabled:opacity-60"
-          />
+        {identity ? (
+          <DealerProfileMenu tenantName={identity.tenantName} displayName={identity.displayName} role={identity.role} locale={locale} />
+        ) : (
+          <div className="flex items-center gap-2.5 ps-1">
+            <div className="text-end hidden sm:block">
+              <div className="font-body-sm text-xs font-semibold text-on-surface leading-tight">{isArabic ? 'معاينة' : 'Preview'}</div>
+              <div className="font-label-caps text-[10px] text-on-surface-variant uppercase font-medium">{isArabic ? 'بيانات تجريبية فقط' : 'Sample data only'}</div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary text-xs shadow-md" aria-hidden="true">
+              <span className="material-symbols-outlined text-on-primary text-[18px]">person</span>
+            </div>
+          </div>
         )}
-
-        <div className="flex items-center gap-2.5 ps-1">
-          <div className="text-end hidden sm:block">
-            <div className="font-body-sm text-xs font-semibold text-on-surface leading-tight">
-              {identity ? identity.displayName : isArabic ? 'معاينة' : 'Preview'}
-            </div>
-            <div className="font-label-caps text-[10px] text-on-surface-variant uppercase font-medium">
-              {identity ? localizedRoleLabel(t, identity.role) : isArabic ? 'بيانات تجريبية فقط' : 'Sample data only'}
-            </div>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-on-primary text-xs shadow-md" aria-hidden="true">
-            <span className="material-symbols-outlined text-on-primary text-[18px]">person</span>
-          </div>
-        </div>
       </div>
     </header>
   );
