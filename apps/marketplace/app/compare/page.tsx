@@ -504,8 +504,19 @@ export default function VehicleComparisonPage() {
 
       {/* Add Vehicle Selector Modal */}
       {addModalOpen && (
-        <div ref={pickerRef} role="dialog" aria-modal="true" tabIndex={-1} aria-label={isArabic ? 'اختر مركبة للمقارنة' : 'Select Vehicle to Compare'} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-xl max-h-[80vh] bg-surface-container p-6 rounded-2xl border border-outline-variant/40 shadow-2xl flex flex-col gap-4 overflow-hidden">
+        <div
+          ref={pickerRef}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+          aria-label={isArabic ? 'اختر مركبة للمقارنة' : 'Select Vehicle to Compare'}
+          onClick={() => setAddModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-xl max-h-[80vh] bg-surface-container p-6 rounded-2xl border border-outline-variant/40 shadow-2xl flex flex-col gap-4 overflow-hidden"
+          >
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/30">
               <h3 className="font-headline-sm text-lg font-bold text-on-surface">
                 {isArabic ? 'اختر مركبة للمقارنة' : 'Select Vehicle to Compare'}
@@ -513,7 +524,7 @@ export default function VehicleComparisonPage() {
               <button
                 type="button"
                 onClick={() => setAddModalOpen(false)}
-                className="text-outline hover:text-on-surface p-1 text-sm"
+                className="text-outline hover:text-on-surface p-1 text-sm rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-label={isArabic ? 'إغلاق' : 'Close vehicle picker'}
               >
                 <span aria-hidden="true">✕</span>
@@ -537,11 +548,17 @@ export default function VehicleComparisonPage() {
               </p>
             )}
             <div className="overflow-y-auto flex flex-col gap-2.5 pr-1">
-              {selectableListings.length === 0 && (
+              {selectableListings.length === 0 ? (
                 <p className="text-sm text-outline text-center py-6">
                   {isArabic ? 'لا توجد سيارات متاحة للإضافة.' : 'No more published vehicles to add.'}
                 </p>
-              )}
+              ) : selectableListings.filter((item) =>
+                  !pickerQuery.trim() || item.title.toLowerCase().includes(pickerQuery.trim().toLowerCase())
+                ).length === 0 ? (
+                <p className="text-sm text-outline text-center py-6">
+                  {isArabic ? 'لا توجد سيارات مطابقة لبحثك.' : 'No vehicles match your search.'}
+                </p>
+              ) : null}
               {selectableListings
                 .filter((item) => !pickerQuery.trim() || item.title.toLowerCase().includes(pickerQuery.trim().toLowerCase()))
                 .map((item) => (
