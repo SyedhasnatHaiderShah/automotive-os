@@ -1,0 +1,3 @@
+admin /admin/data/User | tapTargets | 2x (mobile/en mobile/ar) | a.text-primary.hover:underline "f8464c93…" 59x14 | a.text-primary.hover:underline "7540df79…" 59x14 | a.text-primary.hover:underline "6f8e4c44…" 59x14 | a.text-primary.hover:underline "44f63bad…" 59x14
+admin /admin/data/User/new | tapTargets | 2x (mobile/en mobile/ar) | input#f-isPlatformAdmin.h-4.w-4.accent-[#d4af37] "" 16x16 | input#f-mfaEnabled.h-4.w-4.accent-[#d4af37] "" 16x16
+admin /admin/data/User/f8464c93-088b-4b94-8714-77164538b221 | tapTargets | 2x (mobile/en mobile/ar) | input#f-isPlatformAdmin.h-4.w-4.accent-[#d4af37] "" 16x16 | input#f-mfaEnabled.h-4.w-4.accent-[#d4af37] "" 16x16

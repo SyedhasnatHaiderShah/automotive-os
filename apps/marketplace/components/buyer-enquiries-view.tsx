@@ -221,7 +221,7 @@ function EnquiriesBody({ initialEnquiries }: { initialEnquiries: BuyerEnquiryIte
               ))}
             </ul>
           )}
-          <Link href="/account/garage" className="inline-block mt-4 text-xs text-[#f2ca50] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f2ca50] rounded">
+          <Link href="/account/garage" className="inline-flex min-h-6 items-center mt-4 text-xs text-[#f2ca50] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f2ca50] rounded">
             {isArabic ? 'إدارة المواعيد' : 'Manage appointments'}
           </Link>
         </AccountCard>

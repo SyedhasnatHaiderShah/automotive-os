@@ -180,7 +180,7 @@ export default function DataModelListPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-surface-container-low overflow-x-auto">
+      <div className="relative rounded-xl border border-white/10 bg-surface-container-low overflow-x-auto">
         <table className="w-full text-sm min-w-[720px]">
           <thead className="bg-surface-container-lowest text-[11px] uppercase tracking-wider text-outline">
             <tr>
@@ -190,7 +190,7 @@ export default function DataModelListPage() {
                     type="button"
                     onClick={() => toggleSort(c.name)}
                     aria-sort={sort === c.name ? (dir === 'asc' ? 'ascending' : 'descending') : 'none'}
-                    className="hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                    className="inline-flex min-h-6 items-center min-w-6 hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
                   >
                     {c.name}
                     {sort === c.name ? (dir === 'asc' ? ' ↑' : ' ↓') : ''}
@@ -223,7 +223,7 @@ export default function DataModelListPage() {
                     {columns.map((c) => (
                       <td key={c.name} className={`py-2 px-3 ${c.name === schema!.idField ? 'font-mono text-[11px]' : 'text-xs'} max-w-[260px] truncate`}>
                         {c.name === schema!.idField ? (
-                          <Link href={`/data/${model}/${id}`} className="text-primary hover:underline">
+                          <Link href={`/data/${model}/${id}`} className="inline-flex min-h-6 items-center text-primary hover:underline">
                             {id.slice(0, 8)}…
                           </Link>
                         ) : (
@@ -235,7 +235,7 @@ export default function DataModelListPage() {
                       <button
                         type="button"
                         onClick={() => router.push(`/data/${model}/${id}`)}
-                        className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs me-2"
+                        className="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-white text-xs me-2"
                       >
                         {t('Edit', 'تعديل')}
                       </button>
@@ -246,7 +246,7 @@ export default function DataModelListPage() {
                           setPendingDelete(row);
                         }}
                         aria-label={t(`Delete ${model} ${id.slice(0, 8)}`, `حذف ${model} ${id.slice(0, 8)}`)}
-                        className="px-2.5 py-1 rounded bg-red-900/40 hover:bg-red-900/70 text-red-200 text-xs inline-flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded bg-red-900/40 hover:bg-red-900/70 text-red-200 text-xs inline-flex items-center gap-1"
                       >
                         <Trash2 className="w-3 h-3" aria-hidden="true" />
                         <span>{t('Delete', 'حذف')}</span>
@@ -267,7 +267,7 @@ export default function DataModelListPage() {
               type="button"
               disabled={loading || page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <PrevIcon className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{t('Prev', 'السابق')}</span>
@@ -276,7 +276,7 @@ export default function DataModelListPage() {
               type="button"
               disabled={loading || page >= totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2.5 py-1.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-white flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <span>{t('Next', 'التالي')}</span>
               <NextIcon className="w-3.5 h-3.5" aria-hidden="true" />

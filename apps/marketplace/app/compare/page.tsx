@@ -8,6 +8,7 @@ import {
   Button,
   Badge,
   useModalFocus,
+  MediaImage,
 } from '@automotive-os/ui';
 import {
   fetchPublicListings,
@@ -269,11 +270,11 @@ export default function VehicleComparisonPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-outline-variant/30">
           <div>
             <div className="flex items-center gap-2 text-xs font-data-mono-num text-outline mb-2">
-              <a href="/" className="hover:text-primary transition-colors">
+              <a href="/" className="inline-flex min-h-6 items-center hover:text-primary transition-colors">
                 {isArabic ? 'الرئيسية' : 'Home'}
               </a>
               <span>/</span>
-              <a href="/cars" className="hover:text-primary transition-colors">
+              <a href="/cars" className="inline-flex min-h-6 items-center hover:text-primary transition-colors">
                 {isArabic ? 'السيارات' : 'Inventory'}
               </a>
               <span>/</span>
@@ -366,8 +367,7 @@ export default function VehicleComparisonPage() {
                         {/* Vehicle Photo */}
                         <div className="w-full aspect-[16/10] rounded-lg overflow-hidden bg-surface-container-lowest border border-outline-variant/30">
                           {vehicle.media?.[0]?.url && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={vehicle.media[0].url} alt={vehicle.title} className="w-full h-full object-cover" />
+                            <MediaImage src={vehicle.media[0].url} alt={vehicle.title} className="w-full h-full object-cover" />
                           )}
                         </div>
 
@@ -571,8 +571,7 @@ export default function VehicleComparisonPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-10 rounded-lg overflow-hidden bg-surface-container-lowest flex-shrink-0">
                         {item.media?.[0]?.url && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={item.media[0].url} alt={item.title} className="w-full h-full object-cover" />
+                          <MediaImage src={item.media[0].url} alt={item.title} className="w-full h-full object-cover" />
                         )}
                       </div>
                       <div>

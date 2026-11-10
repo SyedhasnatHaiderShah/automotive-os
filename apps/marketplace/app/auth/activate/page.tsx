@@ -234,7 +234,7 @@ function ActivateAccountContent() {
 
 export default function ActivatePage() {
   return (
-    <div className="min-h-screen bg-[#070707] flex flex-col justify-center items-center p-4">
+    <main className="min-h-screen bg-[#070707] flex flex-col justify-center items-center p-4">
       <Suspense
         fallback={
           <div className="w-full max-w-lg bg-stone-900/80 backdrop-blur-xl border border-stone-800 rounded-2xl p-8 text-center text-stone-400">
@@ -244,6 +244,6 @@ export default function ActivatePage() {
       >
         <ActivateAccountContent />
       </Suspense>
-    </div>
+    </main>
   );
 }

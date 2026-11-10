@@ -20,7 +20,9 @@ export const EnquiryView: React.FC<EnquiryViewProps> = ({ vehicle }) => {
   };
 
   return (
-    <div className="relative min-h-screen bg-background text-on-surface flex flex-col justify-center items-center overflow-x-hidden">
+    <main className="relative min-h-screen bg-background text-on-surface flex flex-col justify-center items-center overflow-x-hidden">
+      {/* This route is only the dialog, so the page heading is for assistive technology. */}
+      <h1 className="sr-only">Enquire about {vehicle.title}</h1>
       {/* Vehicle Context Canvas Behind the Scrim */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div
@@ -53,6 +55,6 @@ export const EnquiryView: React.FC<EnquiryViewProps> = ({ vehicle }) => {
           onClose={handleClose}
         />
       </div>
-    </div>
+    </main>
   );
 };

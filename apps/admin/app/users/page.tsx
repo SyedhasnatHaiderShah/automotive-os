@@ -251,7 +251,7 @@ export default function AdminUsersPage() {
               />
             </div>
 
-            <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-outline font-mono" aria-hidden="true">{t('Status:', 'الحالة:')}</span>
                 <select
@@ -375,7 +375,7 @@ export default function AdminUsersPage() {
                           ) : u.isBuyer ? (
                             <span className="text-gray-400">{t('BUYER (Retail)', 'مشترٍ (تجزئة)')}</span>
                           ) : (
-                            <span className="text-gray-600">—</span>
+                            <span className="text-gray-400">—</span>
                           )}
                         </td>
 
@@ -389,7 +389,7 @@ export default function AdminUsersPage() {
                               ))}
                             </div>
                           ) : (
-                            <span className="text-gray-600">—</span>
+                            <span className="text-gray-400">—</span>
                           )}
                         </td>
 

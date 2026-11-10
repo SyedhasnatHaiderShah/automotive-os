@@ -10,7 +10,7 @@ import {
   BuyerMe,
 } from '../lib/api';
 import { BuyerAuthRequiredError } from '../lib/buyer-api-client';
-import { useModalFocus } from '@automotive-os/ui';
+import { useModalFocus, MediaImage } from '@automotive-os/ui';
 
 export interface VipEnquiryModalProps {
   vehicle: PublicListingDetail;
@@ -167,8 +167,7 @@ export const VipEnquiryModal: React.FC<VipEnquiryModalProps> = ({
             <div className="flex items-center gap-4 min-w-0">
               <div className="relative w-16 h-12 rounded-lg overflow-hidden shrink-0 bg-surface-container-lowest border border-white/[0.07]">
                 {vehicle.media[0]?.url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={vehicle.media[0].url} alt={vehicle.title} className="w-full h-full object-cover" />
+                  <MediaImage src={vehicle.media[0].url} alt={vehicle.title} className="w-full h-full object-cover" />
                 )}
               </div>
               <div className="min-w-0">

@@ -119,7 +119,7 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
                 if (isRtl && onToggleRtl) onToggleRtl();
               }}
               aria-pressed={!isRtl}
-              className={`px-2 py-0.5 rounded transition-colors ${
+              className={`min-h-6 px-2 py-1 rounded transition-colors ${
                 !isRtl
                   ? 'bg-surface-bright text-on-surface font-semibold'
                   : 'text-outline hover:text-on-surface'
@@ -134,7 +134,7 @@ export function AdminHeader({ isRtl = false, onToggleRtl }: AdminHeaderProps) {
                 if (!isRtl && onToggleRtl) onToggleRtl();
               }}
               aria-pressed={isRtl}
-              className={`px-2 py-0.5 rounded transition-colors ${
+              className={`min-h-6 px-2 py-1 rounded transition-colors ${
                 isRtl
                   ? 'bg-surface-bright text-on-surface font-semibold'
                   : 'text-outline hover:text-on-surface'

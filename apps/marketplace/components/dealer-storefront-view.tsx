@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { MarketplaceFooter } from '@automotive-os/ui';
+import { MarketplaceFooter, MediaImage } from '@automotive-os/ui';
 import type { PublicDealerProfile, PublicListingItem } from '../lib/api';
 
 interface DealerStorefrontViewProps {
@@ -134,7 +134,7 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
           <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 relative z-10">
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-[#99907c]">
-                <Link href="/dealers" className="hover:text-white transition-colors">
+                <Link href="/dealers" className="inline-flex min-h-6 items-center hover:text-white transition-colors">
                   {isRtl ? 'المعارض' : 'Dealers'}
                 </Link>
                 {branch?.emirate && (
@@ -335,8 +335,7 @@ export function DealerStorefrontView({ dealer }: DealerStorefrontViewProps) {
                     >
                       <div className="relative aspect-[16/10] bg-[#0a0e13] overflow-hidden flex items-center justify-center">
                         {heroImg ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={heroImg} alt={car.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <MediaImage src={heroImg} alt={car.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <span className="text-xs text-[#99907c]">{isRtl ? 'لا توجد صورة' : 'No photo'}</span>
                         )}
