@@ -3,6 +3,9 @@ import { PublicMediaController } from './public-media.controller';
 import { PrismaService } from '../database/prisma.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Readable } from 'node:stream';
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from '../common/decorators/public.decorator';
+import { AUTH_RATE_LIMIT_KEY, AuthRateLimitGuard } from '../common/guards/auth-rate-limit.guard';
 
 describe('PublicMediaController (SEC-22)', () => {
   let controller: PublicMediaController;
@@ -137,5 +140,20 @@ describe('PublicMediaController (SEC-22)', () => {
       NotFoundException,
     );
     expect(mockS3Send).not.toHaveBeenCalled();
+  });
+
+  it('enforces @Public() and @AuthRateLimit metadata with AuthRateLimitGuard', () => {
+    const reflector = new Reflector();
+    const isPublic = reflector.get<boolean>(IS_PUBLIC_KEY, PublicMediaController);
+    expect(isPublic).toBe(true);
+
+    const rateLimitOptions = reflector.get(
+      AUTH_RATE_LIMIT_KEY,
+      PublicMediaController.prototype.getPublicMedia
+    );
+    expect(rateLimitOptions).toEqual({ limit: 120, windowMs: 60_000 });
+
+    const guards = Reflect.getMetadata('__guards__', PublicMediaController.prototype.getPublicMedia);
+    expect(guards).toContain(AuthRateLimitGuard);
   });
 });
