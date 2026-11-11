@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useMarketplaceLocale } from '../../lib/locale';
 import Link from 'next/link';
 import { MarketplaceHeader, MarketplaceFooter } from '@automotive-os/ui';
@@ -51,11 +51,20 @@ export default function DealersDirectoryPage() {
   const locationLabel = (dealer: PublicDealerSummary) =>
     [...dealer.cities, ...dealer.emirates.filter((e) => !dealer.cities.includes(e))].join(', ') || 'UAE';
 
-  const filteredDealers = dealers.filter((dealer) => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    return dealer.displayName.toLowerCase().includes(q) || locationLabel(dealer).toLowerCase().includes(q);
-  });
+  // Optimization (⚡ Bolt): Memoize filteredDealers to prevent re-filtering across re-renders
+  // (e.g. locale changes, header interactions, pagination state updates).
+  // Also pre-computes searchQuery.trim().toLowerCase() once outside the loop instead of
+  // re-trimming/lowercasing for every dealer on every render pass.
+  const filteredDealers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return dealers;
+    return dealers.filter((dealer) => {
+      return (
+        dealer.displayName.toLowerCase().includes(q) ||
+        locationLabel(dealer).toLowerCase().includes(q)
+      );
+    });
+  }, [dealers, searchQuery]);
 
   return (
     <div
